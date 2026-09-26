@@ -5,7 +5,7 @@ import {
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
   Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
-  SlidersHorizontal, ArrowLeft, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
+  SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Volume2, Smartphone, Mail, CircleUser,
   Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown
 } from "lucide-react";
@@ -137,11 +137,6 @@ function App() {
   }
 
   const navigate = p => {
-    setSettingsOpen(false);
-    // A normal navigation should leave any previously opened DM.
-    // This prevents Messages from reopening an old conversation when
-    // the user returns to the Messages tab from Home/Profile/Settings.
-    if (p !== "messages") setOpenConversationId(null);
     setPage(p);
     if (p !== "user-profile") setProfileUserId(null);
     setMenuOpen(false);
@@ -214,7 +209,7 @@ function App() {
         }} />}
         {page === "explore" && <ExplorePage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
-        {page === "messages" && <MessagesPage openConversationId={openConversationId} onClearConversation={() => setOpenConversationId(null)} />}
+        {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
@@ -234,21 +229,7 @@ function App() {
       {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
       {storyOpen && <StoryComposer onClose={() => setStoryOpen(false)} onDone={() => { setStoryOpen(false); setFeedRefresh(v => v + 1); }} />}
       {reelOpen && <ReelComposer onClose={() => setReelOpen(false)} onDone={() => setReelOpen(false)} />}
-      {settingsOpen && (
-        <SettingsModal
-          user={user}
-          setUser={setUser}
-          onClose={() => {
-            setSettingsOpen(false);
-            setMenuOpen(false);
-            setPage("home");
-            setProfileUserId(null);
-            setOpenConversationId(null);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          onLogout={logout}
-        />
-      )}
+      {settingsOpen && <SettingsModal user={user} setUser={setUser} onClose={() => setSettingsOpen(false)} onLogout={logout} />}
       </div>
     </>
   );
@@ -531,14 +512,6 @@ function StoryViewer({ story, onClose }) {
     <div className="story-viewer" onClick={onClose}>
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
-        <button
-          type="button"
-          className="story-viewer-back"
-          aria-label="Back"
-          onClick={e => { e.stopPropagation(); onClose(); }}
-        >
-          <ArrowLeft />
-        </button>
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
           <div>
@@ -546,12 +519,7 @@ function StoryViewer({ story, onClose }) {
             <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
-        <button
-          type="button"
-          className="story-viewer-close"
-          aria-label="Close story"
-          onClick={e => { e.stopPropagation(); onClose(); }}
-        ><X /></button>
+        <button onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
       </div>
       <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
         {mediaUrl && story.kind === 'video' ? (
@@ -1566,7 +1534,7 @@ function ExplorePage() {
   return <div className="page"><div className="page-heading"><div><h1>Explore</h1><p>Discover photos, videos and creators</p></div></div><div className="explore-feature"><Compass /><h2>Explore</h2><p>Recommended content will appear here as your community grows.</p></div></div>;
 }
 
-function MessagesPage({ openConversationId = null, onClearConversation = () => {} }) {
+function MessagesPage({ openConversationId = null }) {
   const me = getUser();
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
@@ -1669,7 +1637,7 @@ function MessagesPage({ openConversationId = null, onClearConversation = () => {
   });
 
   return (
-    <div className="page messages-page">
+    <div className={`page messages-page ${mobileChat && active ? "is-mobile-chat" : ""}`}>
       <div className="messages-instagram-head">
         <div className="messages-account-title">
           <b>{me?.username || me?.name || 'Messages'}</b>
@@ -1717,7 +1685,7 @@ function MessagesPage({ openConversationId = null, onClearConversation = () => {
         })}</div>}
       </div></div>}
 
-      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''} ${mobileChat && active ? 'mobile-chat-open' : ''}`}>
+      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`}>
         <div className="conversation-list instagram-conversation-list">
           <div className="conversation-list-title">
             <b>Messages</b>
@@ -1738,7 +1706,7 @@ function MessagesPage({ openConversationId = null, onClearConversation = () => {
         <div className="chat instagram-chat">
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
-              <button className="chat-back-button" onClick={() => { setActive(null); setMessages([]); setText(''); setMobileChat(false); onClearConversation(); }} aria-label="Back to messages"><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
+              <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
               <Avatar user={other(active)} size={44} /><div><b>@{other(active)?.username || other(active)?.name}</b><span>Active now</span></div>
             </div>
             <div className="chat-messages instagram-chat-messages">
@@ -1804,7 +1772,6 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
   const [dark, setDark] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
-  const [mobileSectionDetail, setMobileSectionDetail] = useState(false);
 
   const visible = settingsSections.filter(s =>
     !search || s.title.toLowerCase().includes(search.toLowerCase()) || s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
@@ -1836,47 +1803,14 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   }
 
   return <div className="overlay settings-overlay">
-    <div className={`settings-modal instagram-settings ${mobileSectionDetail ? "mobile-settings-detail" : ""}`}>
+    <div className="settings-modal instagram-settings">
       <div className="settings-topbar"><button className="settings-back" onClick={onClose}><X /></button><h2>Settings and activity</h2></div>
       <div className="settings-search"><Search /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search settings" /></div>
-
-      <div className="settings-mobile-sections" aria-label="Settings sections">
-        <div className="settings-mobile-sections-title">
-          <b>Settings</b>
-          <span>All ReelsGo settings</span>
-        </div>
-        <div className="settings-mobile-section-list">
-          {visible.map(s => {
-            const Icon = s.icon;
-            return (
-              <button
-                type="button"
-                key={s.id}
-                className={section === s.id ? "active" : ""}
-                onClick={() => { setSection(s.id); setSelectedItem(""); setMobileSectionDetail(true); }}
-              >
-                <span className="settings-mobile-section-icon"><Icon /></span>
-                <span className="settings-mobile-section-copy">
-                  <b>{s.title}</b>
-                  <small>{s.items.length} options</small>
-                </span>
-                <ChevronRight />
-              </button>
-            );
-          })}
-          <button type="button" className="settings-mobile-logout" onClick={onLogout}>
-            <span className="settings-mobile-section-icon"><LogOut /></span>
-            <span className="settings-mobile-section-copy"><b>Log out</b><small>Sign out of ReelsGo</small></span>
-            <ChevronRight />
-          </button>
-        </div>
-      </div>
-
       <div className="settings-layout">
         <aside className="settings-sidebar">
           {visible.map(s => {
             const Icon = s.icon;
-            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); setMobileSectionDetail(true); }}>
+            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); }}>
               <Icon /><span>{s.title}</span><ChevronRight />
             </button>;
           })}
@@ -1884,14 +1818,6 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
         </aside>
 
         <section className="settings-content">
-          <button
-            type="button"
-            className="settings-mobile-content-back"
-            onClick={() => { setMobileSectionDetail(false); setSelectedItem(""); }}
-          >
-            <ArrowLeft />
-            <span>All settings</span>
-          </button>
           <div className="settings-section-title">
             <h1>{settingsSections.find(x => x.id === section)?.title}</h1>
             <p>Manage your ReelsGo experience.</p>
