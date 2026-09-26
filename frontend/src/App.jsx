@@ -137,6 +137,7 @@ function App() {
   }
 
   const navigate = p => {
+    setSettingsOpen(false);
     setPage(p);
     if (p !== "user-profile") setProfileUserId(null);
     setMenuOpen(false);
@@ -229,7 +230,21 @@ function App() {
       {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
       {storyOpen && <StoryComposer onClose={() => setStoryOpen(false)} onDone={() => { setStoryOpen(false); setFeedRefresh(v => v + 1); }} />}
       {reelOpen && <ReelComposer onClose={() => setReelOpen(false)} onDone={() => setReelOpen(false)} />}
-      {settingsOpen && <SettingsModal user={user} setUser={setUser} onClose={() => setSettingsOpen(false)} onLogout={logout} />}
+      {settingsOpen && (
+        <SettingsModal
+          user={user}
+          setUser={setUser}
+          onClose={() => {
+            setSettingsOpen(false);
+            setMenuOpen(false);
+            setPage("home");
+            setProfileUserId(null);
+            setOpenConversationId(null);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          onLogout={logout}
+        />
+      )}
       </div>
     </>
   );

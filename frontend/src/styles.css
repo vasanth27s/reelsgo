@@ -5557,3 +5557,23 @@ textarea{
     font-size:11px !important;
   }
 }
+
+
+/* FINAL FIX: Settings is a true full-screen page. It must sit above the mobile nav.
+   Closing Settings returns to Home through SettingsModal.onClose. */
+.settings-overlay{
+  z-index: 1500 !important;
+}
+.settings-modal.instagram-settings{
+  position:relative;
+  z-index:1501 !important;
+}
+@media (max-width:700px){
+  .settings-overlay{
+    z-index:1500 !important;
+  }
+  .settings-modal.instagram-settings{
+    min-height:100dvh !important;
+    height:100dvh !important;
+  }
+}
