@@ -5176,3 +5176,257 @@ textarea{
   .instagram-chat-layout{grid-template-columns:minmax(260px,34%) minmax(0,1fr)}
   .conversation-copy{min-width:0}.message-line .bubble{max-width:72%}
 }
+
+
+/* ============================================================
+   REELSGO FINAL MOBILE PROFILE AVATAR
+   Instagram-style compact circular profile header
+   ============================================================ */
+@media (max-width: 700px) {
+  .profile-page {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-top: 8px !important;
+    padding-bottom: 105px !important;
+    overflow-x: hidden;
+  }
+
+  .profile-header {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: 96px minmax(0, 1fr) !important;
+    column-gap: 16px !important;
+    align-items: start !important;
+    padding: 12px 2px 18px !important;
+    margin: 0 !important;
+    min-width: 0;
+  }
+
+  .profile-avatar-wrap {
+    position: relative !important;
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
+    max-width: 96px !important;
+    max-height: 96px !important;
+    border-radius: 50% !important;
+    overflow: visible !important;
+    flex: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .profile-avatar-wrap::before,
+  .profile-avatar-wrap::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  .profile-avatar-wrap .profile-avatar,
+  .profile-avatar-wrap > .avatar.profile-avatar {
+    width: 96px !important;
+    height: 96px !important;
+    min-width: 96px !important;
+    min-height: 96px !important;
+    max-width: 96px !important;
+    max-height: 96px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    display: block !important;
+    border: 2px solid #2c3038 !important;
+    box-shadow: 0 0 0 1px #0b0d10 !important;
+    background: #111318 !important;
+    outline: none !important;
+  }
+
+  .profile-avatar-wrap .profile-avatar img,
+  .profile-avatar-wrap > .avatar.profile-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+    border-radius: 50% !important;
+    display: block !important;
+  }
+
+  .profile-avatar-wrap .avatar-camera {
+    width: 29px !important;
+    height: 29px !important;
+    min-width: 29px !important;
+    min-height: 29px !important;
+    right: -3px !important;
+    bottom: -2px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    border: 2px solid #08090d !important;
+    background: #171a20 !important;
+    color: #fff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.45) !important;
+  }
+
+  .profile-avatar-wrap .avatar-camera svg {
+    width: 15px !important;
+    height: 15px !important;
+    stroke-width: 2.2 !important;
+  }
+
+  .profile-details {
+    min-width: 0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .profile-line {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 0 13px !important;
+    flex-wrap: nowrap !important;
+    min-width: 0;
+  }
+
+  .profile-line h1 {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    font-size: 19px !important;
+    line-height: 1.2 !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .profile-line .secondary {
+    flex: 0 0 auto !important;
+    min-height: 38px !important;
+    padding: 8px 11px !important;
+    border-radius: 11px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+
+  .profile-stats {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    margin: 0 0 12px !important;
+  }
+
+  .profile-stats span {
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+  }
+
+  .profile-stats b {
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+    color: #fff !important;
+  }
+
+  .profile-stats small {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    color: #969aa3 !important;
+  }
+
+  .profile-details > b {
+    display: block !important;
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 3px !important;
+  }
+
+  .profile-details > p {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    color: #a0a4ad !important;
+  }
+
+  .profile-tabs {
+    width: 100% !important;
+    margin: 0 0 10px !important;
+    border-top: 1px solid #252932 !important;
+    border-bottom: 1px solid #252932 !important;
+  }
+
+  .profile-tabs button {
+    min-height: 48px !important;
+    padding: 10px 3px !important;
+    font-size: 10px !important;
+    gap: 4px !important;
+  }
+
+  .profile-tabs button svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+
+  .profile-grid {
+    width: 100% !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 2px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .profile-header {
+    grid-template-columns: 84px minmax(0, 1fr) !important;
+    column-gap: 13px !important;
+  }
+
+  .profile-avatar-wrap,
+  .profile-avatar-wrap .profile-avatar,
+  .profile-avatar-wrap > .avatar.profile-avatar {
+    width: 84px !important;
+    height: 84px !important;
+    min-width: 84px !important;
+    min-height: 84px !important;
+    max-width: 84px !important;
+    max-height: 84px !important;
+  }
+
+  .profile-avatar-wrap .avatar-camera {
+    width: 27px !important;
+    height: 27px !important;
+    min-width: 27px !important;
+    min-height: 27px !important;
+  }
+
+  .profile-avatar-wrap .avatar-camera svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .profile-line h1 {
+    font-size: 17px !important;
+  }
+}
+
+@media (min-width: 701px) {
+  .profile-avatar-wrap .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+}

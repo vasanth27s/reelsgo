@@ -1039,7 +1039,7 @@ function ProfilePage({ user, setUser }) {
     <div className="page profile-page">
       <div className="profile-header">
         <div className="profile-avatar-wrap">
-          <Avatar user={user} size={150} className="profile-avatar" />
+          <Avatar user={user} size={96} className="profile-avatar" />
           <button className="avatar-camera" onClick={() => input.current?.click()} disabled={saving}><Camera /></button>
           <input ref={input} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={avatarUpload} />
         </div>
@@ -1443,7 +1443,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
       <div className="profile-header">
         <div className="profile-avatar-wrap">
-          <Avatar user={u} size={150} className="profile-avatar" />
+          <Avatar user={u} size={96} className="profile-avatar" />
         </div>
 
         <div className="profile-details">
