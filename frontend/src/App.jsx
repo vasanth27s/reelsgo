@@ -58,6 +58,22 @@ function Avatar({ user, size = 42, className = "" }) {
   );
 }
 
+
+/* ReelsGo responsive viewport guard */
+function ReelsGoViewport() {
+  useEffect(() => {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "viewport";
+      document.head.appendChild(meta);
+    }
+    meta.content =
+      "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover";
+  }, []);
+  return null;
+}
+
 function ReelsGoBranding() {
   useEffect(() => {
     document.title = "ReelsGo";
@@ -131,6 +147,7 @@ function App() {
 
   return (
     <>
+      <ReelsGoViewport />
       <ReelsGoBranding />
       <div className="app">
       <aside className="sidebar">
