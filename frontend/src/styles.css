@@ -1,0 +1,3973 @@
+:root{
+  --bg:#f7f7f9;--card:#fff;--text:#111318;--muted:#737985;--line:#e6e7eb;
+  --accent:#4f46e5;--accent2:#7c3aed;--danger:#dc2626;--soft:#f1f2f5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea{font:inherit}
+button{border:0;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+input,textarea{outline:none}
+img,video{display:block;max-width:100%}
+a{text-decoration:none;color:var(--accent)}
+svg{stroke-width:1.9}
+
+.app{min-height:100vh}
+.sidebar{
+ position:fixed;left:0;top:0;bottom:0;width:250px;background:#fff;border-right:1px solid var(--line);
+ padding:18px 12px;z-index:60;display:flex;flex-direction:column
+}
+.brand{height:64px;display:flex;align-items:center;gap:11px;padding:0 10px;border-bottom:1px solid #eee;margin-bottom:12px}
+.brand b,.auth-logo,.auth-showcase-logo{
+ width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#111827,#4f46e5);
+ color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900
+}
+.brand span{font-size:20px;font-weight:800}
+.nav{width:100%;min-height:48px;background:transparent;border-radius:12px;display:flex;align-items:center;gap:14px;padding:10px 13px;color:#555d6b;text-align:left;margin:2px 0}
+.nav span{display:flex;align-items:center;justify-content:center}
+.nav svg{width:21px;height:21px}
+.nav:hover,.nav.active{background:#f0efff;color:#4f46e5}
+.nav-bottom{margin-top:auto}
+
+.main{margin-left:250px;min-height:100vh;padding-bottom:40px}
+.page{width:min(100%,920px);margin:auto;padding:34px 24px}
+.page-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.page-heading h1{font-size:28px;letter-spacing:-.5px}
+.page-heading p{color:var(--muted);font-size:13px;margin-top:4px}
+.desktop-create,.primary{
+ background:#111827;color:#fff;border-radius:10px;padding:10px 15px;font-weight:750;
+ display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.desktop-create svg{width:18px}
+
+.avatar{
+ width:42px;height:42px;min-width:42px;min-height:42px;
+ aspect-ratio:1 / 1;
+ border-radius:50% !important;
+ overflow:hidden !important;
+ background:linear-gradient(135deg,#111827,#4f46e5);
+ display:flex;align-items:center;justify-content:center;
+ flex:0 0 auto;color:#fff;font-weight:850;
+ position:relative;
+}
+.avatar img{
+ width:100% !important;height:100% !important;
+ min-width:100% !important;min-height:100% !important;
+ max-width:none !important;max-height:none !important;
+ aspect-ratio:1 / 1 !important;
+ object-fit:cover !important;object-position:center !important;
+ border-radius:50% !important;display:block;
+}
+.avatar span{font-size:42%;line-height:1}
+
+.mobile-header,.bottom-nav{display:none}
+
+/* feed */
+.stories-card{
+ background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px;
+ display:flex;gap:17px;overflow-x:auto;margin-bottom:14px
+}
+.stories-card::-webkit-scrollbar{display:none}
+.story{background:transparent;min-width:70px;color:#5f6570;font-size:11px}
+.story>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.story-ring,.story-placeholder{
+ width:70px;height:70px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#ff9d00,#e1306c,#833ab4);
+ position:relative;margin-bottom:6px;overflow:hidden;isolation:isolate
+}
+.story-ring .avatar,.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid #fff;object-fit:cover}
+.story-ring i{position:absolute;right:-1px;bottom:0;width:23px;height:23px;border-radius:50%;background:#4f46e5;color:#fff;border:2px solid #fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:17px}
+.story-placeholder{display:flex;align-items:center;justify-content:center;color:#fff;background:#111827;border:3px solid #fff;font-size:22px;font-weight:800}
+.quick-create{
+ display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px;margin-bottom:14px
+}
+.quick-create>button:nth-child(2){flex:1;text-align:left;background:#f3f4f6;color:#8b919c;border-radius:11px;height:42px;padding:0 13px}
+.quick-icon{width:42px;height:42px;border-radius:11px;background:#eef0ff;color:#4f46e5;display:flex;align-items:center;justify-content:center}
+
+.post-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.post-head{display:flex;justify-content:space-between;align-items:center;padding:12px 13px}
+.post-user{display:flex;gap:10px;align-items:center}
+.post-user>div{display:flex;flex-direction:column}
+.post-user span{font-size:11px;color:#8a909a;margin-top:2px}
+.icon-button{width:36px;height:36px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}
+.icon-button:hover{background:var(--soft)}
+.post-media{width:100%;max-height:720px;object-fit:cover;background:#eee}
+.actions{display:flex;justify-content:space-between;padding:7px 10px 3px}
+.actions>div{display:flex}
+.actions button{width:40px;height:40px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}
+.actions button:hover{background:#f4f4f5}
+.actions svg{width:21px}
+.actions .liked{color:#e11d48}
+.actions .saved{color:#4f46e5}
+.post-body{padding:4px 13px 15px;font-size:13px}
+.post-body>p{margin-top:6px;line-height:1.5}
+.comments-link{background:none;color:#858b96;margin-top:8px;font-size:12px}
+.comments{margin-top:9px;border-top:1px solid #eee;padding-top:9px}
+.comment{display:flex;gap:8px;margin:8px 0}
+.comment>div{display:flex;flex-direction:column}
+.comment span{color:#444}
+.comment-input{display:flex;gap:6px;margin-top:9px}
+.comment-input input{flex:1;border:1px solid #ddd;border-radius:10px;padding:10px}
+.comment-input button{color:#4f46e5;background:none;font-weight:700}
+
+.empty{
+ background:#fff;border:1px solid var(--line);border-radius:16px;padding:55px 20px;text-align:center;color:#777
+}
+.empty svg{width:40px;height:40px;margin-bottom:10px}
+.empty h2{color:#222;margin-bottom:6px}
+.empty p{line-height:1.5}
+.small{display:inline-flex;margin-top:12px}
+.small-empty{margin-top:15px;padding:35px}
+
+/* auth */
+.auth-page{
+ min-height:100vh;display:grid;grid-template-columns:1fr 460px;gap:70px;align-items:center;
+ padding:40px max(24px,8vw);background:radial-gradient(circle at 20% 20%,#e9e7ff,transparent 34%),#f8f8fb
+}
+.auth-showcase{max-width:620px}
+.auth-showcase-logo{width:70px;height:70px;font-size:24px;border-radius:20px;margin-bottom:24px}
+.auth-showcase h1{font-size:clamp(44px,6vw,74px);line-height:.98;letter-spacing:-4px;max-width:600px}
+.auth-showcase p{font-size:19px;line-height:1.6;color:#606773;max-width:540px;margin-top:20px}
+.auth-pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:25px}
+.auth-pills span{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px}
+.auth-card{
+ width:100%;background:#fff;border:1px solid var(--line);border-radius:24px;padding:32px;
+ box-shadow:0 25px 80px #11182712;display:flex;flex-direction:column;gap:12px
+}
+.auth-logo{width:58px;height:58px;margin:0 auto 4px;font-size:21px}
+.auth-card h2{text-align:center;font-size:24px}
+.auth-subtitle{text-align:center;color:#7a808b;font-size:13px;margin-bottom:8px}
+.field-wrap{height:49px;border:1px solid #dfe1e5;border-radius:11px;display:flex;align-items:center;gap:9px;padding:0 12px;background:#fff}
+.field-wrap:focus-within{border-color:#8b82ff;box-shadow:0 0 0 3px #4f46e514}
+.field-wrap>span{display:flex;color:#8a9099}
+.field-wrap svg{width:18px}
+.field-wrap input{border:0;flex:1;min-width:0}
+.password-field{position:relative}
+.password-field>.field-wrap{padding-right:46px}
+.password-field>button{position:absolute;right:6px;top:5px;width:38px;height:38px;border-radius:8px;background:transparent;color:#666}
+.forgot{align-self:flex-end;background:none;color:#4f46e5;font-size:12px;font-weight:700}
+.auth-submit{width:100%;height:47px;margin-top:3px}
+.auth-divider{height:30px;display:flex;align-items:center;gap:10px;color:#9aa0aa;font-size:11px}
+.auth-divider:before,.auth-divider:after{content:"";height:1px;background:#eee;flex:1}
+.auth-switch{width:100%;justify-content:center;height:45px}
+.error{background:#fef2f2;color:#dc2626;padding:10px;border-radius:9px;font-size:13px}
+
+/* modals */
+.overlay{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{width:min(100%,600px);max-height:92vh;overflow:auto;background:#fff;border-radius:20px}
+.modal-head{height:62px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}
+.modal-head h2{font-size:18px}
+.modal-head button{width:35px;height:35px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:18px}
+.composer-user{display:flex;align-items:center;gap:10px;margin-bottom:13px}
+.composer-user>div{display:flex;flex-direction:column}
+.composer-user span{font-size:12px;color:#888;margin-top:2px}
+.composer-text{width:100%;min-height:140px;border:0;resize:vertical;font-size:16px}
+.file-preview{padding:10px;background:#f5f6f8;border-radius:10px;margin-bottom:10px}
+.file-preview>div{display:flex;gap:7px;align-items:center;padding:4px 0;font-size:13px}
+.form-row{display:flex;gap:8px;margin:10px 0}
+.form-row input,.normal-input,.search-box input{border:1px solid #ddd;border-radius:10px;padding:10px}
+.form-row input{flex:1}
+.secondary{background:#eef0f3;color:#222;border-radius:10px;padding:10px 13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.full{width:100%;margin-top:10px}
+.story-editor{border:1px solid #ddd;border-radius:15px;padding:12px}
+.story-editor-placeholder{height:220px;background:#f5f6f8;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#777;gap:7px}
+.story-editor-placeholder svg{width:42px;height:42px}
+.story-editor textarea{width:100%;border:0;min-height:80px;margin-top:10px;resize:vertical}
+.selected-file{display:flex;align-items:center;gap:7px;background:#eef0ff;color:#4f46e5;border-radius:9px;padding:9px;font-size:13px}
+.reel-editor{text-align:center;border:2px dashed #d8dae0;border-radius:15px;padding:35px;margin-bottom:10px}
+.reel-editor>svg{width:44px;height:44px;margin:auto auto 10px}
+.reel-editor p{color:#777;font-size:12px;margin:6px 0 12px}
+.normal-input{width:100%;margin-top:10px}
+
+/* profile */
+.profile-page{max-width:900px}
+.profile-header{display:flex;gap:48px;padding:10px 14px 28px;align-items:center}
+.profile-avatar-wrap{position:relative;flex:none}
+.profile-avatar{border:4px solid #fff;box-shadow:0 0 0 1px #dfe1e5}
+.avatar-camera{
+ position:absolute;right:3px;bottom:5px;width:37px;height:37px;border-radius:50%;
+ background:#111827;color:#fff;border:3px solid #fff;display:flex;align-items:center;justify-content:center
+}
+.profile-details{flex:1;min-width:0}
+.profile-line{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.profile-line h1{font-size:24px}
+.profile-more{margin-left:auto}
+.profile-stats{display:flex;gap:38px;margin-bottom:18px}
+.profile-stats span{display:flex;gap:5px;align-items:baseline}
+.profile-stats b{font-size:16px}.profile-stats small{color:#555;font-size:13px}
+.profile-details>p{color:#606671;margin-top:5px;line-height:1.5}
+.profile-details>a{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:13px}
+.profile-details>a svg{width:15px}
+.profile-tabs{display:flex;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin-bottom:20px}
+.profile-tabs button{flex:1;background:transparent;padding:14px 7px;color:#777;display:flex;align-items:center;justify-content:center;gap:7px}
+.profile-tabs button svg{width:17px}
+.profile-tabs button.active{color:#111;font-weight:750;border-bottom:2px solid #111}
+.edit-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
+.card-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.card-title-row button{background:transparent}
+.edit-card label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}
+.edit-card input,.edit-card textarea{width:100%;border:1px solid #ddd;border-radius:10px;padding:11px}
+.edit-card textarea{min-height:90px;resize:vertical}
+.edit-card>small{display:block;text-align:right;color:#888}
+.switch-line{display:flex!important;align-items:center;justify-content:space-between}
+.switch-line span{display:flex;align-items:center;gap:7px}
+.switch-line input,.setting-switch input{width:19px;height:19px;accent-color:#4f46e5}
+
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.grid-media,.grid-reel{aspect-ratio:1/1;overflow:hidden;background:#e9e9ec}
+.grid-media img,.grid-media video,.grid-reel video{width:100%;height:100%;object-fit:cover}
+.tab-empty{margin-top:10px}
+.embedded-saved{margin-top:0}
+
+/* search / explore */
+.search-box{height:50px;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #ddd;border-radius:12px;padding:0 12px}
+.search-box svg{color:#777}.search-box input{border:0;background:transparent;flex:1}
+.user-list{margin-top:12px}
+.user-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);padding:11px;border-radius:13px;margin-top:8px}
+.user-row>div{flex:1;display:flex;flex-direction:column}
+.user-row span{color:#777;font-size:12px}.user-row button{white-space:nowrap}
+.explore-feature{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:360px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px;color:#777}
+.explore-feature svg{width:45px;height:45px;color:#4f46e5;margin-bottom:12px}
+.explore-feature h2{color:#222;margin-bottom:6px}
+
+/* reels */
+.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.reel-card{background:#111;color:#fff;border-radius:14px;overflow:hidden}
+.reel-card video{width:100%;aspect-ratio:9/16;object-fit:cover;background:#000}
+.reel-card div{padding:10px}.reel-card p{color:#ddd;margin-top:4px;font-size:12px}
+.reels-profile-grid{gap:3px}
+
+/* messages */
+.chat-layout{display:grid;grid-template-columns:270px 1fr;min-height:560px;background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.conversation-list{border-right:1px solid #eee}
+.conversation-list button{width:100%;padding:14px;text-align:left;background:transparent;border-bottom:1px solid #eee}
+.chat-empty-list{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#888;gap:8px}
+.chat{display:flex;flex-direction:column}
+.chat-messages{flex:1;padding:15px;overflow:auto}
+.bubble{width:max-content;max-width:75%;background:#eef0f3;border-radius:15px;padding:9px 12px;margin-bottom:7px}
+.bubble.mine{margin-left:auto;background:#4f46e5;color:#fff}
+.chat-input{display:flex;gap:7px;border-top:1px solid #eee;padding:10px}
+.chat-input input{flex:1;border:1px solid #ddd;border-radius:10px;padding:10px}
+.chat-input button{background:transparent;width:38px}
+
+/* notifications */
+.notification{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:7px}
+.notification>div{display:flex;flex-direction:column}.notification small{color:#888;margin-top:3px}
+
+/* mobile menu */
+.mobile-menu{position:absolute;right:10px;top:66px;width:min(360px,calc(100% - 20px));background:#fff;border-radius:18px;padding:10px;box-shadow:0 20px 60px #0003}
+.menu-user{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #eee;margin-bottom:7px}
+.menu-user>div{flex:1;display:flex;flex-direction:column}.menu-user span{font-size:12px;color:#777}
+.menu-user button{background:#f1f2f4;width:34px;height:34px;border-radius:50%}
+.mobile-menu>button{width:100%;background:transparent;text-align:left;padding:12px;display:flex;align-items:center;gap:10px;border-radius:10px}
+.mobile-menu>button:hover{background:#f3f4f6}
+
+/* settings */
+.settings-overlay{padding:0;background:#fff}
+.settings-modal.instagram-settings{width:100%;height:100%;max-height:100vh;border-radius:0;display:flex;flex-direction:column;background:#fff}
+.settings-topbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative}
+.settings-topbar h2{font-size:19px}
+.settings-back{position:absolute;left:20px;background:transparent;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.settings-back:hover{background:#f1f2f4}
+.settings-search{height:52px;width:min(900px,calc(100% - 40px));margin:16px auto 0;background:#f1f2f4;border-radius:11px;display:flex;align-items:center;gap:9px;padding:0 12px}
+.settings-search input{border:0;background:transparent;flex:1}
+.settings-layout{display:grid;grid-template-columns:330px 1fr;flex:1;min-height:0;width:min(1200px,100%);margin:16px auto 0}
+.settings-sidebar{border-right:1px solid var(--line);overflow:auto;padding:0 14px 30px}
+.settings-sidebar button{width:100%;display:flex;align-items:center;gap:12px;padding:13px 12px;background:transparent;border-radius:10px;text-align:left;color:#30343b}
+.settings-sidebar button svg:first-child{width:19px}.settings-sidebar button svg:last-child{margin-left:auto;width:17px;color:#aaa}
+.settings-sidebar button.active{background:#f0efff;color:#4f46e5;font-weight:700}
+.settings-logout{margin-top:20px;color:#dc2626!important}
+.settings-content{overflow:auto;padding:5px 40px 50px}
+.settings-section-title{padding:0 0 18px;border-bottom:1px solid #eee;margin-bottom:8px}
+.settings-section-title h1{font-size:25px}.settings-section-title p{color:#777;margin-top:4px;font-size:13px}
+.settings-panel{max-width:700px}
+.settings-profile-row{display:flex;align-items:center;gap:13px;padding:16px 0;border-bottom:1px solid #eee}
+.settings-profile-row>div{flex:1;display:flex;flex-direction:column}.settings-profile-row span{font-size:12px;color:#777;margin-top:3px}
+.setting-row{width:100%;display:flex;align-items:center;gap:13px;background:#fff;padding:16px 0;border-bottom:1px solid #eee;text-align:left}
+.setting-row:hover{background:#fafafa}
+.setting-row-icon{width:37px;height:37px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center;flex:none}
+.setting-row-text{flex:1;display:flex;flex-direction:column;gap:3px}.setting-row-text small{color:#777;font-size:12px}
+.setting-row>svg{color:#999;width:18px}.setting-row em{font-style:normal;color:#4f46e5;font-size:13px;font-weight:700}
+.danger-row .setting-row-icon{color:#dc2626;background:#fef2f2}.danger-row .setting-row-text b{color:#dc2626}
+.settings-card-highlight{display:flex;gap:12px;background:#f6f5ff;padding:15px;border-radius:13px;margin:12px 0}
+.settings-card-highlight>svg{color:#4f46e5}.settings-card-highlight p{font-size:12px;color:#777;margin-top:4px;line-height:1.5}
+.setting-switch{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 0;border-bottom:1px solid #eee}
+.setting-switch span{display:flex;flex-direction:column;gap:4px}.setting-switch small{color:#777;font-size:12px}
+.panel-heading{font-size:18px;margin:14px 0}
+.setting-detail{background:#f7f7f8;border-radius:12px;padding:14px;margin-top:15px;color:#555}.setting-detail p{font-size:12px;margin-top:5px}
+
+@media(max-width:1050px){
+ .sidebar{width:78px}.brand{justify-content:center}.brand span,.nav{font-size:0}.nav{justify-content:center}.nav svg{width:22px;height:22px}.main{margin-left:78px}
+ .auth-page{grid-template-columns:1fr 430px;gap:30px;padding:30px}
+}
+@media(max-width:700px){
+ body{padding-bottom:68px}
+ .sidebar{display:none}
+ .main{margin-left:0;padding-top:57px;padding-bottom:82px}
+ .mobile-header{display:flex;position:fixed;left:0;right:0;top:0;height:57px;background:#ffffffeF;backdrop-filter:blur(16px);border-bottom:1px solid #eee;z-index:80;align-items:center;justify-content:space-between;padding:0 12px}
+ .mobile-brand{background:transparent;font-size:19px;font-weight:850}
+ .mobile-header-actions{display:flex}.mobile-header button{width:40px;height:40px;background:transparent;display:flex;align-items:center;justify-content:center}
+ .page{padding:18px 10px}.page-heading h1{font-size:24px}.desktop-create{display:none}
+ .stories-card{border-radius:14px;padding:12px;gap:14px}.post-card{border-radius:12px}
+ .post-media{max-height:none}
+ .bottom-nav{position:fixed;left:0;right:0;bottom:0;height:68px;display:grid;grid-template-columns:repeat(5,1fr);background:#fffffff2;backdrop-filter:blur(18px);border-top:1px solid #e5e7eb;z-index:90;padding-bottom:env(safe-area-inset-bottom)}
+ .nav-mobile{background:transparent;color:#777;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px}
+ .nav-mobile svg{width:22px}.nav-mobile.active{color:#111827}
+ .create-bottom{width:45px;height:45px;align-self:center;justify-self:center;border-radius:14px;background:linear-gradient(135deg,#111827,#4f46e5);color:#fff;display:flex;align-items:center;justify-content:center}
+ .mobile-profile{background:transparent;color:#777;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px}
+ .mobile-profile.active{color:#111827}.mobile-profile .avatar{border:2px solid transparent}.mobile-profile.active .avatar{border-color:#111827}
+ .profile-header{gap:16px;padding:6px 4px 20px;align-items:flex-start}.profile-avatar,.profile-avatar-wrap .avatar{width:88px!important;height:88px!important}
+ .avatar-camera{width:30px;height:30px;right:-1px;bottom:0}.avatar-camera svg{width:16px}
+ .profile-line{gap:7px;margin-bottom:14px;flex-wrap:wrap}.profile-line h1{font-size:18px}.profile-line .secondary{padding:7px 9px;font-size:11px}.profile-more{display:none}
+ .profile-stats{gap:15px;margin-bottom:12px}.profile-stats b{font-size:14px}.profile-stats small{font-size:10px}
+ .profile-details>p{font-size:11px}.profile-details>a{font-size:11px}
+ .profile-tabs button{font-size:10px;padding:12px 2px;gap:4px}.profile-tabs button svg{width:16px}
+ .profile-grid{gap:2px}.edit-card{border-radius:13px;padding:15px}
+ .reels-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+ .reel-card{border-radius:10px}.reel-card div{padding:8px}
+ .chat-layout{grid-template-columns:1fr;min-height:520px}.conversation-list{display:none}
+ .overlay{align-items:flex-end;padding:0}.modal{width:100%;max-height:94vh;border-radius:20px 20px 0 0}
+ .form-row{flex-direction:column}
+ .auth-page{display:flex;min-height:100vh;padding:20px 14px;align-items:center;justify-content:center}
+ .auth-showcase{display:none}.auth-card{padding:25px 19px;border-radius:20px}
+ .auth-card h2{font-size:21px}
+ .settings-modal.instagram-settings{height:100%;max-height:100vh}
+ .settings-topbar{height:58px}.settings-topbar h2{font-size:17px}
+ .settings-search{width:calc(100% - 24px);margin:10px auto}
+ .settings-layout{display:block;margin-top:8px}.settings-sidebar{display:none}
+ .settings-content{padding:8px 15px 35px}.settings-section-title{padding-bottom:12px}.settings-section-title h1{font-size:22px}
+ .settings-overlay{align-items:stretch}
+ .settings-profile-row .secondary{font-size:11px;padding:8px}
+}
+@media(max-width:390px){
+ .bottom-nav{height:62px}.nav-mobile span,.mobile-profile span{display:none}.create-bottom{width:42px;height:42px}
+ .profile-header{gap:10px}.profile-stats{gap:10px}
+}
+
+/* Instagram-style private account switch */
+.privacy-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:15px 0;
+  margin:8px 0 12px;
+  border-bottom:1px solid #eee;
+}
+.privacy-toggle-row>div:first-child{display:flex;flex-direction:column;gap:4px}
+.privacy-toggle-row b{font-size:14px}
+.privacy-toggle-row span:not(.toggle-knob){font-size:12px;color:#777;line-height:1.45}
+.toggle{
+  width:52px;
+  height:31px;
+  border-radius:999px;
+  padding:3px;
+  flex:none;
+  position:relative;
+  background:#d8dbe1;
+  transition:.2s ease;
+}
+.toggle.on{background:#111827}
+.toggle.off{background:#d8dbe1}
+.toggle:disabled{opacity:.5;cursor:not-allowed}
+.toggle-knob{
+  display:block;
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px #0003;
+  transition:transform .2s ease;
+}
+.toggle.on .toggle-knob{transform:translateX(21px)}
+
+/* Story circles: media is clipped inside the ring, never outside it. */
+.story-ring{overflow:hidden;flex:none;isolation:isolate}
+.story-ring>img,.story-ring>video,.story-ring>.story-text-thumb{
+  position:absolute;
+  inset:3px;
+  width:calc(100% - 6px);
+  height:calc(100% - 6px);
+  border:3px solid #fff;
+  border-radius:50%;
+  object-fit:cover;
+  overflow:hidden;
+  background:#111827;
+}
+.story-ring .avatar{position:absolute;inset:3px;width:calc(100% - 6px)!important;height:calc(100% - 6px)!important;border:3px solid #fff}
+.story-text-thumb{display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
+
+/* Full story viewer */
+.story-viewer{position:fixed;inset:0;background:rgba(8,8,12,.96);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
+.story-viewer-top{position:absolute;top:18px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;z-index:2;color:#fff}
+.story-viewer-user{display:flex;align-items:center;gap:10px}
+.story-viewer-user>div{display:flex;flex-direction:column;gap:2px}
+.story-viewer-user span{font-size:11px;color:#c8c8cf}
+.story-viewer-top>button{width:42px;height:42px;border-radius:50%;background:#ffffff18;color:#fff;display:flex;align-items:center;justify-content:center}
+.story-viewer-content{height:min(88vh,850px);width:min(92vw,480px);display:flex;align-items:center;justify-content:center;border-radius:18px;overflow:hidden;background:#111}
+.story-viewer-content img,.story-viewer-content video{width:100%;height:100%;object-fit:contain;background:#000}
+.story-text-view{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:40px;font-size:30px;font-weight:800;word-break:break-word}
+
+@media(max-width:700px){
+  .privacy-toggle-row{padding:14px 0}
+  .story-ring,.story-placeholder{width:68px;height:68px}
+  .story-viewer{padding:0}
+  .story-viewer-content{height:100%;width:100%;border-radius:0}
+  .story-viewer-top{top:12px;left:12px;right:12px}
+}
+
+
+/* UNIVERSAL AVATAR FIX - use the same circular profile image everywhere */
+.settings-profile-row > .avatar,
+.profile-avatar-wrap > .avatar,
+.post-user > .avatar,
+.user-row > .avatar,
+.comment > .avatar,
+.mobile-profile > .avatar,
+.nav > span > .avatar {
+  flex: 0 0 auto !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+.settings-profile-row > .avatar img,
+.profile-avatar-wrap > .avatar img,
+.post-user > .avatar img,
+.user-row > .avatar img,
+.comment > .avatar img,
+.mobile-profile > .avatar img,
+.nav > span > .avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  border-radius: 50% !important;
+}
+
+.settings-profile-row{
+  min-width:0;
+}
+.settings-profile-row > .avatar{
+  width:72px !important;
+  height:72px !important;
+  min-width:72px !important;
+  min-height:72px !important;
+}
+
+@media(max-width:700px){
+  .settings-profile-row > .avatar{
+    width:64px !important;
+    height:64px !important;
+    min-width:64px !important;
+    min-height:64px !important;
+  }
+}
+
+
+/* Search result rows are buttons but look like normal Instagram rows. */
+.user-row {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.user-row > svg {
+  width: 18px;
+  color: #999;
+  flex: 0 0 auto;
+}
+
+.profile-back-row {
+  margin-bottom: 14px;
+}
+
+.profile-back-row .secondary {
+  padding: 8px 11px;
+}
+
+.profile-back-row svg {
+  width: 16px;
+}
+
+.private-profile-note {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 11px 13px;
+  background: #f5f4ff;
+  border-radius: 12px;
+  color: #4f46e5;
+  max-width: 520px;
+}
+
+.private-profile-note svg {
+  width: 20px;
+  flex: 0 0 auto;
+}
+
+.private-profile-note div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.private-profile-note span {
+  color: #6f7280;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.private-profile-lock {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.private-lock-icon {
+  width: 62px;
+  height: 62px;
+  border: 2px solid #111827;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.private-lock-icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.private-profile-lock h2 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.private-profile-lock p {
+  color: #777;
+  font-size: 13px;
+  max-width: 330px;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .profile-back-row {
+    margin-bottom: 8px;
+  }
+
+  .profile-back-row .secondary {
+    font-size: 11px;
+  }
+
+  .private-profile-note {
+    font-size: 11px;
+  }
+}
+
+/* ============================================================
+   INSTAGRAM STYLE MESSAGES + STORY VIEWERS
+============================================================ */
+.messages-page{max-width:1050px}.messages-instagram-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.messages-instagram-head h1{font-size:28px;font-weight:800}.messages-instagram-head p{margin-top:4px;color:#8b919b;font-size:13px}.messages-requests-button{border:0;background:transparent;font-weight:700;color:#111827;display:flex;align-items:center;gap:7px;cursor:pointer}.messages-requests-button span{min-width:21px;height:21px;border-radius:50%;background:#ed4956;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}.messages-notes-section{background:#fff;border:1px solid #e8e9ed;border-radius:18px;padding:14px;margin-bottom:14px}.messages-notes-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.messages-notes-header button{background:transparent;border:0;color:#737985;font-size:12px;cursor:pointer}.messages-notes-scroll{display:flex;gap:19px;overflow-x:auto;padding:4px 2px 5px;scrollbar-width:none}.messages-notes-scroll::-webkit-scrollbar{display:none}.message-note-card{position:relative;min-width:82px;width:82px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;color:#222;cursor:pointer;padding:0}.message-note-card>b{margin-top:7px;font-size:11px;max-width:82px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.message-note-card>span{margin-top:3px;font-size:10px;color:#858b96;max-width:82px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.message-note-avatar-wrap{position:relative}.message-note-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center}.note-add{position:absolute;right:0;bottom:0;width:21px;height:21px;border-radius:50%;background:#0095f6;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}.message-note-bubble{position:absolute;top:-7px;left:50%;transform:translateX(-50%);max-width:105px;background:#fff;border:1px solid #dfe1e6;box-shadow:0 3px 12px #0001;border-radius:12px;padding:5px 8px;font-size:9px;line-height:1.2;z-index:2}.notes-empty{min-width:230px;height:70px;display:flex;align-items:center;justify-content:center;color:#9297a1;font-size:12px;text-align:center}.instagram-chat-layout{min-height:610px;border-radius:18px}.instagram-conversation-list{min-width:320px}.conversation-list-title{height:58px;padding:0 17px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between}.conversation-list-title span{color:#9297a1;font-size:12px}.conversation-scroll{overflow-y:auto;max-height:552px}.conversation-item{width:100%;display:flex;align-items:center;gap:11px;padding:12px 13px;border:0;border-bottom:1px solid #f0f0f0;background:transparent;text-align:left;cursor:pointer}.conversation-item:hover{background:#f7f7f8}.conversation-item.active{background:#f0efff}.conversation-copy{min-width:0;flex:1;display:flex;flex-direction:column}.conversation-copy b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-copy span{margin-top:3px;color:#7c818b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-copy small{color:#a0a4ab;font-size:9px;margin-top:3px}.instagram-chat-placeholder{height:100%;min-height:610px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.message-placeholder-icon{width:76px;height:76px;border:1px solid #222;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:15px}.message-placeholder-icon svg{width:35px;height:35px}.instagram-chat-placeholder h2{font-size:20px;margin-bottom:7px}.instagram-chat-placeholder p{color:#777;font-size:13px;margin-bottom:4px}.instagram-chat-placeholder span{color:#999;font-size:11px}.instagram-chat-head{height:66px;border-bottom:1px solid #eee;padding:0 14px;gap:10px}.instagram-chat-head>div{display:flex;flex-direction:column}.instagram-chat-head b{font-size:14px}.instagram-chat-head span{margin-top:3px;color:#4caf50;font-size:10px}.chat-back-button{display:none;width:35px;height:35px;background:transparent;align-items:center;justify-content:center}.instagram-chat-messages{padding:20px;background:#fff}.message-line{display:flex;align-items:flex-end;gap:7px;margin-bottom:9px}.message-line.mine{justify-content:flex-end}.message-line.received{justify-content:flex-start}.message-line .bubble{max-width:68%;margin:0;border-radius:20px;padding:9px 13px;background:#efeff1;color:#111}.message-line .bubble.mine{background:#3797f0;color:#fff}.message-meta{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px}.message-meta small{font-size:8px;opacity:.68}.chat-first-message-avatar{margin-bottom:9px}.chat-no-messages{height:100%;min-height:430px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}.chat-no-messages h2{font-size:17px;margin:4px 0}.chat-no-messages p{color:#777;font-size:12px}.chat-no-messages span{color:#999;font-size:11px}.instagram-chat-input{height:58px;border-top:1px solid #eee;padding:9px 12px}.instagram-chat-input input{border:1px solid #ddd;border-radius:22px;padding:10px 14px;background:#fff}.chat-attach-button,.chat-smile-button,.chat-send-button{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}.chat-send-button{color:#0095f6}.chat-send-button:disabled{opacity:.4}.messages-requests-overlay{position:fixed;inset:0;z-index:500;background:#0007;display:flex;align-items:center;justify-content:center;padding:20px}.messages-requests-modal{width:min(100%,480px);max-height:75vh;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 20px 70px #0005}.messages-requests-head{height:60px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}.messages-requests-head button{width:34px;height:34px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}.requests-list{overflow-y:auto;max-height:calc(75vh - 60px)}.request-row{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid #eee}.request-row>div{display:flex;flex-direction:column}.request-row span{color:#888;font-size:11px;margin-top:3px}.requests-empty{min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#777;gap:7px}.requests-empty svg{width:35px;height:35px}.requests-empty b{color:#222}.requests-empty span{font-size:11px}.story-viewers-sheet{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,540px);max-height:70vh;background:#fff;color:#111;border-radius:22px 22px 0 0;z-index:30;overflow:hidden;box-shadow:0 -20px 60px #0009}.story-viewers-head{height:66px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}.story-viewers-head>div{display:flex;flex-direction:column}.story-viewers-head span{color:#888;font-size:10px;margin-top:3px}.story-viewers-head button{width:35px;height:35px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}.story-viewers-list{max-height:calc(70vh - 66px);overflow-y:auto;padding:7px 12px 15px}.story-viewer-row{display:flex;align-items:center;gap:11px;padding:10px 6px;border-bottom:1px solid #f0f0f0}.story-viewer-user-info{min-width:0;flex:1;display:flex;flex-direction:column}.story-viewer-user-info b{font-size:13px}.story-viewer-user-info span{color:#888;font-size:11px;margin-top:2px}.story-viewer-row>small{color:#999;font-size:10px}.story-viewers-empty{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#777;gap:8px;padding:25px}.story-viewers-empty svg{width:40px;height:40px}.story-viewers-empty b{color:#222}.story-viewers-empty span{max-width:290px;font-size:11px;line-height:1.5}.viewer-loader{width:25px;height:25px;border:3px solid #ddd;border-top-color:#111;border-radius:50%;animation:viewerSpin .8s linear infinite}@keyframes viewerSpin{to{transform:rotate(360deg)}}
+@media(max-width:700px){.messages-page{width:100%;padding:15px 10px 90px}.messages-instagram-head{padding:4px 6px}.messages-instagram-head h1{font-size:21px}.messages-instagram-head p{display:none}.messages-requests-button{font-size:13px}.messages-notes-section{border:0;border-radius:0;background:transparent;padding:5px 0 12px}.messages-notes-header{padding:0 5px}.messages-notes-scroll{gap:15px}.message-note-card{min-width:72px;width:72px}.message-note-avatar{width:58px;height:58px}.message-note-card>b{font-size:10px}.message-note-card>span{font-size:9px}.message-note-bubble{max-width:90px;font-size:8px}.instagram-chat-layout{min-height:calc(100vh - 230px);border-radius:15px;overflow:hidden}.instagram-chat-layout:not(.has-active) .instagram-chat{display:none}.instagram-chat-layout.has-active .instagram-conversation-list{display:none}.instagram-conversation-list{min-width:100%;width:100%;border-right:0}.conversation-scroll{max-height:calc(100vh - 290px)}.conversation-item{padding:13px 9px}.instagram-chat{width:100%;min-width:0}.instagram-chat-head{height:62px;padding:0 10px}.chat-back-button{display:flex}.instagram-chat-messages{min-height:calc(100vh - 355px);padding:14px 10px}.message-line .bubble{max-width:78%}.instagram-chat-input{height:56px;padding:8px}.instagram-chat-input input{min-width:0}.instagram-chat-placeholder{min-height:calc(100vh - 250px)}.messages-requests-overlay{align-items:flex-end;padding:0}.messages-requests-modal{width:100%;max-height:80vh;border-radius:22px 22px 0 0}.story-viewers-sheet{width:100%;max-height:70vh;border-radius:22px 22px 0 0}.story-viewers-list{max-height:calc(70vh - 66px)}}
+.story-progress{position:absolute;top:10px;left:18px;right:18px;height:3px;background:#ffffff55;border-radius:99px;z-index:5;overflow:hidden}.story-progress span{display:block;width:35%;height:100%;background:#fff;border-radius:99px}.story-viewers-button{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:25;border:0;border-radius:22px;background:#ffffffee;color:#111;padding:10px 18px;display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;box-shadow:0 8px 30px #0006}.story-viewers-button svg{width:18px;height:18px}.story-viewers-button:hover{background:#fff}@media(max-width:700px){.story-progress{left:10px;right:10px}.story-viewers-button{bottom:20px}}
+
+/* ============================================================
+   GLASS MOBILE NAV + MEDIA VIEWERS + SHARE + PROFILE EDIT
+   ============================================================ */
+@media (max-width:700px) {
+  body{background:radial-gradient(circle at 15% 0%,#4c3934 0%,transparent 34%),radial-gradient(circle at 90% 85%,#3d2630 0%,transparent 40%),#08090d;color:#f7f7f8}
+  .main{background:transparent}
+  .mobile-header{background:rgba(8,9,13,.58);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+  .mobile-brand,.mobile-header button{color:#fff}
+  .page{padding-bottom:105px}
+  .bottom-nav.glass-bottom-nav{left:5%;right:5%;bottom:12px;width:90%;height:72px;padding:6px 8px;border:1px solid rgba(255,255,255,.2);border-radius:38px;background:linear-gradient(120deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 18px 45px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.18);backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%);display:grid;grid-template-columns:repeat(5,1fr);z-index:120}
+  .glass-bottom-nav .nav-mobile,.glass-bottom-nav .mobile-profile{position:relative;height:58px;min-width:0;border-radius:30px;color:#f5f5f6;background:transparent;transition:.2s ease}
+  .glass-bottom-nav .nav-mobile svg{width:31px;height:31px;stroke-width:1.75}
+  .glass-bottom-nav .nav-mobile span,.glass-bottom-nav .mobile-profile span{display:none}
+  .glass-bottom-nav .nav-mobile.active,.glass-bottom-nav .mobile-profile.active{color:#fff;background:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 5px 20px rgba(0,0,0,.15)}
+  .glass-bottom-nav .mobile-profile .avatar{width:34px!important;height:34px!important;border:2px solid transparent}
+  .glass-bottom-nav .mobile-profile.active .avatar{border-color:#fff}
+  .post-media-button,.grid-media-button,.reel-card-button{position:relative;width:100%;padding:0;border:0;overflow:hidden;background:transparent;display:block;cursor:pointer}
+  .post-media-button .post-media{pointer-events:none}
+  .media-play-overlay,.reel-play,.grid-video-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:none;backdrop-filter:blur(8px)}
+  .media-play-overlay svg,.reel-play svg,.grid-video-icon svg{width:27px;height:27px}
+  .media-viewer-overlay,.reel-viewer-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  .media-viewer-close{position:fixed;right:22px;top:22px;z-index:20;width:44px;height:44px;border-radius:50%;color:#fff;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16)}
+  .media-viewer-card{width:min(92vw,760px);max-height:92vh;overflow:hidden;border-radius:24px;background:#090a0d;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 100px #000}
+  .media-viewer-head{display:flex;align-items:center;gap:10px;padding:13px;color:#fff}
+  .media-viewer-head>div{display:flex;flex-direction:column}.media-viewer-head span{color:#999da7;font-size:10px;margin-top:3px}
+  .media-viewer-card>img,.media-viewer-card>video{width:100%;max-height:74vh;object-fit:contain;background:#000}.media-viewer-caption{padding:12px 14px 15px;color:#ddd;font-size:13px;line-height:1.5}
+  .reel-viewer-card{height:min(88vh,820px);width:min(94vw,460px);border-radius:26px;overflow:hidden;position:relative;background:#050507;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 100px #000}
+  .reel-viewer-card>video{width:100%;height:100%;object-fit:contain;background:#000}.reel-viewer-user{position:absolute;z-index:4;left:13px;right:13px;top:13px;display:flex;align-items:center;gap:9px;color:#fff;text-shadow:0 1px 5px #000}.reel-viewer-user>div{display:flex;flex-direction:column}.reel-viewer-user span{font-size:10px;color:#ddd;margin-top:2px}
+  .grid-media-button img,.grid-media-button video{width:100%;height:100%;object-fit:cover}.reel-thumb{position:relative;aspect-ratio:9/13;overflow:hidden;background:#000}.reel-thumb video{width:100%;height:100%;object-fit:cover}
+  .share-sheet-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+  .share-sheet{width:min(100%,760px);max-height:82vh;border-radius:30px 30px 0 0;padding:13px 18px 20px;color:#fff;border:1px solid rgba(255,255,255,.17);background:linear-gradient(145deg,rgba(38,39,48,.96),rgba(15,16,21,.96));box-shadow:0 -20px 80px #0009}
+  .share-sheet-handle{width:42px;height:4px;border-radius:99px;background:#777b84;margin:0 auto 12px}.share-sheet-head{display:flex;justify-content:space-between;align-items:center}.share-sheet-head h2{font-size:20px}.share-sheet-head p{color:#9fa3ac;font-size:10px;margin-top:3px}
+  .share-search{height:44px;margin:15px 0;border-radius:14px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09)}.share-search svg{width:18px;color:#9ca0aa}.share-search input{flex:1;min-width:0;border:0;background:transparent;color:#fff}.share-search input::placeholder{color:#8b8f98}
+  .share-people{min-height:160px;max-height:40vh;overflow-x:auto;overflow-y:hidden;display:flex;align-items:flex-start;gap:18px;padding:10px 5px 18px;scrollbar-width:none}.share-people::-webkit-scrollbar{display:none}.share-person{min-width:76px;max-width:86px;color:#fff;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px}.share-person-avatar{position:relative;padding:3px;border-radius:50%}.share-person.selected .share-person-avatar{background:linear-gradient(135deg,#ffb800,#ff316b,#7c3aed)}.share-person b{width:86px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;text-align:center}.share-person>span{width:86px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9296a0;font-size:9px;text-align:center}.share-selected-check{position:absolute;right:-2px;bottom:1px;width:23px;height:23px;border-radius:50%;background:#0095f6;border:2px solid #17181d;display:flex;align-items:center;justify-content:center}.share-selected-check svg{width:13px;height:13px}.share-loading,.share-empty{width:100%;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#9b9fa8;text-align:center}.share-empty svg{width:34px;height:34px}.share-empty b{color:#fff}.share-empty span{font-size:10px;max-width:240px}.share-send-button{width:100%;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#111;font-weight:800}.share-send-button:disabled{opacity:.38}
+  .edit-card{border-radius:28px!important;padding:22px!important;color:#fff;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.07))!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 30px 100px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(30px) saturate(130%);-webkit-backdrop-filter:blur(30px) saturate(130%)}
+  .edit-card input,.edit-card textarea{background:rgba(0,0,0,.2)!important;color:#fff!important;border-color:rgba(255,255,255,.13)!important}.edit-card label{color:#c7c9d0}.edit-card .privacy-toggle-row{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.1)}
+}
+@media(max-width:700px){.edit-profile-overlay{padding:10px}.edit-profile-glass{width:100%;max-height:92vh;border-radius:27px;padding:18px}.media-viewer-overlay,.reel-viewer-overlay{padding:0}.media-viewer-card{width:100%;max-height:100%;border-radius:0}.media-viewer-card>img,.media-viewer-card>video{max-height:78vh}.media-viewer-close{right:12px;top:12px}.reel-viewer-card{width:100%;height:100%;border-radius:0}.share-sheet{width:100%;max-height:84vh}}
+
+
+/* ============================================================
+   FULL SCREEN POST / IMAGE / VIDEO VIEWER
+   Opens exactly like the story viewer: no side panel/card.
+   ============================================================ */
+.media-screen-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.media-screen-backdrop {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 0;
+}
+
+.media-screen-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.62), transparent);
+}
+
+.media-screen-back,
+.media-screen-more {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.media-screen-back svg,
+.media-screen-more svg {
+  width: 23px;
+  height: 23px;
+}
+
+.media-screen-user {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.media-screen-user > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.media-screen-user b {
+  color: #fff;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.media-screen-user span {
+  color: #c7c7c7;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.media-screen-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 76px 0 130px;
+  pointer-events: none;
+}
+
+.media-screen-media {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.media-screen-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  padding: 16px 20px 28px;
+  background: linear-gradient(to top, rgba(0,0,0,.75), transparent);
+}
+
+.media-screen-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.media-screen-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.media-screen-actions button {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.media-screen-actions button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.media-screen-actions button.active:first-child {
+  color: #ff3040;
+}
+
+.media-screen-caption {
+  max-width: 900px;
+  margin: 11px auto 0;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.45;
+  text-shadow: 0 1px 4px #000;
+}
+
+.media-screen-caption b {
+  margin-right: 4px;
+}
+
+/* Desktop: make the media feel like a separate screen, not a card. */
+@media (min-width: 701px) {
+  .media-screen-content {
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-bottom: 120px;
+  }
+
+  .media-screen-media {
+    max-width: 1100px;
+    max-height: calc(100vh - 150px);
+  }
+}
+
+/* Mobile: exactly full-screen like Story. */
+@media (max-width: 700px) {
+  .media-screen-viewer {
+    position: fixed;
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100vh;
+  }
+
+  .media-screen-topbar {
+    height: 72px;
+    padding: 10px 12px;
+  }
+
+  .media-screen-back,
+  .media-screen-more {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .media-screen-content {
+    padding: 0;
+  }
+
+  .media-screen-media {
+    width: 100vw;
+    height: 100dvh;
+    object-fit: contain;
+  }
+
+  .media-screen-bottom {
+    padding: 12px 14px 94px;
+  }
+
+  .media-screen-actions button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .media-screen-caption {
+    font-size: 12px;
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   VK SOCIAL — INSTAGRAM-STYLE DESKTOP INTERFACE
+   Desktop target: dark canvas, slim icon rail, centered feed,
+   stories row, right suggestions panel, profile grid.
+============================================================ */
+@media (min-width: 701px) {
+  :root {
+    --bg: #0b0e12;
+    --card: #101318;
+    --text: #f5f5f5;
+    --muted: #9a9da5;
+    --line: #262a31;
+    --soft: #1b1f25;
+    --accent: #4f8cff;
+  }
+
+  html, body, #root {
+    min-height: 100%;
+    background: #0b0e12 !important;
+    color: #f5f5f5 !important;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .app {
+    min-height: 100vh;
+    background: #0b0e12;
+  }
+
+  /* LEFT INSTAGRAM-LIKE RAIL */
+  .sidebar {
+    width: 74px;
+    padding: 18px 9px 20px;
+    background: #0b0e12;
+    border-right: 1px solid #242830;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .brand {
+    width: 52px;
+    height: 54px;
+    padding: 0;
+    margin: 0 0 27px;
+    border: 0;
+    background: transparent;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .brand b {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #171b22, #35405d);
+    border: 1px solid #4a5262;
+    font-size: 13px;
+    box-shadow: 0 8px 22px rgba(0,0,0,.28);
+  }
+
+  .brand span {
+    display: none;
+  }
+
+  .sidebar-main-nav {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sidebar .nav,
+  .sidebar .nav-bottom .nav {
+    width: 54px;
+    min-height: 54px;
+    height: 54px;
+    margin: 0 auto;
+    padding: 0;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #f0f1f4;
+    gap: 0;
+  }
+
+  .sidebar .nav span {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar .nav svg {
+    width: 25px;
+    height: 25px;
+    stroke-width: 1.8;
+  }
+
+  .sidebar .nav:hover,
+  .sidebar .nav.active {
+    background: #191d23;
+    color: #fff;
+  }
+
+  .sidebar .nav.active svg {
+    stroke-width: 2.35;
+  }
+
+  .sidebar .nav .avatar {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    border: 2px solid #f2f2f2;
+  }
+
+  .nav-bottom {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* MAIN CANVAS */
+  .main {
+    margin-left: 74px;
+    min-height: 100vh;
+    background: #0b0e12;
+    padding-bottom: 0;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 1160px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 38px 32px 70px;
+  }
+
+  .page-heading {
+    margin-bottom: 22px;
+  }
+
+  .page-heading h1 {
+    font-size: 24px;
+    color: #fff;
+  }
+
+  .page-heading p {
+    color: #8e929a;
+  }
+
+  .desktop-create,
+  .primary {
+    background: #f2f3f5;
+    color: #111318;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .desktop-create:hover,
+  .primary:hover {
+    background: #fff;
+  }
+
+  /* HOME TWO-COLUMN LAYOUT */
+  .feed-page {
+    max-width: 1190px;
+  }
+
+  .home-layout {
+    display: grid;
+    grid-template-columns: minmax(500px, 610px) 310px;
+    gap: 72px;
+    align-items: start;
+    justify-content: center;
+  }
+
+  .home-feed-column {
+    min-width: 0;
+  }
+
+  .home-feed-column > .page-heading {
+    display: none;
+  }
+
+  .home-feed-column .stories-card {
+    margin-top: 6px;
+  }
+
+  /* STORIES */
+  .stories-card {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 7px 0 22px;
+    margin-bottom: 5px;
+    gap: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .stories-card::-webkit-scrollbar {
+    display: none;
+  }
+
+  .story {
+    min-width: 66px;
+    color: #d9dbe0;
+    font-size: 11px;
+  }
+
+  .story-ring,
+  .story-placeholder {
+    width: 66px;
+    height: 66px;
+    padding: 3px;
+    margin-bottom: 7px;
+    background: linear-gradient(135deg, #ffb900, #ff2472 55%, #8a39e8);
+  }
+
+  .story-ring .avatar,
+  .story-ring img,
+  .story-ring video {
+    width: 100% !important;
+    height: 100% !important;
+    border: 3px solid #0b0e12;
+    object-fit: cover;
+  }
+
+  .story-ring i {
+    right: 0;
+    bottom: 0;
+    width: 21px;
+    height: 21px;
+    border: 2px solid #0b0e12;
+    background: #1677ff;
+  }
+
+  .story > span {
+    color: #c9cbd1;
+  }
+
+  /* CREATE BAR */
+  .quick-create {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid #242830;
+    border-bottom: 1px solid #242830;
+    border-radius: 0;
+    padding: 13px 0;
+    margin-bottom: 17px;
+  }
+
+  .quick-create > button:nth-child(2) {
+    background: #171b21;
+    color: #858991;
+    border: 1px solid #252a32;
+  }
+
+  .quick-icon {
+    background: transparent;
+    color: #dfe2e8;
+  }
+
+  /* FEED POST */
+  .post-card {
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #292d34;
+    border-radius: 0;
+    overflow: visible;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+  }
+
+  .post-head {
+    padding: 8px 0 11px;
+  }
+
+  .post-user,
+  .post-user-button {
+    color: #fff;
+  }
+
+  .post-user b {
+    font-size: 13px;
+  }
+
+  .post-user span {
+    color: #8e929b;
+  }
+
+  .post-head .icon-button {
+    color: #e6e7ea;
+  }
+
+  .post-media-button {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #050607;
+    border: 1px solid #242830;
+  }
+
+  .post-media {
+    width: 100%;
+    max-height: 760px;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    background: #050607;
+  }
+
+  .post-media-button:has(video) .post-media {
+    aspect-ratio: 4 / 5;
+  }
+
+  .media-play-overlay {
+    width: 58px;
+    height: 58px;
+    background: rgba(0,0,0,.48);
+    backdrop-filter: blur(6px);
+  }
+
+  .actions {
+    padding: 7px 0 1px;
+  }
+
+  .actions button {
+    color: #f4f5f6;
+    width: 42px;
+    height: 42px;
+  }
+
+  .actions button:hover {
+    background: transparent;
+  }
+
+  .post-body {
+    color: #dddfe3;
+    font-size: 13px;
+  }
+
+  .post-body > b {
+    color: #fff;
+  }
+
+  .post-body p {
+    color: #e0e1e5;
+  }
+
+  .comments-link {
+    color: #858a94;
+    background: transparent;
+  }
+
+  /* RIGHT SUGGESTIONS */
+  .suggestions-rail {
+    position: sticky;
+    top: 34px;
+    width: 310px;
+    padding-top: 18px;
+  }
+
+  .rail-account {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 11px;
+    align-items: center;
+    margin-bottom: 29px;
+  }
+
+  .rail-account-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .rail-account-info b {
+    color: #f5f5f6;
+    font-size: 13px;
+  }
+
+  .rail-account-info span {
+    color: #8d919a;
+    font-size: 12px;
+    margin-top: 3px;
+  }
+
+  .rail-account > button,
+  .suggestions-title button,
+  .suggestion-row .follow,
+  .suggestion-row .following {
+    color: #5794ff;
+    background: transparent;
+    font-weight: 700;
+    font-size: 11px;
+  }
+
+  .suggestions-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .suggestions-title b {
+    color: #858a93;
+    font-size: 13px;
+  }
+
+  .suggestions-title button {
+    color: #eee;
+  }
+
+  .suggestion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .suggestion-row {
+    display: grid;
+    grid-template-columns: 42px 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .suggestion-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .suggestion-copy b {
+    color: #f1f2f4;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .suggestion-copy span {
+    color: #777c85;
+    font-size: 10px;
+    margin-top: 3px;
+  }
+
+  .suggestion-row .following {
+    color: #858a92;
+  }
+
+  .rail-footer {
+    color: #666b74;
+    font-size: 10px;
+    line-height: 1.7;
+    margin-top: 38px;
+  }
+
+  .floating-messages {
+    position: fixed;
+    right: 34px;
+    bottom: 30px;
+    min-width: 210px;
+    height: 58px;
+    padding: 0 14px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #20242a;
+    color: #fff;
+    border: 1px solid #333840;
+    box-shadow: 0 18px 45px rgba(0,0,0,.34);
+    z-index: 80;
+  }
+
+  .floating-messages > svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .floating-messages b {
+    font-size: 13px;
+  }
+
+  .floating-avatars {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .floating-avatars .avatar {
+    margin-left: -7px;
+    border: 2px solid #20242a;
+  }
+
+  /* PROFILE */
+  .profile-page {
+    max-width: 1040px;
+    padding-top: 50px;
+  }
+
+  .profile-header {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 50px;
+    align-items: start;
+    padding-bottom: 40px;
+  }
+
+  .profile-avatar-wrap {
+    justify-self: center;
+  }
+
+  .profile-avatar-wrap .avatar {
+    border: 1px solid #343942;
+    box-shadow: 0 8px 28px rgba(0,0,0,.25);
+  }
+
+  .profile-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 21px;
+  }
+
+  .profile-line h1 {
+    font-size: 24px;
+    color: #fff;
+    margin-right: 4px;
+  }
+
+  .profile-line .secondary {
+    background: #25292f;
+    color: #fff;
+    border: 1px solid #30353d;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 700;
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 19px;
+  }
+
+  .profile-stats span {
+    color: #f0f1f3;
+  }
+
+  .profile-stats small {
+    color: #a1a5ad;
+    margin-left: 4px;
+  }
+
+  .profile-details > b {
+    color: #fff;
+  }
+
+  .profile-details > p {
+    color: #d4d6da;
+    margin-top: 8px;
+    white-space: pre-line;
+    line-height: 1.4;
+    max-width: 620px;
+  }
+
+  .profile-details > a {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    margin-top: 8px;
+    color: #dce7ff;
+    font-size: 12px;
+  }
+
+  .profile-tabs {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 56px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid #2a2e35;
+  }
+
+  .profile-tabs button {
+    color: #858a92;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    position: relative;
+  }
+
+  .profile-tabs button svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .profile-tabs button.active {
+    color: #fff;
+  }
+
+  .profile-tabs button.active::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 28%;
+    right: 28%;
+    height: 1px;
+    background: #fff;
+  }
+
+  .profile-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+  }
+
+  .grid-media,
+  .grid-reel {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #15181d;
+    border: 0;
+    position: relative;
+  }
+
+  .grid-media img,
+  .grid-media video,
+  .grid-reel video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .grid-media-button:hover img,
+  .grid-media-button:hover video {
+    transform: scale(1.025);
+    transition: transform .18s ease;
+  }
+
+  .grid-video-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0,0,0,.38);
+  }
+
+  .grid-video-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .edit-card {
+    max-width: 900px;
+    margin: 0 auto 20px;
+    padding: 22px;
+    background: #15191f;
+    border: 1px solid #2a2f37;
+    border-radius: 16px;
+    color: #fff;
+  }
+
+  .edit-card input,
+  .edit-card textarea {
+    background: #0f1216;
+    color: #fff;
+    border: 1px solid #30353e;
+    border-radius: 9px;
+    padding: 10px 12px;
+  }
+
+  .privacy-toggle-row {
+    background: #11151a;
+    border: 1px solid #2c3139;
+    color: #fff;
+  }
+
+  /* OTHER PAGES */
+  .messages-layout,
+  .search-box,
+  .user-list,
+  .settings-card,
+  .notification-list,
+  .saved-grid {
+    background: #101318;
+    border-color: #282d35;
+    color: #fff;
+  }
+
+  .messages-layout {
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .empty {
+    color: #b4b8c0;
+    background: transparent;
+  }
+
+  .empty h2 {
+    color: #fff;
+  }
+
+  .empty p {
+    color: #858a93;
+  }
+
+  .mobile-header,
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Desktop small screens: keep the rail, reduce right column. */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .home-layout {
+    grid-template-columns: minmax(480px, 600px);
+  }
+
+  .suggestions-rail {
+    display: none;
+  }
+
+  .page {
+    max-width: 720px;
+  }
+
+  .profile-header,
+  .profile-tabs,
+  .profile-grid {
+    max-width: 680px;
+  }
+}
+
+/* ============================================================
+   MOBILE KEEPS THE GLASS NAVIGATION
+============================================================ */
+@media (max-width: 700px) {
+  body, #root {
+    background: #08090d !important;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .main {
+    margin-left: 0;
+    background: #08090d;
+  }
+
+  .suggestions-rail {
+    display: none;
+  }
+
+  .home-layout {
+    display: block;
+  }
+
+  .home-feed-column {
+    width: 100%;
+  }
+
+  .floating-messages {
+    display: none;
+  }
+}
+
+
+/* ============================================================
+   FINAL DESKTOP ALIGNMENT — INSTAGRAM STYLE
+   Keep all existing functions; only restore desktop geometry.
+============================================================ */
+@media (min-width: 1101px) {
+  html, body, #root { background:#0b0e12 !important; color:#f5f5f5 !important; }
+  body { overflow-x:hidden; }
+
+  .app { min-height:100vh; background:#0b0e12; }
+
+  /* slim Instagram-style icon rail */
+  .sidebar {
+    width:74px !important;
+    padding:18px 9px 20px !important;
+    background:#0b0e12 !important;
+    border-right:1px solid #242830 !important;
+    overflow:hidden;
+  }
+  .brand {
+    width:54px !important;
+    height:54px !important;
+    padding:0 !important;
+    margin:0 auto 27px !important;
+    border:0 !important;
+    background:transparent !important;
+    justify-content:center !important;
+  }
+  .brand span { display:none !important; }
+  .brand b {
+    width:34px !important;
+    height:34px !important;
+    border-radius:10px !important;
+    background:linear-gradient(145deg,#171b22,#35405d) !important;
+    border:1px solid #4a5262 !important;
+    font-size:13px !important;
+  }
+  .sidebar-main-nav { width:100%; gap:8px !important; }
+  .sidebar .nav,
+  .sidebar .nav-bottom .nav {
+    width:54px !important;
+    min-width:54px !important;
+    height:54px !important;
+    min-height:54px !important;
+    margin:0 auto !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:0 !important;
+    color:#f0f1f4 !important;
+    font-size:0 !important;
+    overflow:hidden !important;
+  }
+  .sidebar .nav span {
+    width:54px !important;
+    height:54px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 54px !important;
+  }
+  .sidebar .nav svg { width:25px !important; height:25px !important; }
+  .sidebar .nav:hover,
+  .sidebar .nav.active { background:#191d23 !important; color:#fff !important; }
+  .sidebar .nav .avatar { width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; border:2px solid #f2f2f2 !important; }
+  .nav-bottom { width:100%; gap:8px !important; }
+
+  /* full desktop canvas */
+  .main {
+    margin-left:74px !important;
+    width:calc(100% - 74px) !important;
+    min-height:100vh !important;
+    padding-bottom:0 !important;
+    background:#0b0e12 !important;
+  }
+
+  .page.feed-page {
+    width:100% !important;
+    max-width:1160px !important;
+    padding:30px 0 80px !important;
+    margin:0 auto !important;
+  }
+
+  .home-layout {
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,610px) 310px !important;
+    gap:72px !important;
+    align-items:start !important;
+    justify-content:center !important;
+  }
+  .home-feed-column { min-width:0 !important; width:610px !important; }
+  .home-feed-column > .page-heading { display:none !important; }
+
+  .stories-card {
+    width:100% !important;
+    display:flex !important;
+    gap:17px !important;
+    padding:7px 0 22px !important;
+    margin:0 0 5px !important;
+    background:transparent !important;
+    border:0 !important;
+    border-radius:0 !important;
+    overflow-x:auto !important;
+    scrollbar-width:none !important;
+  }
+  .stories-card::-webkit-scrollbar { display:none !important; }
+  .story { min-width:66px !important; width:66px !important; }
+  .story-ring,.story-placeholder { width:66px !important; height:66px !important; }
+
+  .quick-create {
+    width:100% !important;
+    background:transparent !important;
+    border-top:1px solid #242830 !important;
+    border-bottom:1px solid #242830 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    border-radius:0 !important;
+    padding:13px 0 !important;
+    margin-bottom:17px !important;
+  }
+  .quick-create > button:nth-child(2) { background:#171b21 !important; border:1px solid #252a32 !important; }
+
+  .post-card {
+    width:100% !important;
+    background:transparent !important;
+    border:0 !important;
+    border-bottom:1px solid #292d34 !important;
+    border-radius:0 !important;
+    margin-bottom:18px !important;
+    padding-bottom:18px !important;
+  }
+  .post-head { padding:8px 0 11px !important; }
+  .post-media-button { width:100% !important; border-radius:4px !important; border:1px solid #242830 !important; }
+  .post-media { width:100% !important; max-height:760px !important; aspect-ratio:4/5 !important; object-fit:cover !important; }
+
+  /* right Instagram rail */
+  .suggestions-rail {
+    display:block !important;
+    width:310px !important;
+    min-width:310px !important;
+    position:sticky !important;
+    top:30px !important;
+    padding-top:18px !important;
+  }
+
+  .rail-account { margin-bottom:29px !important; }
+  .suggestions-title { margin-bottom:16px !important; }
+  .suggestion-list { gap:16px !important; }
+
+  .floating-messages {
+    right:34px !important;
+    bottom:30px !important;
+  }
+
+  /* desktop profile remains centered and spacious */
+  .profile-page { width:min(935px,calc(100% - 80px)) !important; max-width:935px !important; margin:0 auto !important; }
+
+  /* other pages get a useful desktop width */
+  .main > .page:not(.feed-page) { max-width:1100px !important; }
+
+  .bottom-nav { display:none !important; }
+  .mobile-header { display:none !important; }
+}
+
+/* Between tablet and desktop: keep all navigation and use one centered feed. */
+@media (min-width:701px) and (max-width:1100px) {
+  .sidebar { width:74px !important; padding-left:9px !important; padding-right:9px !important; }
+  .sidebar .nav { width:54px !important; min-width:54px !important; padding:0 !important; font-size:0 !important; justify-content:center !important; }
+  .sidebar .nav span { width:54px !important; flex:0 0 54px !important; }
+  .brand span { display:none !important; }
+  .main { margin-left:74px !important; width:calc(100% - 74px) !important; }
+  .page.feed-page { max-width:700px !important; margin:0 auto !important; }
+  .home-layout { display:block !important; }
+  .home-feed-column { width:100% !important; }
+  .suggestions-rail { display:none !important; }
+}
+
+/* ============================================================
+   FINAL POLISH — SHARE + SETTINGS
+   Keeps every existing function and only improves presentation.
+============================================================ */
+
+/* ---------------- SHARE SHEET: ALL SCREEN SIZES ---------------- */
+.share-sheet-overlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:1000 !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:center !important;
+  padding:24px !important;
+  background:rgba(0,0,0,.70) !important;
+  backdrop-filter:blur(18px) saturate(120%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(120%) !important;
+}
+
+.share-sheet{
+  width:min(680px,100%) !important;
+  max-height:min(620px,88vh) !important;
+  overflow:hidden !important;
+  padding:18px 22px 22px !important;
+  border-radius:28px !important;
+  color:#f7f7f8 !important;
+  background:linear-gradient(145deg,#1b2027,#101318) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  box-shadow:0 30px 100px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter:blur(28px) saturate(135%) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(135%) !important;
+}
+
+.share-sheet-handle{
+  width:42px !important;
+  height:4px !important;
+  margin:0 auto 16px !important;
+  border-radius:99px !important;
+  background:#707781 !important;
+}
+
+.share-sheet-head{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:15px !important;
+  margin-bottom:4px !important;
+}
+
+.share-sheet-head h2{
+  color:#fff !important;
+  font-size:22px !important;
+  line-height:1.15 !important;
+}
+
+.share-sheet-head p{
+  margin-top:5px !important;
+  color:#a5abb4 !important;
+  font-size:12px !important;
+}
+
+.share-sheet-head .icon-button{
+  width:38px !important;
+  height:38px !important;
+  min-width:38px !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  color:#fff !important;
+  background:rgba(255,255,255,.08) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+}
+
+.share-sheet-head .icon-button svg{width:19px !important;height:19px !important}
+
+.share-search{
+  width:100% !important;
+  height:46px !important;
+  margin:17px 0 16px !important;
+  padding:0 14px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  border-radius:15px !important;
+  background:#252b33 !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+}
+
+.share-search svg{
+  width:19px !important;
+  height:19px !important;
+  flex:0 0 auto !important;
+  color:#aeb4be !important;
+}
+
+.share-search input{
+  width:100% !important;
+  min-width:0 !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  color:#fff !important;
+  font-size:14px !important;
+}
+
+.share-search input::placeholder{color:#9097a2 !important}
+
+.share-people{
+  min-height:155px !important;
+  max-height:280px !important;
+  width:100% !important;
+  display:flex !important;
+  align-items:flex-start !important;
+  gap:22px !important;
+  padding:8px 5px 20px !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  scrollbar-width:none !important;
+}
+
+.share-people::-webkit-scrollbar{display:none !important}
+
+.share-person{
+  position:relative !important;
+  flex:0 0 82px !important;
+  width:82px !important;
+  min-width:82px !important;
+  max-width:82px !important;
+  min-height:122px !important;
+  padding:5px 0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:7px !important;
+  color:#fff !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:16px !important;
+}
+
+.share-person:hover{background:rgba(255,255,255,.06) !important}
+
+.share-person-avatar{
+  position:relative !important;
+  width:70px !important;
+  height:70px !important;
+  padding:3px !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.share-person-avatar .avatar{
+  width:64px !important;
+  height:64px !important;
+  min-width:64px !important;
+  min-height:64px !important;
+  border-radius:50% !important;
+}
+
+.share-person.selected .share-person-avatar{
+  background:linear-gradient(135deg,#ffbf00,#ff2d74,#7c3aed) !important;
+}
+
+.share-person b{
+  width:82px !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  text-align:center !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.share-person>span{
+  width:82px !important;
+  color:#9299a4 !important;
+  font-size:10px !important;
+  text-align:center !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.share-selected-check{
+  position:absolute !important;
+  right:-1px !important;
+  bottom:0 !important;
+  width:23px !important;
+  height:23px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:50% !important;
+  background:#168cff !important;
+  color:#fff !important;
+  border:2px solid #171b21 !important;
+}
+
+.share-selected-check svg{width:13px !important;height:13px !important}
+
+.share-loading,.share-empty{
+  width:100% !important;
+  min-height:140px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  color:#a2a8b1 !important;
+  text-align:center !important;
+}
+
+.share-empty svg{width:32px !important;height:32px !important;color:#89919c !important}
+.share-empty b{color:#fff !important;font-size:13px !important}
+.share-empty span{max-width:260px !important;font-size:11px !important;line-height:1.4 !important}
+
+.share-send-button{
+  width:100% !important;
+  height:48px !important;
+  margin-top:3px !important;
+  border-radius:15px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:8px !important;
+  background:#fff !important;
+  color:#111318 !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+}
+
+.share-send-button svg{width:18px !important;height:18px !important}
+.share-send-button:disabled{opacity:.35 !important}
+
+/* ---------------- SETTINGS: DESKTOP ---------------- */
+.settings-overlay{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:950 !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:stretch !important;
+  justify-content:center !important;
+  background:#080b0f !important;
+}
+
+.settings-modal.instagram-settings{
+  width:100% !important;
+  height:100% !important;
+  max-height:none !important;
+  border-radius:0 !important;
+  overflow:hidden !important;
+  display:flex !important;
+  flex-direction:column !important;
+  background:#0b0f13 !important;
+  color:#f4f5f7 !important;
+}
+
+.settings-topbar{
+  position:relative !important;
+  height:70px !important;
+  flex:0 0 70px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-bottom:1px solid #242a31 !important;
+  background:rgba(11,15,19,.96) !important;
+}
+
+.settings-topbar h2{
+  color:#fff !important;
+  font-size:18px !important;
+  font-weight:750 !important;
+}
+
+.settings-back{
+  position:absolute !important;
+  left:22px !important;
+  top:15px !important;
+  width:40px !important;
+  height:40px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:50% !important;
+  color:#fff !important;
+  background:#1b2027 !important;
+  border:1px solid #2a3038 !important;
+}
+
+.settings-back:hover{background:#252b33 !important}
+.settings-back svg{width:19px !important;height:19px !important}
+
+.settings-search{
+  width:min(760px,calc(100% - 40px)) !important;
+  height:48px !important;
+  margin:18px auto 16px !important;
+  flex:0 0 48px !important;
+  padding:0 14px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  border-radius:14px !important;
+  background:#1b2026 !important;
+  border:1px solid #282e36 !important;
+}
+
+.settings-search svg{width:18px !important;height:18px !important;color:#9199a5 !important}
+.settings-search input{color:#fff !important;background:transparent !important;border:0 !important}
+.settings-search input::placeholder{color:#7e8792 !important}
+
+.settings-layout{
+  width:min(1120px,calc(100% - 48px)) !important;
+  margin:0 auto !important;
+  flex:1 !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-columns:300px minmax(0,1fr) !important;
+  border:1px solid #252b33 !important;
+  border-radius:18px 18px 0 0 !important;
+  overflow:hidden !important;
+  background:#0d1116 !important;
+}
+
+.settings-sidebar{
+  min-width:0 !important;
+  padding:16px 12px 24px !important;
+  overflow:auto !important;
+  background:#0d1116 !important;
+  border-right:1px solid #252b33 !important;
+}
+
+.settings-sidebar button{
+  width:100% !important;
+  min-height:48px !important;
+  margin-bottom:4px !important;
+  padding:0 12px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:11px !important;
+  color:#d9dde3 !important;
+  background:transparent !important;
+  border-radius:11px !important;
+  text-align:left !important;
+}
+
+.settings-sidebar button:hover{background:#171c22 !important}
+.settings-sidebar button.active{background:#202638 !important;color:#8d83ff !important}
+.settings-sidebar button svg:first-child{width:19px !important;height:19px !important;flex:0 0 19px !important}
+.settings-sidebar button svg:last-child{width:16px !important;height:16px !important;margin-left:auto !important;color:#68717c !important}
+.settings-sidebar button.active svg:last-child{color:#8d83ff !important}
+.settings-logout{margin-top:18px !important;color:#ff6464 !important;border-top:1px solid #252b33 !important;border-radius:0 !important;padding-top:15px !important}
+.settings-logout svg:last-child{display:none !important}
+
+.settings-content{
+  min-width:0 !important;
+  overflow:auto !important;
+  padding:28px 44px 60px !important;
+  background:#0b0f13 !important;
+}
+
+.settings-section-title{
+  padding:0 0 20px !important;
+  margin:0 0 7px !important;
+  border-bottom:1px solid #252b33 !important;
+}
+
+.settings-section-title h1{font-size:25px !important;color:#fff !important}
+.settings-section-title p{margin-top:5px !important;color:#8d96a1 !important;font-size:12px !important}
+.settings-panel{max-width:720px !important}
+
+.settings-profile-row{
+  min-height:92px !important;
+  padding:17px 0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+  border-bottom:1px solid #252b33 !important;
+}
+
+.settings-profile-row>div{min-width:0 !important;display:flex !important;flex-direction:column !important}
+.settings-profile-row b{color:#fff !important}
+.settings-profile-row span{color:#8e96a1 !important;font-size:12px !important;margin-top:4px !important}
+.settings-profile-row .secondary{background:#20262d !important;color:#fff !important;border:1px solid #303741 !important;border-radius:10px !important}
+
+.setting-row{
+  min-height:67px !important;
+  padding:10px 0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:13px !important;
+  border-bottom:1px solid #222830 !important;
+  color:#fff !important;
+  background:transparent !important;
+}
+
+.setting-row:hover{background:#10151a !important}
+.setting-row>svg:first-child{width:20px !important;height:20px !important;color:#b3bac4 !important;flex:0 0 20px !important}
+.setting-row>div{min-width:0 !important;flex:1 !important;display:flex !important;flex-direction:column !important}
+.setting-row b{font-size:14px !important;color:#f3f4f6 !important}
+.setting-row span{font-size:11px !important;color:#828b96 !important;margin-top:3px !important}
+.setting-row>svg:last-child{width:17px !important;height:17px !important;color:#65707c !important}
+
+.settings-card-highlight{
+  display:flex !important;
+  gap:12px !important;
+  padding:15px !important;
+  margin:14px 0 !important;
+  border-radius:14px !important;
+  background:#171b2a !important;
+  border:1px solid #292f48 !important;
+}
+.settings-card-highlight>svg{color:#8d83ff !important;flex:0 0 auto !important}
+.settings-card-highlight b{color:#fff !important}
+.settings-card-highlight p{color:#8e97a3 !important}
+
+.privacy-toggle-row{
+  border-color:#252b33 !important;
+  color:#fff !important;
+}
+.privacy-toggle-row b{color:#fff !important}
+.privacy-toggle-row span:not(.toggle-knob){color:#8d96a1 !important}
+
+.setting-detail{
+  margin-top:18px !important;
+  padding:17px !important;
+  border-radius:14px !important;
+  background:#171c22 !important;
+  border:1px solid #2a3038 !important;
+  color:#fff !important;
+}
+.setting-detail p{margin-top:6px !important;color:#8d96a1 !important;font-size:12px !important;line-height:1.5 !important}
+
+/* toggle polish */
+.toggle{
+  flex:0 0 auto !important;
+}
+
+/* ---------------- SHARE + SETTINGS MOBILE ---------------- */
+@media(max-width:700px){
+  .share-sheet-overlay{padding:0 !important;align-items:flex-end !important}
+  .share-sheet{width:100% !important;max-height:84vh !important;border-radius:28px 28px 0 0 !important;padding:14px 16px 18px !important}
+  .share-people{gap:17px !important}
+
+  .settings-overlay{align-items:stretch !important}
+  .settings-modal.instagram-settings{height:100% !important}
+  .settings-topbar{height:58px !important;flex-basis:58px !important}
+  .settings-topbar h2{font-size:17px !important}
+  .settings-back{left:10px !important;top:9px !important}
+  .settings-search{width:calc(100% - 24px) !important;margin:10px auto !important;height:44px !important;flex-basis:44px !important}
+  .settings-layout{width:100% !important;margin:0 !important;border:0 !important;border-radius:0 !important;display:block !important}
+  .settings-sidebar{display:none !important}
+  .settings-content{padding:15px 16px 80px !important}
+  .settings-section-title h1{font-size:21px !important}
+}
+
+/* ============================================================
+   VK SOCIAL — INSTAGRAM STYLE VERTICAL REELS FEED
+   Desktop + mobile scroll up/down
+   ============================================================ */
+.reels-page {
+  max-width: 1180px !important;
+}
+
+.reels-heading {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  background: linear-gradient(180deg, #0b0f12 75%, rgba(11,15,18,0));
+}
+
+.reels-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: calc(100vh - 150px);
+}
+
+.reels-scroll {
+  width: min(430px, 92vw);
+  height: calc(100vh - 165px);
+  min-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-y: contain;
+  padding: 0 0 70px;
+}
+
+.reels-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.reel-feed-card {
+  width: 100%;
+  min-height: calc(100vh - 205px);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0;
+  opacity: .72;
+  transform: scale(.96);
+  transition: opacity .25s ease, transform .25s ease;
+}
+
+.reel-feed-card.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.reel-feed-media {
+  position: relative;
+  width: 100%;
+  height: min(78vh, 720px);
+  min-height: 520px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #050507;
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 28px 80px rgba(0,0,0,.45);
+}
+
+.reel-feed-media > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.reel-feed-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 2px 8px #000;
+}
+
+.reel-feed-top > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.reel-feed-top b {
+  font-size: 13px;
+}
+
+.reel-feed-top span {
+  margin-top: 3px;
+  max-width: 300px;
+  color: #ddd;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reel-feed-bottom {
+  position: absolute;
+  right: 14px;
+  bottom: 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reel-feed-bottom button,
+.reels-side-controls button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20,21,25,.78);
+  color: #fff;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+}
+
+.reel-feed-bottom button:hover,
+.reels-side-controls button:hover:not(:disabled) {
+  background: rgba(255,255,255,.18);
+}
+
+.reel-feed-bottom button:disabled,
+.reels-side-controls button:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+}
+
+.reel-feed-bottom svg,
+.reels-side-controls svg {
+  width: 21px;
+  height: 21px;
+}
+
+.reels-side-controls {
+  position: absolute;
+  left: calc(50% + 245px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.reels-side-controls span {
+  color: #9297a1;
+  font-size: 11px;
+  min-width: 55px;
+  text-align: center;
+}
+
+@media (max-width: 1000px) and (min-width: 701px) {
+  .reels-side-controls {
+    left: calc(50% + 235px);
+  }
+}
+
+@media (max-width: 700px) {
+  .reels-page {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-bottom: 100px !important;
+  }
+
+  .reels-heading {
+    padding: 10px 8px 14px;
+  }
+
+  .reels-stage {
+    min-height: calc(100vh - 135px);
+  }
+
+  .reels-scroll {
+    width: 100%;
+    height: calc(100vh - 145px);
+    min-height: 520px;
+    padding-bottom: 50px;
+  }
+
+  .reel-feed-card {
+    min-height: calc(100vh - 175px);
+    padding: 5px 0;
+  }
+
+  .reel-feed-media {
+    width: 100%;
+    height: calc(100vh - 190px);
+    min-height: 500px;
+    border-radius: 18px;
+  }
+
+  .reel-feed-top {
+    top: 13px;
+    left: 13px;
+    right: 13px;
+  }
+
+  .reel-feed-bottom {
+    right: 10px;
+    bottom: 14px;
+  }
+
+  .reel-feed-bottom button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .reels-side-controls {
+    right: 8px;
+    left: auto;
+    top: auto;
+    bottom: 120px;
+    transform: none;
+  }
+
+  .reels-side-controls span {
+    display: none;
+  }
+}
+
+/* =========================================================
+   VK SOCIAL — MESSAGES DARK GLASS THEME
+   Keep the same dark theme as the rest of the application.
+   Functional classes are unchanged.
+========================================================= */
+
+.messages-page {
+  color: #f5f7fb !important;
+}
+
+.messages-page .messages-instagram-head h1 {
+  color: #f8fafc !important;
+}
+
+.messages-page .messages-instagram-head p {
+  color: #8f98a7 !important;
+}
+
+.messages-page .messages-requests-button {
+  color: #c8d0dc !important;
+}
+
+/* Notes */
+.messages-page .messages-notes-section {
+  background: linear-gradient(145deg, rgba(28,33,40,.94), rgba(16,20,25,.94)) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  color: #f5f7fb !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+
+.messages-page .messages-notes-header b {
+  color: #f5f7fb !important;
+}
+
+.messages-page .messages-notes-header button {
+  color: #9da7b5 !important;
+}
+
+.messages-page .message-note-card {
+  color: #f5f7fb !important;
+}
+
+.messages-page .message-note-card > b {
+  color: #f5f7fb !important;
+}
+
+.messages-page .message-note-card > span {
+  color: #8e98a6 !important;
+}
+
+.messages-page .message-note-bubble {
+  color: #f5f7fb !important;
+  background: #20262f !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35) !important;
+}
+
+.messages-page .note-add {
+  border-color: #15191f !important;
+}
+
+.messages-page .notes-empty {
+  color: #8e98a6 !important;
+}
+
+/* Main chat shell */
+.messages-page .instagram-chat-layout,
+.messages-page .chat-layout {
+  background: #11161c !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.02) !important;
+}
+
+/* Conversation list */
+.messages-page .instagram-conversation-list,
+.messages-page .conversation-list {
+  background: rgba(17,22,28,.96) !important;
+  border-right: 1px solid rgba(255,255,255,.08) !important;
+  color: #f5f7fb !important;
+}
+
+.messages-page .conversation-list-title {
+  background: rgba(17,22,28,.96) !important;
+  border-bottom: 1px solid rgba(255,255,255,.07) !important;
+}
+
+.messages-page .conversation-list-title b {
+  color: #f5f7fb !important;
+}
+
+.messages-page .conversation-list-title span {
+  color: #7f8998 !important;
+}
+
+.messages-page .conversation-scroll {
+  background: #11161c !important;
+}
+
+.messages-page .conversation-item {
+  color: #f5f7fb !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255,255,255,.045) !important;
+}
+
+.messages-page .conversation-item:hover {
+  background: rgba(255,255,255,.045) !important;
+}
+
+.messages-page .conversation-item.active {
+  background: linear-gradient(90deg, rgba(124,58,237,.24), rgba(124,58,237,.09)) !important;
+}
+
+.messages-page .conversation-copy b {
+  color: #f7f8fa !important;
+}
+
+.messages-page .conversation-copy span {
+  color: #9aa3b0 !important;
+}
+
+.messages-page .conversation-copy small {
+  color: #697382 !important;
+}
+
+/* Empty conversation list */
+.messages-page .chat-empty-list {
+  color: #a4adba !important;
+  background: #11161c !important;
+}
+
+.messages-page .chat-empty-list b {
+  color: #eef2f7 !important;
+}
+
+.messages-page .chat-empty-list span,
+.messages-page .chat-empty-list small {
+  color: #87919f !important;
+}
+
+/* Chat window */
+.messages-page .instagram-chat,
+.messages-page .chat-panel,
+.messages-page .conversation-panel,
+.messages-page .chat-window {
+  background:
+    radial-gradient(circle at 72% 0%, rgba(99,102,241,.10), transparent 34%),
+    #0d1218 !important;
+  color: #f5f7fb !important;
+}
+
+/* Empty chat placeholder */
+.messages-page .instagram-chat-placeholder {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(124,58,237,.09), transparent 30%),
+    #0d1218 !important;
+  color: #f5f7fb !important;
+}
+
+.messages-page .message-placeholder-icon {
+  border: 1px solid rgba(255,255,255,.28) !important;
+  background: rgba(255,255,255,.025) !important;
+}
+
+.messages-page .message-placeholder-icon svg {
+  color: #e7ebf0 !important;
+}
+
+.messages-page .instagram-chat-placeholder h2 {
+  color: #f5f7fb !important;
+}
+
+.messages-page .instagram-chat-placeholder p {
+  color: #9aa3b0 !important;
+}
+
+.messages-page .instagram-chat-placeholder span {
+  color: #687383 !important;
+}
+
+/* Chat header */
+.messages-page .instagram-chat-head {
+  background: rgba(13,18,24,.90) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  color: #f5f7fb !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.messages-page .instagram-chat-head b {
+  color: #f5f7fb !important;
+}
+
+.messages-page .instagram-chat-head span {
+  color: #62d394 !important;
+}
+
+.messages-page .chat-back-button {
+  color: #f5f7fb !important;
+}
+
+/* Messages */
+.messages-page .instagram-chat-messages,
+.messages-page .chat-messages {
+  background: transparent !important;
+  color: #f5f7fb !important;
+}
+
+.messages-page .message-line .bubble {
+  background: #20262f !important;
+  color: #f4f7fa !important;
+  border: 1px solid rgba(255,255,255,.055) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.16) !important;
+}
+
+.messages-page .message-line .bubble.mine {
+  background: linear-gradient(135deg, #6d45e8, #8b5cf6) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  box-shadow: 0 7px 20px rgba(109,69,232,.22) !important;
+}
+
+.messages-page .message-meta small {
+  color: #9ca6b4 !important;
+}
+
+.messages-page .message-line .bubble.mine + .message-meta small,
+.messages-page .message-line.mine .message-meta small {
+  color: #cfc4ff !important;
+}
+
+.messages-page .chat-no-messages {
+  color: #f5f7fb !important;
+}
+
+.messages-page .chat-no-messages h2 {
+  color: #f5f7fb !important;
+}
+
+.messages-page .chat-no-messages p {
+  color: #a0a9b6 !important;
+}
+
+.messages-page .chat-no-messages span {
+  color: #707b89 !important;
+}
+
+/* Composer */
+.messages-page .instagram-chat-input,
+.messages-page .chat-input {
+  background: rgba(13,18,24,.96) !important;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+}
+
+.messages-page .instagram-chat-input input,
+.messages-page .chat-input input,
+.messages-page .message-composer input,
+.messages-page .message-composer textarea {
+  background: #1a2028 !important;
+  color: #f7f9fb !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025) !important;
+}
+
+.messages-page .instagram-chat-input input::placeholder,
+.messages-page .chat-input input::placeholder,
+.messages-page .message-composer input::placeholder,
+.messages-page .message-composer textarea::placeholder {
+  color: #77818f !important;
+}
+
+.messages-page .instagram-chat-input input:focus,
+.messages-page .chat-input input:focus,
+.messages-page .message-composer input:focus,
+.messages-page .message-composer textarea:focus {
+  border-color: rgba(139,92,246,.65) !important;
+  box-shadow: 0 0 0 3px rgba(139,92,246,.10) !important;
+  outline: none !important;
+}
+
+.messages-page .chat-attach-button,
+.messages-page .chat-smile-button,
+.messages-page .chat-send-button {
+  color: #dbe1e8 !important;
+  background: transparent !important;
+}
+
+.messages-page .chat-send-button {
+  color: #8b5cf6 !important;
+}
+
+.messages-page .chat-attach-button:hover,
+.messages-page .chat-smile-button:hover,
+.messages-page .chat-send-button:hover {
+  background: rgba(255,255,255,.06) !important;
+}
+
+/* Requests modal also follows the dark theme */
+.messages-page .messages-requests-modal {
+  background: #151a21 !important;
+  color: #f5f7fb !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+}
+
+.messages-page .messages-requests-head {
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+}
+
+.messages-page .messages-requests-head b {
+  color: #f5f7fb !important;
+}
+
+.messages-page .messages-requests-head button {
+  background: #252b34 !important;
+  color: #f5f7fb !important;
+}
+
+.messages-page .request-row {
+  border-bottom: 1px solid rgba(255,255,255,.055) !important;
+}
+
+.messages-page .request-row span {
+  color: #929cab !important;
+}
+
+.messages-page .requests-empty {
+  color: #929cab !important;
+}
+
+.messages-page .requests-empty b {
+  color: #f5f7fb !important;
+}
+
+/* Scrollbars */
+.messages-page *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.messages-page *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-page *::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.13);
+  border-radius: 20px;
+}
+
+.messages-page *::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,.22);
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .messages-page .messages-notes-section {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .messages-page .instagram-chat-layout {
+    background: #11161c !important;
+    border: 1px solid rgba(255,255,255,.08) !important;
+  }
+
+  .messages-page .instagram-conversation-list {
+    background: #11161c !important;
+  }
+
+  .messages-page .instagram-chat-messages {
+    background: #0d1218 !important;
+  }
+}
+
+
+/* ============================================================
+   VK SOCIAL — DARK THEME OVERRIDE
+   Added at the end so the existing UI/functions are preserved.
+   ============================================================ */
+
+:root{
+  color-scheme:dark;
+  --bg:#0b0d10;
+  --card:#14171c;
+  --text:#f5f7fa;
+  --muted:#9aa3af;
+  --line:#292e36;
+  --accent:#8b7cff;
+  --accent2:#a78bfa;
+  --danger:#ff5c70;
+  --soft:#1b1f26;
+}
+
+html,body{
+  background:#0b0d10 !important;
+  color:#f5f7fa !important;
+}
+
+body{
+  color-scheme:dark;
+}
+
+.app,.main,.page{
+  background:#0b0d10 !important;
+  color:#f5f7fa !important;
+}
+
+.sidebar{
+  background:#101318 !important;
+  border-right-color:#292e36 !important;
+}
+
+.brand{
+  border-bottom-color:#292e36 !important;
+}
+
+.brand span,
+.page-heading h1,
+.profile-line h1,
+.profile-stats b,
+.profile-details>b,
+.auth-showcase h1,
+.auth-card h2,
+.modal-head h2,
+.settings-topbar h2,
+.settings-section-title h1,
+.panel-heading,
+.explore-feature h2,
+.empty h2,
+.private-profile-lock h2{
+  color:#f5f7fa !important;
+}
+
+.nav{
+  color:#a8b0bc !important;
+  background:transparent !important;
+}
+
+.nav:hover,.nav.active{
+  background:#1c2028 !important;
+  color:#ffffff !important;
+}
+
+.nav-bottom{
+  border-color:#292e36 !important;
+}
+
+.stories-card,
+.quick-create,
+.post-card,
+.empty,
+.search-box,
+.user-row,
+.explore-feature,
+.chat-layout,
+.notification,
+.edit-card,
+.auth-card,
+.modal,
+.mobile-menu,
+.settings-modal.instagram-settings,
+.settings-card-highlight,
+.setting-row,
+.rail-account,
+.suggestions-rail{
+  background:#14171c !important;
+  color:#f5f7fa !important;
+  border-color:#292e36 !important;
+}
+
+.stories-card{
+  box-shadow:none !important;
+}
+
+.story{
+  color:#a8b0bc !important;
+}
+
+.story-ring .avatar,
+.story-ring img{
+  border-color:#14171c !important;
+}
+
+.story-ring i{
+  border-color:#14171c !important;
+}
+
+.quick-create>button:nth-child(2){
+  background:#1d222a !important;
+  color:#9ca5b2 !important;
+}
+
+.quick-icon{
+  background:#211f3b !important;
+  color:#9b8cff !important;
+}
+
+.post-head,
+.post-body,
+.actions{
+  color:#f5f7fa !important;
+}
+
+.post-user span,
+.post-body .comments-link,
+.comments-link{
+  color:#929aa7 !important;
+}
+
+.icon-button:hover,
+.actions button:hover{
+  background:#20242c !important;
+}
+
+.post-media{
+  background:#090b0e !important;
+}
+
+.comments{
+  border-top-color:#292e36 !important;
+}
+
+.comment span{
+  color:#d4d8de !important;
+}
+
+.comment-input input,
+.search-box input,
+.form-row input,
+.normal-input,
+.chat-input input,
+.edit-card input,
+.edit-card textarea,
+.settings-search input,
+.field-wrap input,
+.composer-text,
+.story-editor textarea{
+  background:#101318 !important;
+  color:#f5f7fa !important;
+  border-color:#343a44 !important;
+}
+
+.comment-input input::placeholder,
+.search-box input::placeholder,
+.form-row input::placeholder,
+.normal-input::placeholder,
+.chat-input input::placeholder,
+.edit-card input::placeholder,
+.edit-card textarea::placeholder,
+.settings-search input::placeholder,
+.field-wrap input::placeholder,
+.composer-text::placeholder,
+.story-editor textarea::placeholder{
+  color:#747d89 !important;
+}
+
+.field-wrap{
+  background:#101318 !important;
+  border-color:#343a44 !important;
+}
+
+.field-wrap>span{
+  color:#9aa3af !important;
+}
+
+.secondary{
+  background:#242932 !important;
+  color:#f3f4f6 !important;
+  border:1px solid #343a44 !important;
+}
+
+.secondary:hover{
+  background:#2d333d !important;
+}
+
+.primary,
+.desktop-create{
+  background:#6d5ce7 !important;
+  color:#ffffff !important;
+}
+
+.primary:hover,
+.desktop-create:hover{
+  background:#7b6aee !important;
+}
+
+.forgot,
+.comment-input button{
+  color:#9b8cff !important;
+}
+
+.error{
+  background:#351a20 !important;
+  color:#ff9aaa !important;
+  border:1px solid #5a2732 !important;
+}
+
+.auth-page{
+  background:
+    radial-gradient(circle at 20% 20%,#1d2040,transparent 34%),
+    radial-gradient(circle at 80% 80%,#171b31,transparent 35%),
+    #090b0f !important;
+}
+
+.auth-showcase p,
+.auth-subtitle{
+  color:#a6aebb !important;
+}
+
+.auth-pills span{
+  background:#151920 !important;
+  color:#d8dce3 !important;
+  border-color:#303641 !important;
+}
+
+.auth-card{
+  box-shadow:0 25px 80px rgba(0,0,0,.45) !important;
+}
+
+.auth-divider{
+  color:#7f8793 !important;
+}
+
+.auth-divider:before,
+.auth-divider:after{
+  background:#303641 !important;
+}
+
+.password-field>button{
+  color:#aab2bd !important;
+}
+
+.file-preview,
+.story-editor-placeholder,
+.reel-editor{
+  background:#101318 !important;
+  color:#aeb5c0 !important;
+  border-color:#343a44 !important;
+}
+
+.selected-file{
+  background:#211f3b !important;
+  color:#a99dff !important;
+}
+
+.story-editor{
+  border-color:#343a44 !important;
+}
+
+.profile-avatar{
+  border-color:#14171c !important;
+  box-shadow:0 0 0 1px #343a44 !important;
+}
+
+.profile-tabs{
+  border-top-color:#292e36 !important;
+  border-bottom-color:#292e36 !important;
+}
+
+.profile-tabs button{
+  color:#8f98a5 !important;
+}
+
+.profile-tabs button.active{
+  color:#ffffff !important;
+  border-bottom-color:#ffffff !important;
+}
+
+.profile-stats small{
+  color:#a0a8b4 !important;
+}
+
+.profile-details>p{
+  color:#a7afba !important;
+}
+
+.private-profile-note{
+  background:#1d1b35 !important;
+  color:#b8afff !important;
+}
+
+.private-profile-note span{
+  color:#a2a9b4 !important;
+}
+
+.private-profile-lock{
+  color:#f5f7fa !important;
+}
+
+.private-lock-icon{
+  border-color:#f5f7fa !important;
+}
+
+.grid-media,.grid-reel{
+  background:#101318 !important;
+}
+
+.search-box{
+  background:#14171c !important;
+}
+
+.search-box svg{
+  color:#9ba3af !important;
+}
+
+.user-row{
+  background:#14171c !important;
+}
+
+.user-row span{
+  color:#929aa7 !important;
+}
+
+.explore-feature svg{
+  color:#8b7cff !important;
+}
+
+.reel-card{
+  background:#090b0e !important;
+}
+
+.reel-card p{
+  color:#aeb5c0 !important;
+}
+
+.conversation-list{
+  border-right-color:#292e36 !important;
+}
+
+.conversation-list button{
+  color:#f5f7fa !important;
+  border-bottom-color:#292e36 !important;
+}
+
+.chat-input{
+  border-top-color:#292e36 !important;
+}
+
+.bubble{
+  background:#252a32 !important;
+  color:#f2f4f7 !important;
+}
+
+.bubble.mine{
+  background:#6252d9 !important;
+  color:#ffffff !important;
+}
+
+.notification{
+  color:#f5f7fa !important;
+}
+
+.notification small{
+  color:#8e97a4 !important;
+}
+
+.mobile-menu{
+  box-shadow:0 20px 60px rgba(0,0,0,.65) !important;
+}
+
+.menu-user{
+  border-bottom-color:#292e36 !important;
+}
+
+.menu-user span{
+  color:#929aa7 !important;
+}
+
+.menu-user button{
+  background:#252a32 !important;
+  color:#f5f7fa !important;
+}
+
+.mobile-menu>button{
+  color:#f0f2f5 !important;
+}
+
+.mobile-menu>button:hover{
+  background:#20242c !important;
+}
+
+.mobile-header{
+  background:rgba(14,17,22,.94) !important;
+  border-bottom-color:#292e36 !important;
+  color:#f5f7fa !important;
+}
+
+.mobile-brand{
+  color:#f5f7fa !important;
+}
+
+.mobile-header button{
+  color:#f0f2f5 !important;
+}
+
+.bottom-nav{
+  background:rgba(14,17,22,.97) !important;
+  border-top-color:#292e36 !important;
+  box-shadow:0 -10px 35px rgba(0,0,0,.35) !important;
+}
+
+.nav-mobile{
+  background:transparent !important;
+  color:#929aa7 !important;
+}
+
+.nav-mobile.active{
+  color:#ffffff !important;
+}
+
+.mobile-profile{
+  background:transparent !important;
+  color:#929aa7 !important;
+}
+
+.mobile-profile.active{
+  color:#ffffff !important;
+}
+
+.mobile-profile.active .avatar{
+  border-color:#ffffff !important;
+}
+
+.create-bottom{
+  background:linear-gradient(135deg,#312e81,#6d5ce7) !important;
+}
+
+.settings-overlay{
+  background:#090b0f !important;
+}
+
+.settings-modal.instagram-settings{
+  background:#0e1116 !important;
+}
+
+.settings-topbar{
+  background:#0e1116 !important;
+  border-bottom-color:#292e36 !important;
+}
+
+.settings-back:hover{
+  background:#20242c !important;
+}
+
+.settings-search{
+  background:#1b1f26 !important;
+}
+
+.settings-layout{
+  background:#0e1116 !important;
+}
+
+.settings-sidebar{
+  border-right-color:#292e36 !important;
+}
+
+.settings-sidebar button{
+  color:#dce0e6 !important;
+}
+
+.settings-sidebar button.active{
+  background:#211f3b !important;
+  color:#a99dff !important;
+}
+
+.settings-sidebar button svg:last-child{
+  color:#747d89 !important;
+}
+
+.settings-content{
+  color:#f5f7fa !important;
+}
+
+.settings-section-title{
+  border-bottom-color:#292e36 !important;
+}
+
+.settings-section-title p{
+  color:#929aa7 !important;
+}
+
+.settings-profile-row,
+.setting-row,
+.setting-switch{
+  border-bottom-color:#292e36 !important;
+}
+
+.setting-row{
+  background:#0e1116 !important;
+}
+
+.setting-row:hover{
+  background:#171b21 !important;
+}
+
+.setting-row-icon{
+  background:#20242c !important;
+  color:#dce1e8 !important;
+}
+
+.setting-row-text small,
+.setting-detail p,
+.setting-switch small{
+  color:#929aa7 !important;
+}
+
+.settings-card-highlight{
+  background:#1d1b35 !important;
+}
+
+.setting-detail{
+  background:#191d24 !important;
+  color:#c3c9d2 !important;
+}
+
+.privacy-toggle-row{
+  border-bottom-color:#292e36 !important;
+}
+
+.setting-switch input,
+.switch-line input{
+  accent-color:#8b7cff !important;
+}
+
+/* Generic remaining light surfaces */
+[style*="background:#fff"],
+[style*="background: #fff"],
+[style*="background:#ffffff"],
+[style*="background: #ffffff"]{
+  background:#14171c !important;
+}
+
+input,
+textarea,
+select{
+  color-scheme:dark;
+}
+
+input,
+textarea,
+select{
+  color:#f5f7fa;
+}
+
+::selection{
+  background:#6d5ce7;
+  color:#ffffff;
+}
+
+/* Force the mobile navigation to stay dark even when earlier rules exist. */
+@media(max-width:700px){
+  .mobile-header{
+    background:rgba(14,17,22,.96) !important;
+    border-bottom-color:#292e36 !important;
+  }
+
+  .bottom-nav{
+    background:#0e1116 !important;
+    border-top:1px solid #292e36 !important;
+  }
+
+  .nav-mobile,
+  .mobile-profile{
+    background:transparent !important;
+    color:#929aa7 !important;
+  }
+
+  .nav-mobile.active,
+  .mobile-profile.active{
+    color:#ffffff !important;
+  }
+
+  .page,
+  .main{
+    background:#0b0d10 !important;
+  }
+
+  .auth-page{
+    background:#090b0f !important;
+  }
+}
+
+@media(max-width:390px){
+  .bottom-nav{
+    background:#0e1116 !important;
+  }
+}
+
+/* ============================================================
+   VK SOCIAL — INSTAGRAM DARK MESSAGES LAYOUT
+   Matches the supplied Instagram desktop reference:
+   compact left message rail + large dark conversation area.
+   ============================================================ */
+
+.messages-page{
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  min-height:100vh !important;
+  padding:28px 0 40px 34px !important;
+  background:#080a0d !important;
+}
+
+.messages-instagram-head{
+  width:430px !important;
+  height:52px !important;
+  margin:0 !important;
+  padding:0 2px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+}
+
+.messages-account-title{
+  display:flex !important;
+  align-items:center !important;
+  gap:5px !important;
+  min-width:0 !important;
+}
+
+.messages-account-title b{
+  color:#f5f7fb !important;
+  font-size:20px !important;
+  font-weight:800 !important;
+  letter-spacing:-.35px !important;
+}
+
+.messages-account-chevron{
+  width:17px !important;
+  height:17px !important;
+  color:#a8afb9 !important;
+}
+
+.messages-compose-button{
+  width:38px !important;
+  height:38px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:10px !important;
+  background:transparent !important;
+  color:#f5f7fb !important;
+}
+
+.messages-compose-button svg{
+  width:23px !important;
+  height:23px !important;
+}
+
+.messages-compose-button:hover{
+  background:#1c2027 !important;
+}
+
+.messages-search-bar{
+  width:430px !important;
+  height:42px !important;
+  margin:7px 0 14px !important;
+  border-radius:12px !important;
+  background:#20242a !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:0 13px !important;
+  color:#8e96a1 !important;
+}
+
+.messages-search-bar > svg{
+  width:17px !important;
+  height:17px !important;
+  flex:0 0 auto !important;
+}
+
+.messages-search-bar input{
+  width:100% !important;
+  min-width:0 !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  color:#f5f7fb !important;
+  font-size:14px !important;
+}
+
+.messages-search-bar input::placeholder{
+  color:#9299a4 !important;
+}
+
+.messages-search-bar button{
+  width:25px !important;
+  height:25px !important;
+  flex:0 0 auto !important;
+  border-radius:50% !important;
+  background:#383d45 !important;
+  color:#cbd0d7 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.messages-search-bar button svg{
+  width:14px !important;
+}
+
+.messages-page .messages-notes-section{
+  width:430px !important;
+  min-height:122px !important;
+  margin:0 0 8px !important;
+  padding:8px 0 10px !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+.messages-page .messages-notes-header{
+  display:none !important;
+}
+
+.messages-page .messages-notes-scroll{
+  gap:12px !important;
+  padding:2px 0 7px !important;
+}
+
+.messages-page .message-note-card{
+  min-width:76px !important;
+  width:76px !important;
+}
+
+.messages-page .message-note-avatar-wrap,
+.messages-page .message-note-avatar{
+  width:66px !important;
+  height:66px !important;
+}
+
+.messages-page .message-note-card > b{
+  margin-top:6px !important;
+  font-size:11px !important;
+  color:#f0f2f5 !important;
+}
+
+.messages-page .message-note-card > span{
+  color:#858d99 !important;
+  font-size:9px !important;
+}
+
+.messages-page .message-note-bubble{
+  top:-5px !important;
+  max-width:105px !important;
+  background:#242930 !important;
+  color:#f1f3f5 !important;
+}
+
+.messages-page .instagram-chat-layout{
+  width:calc(100vw - 58px - 34px) !important;
+  min-height:calc(100vh - 235px) !important;
+  height:calc(100vh - 235px) !important;
+  margin:0 !important;
+  display:grid !important;
+  grid-template-columns:420px minmax(0,1fr) !important;
+  border-radius:0 !important;
+  border:1px solid #262b32 !important;
+  overflow:hidden !important;
+  background:#0c1014 !important;
+  box-shadow:none !important;
+}
+
+.messages-page .instagram-conversation-list{
+  min-width:420px !important;
+  width:420px !important;
+  background:#0d1115 !important;
+  border-right:1px solid #282d34 !important;
+}
+
+.messages-page .conversation-list-title{
+  height:55px !important;
+  padding:0 15px !important;
+  background:#0d1115 !important;
+  border-bottom:1px solid #242930 !important;
+}
+
+.messages-page .conversation-list-title > b{
+  font-size:16px !important;
+  color:#f5f7fa !important;
+}
+
+.messages-page .conversation-list-title .messages-requests-button{
+  font-size:12px !important;
+  color:#8d96a3 !important;
+}
+
+.messages-page .conversation-list-title .messages-requests-button:hover{
+  color:#fff !important;
+}
+
+.messages-page .conversation-item{
+  min-height:82px !important;
+  padding:11px 14px !important;
+  border-bottom:0 !important;
+  background:transparent !important;
+}
+
+.messages-page .conversation-item:hover{
+  background:#151a20 !important;
+}
+
+.messages-page .conversation-item.active{
+  background:#1b2027 !important;
+}
+
+.messages-page .conversation-item .avatar{
+  width:58px !important;
+  height:58px !important;
+}
+
+.messages-page .conversation-copy b{
+  font-size:14px !important;
+  color:#f4f6f8 !important;
+}
+
+.messages-page .conversation-copy span{
+  font-size:12px !important;
+  color:#9aa2ad !important;
+  margin-top:4px !important;
+}
+
+.messages-page .conversation-copy small{
+  font-size:10px !important;
+  color:#707986 !important;
+  margin-top:3px !important;
+}
+
+.messages-page .instagram-chat{
+  min-width:0 !important;
+  width:100% !important;
+  background:#0b0f13 !important;
+}
+
+.messages-page .instagram-chat-placeholder{
+  min-height:100% !important;
+  height:100% !important;
+  background:#0b0f13 !important;
+}
+
+.messages-page .message-placeholder-icon{
+  width:92px !important;
+  height:92px !important;
+  border:2px solid #e5e8ec !important;
+  background:transparent !important;
+  margin-bottom:20px !important;
+}
+
+.messages-page .message-placeholder-icon svg{
+  width:42px !important;
+  height:42px !important;
+  color:#eef1f4 !important;
+  stroke-width:1.6 !important;
+}
+
+.messages-page .instagram-chat-placeholder h2{
+  font-size:21px !important;
+  font-weight:600 !important;
+  color:#f3f5f7 !important;
+}
+
+.messages-page .instagram-chat-placeholder p{
+  font-size:13px !important;
+  color:#929aa5 !important;
+  margin-bottom:5px !important;
+}
+
+.messages-page .instagram-chat-placeholder span{
+  color:#6f7884 !important;
+  font-size:11px !important;
+}
+
+.messages-page .instagram-chat-head{
+  height:66px !important;
+  background:#0d1115 !important;
+  border-bottom:1px solid #282d34 !important;
+}
+
+.messages-page .instagram-chat-messages{
+  min-height:0 !important;
+  background:#0b0f13 !important;
+}
+
+.messages-page .instagram-chat-input{
+  background:#0d1115 !important;
+  border-top:1px solid #282d34 !important;
+}
+
+.messages-page .instagram-chat-input input{
+  background:#1b2026 !important;
+  border:1px solid #313741 !important;
+  color:#f5f7fa !important;
+}
+
+@media(max-width:1050px) and (min-width:701px){
+  .messages-page{
+    padding-left:22px !important;
+  }
+  .messages-page .instagram-chat-layout{
+    width:calc(100vw - 78px - 22px) !important;
+    grid-template-columns:340px minmax(0,1fr) !important;
+  }
+  .messages-page .instagram-conversation-list{
+    min-width:340px !important;
+    width:340px !important;
+  }
+}
+
+@media(max-width:700px){
+  .messages-page{
+    width:100% !important;
+    min-height:calc(100vh - 57px) !important;
+    padding:9px 0 82px !important;
+  }
+
+  .messages-instagram-head{
+    width:100% !important;
+    height:48px !important;
+    padding:0 12px !important;
+  }
+
+  .messages-account-title b{
+    font-size:18px !important;
+  }
+
+  .messages-search-bar{
+    width:calc(100% - 20px) !important;
+    margin:5px 10px 7px !important;
+  }
+
+  .messages-page .messages-notes-section{
+    width:100% !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+    min-height:112px !important;
+  }
+
+  .messages-page .instagram-chat-layout{
+    width:calc(100% - 20px) !important;
+    margin:0 10px !important;
+    min-height:calc(100vh - 250px) !important;
+    height:calc(100vh - 250px) !important;
+    grid-template-columns:1fr !important;
+    border-radius:14px !important;
+  }
+
+  .messages-page .instagram-conversation-list{
+    min-width:100% !important;
+    width:100% !important;
+  }
+
+  .messages-page .conversation-list-title{
+    padding:0 12px !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-conversation-list{
+    display:none !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-chat{
+    display:flex !important;
+  }
+
+  .messages-page .instagram-chat-placeholder{
+    min-height:calc(100vh - 250px) !important;
+  }
+}
+
+
+/* ============================================================
+   REELSGO BRANDING — USE EXISTING frontend/image.png EVERYWHERE
+   ============================================================ */
+.brand-logo-img,
+.auth-logo-img,
+.mobile-brand-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.brand-logo-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  object-fit: cover;
+}
+
+.auth-showcase-logo {
+  overflow: hidden;
+}
+
+.auth-showcase-logo .auth-logo-img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.auth-logo {
+  overflow: hidden;
+}
+
+.auth-logo .auth-logo-img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.mobile-brand {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 9px;
+}
+
+.mobile-brand-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.mobile-brand span {
+  font-weight: 850;
+}
+
+/* Desktop compact Instagram-style rail */
+@media (min-width: 701px) {
+  .brand-logo-img {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+}
+
+/* Keep the ReelsGo logo visible on mobile */
+@media (max-width: 700px) {
+  .mobile-brand-logo {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+  }
+}

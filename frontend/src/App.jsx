@@ -1,0 +1,1900 @@
+import reelsGoLogo from "../image.png";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
+  Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
+  Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
+  UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
+  SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
+  Link as LinkIcon, AtSign, UserRoundCheck, Volume2, Smartphone, Mail, CircleUser,
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown
+} from "lucide-react";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SERVER = API.replace(/\/api\/?$/, "");
+
+const getToken = () => localStorage.getItem("vk_token");
+const getUser = () => {
+  try { return JSON.parse(localStorage.getItem("vk_user") || "null"); } catch { return null; }
+};
+
+function authHeaders(extra = {}) {
+  return { ...extra, ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}) };
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(`${API}${path}`, {
+    ...options,
+    headers: authHeaders(options.headers || {})
+  });
+  const type = response.headers.get("content-type") || "";
+  const raw = await response.text();
+  let data;
+  try {
+    data = type.includes("application/json") ? JSON.parse(raw) : { message: raw };
+  } catch {
+    data = { message: raw || `HTTP ${response.status}` };
+  }
+  if (!response.ok) throw new Error(data?.message || `Request failed (${response.status})`);
+  return data;
+}
+
+function avatarUrl(user) {
+  return user?._id ? `${SERVER}/api/users/${user._id}/avatar?v=${user.updatedAt || ""}` : "";
+}
+
+function Avatar({ user, size = 42, className = "" }) {
+  const [failed, setFailed] = useState(false);
+  const src = user?.avatar && typeof user.avatar === "string" ? user.avatar : avatarUrl(user);
+  const initial = (user?.name || user?.username || "U").slice(0, 1).toUpperCase();
+  return (
+    <div className={`avatar ${className}`} style={{ width: size, height: size, minWidth: size, minHeight: size, aspectRatio: "1 / 1", borderRadius: "50%", overflow: "hidden" }}>
+      {!failed && src ? (
+        <img src={src} alt="" onError={() => setFailed(true)} style={{ width: "100%", height: "100%", minWidth: "100%", minHeight: "100%", maxWidth: "none", maxHeight: "none", aspectRatio: "1 / 1", objectFit: "cover", objectPosition: "center", borderRadius: "50%", display: "block" }} />
+      ) : (
+        <span>{initial}</span>
+      )}
+    </div>
+  );
+}
+
+function ReelsGoBranding() {
+  useEffect(() => {
+    document.title = "ReelsGo";
+    let icon = document.querySelector('link[data-reelsgo-favicon="true"]');
+    if (!icon) {
+      icon = document.createElement("link");
+      icon.rel = "icon";
+      icon.type = "image/png";
+      icon.dataset.reelsgoFavicon = "true";
+      document.head.appendChild(icon);
+    }
+    icon.href = reelsGoLogo;
+  }, []);
+  return null;
+}
+
+function App() {
+  const [user, setUser] = useState(getUser());
+  const [token, setToken] = useState(getToken());
+  const [page, setPage] = useState("home");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
+  const [reelOpen, setReelOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [feedRefresh, setFeedRefresh] = useState(0);
+  const [profileUserId, setProfileUserId] = useState(null);
+  const [openConversationId, setOpenConversationId] = useState(null);
+
+  useEffect(() => {
+    if (!token) return;
+    const openMessages = () => navigate("messages");
+    window.addEventListener("vk-open-messages", openMessages);
+    return () => window.removeEventListener("vk-open-messages", openMessages);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    api("/users/me")
+      .then(d => {
+        setUser(d.user);
+        localStorage.setItem("vk_user", JSON.stringify(d.user));
+      })
+      .catch(() => {});
+  }, [token]);
+
+  function login(data) {
+    localStorage.setItem("vk_token", data.token);
+    localStorage.setItem("vk_user", JSON.stringify(data.user));
+    setToken(data.token);
+    setUser(data.user);
+    setPage("home");
+  }
+
+  function logout() {
+    localStorage.removeItem("vk_token");
+    localStorage.removeItem("vk_user");
+    setToken(null);
+    setUser(null);
+    setSettingsOpen(false);
+  }
+
+  const navigate = p => {
+    setPage(p);
+    if (p !== "user-profile") setProfileUserId(null);
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (!token) return <Auth onLogin={login} />;
+
+  return (
+    <>
+      <ReelsGoBranding />
+      <div className="app">
+      <aside className="sidebar">
+        <button className="brand" onClick={() => navigate("home")} aria-label="ReelsGo home">
+          <img className="brand-logo-img" src={reelsGoLogo} alt="ReelsGo" /><span>ReelsGo</span>
+        </button>
+
+        <div className="sidebar-main-nav">
+          <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+          <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
+          <Nav icon={<Compass />} label="Explore" active={page === "explore"} onClick={() => navigate("explore")} />
+          <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+          <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+          <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
+          <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
+          <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={() => navigate("profile")} />
+        </div>
+
+        <div className="nav-bottom">
+          <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
+          <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
+          <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
+        </div>
+      </aside>
+
+      <header className="mobile-header">
+        <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><img className="mobile-brand-logo" src={reelsGoLogo} alt="ReelsGo" /><span>ReelsGo</span></button>
+        <div className="mobile-header-actions">
+          <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
+          <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
+        </div>
+      </header>
+
+      {menuOpen && (
+        <div className="overlay" onClick={() => setMenuOpen(false)}>
+          <div className="mobile-menu" onClick={e => e.stopPropagation()}>
+            <div className="menu-user">
+              <Avatar user={user} size={48} />
+              <div><b>{user?.name}</b><span>@{user?.username}</span></div>
+              <button onClick={() => setMenuOpen(false)}><X /></button>
+            </div>
+            <button onClick={() => navigate("profile")}><User /> Profile</button>
+            <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
+            <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
+            <button onClick={logout}><LogOut /> Logout</button>
+          </div>
+        </div>
+      )}
+
+      <main className="main">
+        {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
+        {page === "search" && <SearchPage onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
+        {page === "user-profile" && profileUserId && <UserProfilePage userId={profileUserId} currentUser={user} onBack={() => navigate("search")} onMessage={async (id) => {
+          try {
+            const d = await api("/messages/conversations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: [id] }) });
+            setOpenConversationId(d.conversation?._id || null);
+            navigate("messages");
+          } catch (e) { alert(e.message); }
+        }} />}
+        {page === "explore" && <ExplorePage />}
+        {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
+        {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
+        {page === "notifications" && <NotificationsPage />}
+        {page === "saved" && <SavedPage user={user} />}
+        {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
+      </main>
+
+      <nav className="bottom-nav glass-bottom-nav">
+        <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+        <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+        <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={() => navigate("profile")} aria-label="Profile">
+          <Avatar user={user} size={34} />
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
+      {storyOpen && <StoryComposer onClose={() => setStoryOpen(false)} onDone={() => { setStoryOpen(false); setFeedRefresh(v => v + 1); }} />}
+      {reelOpen && <ReelComposer onClose={() => setReelOpen(false)} onDone={() => setReelOpen(false)} />}
+      {settingsOpen && <SettingsModal user={user} setUser={setUser} onClose={() => setSettingsOpen(false)} onLogout={logout} />}
+      </div>
+    </>
+  );
+}
+
+function Nav({ icon, label, active, onClick }) {
+  return <button className={`nav ${active ? "active" : ""}`} onClick={onClick}><span>{icon}</span>{label}</button>;
+}
+
+function NavMobile({ icon, label, active, onClick }) {
+  return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
+}
+
+function Auth({ onLogin }) {
+  const [mode, setMode] = useState("login");
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const path = mode === "login" ? "/auth/login" : "/auth/register";
+      const body = mode === "login" ? { email: form.email, password: form.password } : form;
+      const d = await api(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      onLogin(d);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      <div className="auth-showcase">
+        <div className="auth-showcase-logo"><img className="auth-logo-img" src={reelsGoLogo} alt="ReelsGo" /></div>
+        <h1>Share your world.</h1>
+        <p>Photos, Reels, Stories, messages and the people you care about — all in one social space.</p>
+        <div className="auth-pills"><span>Posts</span><span>Stories</span><span>Reels</span><span>Messages</span></div>
+      </div>
+
+      <form className="auth-card" onSubmit={submit}>
+        <div className="auth-logo"><img className="auth-logo-img" src={reelsGoLogo} alt="ReelsGo" /></div>
+        <h2>{mode === "login" ? "Log in to ReelsGo" : "Create an account"}</h2>
+        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : "Join ReelsGo and start sharing."}</p>
+
+        {mode === "signup" && <>
+          <Field icon={<CircleUser />} placeholder="Full name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
+          <Field icon={<AtSign />} placeholder="Username" value={form.username} onChange={v => setForm({ ...form, username: v })} />
+        </>}
+
+        <Field icon={<Mail />} type="email" placeholder="Email address" value={form.email} onChange={v => setForm({ ...form, email: v })} />
+        <div className="password-field">
+          <Field icon={<KeyRound />} type={showPassword ? "text" : "password"} placeholder="Password" value={form.password} onChange={v => setForm({ ...form, password: v })} />
+          <button type="button" onClick={() => setShowPassword(v => !v)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+        </div>
+
+        {mode === "login" && <button type="button" className="forgot">Forgot password?</button>}
+        {error && <div className="error">{error}</div>}
+        <button className="primary auth-submit" disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}</button>
+
+        <div className="auth-divider"><span>OR</span></div>
+        <button type="button" className="secondary auth-switch" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}>
+          {mode === "login" ? "Create new account" : "Already have an account? Log in"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function Field({ icon, type = "text", placeholder, value, onChange }) {
+  return <div className="field-wrap"><span>{icon}</span><input type={type} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} /></div>;
+}
+
+function HomePage({ user, refreshKey, onCreate, onStory }) {
+  const [posts, setPosts] = useState([]);
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeStory, setActiveStory] = useState(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const [p, s] = await Promise.all([api("/posts"), api("/stories")]);
+      setPosts(p.posts || []);
+      setStories(s.stories || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { load(); }, [refreshKey]);
+
+  const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
+
+  async function openStory(story) {
+    setActiveStory(story);
+    try { await api(`/stories/${story._id}/view`, { method: "POST" }); } catch {}
+  }
+
+  return (
+    <div className="page feed-page">
+      <div className="home-layout">
+        <section className="home-feed-column">
+          <div className="page-heading">
+            <div><h1>Home</h1><p>Your latest updates</p></div>
+            <button className="desktop-create" onClick={onCreate}><PlusSquare /> Create</button>
+          </div>
+
+          <div className="stories-card">
+        <button className="story own" onClick={() => myStories.length ? openStory(myStories[myStories.length - 1]) : onStory()}>
+          <div className="story-ring">{myStories.length && myStories[myStories.length - 1].mediaUrl ? (myStories[myStories.length - 1].kind === "video" ? <video src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />} {!myStories.length && <i>+</i>}</div><span>{myStories.length ? "Your story" : "Your story"}</span>
+        </button>
+        {stories.map(s => (
+          <button className="story" key={s._id} onClick={() => openStory(s)}>
+            <div className="story-ring">
+              {s.mediaUrl ? (
+                s.kind === "video" ? <video src={`${SERVER}${s.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${s.mediaUrl}`} alt="" />
+              ) : <div className="story-text-thumb">Aa</div>}
+            </div>
+            <span>{s.author?.username || "Story"}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="quick-create">
+        <Avatar user={user} size={42} />
+        <button onClick={onCreate}>What's on your mind?</button>
+        <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
+      </div>
+
+      {loading ? <div className="empty">Loading feed...</div> :
+        posts.length ? posts.map(p => <Post key={p._id} post={p} user={user} />) :
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+
+          {activeStory && <StoryViewer story={activeStory} onClose={() => setActiveStory(null)} />}
+        </section>
+
+        <SuggestionsRail user={user} posts={posts} />
+      </div>
+    </div>
+  );
+}
+
+
+function SuggestionsRail({ user, posts }) {
+  const [people, setPeople] = useState([]);
+  const [following, setFollowing] = useState(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSuggestions() {
+      const map = new Map();
+      const add = (person) => {
+        if (!person?._id) return;
+        if (String(person._id) === String(user?._id)) return;
+        const id = String(person._id);
+        if (!map.has(id)) map.set(id, person);
+      };
+
+      for (const post of posts || []) add(post?.author);
+
+      try {
+        const d = await api('/follows/following');
+        for (const item of (d.following || d.users || [])) add(item?.user || item);
+      } catch {}
+
+      try {
+        const d = await api('/follows/followers');
+        for (const item of (d.followers || d.users || [])) add(item?.user || item);
+      } catch {}
+
+      if (!cancelled) setPeople(Array.from(map.values()).slice(0, 6));
+    }
+
+    loadSuggestions();
+    return () => { cancelled = true; };
+  }, [posts, user?._id]);
+
+  async function follow(person) {
+    const id = String(person._id);
+    try {
+      await api(`/follows/${person._id}`, { method: "POST" });
+      setFollowing(prev => new Set([...prev, id]));
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  return (
+    <aside className="suggestions-rail">
+      <div className="rail-account">
+        <Avatar user={user} size={56} />
+        <div className="rail-account-info">
+          <b>@{user?.username}</b>
+          <span>{user?.name || "ReelsGo user"}</span>
+        </div>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Switch</button>
+      </div>
+
+      <div className="suggestions-title">
+        <b>Suggested for you</b>
+        <button>See all</button>
+      </div>
+
+      <div className="suggestion-list">
+        {people.map(person => {
+          const isFollowing = following.has(String(person._id));
+          return (
+            <div className="suggestion-row" key={person._id}>
+              <Avatar user={person} size={42} />
+              <div className="suggestion-copy">
+                <b>@{person.username}</b>
+                <span>Suggested for you</span>
+              </div>
+              <button className={isFollowing ? "following" : "follow"} onClick={() => !isFollowing && follow(person)}>
+                {isFollowing ? "Following" : "Follow"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="rail-footer">
+        About · Help · Press · API · Jobs · Privacy · Terms<br />
+        Locations · Language<br /><br />
+        © 2026 REELSGO
+      </div>
+
+      <button className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
+        <Send />
+        <b>Messages</b>
+        <span className="floating-avatars">
+          {people.slice(0, 3).map(person => <Avatar key={person._id} user={person} size={25} />)}
+        </span>
+      </button>
+    </aside>
+  );
+}
+
+function StoryViewer({ story, onClose }) {
+  const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
+  const me = getUser();
+  const isOwner = String(story.author?._id || story.author) === String(me?._id);
+  const [viewersOpen, setViewersOpen] = useState(false);
+  const [viewers, setViewers] = useState([]);
+  const [loadingViewers, setLoadingViewers] = useState(false);
+
+  async function openViewers() {
+    if (!isOwner) return;
+    setViewersOpen(true);
+    setLoadingViewers(true);
+    try {
+      const d = await api(`/stories/${story._id}/viewers`);
+      setViewers(d.viewers || []);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoadingViewers(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!isOwner && story?._id) {
+      api(`/stories/${story._id}/view`, { method: 'POST' }).catch(() => {});
+    }
+  }, [story?._id, isOwner]);
+
+  return (
+    <div className="story-viewer" onClick={onClose}>
+      <div className="story-progress"><span /></div>
+      <div className="story-viewer-top">
+        <div className="story-viewer-user">
+          <Avatar user={story.author} size={42} />
+          <div>
+            <b>@{story.author?.username || 'user'}</b>
+            <span>{isOwner ? 'Your story' : 'Story'}</span>
+          </div>
+        </div>
+        <button onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+      </div>
+      <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
+        {mediaUrl && story.kind === 'video' ? (
+          <video src={mediaUrl} autoPlay controls playsInline />
+        ) : mediaUrl ? (
+          <img src={mediaUrl} alt="Story" />
+        ) : (
+          <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>
+        )}
+      </div>
+      {isOwner && (
+        <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
+          <Eye /> <span>{viewers.length || story.views?.length || 0} views</span>
+        </button>
+      )}
+      {viewersOpen && (
+        <div className="story-viewers-sheet" onClick={e => e.stopPropagation()}>
+          <div className="story-viewers-head">
+            <div><b>Story views</b><span>{viewers.length} {viewers.length === 1 ? 'viewer' : 'viewers'}</span></div>
+            <button onClick={() => setViewersOpen(false)}><X /></button>
+          </div>
+          {loadingViewers ? (
+            <div className="story-viewers-empty"><div className="viewer-loader" /><b>Loading viewers...</b></div>
+          ) : viewers.length ? (
+            <div className="story-viewers-list">
+              {viewers.map(v => (
+                <div className="story-viewer-row" key={v._id}>
+                  <Avatar user={v} size={50} />
+                  <div className="story-viewer-user-info"><b>@{v.username}</b><span>{v.name || 'ReelsGo user'}</span></div>
+                  {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="story-viewers-empty"><Eye /><b>No views yet</b><span>When someone watches your story, their profile will appear here.</span></div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Post({ post, user }) {
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [text, setText] = useState("");
+  const [showComments, setShowComments] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const media = post.media?.[0];
+  const mediaUrl = media?.url ? `${SERVER}${media.url}` : "";
+
+  async function like() {
+    try { const d = await api(`/posts/${post._id}/like`, { method: "POST" }); setLiked(d.liked); }
+    catch (e) { alert(e.message); }
+  }
+
+  async function save() {
+    try { const d = await api(`/posts/${post._id}/save`, { method: "POST" }); setSaved(d.saved); }
+    catch (e) { alert(e.message); }
+  }
+
+  async function loadComments() {
+    try {
+      const d = await api(`/posts/${post._id}/comments`);
+      setComments(d.comments || []);
+      setShowComments(true);
+    } catch (e) { alert(e.message); }
+  }
+
+  async function comment() {
+    if (!text.trim()) return;
+    try {
+      await api(`/posts/${post._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text.trim() })
+      });
+      setText("");
+      await loadComments();
+    } catch (e) { alert(e.message); }
+  }
+
+  return (
+    <>
+      <article className="post-card">
+        <div className="post-head">
+          <div className="post-user">
+            <Avatar user={post.author} size={42} />
+            <div><b>{post.author?.username}</b><span>{post.location || "ReelsGo"}</span></div>
+          </div>
+          <button className="icon-button" type="button"><MoreHorizontal /></button>
+        </div>
+
+        {mediaUrl && (
+          <button className="post-media-button" type="button" onClick={() => setViewerOpen(true)} aria-label="Open post">
+            {media.kind === "video" ? (
+              <video className="post-media" src={mediaUrl} muted playsInline preload="metadata" />
+            ) : (
+              <img className="post-media" src={mediaUrl} alt={post.caption || "Post"} />
+            )}
+            {media.kind === "video" && <span className="media-play-overlay"><Play fill="currentColor" /></span>}
+          </button>
+        )}
+
+        <div className="actions">
+          <div>
+            <button className={liked ? "liked" : ""} onClick={like} type="button" aria-label="Like">
+              <Heart fill={liked ? "currentColor" : "none"} />
+            </button>
+            <button onClick={loadComments} type="button" aria-label="Comments"><MessageCircle /></button>
+            <button onClick={() => setShareOpen(true)} type="button" aria-label="Share"><Send /></button>
+          </div>
+          <button className={saved ? "saved" : ""} onClick={save} type="button" aria-label="Save">
+            <Bookmark fill={saved ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        <div className="post-body">
+          {!post.hideLikeCount && <b>{post.likesCount || 0} likes</b>}
+          {post.caption && <p><b>{post.author?.username}</b> {post.caption}</p>}
+          <button className="comments-link" onClick={loadComments} type="button">View all comments</button>
+
+          {showComments && (
+            <div className="comments">
+              {comments.map(c => (
+                <div className="comment" key={c._id}>
+                  <Avatar user={c.author} size={28} />
+                  <div><b>{c.author?.username}</b><span>{c.text}</span></div>
+                </div>
+              ))}
+              {!post.commentsDisabled && (
+                <div className="comment-input">
+                  <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); comment(); } }} placeholder="Add a comment..." />
+                  <button onClick={comment} type="button">Post</button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </article>
+
+      {shareOpen && <ShareSheet post={post} onClose={() => setShareOpen(false)} />}
+      {viewerOpen && <MediaViewer media={media} post={post} onClose={() => setViewerOpen(false)} />}
+    </>
+  );
+}
+
+function MediaViewer({ media, post, onClose }) {
+  const url = media?.url ? `${SERVER}${media.url}` : "";
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  async function like() {
+    try {
+      const d = await api(`/posts/${post?._id}/like`, { method: "POST" });
+      setLiked(!!d.liked);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function save() {
+    try {
+      const d = await api(`/posts/${post?._id}/save`, { method: "POST" });
+      setSaved(!!d.saved);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  if (!url) return null;
+
+  return (
+    <div className="media-screen-viewer" role="dialog" aria-modal="true">
+      <div className="media-screen-backdrop" onClick={onClose} />
+
+      <div className="media-screen-topbar">
+        <button
+          className="media-screen-back"
+          type="button"
+          onClick={onClose}
+          aria-label="Back"
+        >
+          <ChevronRight style={{ transform: "rotate(180deg)" }} />
+        </button>
+
+        <div className="media-screen-user">
+          <Avatar user={post?.author} size={40} />
+          <div>
+            <b>@{post?.author?.username || "user"}</b>
+            <span>{post?.location || "ReelsGo"}</span>
+          </div>
+        </div>
+
+        <button className="media-screen-more" type="button">
+          <MoreHorizontal />
+        </button>
+      </div>
+
+      <div className="media-screen-content">
+        {media.kind === "video" ? (
+          <video
+            src={url}
+            autoPlay
+            controls
+            playsInline
+            className="media-screen-media"
+          />
+        ) : (
+          <img
+            src={url}
+            alt={post?.caption || "Post"}
+            className="media-screen-media"
+          />
+        )}
+      </div>
+
+      <div className="media-screen-bottom">
+        <div className="media-screen-actions">
+          <div className="media-screen-action-group">
+            <button
+              type="button"
+              className={liked ? "active" : ""}
+              onClick={like}
+              aria-label="Like"
+            >
+              <Heart fill={liked ? "currentColor" : "none"} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              aria-label="Share"
+            >
+              <Send />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className={saved ? "active" : ""}
+            onClick={save}
+            aria-label="Save"
+          >
+            <Bookmark fill={saved ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        {post?.caption && (
+          <div className="media-screen-caption">
+            <b>@{post.author?.username}</b>{" "}
+            <span>{post.caption}</span>
+          </div>
+        )}
+      </div>
+
+      {shareOpen && (
+        <ShareSheet
+          post={post}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ShareSheet({ post, onClose }) {
+  const [people, setPeople] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+
+  async function loadPeople() {
+    setLoading(true);
+    try {
+      let users = [];
+      try {
+        const d = await api("/follows/following");
+        users = d.following || d.users || d.followers || [];
+      } catch {}
+
+      if (!users.length) {
+        try {
+          const d = await api("/messages/conversations");
+          users = (d.conversations || []).map(c => (c.members || []).find(m => String(m?._id) !== String(getUser()?._id))).filter(Boolean);
+        } catch {}
+      }
+
+      const unique = [];
+      const seen = new Set();
+      for (const item of users) {
+        const person = item?.user || item;
+        if (!person?._id) continue;
+        const id = String(person._id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        unique.push(person);
+      }
+      setPeople(unique);
+    } catch (e) {
+      console.error(e);
+      setPeople([]);
+    } finally { setLoading(false); }
+  }
+
+  useEffect(() => { loadPeople(); }, []);
+
+  async function sendPost() {
+    if (!selected || sending) return;
+    setSending(true);
+    try {
+      const d = await api("/messages/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ members: [selected._id] })
+      });
+      const conversation = d.conversation;
+      if (!conversation?._id) throw new Error("Unable to create conversation");
+      const postLink = `${window.location.origin}/post/${post._id}`;
+      await api(`/messages/conversations/${conversation._id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
+      });
+      alert(`Post sent to @${selected.username}`);
+      onClose();
+    } catch (e) { alert(e.message); }
+    finally { setSending(false); }
+  }
+
+  const filtered = people.filter(person => `${person.username || ""} ${person.name || ""}`.toLowerCase().includes(query.toLowerCase()));
+
+  return (
+    <div className="share-sheet-overlay" onClick={onClose}>
+      <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
+        <div className="share-sheet-handle" />
+        <div className="share-sheet-head">
+          <div><h2>Share</h2><p>Send this post to someone</p></div>
+          <button className="icon-button" type="button" onClick={onClose}><X /></button>
+        </div>
+        <div className="share-search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search people" autoFocus /></div>
+        <div className="share-people">
+          {loading ? <div className="share-loading">Loading people...</div> : filtered.length ? filtered.map(person => {
+            const active = String(selected?._id) === String(person._id);
+            return (
+              <button key={person._id} type="button" className={`share-person ${active ? "selected" : ""}`} onClick={() => setSelected(person)}>
+                <div className="share-person-avatar">
+                  <Avatar user={person} size={64} />
+                  {active && <span className="share-selected-check"><Check /></span>}
+                </div>
+                <b>@{person.username}</b>
+                <span>{person.name || "ReelsGo user"}</span>
+              </button>
+            );
+          }) : (
+            <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>
+          )}
+        </div>
+        <button className="share-send-button" type="button" disabled={!selected || sending} onClick={sendPost}>
+          <Send />
+          {sending ? "Sending..." : selected ? `Send to @${selected.username}` : "Select a person"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PostComposer({ user, onClose, onDone }) {
+  const input = useRef(null);
+  const [files, setFiles] = useState([]);
+  const [caption, setCaption] = useState("");
+  const [location, setLocation] = useState("");
+  const [hashtags, setHashtags] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function publish() {
+    if (!files.length && !caption.trim()) return alert("Add a photo/video or caption");
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      files.forEach(f => fd.append("media", f));
+      fd.append("caption", caption); fd.append("location", location); fd.append("hashtags", hashtags);
+      await api("/posts", { method: "POST", body: fd });
+      onDone();
+      alert("Post shared");
+    } catch (e) { alert(e.message); } finally { setLoading(false); }
+  }
+
+  return <Modal title="Create new post" onClose={onClose}>
+    <div className="composer-user"><Avatar user={user} /><div><b>{user?.username}</b><span>Share with your followers</span></div></div>
+    <textarea className="composer-text" placeholder="What's on your mind?" value={caption} onChange={e => setCaption(e.target.value)} />
+    {files.length > 0 && <div className="file-preview">{files.map((f, i) => <div key={i}><ImageIcon /> <span>{f.name}</span></div>)}</div>}
+    <div className="form-row"><input placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} /><input placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} /></div>
+    <input ref={input} type="file" multiple accept="image/*,video/*" hidden onChange={e => setFiles(Array.from(e.target.files || []))} />
+    <button className="secondary full" onClick={() => input.current?.click()}><ImageIcon /> Photos / Videos</button>
+    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Sharing..." : "Share"}</button>
+  </Modal>;
+}
+
+function StoryComposer({ onClose, onDone }) {
+  const input = useRef(null);
+  const [file, setFile] = useState(null);
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function publish() {
+    if (!file && !text.trim()) return alert("Add a photo/video or text");
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      if (file) fd.append("media", file);
+      fd.append("text", text);
+      await api("/stories", { method: "POST", body: fd });
+      onDone(); alert("Story shared");
+    } catch (e) { alert(e.message); } finally { setLoading(false); }
+  }
+
+  return <Modal title="Create story" onClose={onClose}>
+    <div className="story-editor">
+      {file ? <div className="selected-file"><Check /> {file.name}</div> : <div className="story-editor-placeholder"><ImageIcon /><b>Add to your story</b><span>Photo, video or text</span></div>}
+      <textarea placeholder="Write something..." value={text} onChange={e => setText(e.target.value)} />
+    </div>
+    <input ref={input} type="file" accept="image/*,video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
+    <button className="secondary full" onClick={() => input.current?.click()}><Camera /> Choose from gallery</button>
+    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Sharing..." : "Share to story"}</button>
+  </Modal>;
+}
+
+function ReelComposer({ onClose, onDone }) {
+  const input = useRef(null);
+  const [file, setFile] = useState(null);
+  const [caption, setCaption] = useState("");
+  const [hashtags, setHashtags] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function publish() {
+    if (!file) return alert("Select a Reel video");
+    if (file.size > 15 * 1024 * 1024) return alert("Video must be below 15 MB for MongoDB BSON storage");
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("video", file); fd.append("caption", caption); fd.append("hashtags", hashtags);
+      await api("/reels", { method: "POST", body: fd });
+      onDone(); alert("Reel published");
+    } catch (e) { alert(e.message); } finally { setLoading(false); }
+  }
+
+  return <Modal title="Create Reel" onClose={onClose}>
+    <div className="reel-editor">
+      <Film />
+      <h3>New Reel</h3>
+      <p>Upload a vertical video. Maximum 15 MB with the current MongoDB media model.</p>
+      {file && <div className="selected-file"><Check /> {file.name}</div>}
+    </div>
+    <input ref={input} type="file" accept="video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
+    <button className="secondary full" onClick={() => input.current?.click()}><Upload /> Choose video</button>
+    <input className="normal-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} />
+    <input className="normal-input" placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Publishing..." : "Publish Reel"}</button>
+  </Modal>;
+}
+
+function ProfilePage({ user, setUser }) {
+  const [tab, setTab] = useState("posts");
+  const [posts, setPosts] = useState([]);
+  const [reels, setReels] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const input = useRef(null);
+  const [name, setName] = useState(user?.name || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [website, setWebsite] = useState(user?.website || "");
+  const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
+
+  async function load() {
+    try {
+      const [p, r] = await Promise.all([api("/posts"), api("/reels")]);
+      setPosts((p.posts || []).filter(x => x.author?._id === user?._id));
+      setReels((r.reels || []).filter(x => x.author?._id === user?._id));
+    } catch (e) { console.error(e); }
+  }
+  useEffect(() => { load(); }, [user?._id]);
+
+  async function avatarUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return alert("Select an image");
+    if (file.size > 10 * 1024 * 1024) return alert("Image must be below 10 MB");
+    const fd = new FormData(); fd.append("avatar", file);
+    try {
+      setSaving(true);
+      const d = await api("/users/me/avatar", { method: "POST", body: fd });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+    } catch (e) { alert(e.message); }
+    finally { setSaving(false); e.target.value = ""; }
+  }
+
+  async function saveProfile() {
+    try {
+      setSaving(true);
+      const d = await api("/users/me", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, bio, website, isPrivate })
+      });
+      setUser(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user));
+      setEditOpen(false);
+    } catch (e) { alert(e.message); } finally { setSaving(false); }
+  }
+
+  const visiblePosts = posts;
+  return (
+    <div className="page profile-page">
+      <div className="profile-header">
+        <div className="profile-avatar-wrap">
+          <Avatar user={user} size={150} className="profile-avatar" />
+          <button className="avatar-camera" onClick={() => input.current?.click()} disabled={saving}><Camera /></button>
+          <input ref={input} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={avatarUpload} />
+        </div>
+        <div className="profile-details">
+          <div className="profile-line">
+            <h1>{user?.username}</h1>
+            <button className="secondary" onClick={() => setEditOpen(v => !v)}><Edit3 /> Edit profile</button>
+            <button className="icon-button profile-more"><MoreHorizontal /></button>
+          </div>
+          <div className="profile-stats">
+            <span><b>{user?.postsCount || posts.length}</b><small>posts</small></span>
+            <span><b>{user?.followersCount || 0}</b><small>followers</small></span>
+            <span><b>{user?.followingCount || 0}</b><small>following</small></span>
+          </div>
+          <b>{user?.name}</b>
+          <p>{user?.bio || "Welcome to ReelsGo."}</p>
+          {user?.website && <a href={user.website} target="_blank" rel="noreferrer"><LinkIcon /> {user.website}</a>}
+        </div>
+      </div>
+
+      <div className="profile-tabs">
+        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
+        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}><Film /> Reels</button>
+        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}><Users /> Tagged</button>
+        <button className={tab === "saved" ? "active" : ""} onClick={() => setTab("saved")}><Bookmark /> Saved</button>
+      </div>
+
+      {editOpen && (
+        <div className="edit-card">
+          <div className="card-title-row"><h2>Edit profile</h2><button onClick={() => setEditOpen(false)}><X /></button></div>
+          <label>Name</label><input value={name} onChange={e => setName(e.target.value)} />
+          <label>Bio</label><textarea value={bio} maxLength={150} onChange={e => setBio(e.target.value)} /><small>{bio.length}/150</small>
+          <label>Website</label><input value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://example.com" />
+          <div className="privacy-toggle-row">
+        <div><b>Private account</b><span>Only people you approve can follow you and see your posts and stories.</span></div>
+        <Toggle checked={isPrivate} onChange={setIsPrivate} />
+      </div>
+          <button className="primary" onClick={saveProfile} disabled={saving}>{saving ? "Saving..." : "Save changes"}</button>
+        </div>
+      )}
+
+      {tab === "posts" && (
+        visiblePosts.length
+          ? <div className="profile-grid">{visiblePosts.map(p => <GridMedia key={p._id} post={p} />)}</div>
+          : <EmptyTab icon={<CameraOff />} title="No posts yet" text="Share your first photo or video." />
+      )}
+
+      {tab === "reels" && (
+        reels.length
+          ? <div className="profile-grid reels-profile-grid">{reels.map(r => <div className="grid-reel" key={r._id}><video src={`${SERVER}${r.mediaUrl}`} controls /></div>)}</div>
+          : <EmptyTab icon={<Film />} title="No Reels yet" text="Your published Reels will appear here." />
+      )}
+
+      {tab === "tagged" && (
+        posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).length
+          ? <div className="profile-grid">{posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).map(p => <GridMedia key={p._id} post={p} />)}</div>
+          : <EmptyTab icon={<Users />} title="Photos of you" text="Posts where you are tagged will appear here." />
+      )}
+      {tab === "saved" && <SavedPage embedded user={user} />}
+    </div>
+  );
+}
+
+function GridMedia({ post }) {
+  const [open, setOpen] = useState(false);
+  const m = post.media?.[0];
+  if (!m?.url) return null;
+  return (
+    <>
+      <button className="grid-media grid-media-button" type="button" onClick={() => setOpen(true)} aria-label="Open media">
+        {m.kind === "video" ? <video src={`${SERVER}${m.url}`} muted playsInline preload="metadata" /> : <img src={`${SERVER}${m.url}`} alt={post.caption || ""} />}
+        {m.kind === "video" && <span className="grid-video-icon"><Play fill="currentColor" /></span>}
+      </button>
+      {open && <MediaViewer media={m} post={post} onClose={() => setOpen(false)} />}
+    </>
+  );
+}
+
+function EmptyTab({ icon, title, text }) {
+  return <div className="empty tab-empty">{icon}<h2>{title}</h2><p>{text}</p></div>;
+}
+
+function ReelsPage({ onCreate }) {
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef(null);
+  const cardRefs = useRef([]);
+
+  async function load() {
+    try {
+      const d = await api("/reels");
+      setReels(d.reels || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    if (!reels.length) return;
+
+    const root = scrollRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible) {
+          const index = Number(visible.target.dataset.index);
+          if (!Number.isNaN(index)) setActiveIndex(index);
+        }
+      },
+      { root, threshold: [0.35, 0.6, 0.8] }
+    );
+
+    cardRefs.current.forEach(card => card && observer.observe(card));
+    return () => observer.disconnect();
+  }, [reels]);
+
+  function goToReel(index) {
+    const next = Math.max(0, Math.min(index, reels.length - 1));
+    const card = cardRefs.current[next];
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      setActiveIndex(next);
+    }
+  }
+
+  return (
+    <div className="page reels-page">
+      <div className="page-heading reels-heading">
+        <div>
+          <h1>Reels</h1>
+          <p>Short videos from ReelsGo</p>
+        </div>
+        <button className="desktop-create" onClick={onCreate}>
+          <Film /> Create Reel
+        </button>
+      </div>
+
+      {!loading && !reels.length ? (
+        <div className="empty">
+          <Film />
+          <h2>No Reels yet</h2>
+          <p>Upload your first short video.</p>
+          <button className="primary small" onClick={onCreate}>Upload Reel</button>
+        </div>
+      ) : (
+        <div className="reels-stage">
+          <div className="reels-scroll" ref={scrollRef}>
+            {reels.map((r, index) => (
+              <article
+                className={`reel-feed-card ${index === activeIndex ? "active" : ""}`}
+                key={r._id}
+                ref={el => { cardRefs.current[index] = el; }}
+                data-index={index}
+              >
+                <div className="reel-feed-media">
+                  <video
+                    src={`${SERVER}${r.mediaUrl}`}
+                    muted
+                    playsInline
+                    controls
+                    preload={index === activeIndex ? "auto" : "metadata"}
+                    autoPlay={index === activeIndex}
+                    loop
+                  />
+
+                  <div className="reel-feed-top">
+                    <Avatar user={r.author} size={42} />
+                    <div>
+                      <b>@{r.author?.username}</b>
+                      <span>{r.caption || "Reel"}</span>
+                    </div>
+                  </div>
+
+                  <div className="reel-feed-bottom">
+                    <button
+                      type="button"
+                      title="Previous Reel"
+                      aria-label="Previous Reel"
+                      onClick={() => goToReel(activeIndex - 1)}
+                      disabled={activeIndex <= 0}
+                    >
+                      <ChevronUp />
+                    </button>
+                    <button
+                      type="button"
+                      title="Next Reel"
+                      aria-label="Next Reel"
+                      onClick={() => goToReel(activeIndex + 1)}
+                      disabled={activeIndex >= reels.length - 1}
+                    >
+                      <ChevronDown />
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="reels-side-controls" aria-label="Reel navigation">
+            <button
+              type="button"
+              title="Previous Reel"
+              aria-label="Previous Reel"
+              onClick={() => goToReel(activeIndex - 1)}
+              disabled={activeIndex <= 0}
+            >
+              <ChevronUp />
+            </button>
+            <span>{reels.length ? `${activeIndex + 1} / ${reels.length}` : ""}</span>
+            <button
+              type="button"
+              title="Next Reel"
+              aria-label="Next Reel"
+              onClick={() => goToReel(activeIndex + 1)}
+              disabled={activeIndex >= reels.length - 1}
+            >
+              <ChevronDown />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+function ReelViewer({ reel, onClose }) {
+  return (
+    <div className="reel-viewer-overlay" onClick={onClose}>
+      <button className="media-viewer-close" type="button" onClick={onClose}><X /></button>
+      <div className="reel-viewer-card" onClick={e => e.stopPropagation()}>
+        <div className="reel-viewer-user">
+          <Avatar user={reel.author} size={42} />
+          <div><b>@{reel.author?.username}</b><span>{reel.caption || "Reel"}</span></div>
+        </div>
+        <video src={`${SERVER}${reel.mediaUrl}`} controls autoPlay loop playsInline />
+      </div>
+    </div>
+  );
+}
+
+function SearchPage({ onOpenProfile }) {
+  const [q, setQ] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  async function search(v) {
+    setQ(v);
+    if (!v.trim()) {
+      setUsers([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const d = await api(`/users/search?q=${encodeURIComponent(v.trim())}`);
+      setUsers(d.users || []);
+    } catch (e) {
+      console.error(e);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="page">
+      <div className="page-heading">
+        <div>
+          <h1>Search</h1>
+          <p>Find people on ReelsGo</p>
+        </div>
+      </div>
+
+      <div className="search-box">
+        <Search />
+        <input
+          value={q}
+          onChange={e => search(e.target.value)}
+          placeholder="Search username or name"
+          autoFocus
+        />
+        {q && (
+          <button
+            className="icon-button"
+            onClick={() => { setQ(""); setUsers([]); }}
+            aria-label="Clear search"
+          >
+            <X />
+          </button>
+        )}
+      </div>
+
+      {loading && <div className="empty small-empty"><p>Searching...</p></div>}
+
+      {!loading && users.length > 0 && (
+        <div className="user-list">
+          {users.map(u => (
+            <button
+              className="user-row"
+              key={u._id}
+              onClick={() => onOpenProfile(u._id)}
+              type="button"
+            >
+              <Avatar user={u} size={48} />
+              <div>
+                <b>@{u.username}</b>
+                <span>{u.name}</span>
+              </div>
+              <ChevronRight />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {!loading && q && !users.length && (
+        <div className="empty small-empty">
+          <Search />
+          <h2>No users found</h2>
+          <p>Try the exact username or another name.</p>
+        </div>
+      )}
+
+      {!q && (
+        <div className="empty small-empty">
+          <User />
+          <h2>Search for people</h2>
+          <p>Tap a person from the results to open their profile.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
+  const [profile, setProfile] = useState(null);
+  const [tab, setTab] = useState("posts");
+  const [loading, setLoading] = useState(true);
+  const [followLoading, setFollowLoading] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const d = await api(`/users/${userId}/profile`);
+      setProfile(d);
+    } catch (e) {
+      alert(e.message);
+      onBack();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    setTab("posts");
+    load();
+  }, [userId]);
+
+  async function toggleFollow() {
+    if (!profile?.user || String(profile.user._id) === String(currentUser?._id)) return;
+    setFollowLoading(true);
+    try {
+      if (profile.followStatus === "accepted" || profile.followStatus === "pending") {
+        await api(`/follows/${profile.user._id}`, { method: "DELETE" });
+      } else {
+        await api(`/follows/${profile.user._id}`, { method: "POST" });
+      }
+      await load();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setFollowLoading(false);
+    }
+  }
+
+  if (loading) {
+    return <div className="page"><div className="empty"><p>Loading profile...</p></div></div>;
+  }
+
+  if (!profile?.user) return null;
+
+  const u = profile.user;
+  const isSelf = String(u._id) === String(currentUser?._id);
+  const canView = !!profile.canViewContent;
+  const posts = profile.posts || [];
+  const reels = profile.reels || [];
+  const tagged = profile.tagged || [];
+
+  return (
+    <div className="page profile-page">
+      <div className="profile-back-row">
+        <button className="secondary" onClick={onBack}><ChevronRight style={{ transform: "rotate(180deg)" }} /> Back to search</button>
+      </div>
+
+      <div className="profile-header">
+        <div className="profile-avatar-wrap">
+          <Avatar user={u} size={150} className="profile-avatar" />
+        </div>
+
+        <div className="profile-details">
+          <div className="profile-line">
+            <h1>{u.username}</h1>
+            {!isSelf && (
+              <>
+                <button
+                  className={profile.followStatus === "accepted" ? "secondary" : "primary"}
+                  onClick={toggleFollow}
+                  disabled={followLoading}
+                >
+                  {followLoading
+                    ? "Please wait..."
+                    : profile.followStatus === "accepted"
+                      ? "Following"
+                      : profile.followStatus === "pending"
+                        ? "Requested"
+                        : "Follow"}
+                </button>
+                <button className="secondary" onClick={() => onMessage(u._id)}>
+                  <MessageCircle /> Message
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="profile-stats">
+            <span><b>{u.postsCount || posts.length}</b><small>posts</small></span>
+            <span><b>{u.followersCount || 0}</b><small>followers</small></span>
+            <span><b>{u.followingCount || 0}</b><small>following</small></span>
+          </div>
+
+          <b>{u.name}</b>
+          <p>{u.bio || "Welcome to ReelsGo."}</p>
+          {u.website && <a href={u.website} target="_blank" rel="noreferrer"><LinkIcon /> {u.website}</a>}
+
+          {u.isPrivate && !canView && !isSelf && (
+            <div className="private-profile-note">
+              <Lock />
+              <div>
+                <b>This account is private</b>
+                <span>Follow this account and wait for approval to see posts and stories.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="profile-tabs">
+        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
+        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}><Film /> Reels</button>
+        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}><Users /> Tagged</button>
+      </div>
+
+      {!canView && !isSelf ? (
+        <div className="private-profile-lock">
+          <div className="private-lock-icon"><Lock /></div>
+          <h2>Private account</h2>
+          <p>Follow this account to see their photos, videos and Reels.</p>
+        </div>
+      ) : (
+        <>
+          {tab === "posts" && (
+            posts.length
+              ? <div className="profile-grid">{posts.map(p => <GridMedia key={p._id} post={p} />)}</div>
+              : <EmptyTab icon={<CameraOff />} title="No posts yet" text="This user has not shared any posts." />
+          )}
+
+          {tab === "reels" && (
+            reels.length
+              ? <div className="profile-grid reels-profile-grid">{reels.map(r => <div className="grid-reel" key={r._id}><video src={`${SERVER}${r.mediaUrl}`} controls playsInline /></div>)}</div>
+              : <EmptyTab icon={<Film />} title="No Reels yet" text="This user has not shared any Reels." />
+          )}
+
+          {tab === "tagged" && (
+            tagged.length
+              ? <div className="profile-grid">{tagged.map(p => <GridMedia key={p._id} post={p} />)}</div>
+              : <EmptyTab icon={<Users />} title="Photos of you" text="Tagged posts will appear here." />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function ExplorePage() {
+  return <div className="page"><div className="page-heading"><div><h1>Explore</h1><p>Discover photos, videos and creators</p></div></div><div className="explore-feature"><Compass /><h2>Explore</h2><p>Recommended content will appear here as your community grows.</p></div></div>;
+}
+
+function MessagesPage({ openConversationId = null }) {
+  const me = getUser();
+  const [conversations, setConversations] = useState([]);
+  const [active, setActive] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [requestsOpen, setRequestsOpen] = useState(false);
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [mobileChat, setMobileChat] = useState(false);
+  const [conversationQuery, setConversationQuery] = useState('');
+
+  async function loadConversations(selectId = null) {
+    try {
+      const d = await api('/messages/conversations');
+      const rows = d.conversations || [];
+      setConversations(rows);
+      if (selectId) {
+        const c = rows.find(x => String(x._id) === String(selectId));
+        if (c) { setActive(c); setMobileChat(true); }
+      }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  }
+
+  async function loadNotes() {
+    try { const d = await api('/notes'); setNotes(d.notes || []); } catch { setNotes([]); }
+  }
+
+  async function loadRequests() {
+    try { const d = await api('/follows/requests'); setRequests(d.requests || []); } catch { setRequests([]); }
+  }
+
+  useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
+
+  useEffect(() => {
+    if (!openConversationId) return;
+    (async () => {
+      try {
+        const [cd, md] = await Promise.all([
+          api('/messages/conversations'),
+          api(`/messages/conversations/${openConversationId}/messages`)
+        ]);
+        const rows = cd.conversations || [];
+        setConversations(rows);
+        const c = rows.find(x => String(x._id) === String(openConversationId));
+        if (c) { setActive(c); setMobileChat(true); }
+        setMessages(md.messages || []);
+      } catch (e) { console.error(e); }
+    })();
+  }, [openConversationId]);
+
+  async function openConversation(c) {
+    setActive(c);
+    setMobileChat(true);
+    try {
+      const d = await api(`/messages/conversations/${c._id}/messages`);
+      const rows = d.messages || [];
+      setMessages(rows);
+      await Promise.all(rows.filter(m => String(m.sender?._id) !== String(me?._id) && !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))).slice(-50).map(m => api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})));
+    } catch (e) { alert(e.message); }
+  }
+
+  async function sendMessage() {
+    if (!active || !text.trim() || sending) return;
+    setSending(true);
+    try {
+      const d = await api(`/messages/conversations/${active._id}/messages`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.trim() })
+      });
+      if (d.message) setMessages(m => [...m, d.message]);
+      setText('');
+      await loadConversations(active._id);
+    } catch (e) { alert(e.message); }
+    finally { setSending(false); }
+  }
+
+  function other(c) {
+    return (c?.members || []).find(x => String(x._id) !== String(me?._id));
+  }
+
+  function name(c) {
+    const u = other(c);
+    return u?.username || u?.name || c?.title || 'Conversation';
+  }
+
+  function time(value) {
+    if (!value) return '';
+    return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  const myNote = notes.find(n => String(n.author?._id) === String(me?._id));
+  const otherNotes = notes.filter(n => String(n.author?._id) !== String(me?._id));
+  const filteredConversations = conversations.filter(c => {
+    const q = conversationQuery.trim().toLowerCase();
+    if (!q) return true;
+    const u = other(c);
+    return String(u?.username || '').toLowerCase().includes(q) || String(u?.name || '').toLowerCase().includes(q);
+  });
+
+  return (
+    <div className="page messages-page">
+      <div className="messages-instagram-head">
+        <div className="messages-account-title">
+          <b>{me?.username || me?.name || 'Messages'}</b>
+          <ChevronRight className="messages-account-chevron" />
+        </div>
+        <button className="messages-compose-button" type="button" aria-label="New message">
+          <Edit3 />
+        </button>
+      </div>
+
+      <div className="messages-search-bar">
+        <Search />
+        <input
+          value={conversationQuery}
+          onChange={e => setConversationQuery(e.target.value)}
+          placeholder="Search"
+          aria-label="Search messages"
+        />
+        {conversationQuery && <button type="button" onClick={() => setConversationQuery('')}><X /></button>}
+      </div>
+
+      <div className="messages-notes-section">
+        <div className="messages-notes-header"><b>Notes</b><button onClick={loadNotes}>Refresh</button></div>
+        <div className="messages-notes-scroll">
+          <button className="message-note-card my-note" type="button">
+            <div className="message-note-avatar-wrap"><Avatar user={me} size={58} />{!myNote && <span className="note-add">+</span>}</div>
+            <b>Your note</b><span>{myNote?.text || 'Share a note'}</span>
+          </button>
+          {otherNotes.map(note => {
+            const c = conversations.find(x => x.members?.some(m => String(m._id) === String(note.author?._id)));
+            return <button className="message-note-card" key={note._id} type="button" onClick={() => c && openConversation(c)}>
+              <div className="message-note-bubble">{note.text}</div><div className="message-note-avatar"><Avatar user={note.author} size={58} /></div>
+              <b>{note.author?.username || note.author?.name || 'User'}</b><span>{note.music || 'Note'}</span>
+            </button>;
+          })}
+          {!otherNotes.length && <div className="notes-empty">Follow people and their notes will appear here.</div>}
+        </div>
+      </div>
+
+      {requestsOpen && <div className="messages-requests-overlay" onClick={() => setRequestsOpen(false)}><div className="messages-requests-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><b>Follow requests</b><button onClick={() => setRequestsOpen(false)}><X /></button></div>
+        {!requests.length ? <div className="requests-empty"><UserPlus /><b>No requests</b><span>New requests will appear here.</span></div> : <div className="requests-list">{requests.map(r => {
+          const u = r.follower || r.requester || r.actor;
+          return <div className="request-row" key={r._id}><Avatar user={u} size={48} /><div><b>@{u?.username || u?.name}</b><span>wants to follow you</span></div></div>;
+        })}</div>}
+      </div></div>}
+
+      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`}>
+        <div className="conversation-list instagram-conversation-list">
+          <div className="conversation-list-title">
+            <b>Messages</b>
+            <button className="messages-requests-button" onClick={() => { setRequestsOpen(true); loadRequests(); }}>
+              Requests {requests.length > 0 && <span>{requests.length}</span>}
+            </button>
+          </div>
+          {loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
+            {filteredConversations.map(c => {
+              const u = other(c); const selected = String(active?._id) === String(c._id);
+              return <button className={`conversation-item ${selected ? 'active' : ''}`} key={c._id} onClick={() => openConversation(c)}>
+                <Avatar user={u} size={58} /><div className="conversation-copy"><b>{name(c)}</b><span>{c.lastMessage?.text || 'Start a conversation'}</span>{c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}</div>
+              </button>;
+            })}
+          </div> : <div className="chat-empty-list"><MessageCircle /><b>Start a conversation</b><span>Send a message to someone you follow.</span><small>Open a profile and tap Message.</small></div>}
+        </div>
+
+        <div className="chat instagram-chat">
+          {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
+            <div className="chat-head instagram-chat-head">
+              <button className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
+              <Avatar user={other(active)} size={44} /><div><b>@{other(active)?.username || other(active)?.name}</b><span>Active now</span></div>
+            </div>
+            <div className="chat-messages instagram-chat-messages">
+              {messages.length ? messages.map(m => {
+                const mine = String(m.sender?._id) === String(me?._id);
+                const seen = (m.seenBy || []).some(x => String(x?._id || x) !== String(me?._id));
+                return <div key={m._id} className={`message-line ${mine ? 'mine' : 'received'}`}>
+                  {!mine && <Avatar user={m.sender} size={30} />}
+                  <div className={`bubble ${mine ? 'mine' : ''}`}><span>{m.text}</span><div className="message-meta"><small>{time(m.createdAt)}</small>{mine && <small>{seen ? 'Seen' : 'Sent'}</small>}</div></div>
+                </div>;
+              }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><p>@{other(active)?.username}</p><span>Start a conversation with this person.</span></div>}
+            </div>
+            <div className="chat-input instagram-chat-input">
+              <button type="button" className="chat-attach-button"><Paperclip /></button>
+              <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Message..." disabled={sending} />
+              {text.trim() ? <button className="chat-send-button" onClick={sendMessage} disabled={sending}><Send /></button> : <button className="chat-smile-button"><Smile /></button>}
+            </div>
+          </>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NotificationsPage() {
+  const [items, setItems] = useState([]);
+  useEffect(() => { api("/notifications").then(d => setItems(d.notifications || [])).catch(() => {}); }, []);
+  return <div className="page"><div className="page-heading"><div><h1>Notifications</h1><p>Likes, comments, follows and more</p></div></div>{items.map(n => <div className="notification" key={n._id}><Avatar user={n.actor} /><div><b>{n.actor?.username}</b> {n.text}<small>{new Date(n.createdAt).toLocaleString()}</small></div></div>)}{!items.length && <div className="empty"><Bell /><h2>No notifications</h2><p>New activity will appear here.</p></div>}</div>;
+}
+
+function SavedPage({ user, embedded = false }) {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    setLoading(true);
+    api("/posts/saved").then(d => setPosts(d.posts || [])).catch(() => setPosts([])).finally(() => setLoading(false));
+  }, []);
+  const body = loading
+    ? <div className="empty"><Bookmark /><p>Loading saved posts...</p></div>
+    : posts.length
+      ? <div className="profile-grid">{posts.slice(0, 30).map(p => <GridMedia key={p._id} post={p} />)}</div>
+      : <EmptyTab icon={<Bookmark />} title="Saved posts" text="Posts you save will appear here." />;
+  if (embedded) return <div className="embedded-saved">{body}</div>;
+  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved collection</p></div></div>{body}</div>;
+}
+
+const settingsSections = [
+  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
+  { id: "security", title: "Security", icon: Shield, items: ["Password", "Two-factor authentication", "Login activity", "Saved login information", "Emails from ReelsGo"] },
+  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Posts, stories and comments", "Following and followers", "Messages", "Calls", "Live and Reels"] },
+  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Messages", "Story replies", "Read receipts", "Typing indicator", "Group messages"] },
+  { id: "content", title: "What you see", icon: Compass, items: ["Content preferences", "Sensitive content", "Suggested content", "Favorites", "Muted accounts"] },
+  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage", "Upload at highest quality", "Autoplay videos", "Accessibility"] },
+  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Text size", "Sound"] },
+  { id: "language", title: "Language", icon: Languages, items: ["App language", "Translations"] },
+  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Terms"] }
+];
+
+function SettingsModal({ user, setUser, onClose, onLogout }) {
+  const [section, setSection] = useState("account");
+  const [search, setSearch] = useState("");
+  const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
+  const [dark, setDark] = useState(false);
+  const [selectedItem, setSelectedItem] = useState("");
+
+  const visible = settingsSections.filter(s =>
+    !search || s.title.toLowerCase().includes(search.toLowerCase()) || s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  async function savePrivacy() {
+    try {
+      const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: privateAccount }) });
+      setUser(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user));
+      alert("Privacy updated");
+    } catch (e) { alert(e.message); }
+  }
+
+  async function togglePrivateAccount(next) {
+    const previous = privateAccount;
+    setPrivateAccount(next);
+    try {
+      const d = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPrivate: next })
+      });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+    } catch (e) {
+      setPrivateAccount(previous);
+      alert(e.message);
+    }
+  }
+
+  return <div className="overlay settings-overlay">
+    <div className="settings-modal instagram-settings">
+      <div className="settings-topbar"><button className="settings-back" onClick={onClose}><X /></button><h2>Settings and activity</h2></div>
+      <div className="settings-search"><Search /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search settings" /></div>
+      <div className="settings-layout">
+        <aside className="settings-sidebar">
+          {visible.map(s => {
+            const Icon = s.icon;
+            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); }}>
+              <Icon /><span>{s.title}</span><ChevronRight />
+            </button>;
+          })}
+          <button className="settings-logout" onClick={onLogout}><LogOut /><span>Log out</span></button>
+        </aside>
+
+        <section className="settings-content">
+          <div className="settings-section-title">
+            <h1>{settingsSections.find(x => x.id === section)?.title}</h1>
+            <p>Manage your ReelsGo experience.</p>
+          </div>
+
+          {section === "account" && <AccountSettings user={user} onSelect={setSelectedItem} />}
+          {section === "privacy" && <PrivacySettings privateAccount={privateAccount} setPrivateAccount={setPrivateAccount} togglePrivateAccount={togglePrivateAccount} savePrivacy={savePrivacy} onSelect={setSelectedItem} />}
+          {section === "security" && <SecuritySettings onSelect={setSelectedItem} />}
+          {section === "notifications" && <ToggleSettings title="Notifications" items={["Likes", "Comments", "Followers and follow requests", "Messages", "Story replies", "Reels interactions", "Live notifications", "Email notifications"]} />}
+          {section === "messages" && <ToggleSettings title="Messages and replies" items={["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing"]} />}
+          {section === "content" && <ToggleSettings title="What you see" items={["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites"]} />}
+          {section === "media" && <ToggleSettings title="Media quality" items={["Upload at highest quality", "Use less mobile data", "Autoplay videos", "Save original photos", "Save original videos"]} />}
+          {section === "accessibility" && <ToggleSettings title="Accessibility" items={["Reduce motion", "Captions", "Text-to-speech", "Sound effects", "Large text"]} />}
+          {section === "language" && <ToggleSettings title="Language" items={["English", "Automatic translations", "Translate captions", "Translate comments"]} />}
+          {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
+          {selectedItem && <div className="setting-detail"><b>{selectedItem}</b><p>This option is currently represented in the ReelsGo interface. Account changes are saved only where a backend endpoint is connected.</p></div>}
+        </section>
+      </div>
+    </div>
+  </div>;
+}
+
+function AccountSettings({ user, onSelect }) {
+  return <div className="settings-panel">
+    <div className="settings-profile-row"><Avatar user={user} size={72} /><div><b>{user?.username}</b><span>{user?.email}</span></div><button className="secondary" onClick={() => onSelect("Edit profile")}>Edit profile</button></div>
+    <SettingRow onClick={() => onSelect("Personal information")} icon={<User />} title="Personal information" description="Name, email and profile information" />
+    <SettingRow onClick={() => onSelect("Password")} icon={<KeyRound />} title="Password" description="Change your account password" />
+    <SettingRow onClick={() => onSelect("Account privacy")} icon={<Lock />} title="Account privacy" description="Public or private account" />
+    <SettingRow onClick={() => onSelect("Deactivate or delete account")} icon={<Trash2 />} title="Deactivate or delete account" description="Temporarily deactivate or permanently delete" danger />
+  </div>;
+}
+
+function Toggle({ checked, onChange, disabled = false }) {
+  return (
+    <button
+      type="button"
+      className={`toggle ${checked ? "on" : "off"}`}
+      aria-pressed={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+    >
+      <span className="toggle-knob" />
+    </button>
+  );
+}
+
+function PrivacySettings({ privateAccount, setPrivateAccount, togglePrivateAccount, savePrivacy, onSelect }) {
+  return <div className="settings-panel">
+    <div className="settings-card-highlight"><Lock /><div><b>Account privacy</b><p>When private, only approved followers can see your posts and stories.</p></div></div>
+    <div className="privacy-toggle-row settings-toggle-row">
+      <div><b>Private account</b><span>Only approved followers can see your posts and stories.</span></div>
+      <Toggle checked={privateAccount} onChange={togglePrivateAccount} />
+    </div>
+    <SettingRow onClick={() => onSelect("Blocked accounts")} icon={<Ban />} title="Blocked accounts" description="Review accounts you blocked" />
+    <SettingRow onClick={() => onSelect("Restricted accounts")} icon={<UserMinus />} title="Restricted accounts" description="Manage restricted people" />
+    <SettingRow onClick={() => onSelect("Tags and mentions")} icon={<AtSign />} title="Tags and mentions" description="Choose who can tag or mention you" />
+    <SettingRow onClick={() => onSelect("Comments")} icon={<MessageSquareText />} title="Comments" description="Control who can comment on your posts" />
+    <button className="primary" onClick={savePrivacy}>Save privacy</button>
+  </div>;
+}
+
+function SecuritySettings({ onSelect }) {
+  return <div className="settings-panel">
+    <SettingRow onClick={() => onSelect("Password")} icon={<KeyRound />} title="Password" description="Update your password regularly" />
+    <SettingRow onClick={() => onSelect("Two-factor authentication")} icon={<Shield />} title="Two-factor authentication" description="Add another layer of account protection" action="Set up" />
+    <SettingRow onClick={() => onSelect("Login activity")} icon={<Clock3 />} title="Login activity" description="Review recent account sessions" />
+    <SettingRow onClick={() => onSelect("Where you're logged in")} icon={<Smartphone />} title="Where you're logged in" description="Review active devices" />
+    <SettingRow onClick={() => onSelect("Emails from ReelsGo")} icon={<Mail />} title="Emails from ReelsGo" description="Security and account emails" />
+  </div>;
+}
+
+function ToggleSettings({ title, items }) {
+  const [values, setValues] = useState(() => Object.fromEntries(items.map(x => [x, localStorage.getItem(`vk_setting_${x}`) !== "false"])));
+  function flip(item) {
+    setValues(v => { const next = !v[item]; localStorage.setItem(`vk_setting_${item}`, String(next)); return { ...v, [item]: next }; });
+  }
+  return <div className="settings-panel"><h2 className="panel-heading">{title}</h2>{items.map(item =>
+    <div className="setting-switch" key={item}>
+      <span><b>{item}</b><small>Manage this preference for your account.</small></span>
+      <Toggle checked={!!values[item]} onChange={() => flip(item)} />
+    </div>
+  )}</div>;
+}
+
+function HelpSettings({ onSelect }) {
+  return <div className="settings-panel"><SettingRow onClick={() => onSelect("Help center")} icon={<CircleHelp />} title="Help center" description="Find answers to common questions" /><SettingRow onClick={() => onSelect("Report a problem")} icon={<Flag />} title="Report a problem" description="Tell us when something is not working" /><SettingRow onClick={() => onSelect("Privacy and safety")} icon={<Shield />} title="Privacy and safety" description="Safety resources and policies" /><SettingRow onClick={() => onSelect("Community guidelines")} icon={<AlertTriangle />} title="Community guidelines" description="Rules for using ReelsGo" /></div>;
+}
+
+function SettingRow({ icon, title, description, action, danger, onClick }) {
+  return <button onClick={onClick} className={`setting-row ${danger ? "danger-row" : ""}`}><span className="setting-row-icon">{icon}</span><span className="setting-row-text"><b>{title}</b><small>{description}</small></span>{action ? <em>{action}</em> : <ChevronRight />}</button>;
+}
+
+function Modal({ title, onClose, children }) {
+  return <div className="overlay" onClick={onClose}><div className="modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button onClick={onClose}><X /></button></div><div className="modal-body">{children}</div></div></div>;
+}
+
+export default App;
