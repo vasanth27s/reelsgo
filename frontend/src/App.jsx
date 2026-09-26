@@ -138,6 +138,10 @@ function App() {
 
   const navigate = p => {
     setSettingsOpen(false);
+    // A normal navigation should leave any previously opened DM.
+    // This prevents Messages from reopening an old conversation when
+    // the user returns to the Messages tab from Home/Profile/Settings.
+    if (p !== "messages") setOpenConversationId(null);
     setPage(p);
     if (p !== "user-profile") setProfileUserId(null);
     setMenuOpen(false);
@@ -210,7 +214,7 @@ function App() {
         }} />}
         {page === "explore" && <ExplorePage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
-        {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
+        {page === "messages" && <MessagesPage openConversationId={openConversationId} onClearConversation={() => setOpenConversationId(null)} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
@@ -1562,7 +1566,7 @@ function ExplorePage() {
   return <div className="page"><div className="page-heading"><div><h1>Explore</h1><p>Discover photos, videos and creators</p></div></div><div className="explore-feature"><Compass /><h2>Explore</h2><p>Recommended content will appear here as your community grows.</p></div></div>;
 }
 
-function MessagesPage({ openConversationId = null }) {
+function MessagesPage({ openConversationId = null, onClearConversation = () => {} }) {
   const me = getUser();
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
@@ -1713,7 +1717,7 @@ function MessagesPage({ openConversationId = null }) {
         })}</div>}
       </div></div>}
 
-      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`}>
+      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''} ${mobileChat && active ? 'mobile-chat-open' : ''}`}>
         <div className="conversation-list instagram-conversation-list">
           <div className="conversation-list-title">
             <b>Messages</b>
@@ -1734,7 +1738,7 @@ function MessagesPage({ openConversationId = null }) {
         <div className="chat instagram-chat">
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
-              <button className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
+              <button className="chat-back-button" onClick={() => { setActive(null); setMessages([]); setText(''); setMobileChat(false); onClearConversation(); }} aria-label="Back to messages"><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
               <Avatar user={other(active)} size={44} /><div><b>@{other(active)?.username || other(active)?.name}</b><span>Active now</span></div>
             </div>
             <div className="chat-messages instagram-chat-messages">

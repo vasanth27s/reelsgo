@@ -5577,3 +5577,240 @@ textarea{
     height:100dvh !important;
   }
 }
+
+
+/* ============================================================
+   MOBILE MESSAGES — INSTAGRAM-LIKE LIST / FULL-SCREEN DM
+   ============================================================ */
+@media (max-width:700px){
+  /* Messages list should be a page, not a large bordered desktop card. */
+  .messages-page{
+    width:100% !important;
+    max-width:none !important;
+    min-height:calc(100dvh - 57px) !important;
+    padding:8px 0 calc(92px + env(safe-area-inset-bottom)) !important;
+    overflow-x:hidden !important;
+  }
+
+  .messages-page .messages-instagram-head{
+    height:52px !important;
+    margin:0 !important;
+    padding:0 22px !important;
+  }
+  .messages-page .messages-account-title{
+    display:flex !important;
+    align-items:center !important;
+    gap:4px !important;
+  }
+  .messages-page .messages-account-title b{
+    color:#f5f5f7 !important;
+    font-size:21px !important;
+    font-weight:800 !important;
+  }
+  .messages-page .messages-account-chevron{color:#f5f5f7 !important;width:18px !important}
+  .messages-page .messages-compose-button{color:#fff !important;width:40px !important;height:40px !important}
+
+  .messages-page .messages-search-bar{
+    width:calc(100% - 32px) !important;
+    height:50px !important;
+    margin:7px 16px 10px !important;
+    border-radius:15px !important;
+    background:#20242a !important;
+    border:1px solid rgba(255,255,255,.05) !important;
+  }
+  .messages-page .messages-search-bar svg{color:#9aa1ad !important;width:23px !important}
+  .messages-page .messages-search-bar input{color:#f5f5f7 !important;font-size:16px !important}
+  .messages-page .messages-search-bar input::placeholder{color:#9aa1ad !important}
+
+  .messages-page .messages-notes-section{
+    width:100% !important;
+    min-height:126px !important;
+    margin:0 !important;
+    padding:3px 20px 8px !important;
+    background:transparent !important;
+    border:0 !important;
+  }
+  .messages-page .messages-notes-header{display:none !important}
+  .messages-page .messages-notes-scroll{
+    gap:18px !important;
+    padding:3px 0 7px !important;
+  }
+  .messages-page .message-note-card{
+    min-width:78px !important;
+    width:78px !important;
+    color:#f5f5f7 !important;
+  }
+  .messages-page .message-note-avatar,
+  .messages-page .message-note-avatar-wrap .avatar{
+    width:68px !important;
+    height:68px !important;
+  }
+  .messages-page .message-note-card>b{color:#f5f5f7 !important;font-size:11px !important}
+  .messages-page .message-note-card>span{color:#9ca2ad !important;font-size:10px !important}
+  .messages-page .message-note-bubble{
+    background:#343942 !important;
+    color:#f5f5f7 !important;
+    border:1px solid rgba(255,255,255,.13) !important;
+    box-shadow:none !important;
+  }
+  .messages-page .notes-empty{
+    min-width:250px !important;
+    height:75px !important;
+    color:#9ca2ad !important;
+    font-size:14px !important;
+    justify-content:flex-start !important;
+  }
+
+  /* This is the key fix: no huge empty bordered rectangle on the Messages page. */
+  .messages-page .instagram-chat-layout{
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    display:block !important;
+    overflow:visible !important;
+  }
+  .messages-page .instagram-conversation-list{
+    width:100% !important;
+    min-width:100% !important;
+    border:0 !important;
+    background:transparent !important;
+    display:block !important;
+  }
+  .messages-page .conversation-list-title{
+    height:49px !important;
+    padding:0 22px !important;
+    border:0 !important;
+    background:transparent !important;
+  }
+  .messages-page .conversation-list-title b{
+    color:#f5f5f7 !important;
+    font-size:21px !important;
+    font-weight:800 !important;
+  }
+  .messages-page .messages-requests-button{
+    color:#9aa0ac !important;
+    font-size:16px !important;
+    font-weight:700 !important;
+  }
+  .messages-page .conversation-scroll{
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  .messages-page .conversation-item{
+    width:100% !important;
+    min-height:78px !important;
+    padding:10px 22px !important;
+    border:0 !important;
+    background:transparent !important;
+    color:#f5f5f7 !important;
+  }
+  .messages-page .conversation-item:active{background:rgba(255,255,255,.06) !important}
+  .messages-page .conversation-item .avatar{
+    width:58px !important;
+    height:58px !important;
+    min-width:58px !important;
+  }
+  .messages-page .conversation-copy b{
+    color:#f5f5f7 !important;
+    font-size:16px !important;
+    font-weight:700 !important;
+  }
+  .messages-page .conversation-copy span{
+    color:#a3a8b2 !important;
+    font-size:14px !important;
+    margin-top:4px !important;
+  }
+  .messages-page .conversation-copy small{color:#7f858f !important;font-size:11px !important;margin-top:2px !important}
+  .messages-page .conversation-item.active{background:rgba(255,255,255,.06) !important}
+
+  .messages-page .chat-empty-list{
+    min-height:180px !important;
+    height:auto !important;
+    padding:40px 25px !important;
+    background:transparent !important;
+    color:#8f96a2 !important;
+    text-align:center !important;
+  }
+  .messages-page .chat-empty-list svg{width:34px !important;height:34px !important;margin-bottom:10px}
+  .messages-page .chat-empty-list b{color:#f5f5f7 !important;font-size:16px !important}
+  .messages-page .chat-empty-list span,.messages-page .chat-empty-list small{color:#8f96a2 !important;font-size:12px !important}
+
+  /* Hide the desktop chat pane while browsing the message list. */
+  .messages-page .instagram-chat-layout:not(.has-active) .instagram-chat{display:none !important}
+
+  /* Opening a conversation switches to a true phone-sized DM screen. */
+  .messages-page .instagram-chat-layout.has-active{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:10000 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#080b0f !important;
+    display:block !important;
+    overflow:hidden !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .instagram-conversation-list{display:none !important}
+  .messages-page .instagram-chat-layout.has-active .instagram-chat{
+    width:100% !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    display:flex !important;
+    flex-direction:column !important;
+    background:#080b0f !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-head{
+    flex:0 0 auto !important;
+    height:calc(64px + env(safe-area-inset-top)) !important;
+    min-height:calc(64px + env(safe-area-inset-top)) !important;
+    padding:env(safe-area-inset-top) 10px 0 !important;
+    background:#080b0f !important;
+    border-bottom:1px solid rgba(255,255,255,.08) !important;
+    color:#fff !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-messages{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    background:#080b0f !important;
+    padding:14px 12px 12px !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-input{
+    flex:0 0 auto !important;
+    min-height:58px !important;
+    height:auto !important;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+    background:#080b0f !important;
+    border-top:1px solid rgba(255,255,255,.08) !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-input input{
+    background:#1c2026 !important;
+    border:1px solid #343a44 !important;
+    color:#fff !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .chat-back-button{
+    display:flex !important;
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    color:#fff !important;
+  }
+  .messages-page .instagram-chat-layout.has-active .chat-back-button svg{width:23px !important;height:23px !important}
+  .messages-page .instagram-chat-layout.has-active .message-line .bubble{max-width:78% !important}
+  .messages-page .instagram-chat-layout.has-active .message-line .bubble{background:#252a31 !important;color:#fff !important}
+  .messages-page .instagram-chat-layout.has-active .message-line .bubble.mine{background:#3797f0 !important;color:#fff !important}
+
+  body:has(.messages-page .instagram-chat-layout.has-active) .bottom-nav,
+  body:has(.messages-page .instagram-chat-layout.has-active) .mobile-header{
+    display:none !important;
+  }
+}
