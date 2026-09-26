@@ -20,7 +20,9 @@ import notificationRoutes from "./routes/notifications.routes.js";
 import noteRoutes from "./routes/notes.routes.js";
 import reportRoutes from "./routes/reports.routes.js";
 
-// Load environment variables
+// ===============================
+// LOAD ENVIRONMENT
+// ===============================
 dotenv.config();
 
 const app = express();
@@ -32,22 +34,21 @@ const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 const CLIENT_URL =
-  process.env.CLIENT_URL || "http://localhost:5173";
+  process.env.CLIENT_URL || "https://reelsgo.vercel.app";
 
 const MONGO_URI = process.env.MONGO_URI;
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // ===============================
-// BASIC ENV CHECK
+// ENVIRONMENT CHECK
 // ===============================
 if (!MONGO_URI) {
-  console.error("❌ MONGO_URI is missing in backend/.env");
+  console.error("❌ MONGO_URI is missing");
   process.exit(1);
 }
 
 if (!JWT_SECRET) {
-  console.error("❌ JWT_SECRET is missing in backend/.env");
+  console.error("❌ JWT_SECRET is missing");
   process.exit(1);
 }
 
@@ -55,15 +56,17 @@ if (!JWT_SECRET) {
 // CORS
 // ===============================
 const allowedOrigins = [
+  "https://reelsgo.vercel.app",
   CLIENT_URL,
   "http://localhost:5173",
-  "http://127.0.0.1:5173"
-];
+  "http://127.0.0.1:5173",
+  "http://localhost:3000"
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests such as Postman/server-side requests
+    origin(origin, callback) {
+      // Allow Postman/server-to-server requests
       if (!origin) {
         return callback(null, true);
       }
@@ -74,11 +77,11 @@ app.use(
 
       console.warn("⚠️ CORS blocked:", origin);
 
-      return callback(
-        new Error("Not allowed by CORS")
-      );
+      return callback(new Error("Not allowed by CORS"));
     },
+
     credentials: true,
+
     methods: [
       "GET",
       "POST",
@@ -87,6 +90,7 @@ app.use(
       "DELETE",
       "OPTIONS"
     ],
+
     allowedHeaders: [
       "Content-Type",
       "Authorization"
@@ -127,8 +131,8 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
   res.json({
     ok: true,
-    name: "VK Social API",
-    message: "VK Social backend is running",
+    name: "ReelsGo API",
+    message: "ReelsGo backend is running",
     version: "1.0.0"
   });
 });
@@ -139,7 +143,7 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    service: "VK Social",
+    service: "ReelsGo",
     database:
       mongoose.connection.readyState === 1
         ? "MongoDB connected"
@@ -270,6 +274,7 @@ const io = new Server(server, {
       "POST"
     ]
   },
+
   transports: [
     "websocket",
     "polling"
@@ -285,9 +290,9 @@ io.on("connection", (socket) => {
     socket.id
   );
 
-  // --------------------------------
-  // Join user's personal room
-  // --------------------------------
+  // ===============================
+  // JOIN USER ROOM
+  // ===============================
   socket.on("join_user", (userId) => {
     if (!userId) return;
 
@@ -300,9 +305,9 @@ io.on("connection", (socket) => {
     );
   });
 
-  // --------------------------------
-  // Join conversation room
-  // --------------------------------
+  // ===============================
+  // JOIN CONVERSATION
+  // ===============================
   socket.on(
     "join_conversation",
     (conversationId) => {
@@ -319,9 +324,9 @@ io.on("connection", (socket) => {
     }
   );
 
-  // --------------------------------
-  // Leave conversation
-  // --------------------------------
+  // ===============================
+  // LEAVE CONVERSATION
+  // ===============================
   socket.on(
     "leave_conversation",
     (conversationId) => {
@@ -338,9 +343,9 @@ io.on("connection", (socket) => {
     }
   );
 
-  // --------------------------------
-  // Typing
-  // --------------------------------
+  // ===============================
+  // TYPING
+  // ===============================
   socket.on("typing", (data) => {
     if (!data?.conversationId) {
       return;
@@ -353,9 +358,9 @@ io.on("connection", (socket) => {
       });
   });
 
-  // --------------------------------
-  // Stop typing
-  // --------------------------------
+  // ===============================
+  // STOP TYPING
+  // ===============================
   socket.on("stop_typing", (data) => {
     if (!data?.conversationId) {
       return;
@@ -368,9 +373,9 @@ io.on("connection", (socket) => {
       });
   });
 
-  // --------------------------------
-  // Message sent through socket
-  // --------------------------------
+  // ===============================
+  // MESSAGE SENT
+  // ===============================
   socket.on("message_sent", (data) => {
     if (!data?.conversationId) {
       return;
@@ -381,9 +386,9 @@ io.on("connection", (socket) => {
       .emit("message_received", data);
   });
 
-  // --------------------------------
-  // Message seen
-  // --------------------------------
+  // ===============================
+  // MESSAGE SEEN
+  // ===============================
   socket.on("message_seen", (data) => {
     if (!data?.conversationId) {
       return;
@@ -394,9 +399,9 @@ io.on("connection", (socket) => {
       .emit("message_seen", data);
   });
 
-  // --------------------------------
-  // Message reaction
-  // --------------------------------
+  // ===============================
+  // MESSAGE REACTION
+  // ===============================
   socket.on("message_reaction", (data) => {
     if (!data?.conversationId) {
       return;
@@ -407,21 +412,20 @@ io.on("connection", (socket) => {
       .emit("message_reaction", data);
   });
 
-  // --------------------------------
-  // Story viewed
-  // --------------------------------
+  // ===============================
+  // STORY VIEWED
+  // ===============================
   socket.on("story_viewed", (data) => {
     if (!data?.storyId) {
       return;
     }
 
-    // Broadcast story-view update
     socket.emit("story_viewed", data);
   });
 
-  // --------------------------------
-  // Notification
-  // --------------------------------
+  // ===============================
+  // NOTIFICATION
+  // ===============================
   socket.on("notification", (data) => {
     if (!data?.userId) {
       return;
@@ -432,9 +436,9 @@ io.on("connection", (socket) => {
       .emit("notification", data);
   });
 
-  // --------------------------------
-  // Disconnect
-  // --------------------------------
+  // ===============================
+  // DISCONNECT
+  // ===============================
   socket.on("disconnect", (reason) => {
     console.log(
       `🔴 Socket disconnected: ${socket.id}`,
@@ -444,7 +448,7 @@ io.on("connection", (socket) => {
 });
 
 // ===============================
-// MONGODB CONNECTION
+// MONGODB
 // ===============================
 mongoose.set(
   "strictQuery",
@@ -491,7 +495,7 @@ async function startServer() {
     );
 
     console.log(
-      "🚀 Starting VK Social server..."
+      "🚀 Starting ReelsGo server..."
     );
 
     console.log(
@@ -514,7 +518,7 @@ async function startServer() {
       "0.0.0.0",
       () => {
         console.log(
-          `🚀 VK Social API running on http://localhost:${PORT}`
+          `🚀 ReelsGo API running on port ${PORT}`
         );
 
         console.log(
@@ -522,7 +526,7 @@ async function startServer() {
         );
 
         console.log(
-          `❤️ Health: http://localhost:${PORT}/api/health`
+          `❤️ Health: /api/health`
         );
 
         console.log(
@@ -534,6 +538,7 @@ async function startServer() {
         );
       }
     );
+
   } catch (error) {
     console.error(
       "================================="
@@ -572,10 +577,11 @@ async function shutdown(signal) {
       );
 
       console.log(
-        "VK Social server stopped."
+        "ReelsGo server stopped."
       );
 
       process.exit(0);
+
     } catch (error) {
       console.error(
         "Shutdown error:",
@@ -587,6 +593,9 @@ async function shutdown(signal) {
   });
 }
 
+// ===============================
+// PROCESS SIGNALS
+// ===============================
 process.on(
   "SIGINT",
   () => shutdown("SIGINT")

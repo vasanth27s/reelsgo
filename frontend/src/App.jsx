@@ -10,7 +10,7 @@ import {
   Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown
 } from "lucide-react";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
 
 const getToken = () => localStorage.getItem("vk_token");
