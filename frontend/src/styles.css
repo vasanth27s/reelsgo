@@ -5088,3 +5088,472 @@ textarea{
   background:#3a3e46;
   border-radius:999px;
 }
+
+
+/* ============================================================
+   REELSGO MOBILE NAVIGATION FIX
+   - exposes every Settings section on phones
+   - adds explicit Story back button
+   - keeps Settings and Story usable on iPhone/Android
+   ============================================================ */
+
+.settings-mobile-sections,
+.settings-mobile-content-back{
+  display:none;
+}
+
+.story-viewer-back,
+.story-viewer-close{
+  border:0;
+  background:rgba(0,0,0,.28);
+  color:#fff;
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.story-viewer-back svg,
+.story-viewer-close svg{
+  width:22px;
+  height:22px;
+}
+.story-viewer-back:active,
+.story-viewer-close:active{
+  transform:scale(.94);
+}
+
+@media (max-width:700px){
+  /* Settings is a real full-screen mobile page */
+  .settings-overlay{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:10000 !important;
+    padding:0 !important;
+    align-items:stretch !important;
+    justify-content:stretch !important;
+    background:#000 !important;
+  }
+
+  .settings-modal.instagram-settings{
+    position:relative !important;
+    width:100% !important;
+    max-width:none !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    max-height:none !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    overflow:hidden !important;
+    background:#080b0f !important;
+    padding-bottom:env(safe-area-inset-bottom) !important;
+  }
+
+  .settings-topbar{
+    position:relative !important;
+    flex:0 0 auto !important;
+    height:58px !important;
+    min-height:58px !important;
+    padding:0 52px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    background:#080b0f !important;
+    border-bottom:1px solid #242932 !important;
+    z-index:20 !important;
+  }
+
+  .settings-topbar h2{
+    margin:0 !important;
+    font-size:17px !important;
+    font-weight:800 !important;
+    color:#fff !important;
+    white-space:nowrap !important;
+  }
+
+  .settings-back{
+    position:absolute !important;
+    left:10px !important;
+    top:8px !important;
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    border-radius:50% !important;
+    background:transparent !important;
+    color:#fff !important;
+    border:0 !important;
+    z-index:30 !important;
+  }
+
+  .settings-back svg{
+    width:23px !important;
+    height:23px !important;
+  }
+
+  .settings-search{
+    flex:0 0 46px !important;
+    width:calc(100% - 28px) !important;
+    height:46px !important;
+    min-height:46px !important;
+    margin:10px 14px !important;
+    border-radius:15px !important;
+    background:#191d23 !important;
+    border:1px solid #2b3038 !important;
+  }
+
+  /* This is the missing mobile replacement for the desktop sidebar. */
+  .settings-mobile-sections{
+    display:block !important;
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding:4px 14px calc(100px + env(safe-area-inset-bottom)) !important;
+    background:#080b0f !important;
+  }
+
+  .settings-mobile-sections-title{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:3px !important;
+    padding:12px 4px 10px !important;
+  }
+
+  .settings-mobile-sections-title b{
+    color:#fff !important;
+    font-size:24px !important;
+    line-height:1.15 !important;
+  }
+
+  .settings-mobile-sections-title span{
+    color:#8e96a2 !important;
+    font-size:13px !important;
+  }
+
+  .settings-mobile-section-list{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:0 !important;
+    border-top:1px solid #252a32 !important;
+  }
+
+  .settings-mobile-section-list > button{
+    width:100% !important;
+    min-height:68px !important;
+    padding:10px 2px !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:13px !important;
+    background:transparent !important;
+    border:0 !important;
+    border-bottom:1px solid #252a32 !important;
+    color:#fff !important;
+    text-align:left !important;
+    -webkit-tap-highlight-color:transparent !important;
+  }
+
+  .settings-mobile-section-list > button:active{
+    background:#15191f !important;
+  }
+
+  .settings-mobile-section-list > button.active{
+    background:#151a21 !important;
+  }
+
+  .settings-mobile-section-icon{
+    width:42px !important;
+    height:42px !important;
+    flex:0 0 42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    border-radius:50% !important;
+    background:#1c222a !important;
+    color:#d9dee7 !important;
+  }
+
+  .settings-mobile-section-icon svg{
+    width:21px !important;
+    height:21px !important;
+  }
+
+  .settings-mobile-section-copy{
+    min-width:0 !important;
+    flex:1 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:3px !important;
+  }
+
+  .settings-mobile-section-copy b{
+    color:#f7f8fa !important;
+    font-size:15px !important;
+    font-weight:750 !important;
+  }
+
+  .settings-mobile-section-copy small{
+    color:#8d96a2 !important;
+    font-size:12px !important;
+  }
+
+  .settings-mobile-section-list > button > svg{
+    width:19px !important;
+    height:19px !important;
+    flex:0 0 19px !important;
+    color:#707985 !important;
+    margin-right:4px !important;
+  }
+
+  .settings-mobile-section-list .settings-mobile-logout{
+    margin-top:14px !important;
+    border:1px solid #3a252a !important;
+    border-radius:14px !important;
+    padding-left:12px !important;
+    background:rgba(255,55,80,.035) !important;
+  }
+
+  .settings-mobile-logout .settings-mobile-section-icon{
+    color:#ff6174 !important;
+    background:rgba(255,70,90,.10) !important;
+  }
+
+  .settings-mobile-logout .settings-mobile-section-copy b{
+    color:#ff6577 !important;
+  }
+
+  /* Keep the desktop content out of the way until a section is selected. */
+  .settings-layout{
+    display:none !important;
+  }
+
+  /*
+     Tapping a category should still show its complete options.
+     We use the same full-screen container and reveal the existing
+     content area when the user taps a category.
+  */
+  .settings-modal.instagram-settings.mobile-settings-detail .settings-mobile-sections{
+    display:none !important;
+  }
+
+  .settings-modal.instagram-settings.mobile-settings-detail .settings-layout{
+    display:block !important;
+    flex:1 1 auto !important;
+    overflow:hidden !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#080b0f !important;
+  }
+
+  .settings-modal.instagram-settings.mobile-settings-detail .settings-content{
+    display:block !important;
+    height:100% !important;
+    max-height:none !important;
+    padding:12px 14px calc(80px + env(safe-area-inset-bottom)) !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+
+  .settings-mobile-content-back{
+    width:auto !important;
+    min-height:42px !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    gap:7px !important;
+    margin:0 0 10px !important;
+    padding:6px 10px 6px 2px !important;
+    border:0 !important;
+    background:transparent !important;
+    color:#f5f5f5 !important;
+    font-size:14px !important;
+    font-weight:700 !important;
+  }
+
+  .settings-mobile-content-back svg{
+    width:20px !important;
+    height:20px !important;
+  }
+
+  .settings-section-title{
+    padding-bottom:14px !important;
+  }
+
+  .settings-section-title h1{
+    font-size:22px !important;
+  }
+
+  .settings-section-title p{
+    font-size:13px !important;
+  }
+
+  .settings-panel{
+    width:100% !important;
+    max-width:none !important;
+  }
+
+  .setting-row{
+    min-height:76px !important;
+    padding:10px 2px !important;
+  }
+
+  .settings-profile-row{
+    min-height:92px !important;
+    flex-wrap:wrap !important;
+    gap:12px !important;
+  }
+
+  .settings-profile-row .secondary{
+    margin-left:auto !important;
+  }
+
+  /* Story viewer: explicit left Back control on mobile. */
+  .story-viewer{
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    z-index:11000 !important;
+    padding-top:env(safe-area-inset-top) !important;
+    padding-bottom:env(safe-area-inset-bottom) !important;
+  }
+
+  .story-viewer-top{
+    top:calc(8px + env(safe-area-inset-top)) !important;
+    left:10px !important;
+    right:10px !important;
+    height:50px !important;
+    display:grid !important;
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+    align-items:center !important;
+    gap:8px !important;
+    z-index:50 !important;
+  }
+
+  .story-viewer-user{
+    min-width:0 !important;
+  }
+
+  .story-viewer-back,
+  .story-viewer-close{
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+  }
+
+  .story-viewer-user b,
+  .story-viewer-user span{
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    max-width:calc(100vw - 150px) !important;
+  }
+
+  /* Mobile chat is completely full-screen once a conversation opens. */
+  .messages-page .instagram-chat-layout.has-active{
+    position:fixed !important;
+    inset:0 !important;
+    z-index:9000 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    display:block !important;
+    background:#080b0f !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-conversation-list{
+    display:none !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-chat{
+    width:100% !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    display:flex !important;
+    flex-direction:column !important;
+    border:0 !important;
+    border-radius:0 !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-head{
+    flex:0 0 auto !important;
+    min-height:64px !important;
+    padding-top:env(safe-area-inset-top) !important;
+    height:calc(64px + env(safe-area-inset-top)) !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-messages{
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:12px !important;
+  }
+
+  .messages-page .instagram-chat-layout.has-active .instagram-chat-input{
+    flex:0 0 auto !important;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .messages-page .chat-back-button{
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    border-radius:50% !important;
+  }
+
+  .messages-page .chat-back-button svg{
+    width:23px !important;
+    height:23px !important;
+  }
+
+  /* Hide the app bottom navigation while the full-screen DM is open. */
+  body:has(.messages-page .instagram-chat-layout.has-active) .bottom-nav{
+    display:none !important;
+  }
+
+  body:has(.messages-page .instagram-chat-layout.has-active) .mobile-header{
+    display:none !important;
+  }
+}
+
+@media (max-width:430px){
+  .settings-mobile-sections{
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+
+  .settings-mobile-section-list > button{
+    min-height:64px !important;
+  }
+
+  .settings-mobile-section-icon{
+    width:40px !important;
+    height:40px !important;
+    flex-basis:40px !important;
+  }
+
+  .settings-mobile-section-copy b{
+    font-size:14px !important;
+  }
+
+  .settings-mobile-section-copy small{
+    font-size:11px !important;
+  }
+}

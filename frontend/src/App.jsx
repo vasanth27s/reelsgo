@@ -5,7 +5,7 @@ import {
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
   Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
-  SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
+  SlidersHorizontal, ArrowLeft, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Volume2, Smartphone, Mail, CircleUser,
   Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown
 } from "lucide-react";
@@ -512,6 +512,14 @@ function StoryViewer({ story, onClose }) {
     <div className="story-viewer" onClick={onClose}>
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
+        <button
+          type="button"
+          className="story-viewer-back"
+          aria-label="Back"
+          onClick={e => { e.stopPropagation(); onClose(); }}
+        >
+          <ArrowLeft />
+        </button>
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
           <div>
@@ -519,7 +527,12 @@ function StoryViewer({ story, onClose }) {
             <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
-        <button onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+        <button
+          type="button"
+          className="story-viewer-close"
+          aria-label="Close story"
+          onClick={e => { e.stopPropagation(); onClose(); }}
+        ><X /></button>
       </div>
       <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
         {mediaUrl && story.kind === 'video' ? (
@@ -1772,6 +1785,7 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
   const [dark, setDark] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
+  const [mobileSectionDetail, setMobileSectionDetail] = useState(false);
 
   const visible = settingsSections.filter(s =>
     !search || s.title.toLowerCase().includes(search.toLowerCase()) || s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
@@ -1803,14 +1817,47 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   }
 
   return <div className="overlay settings-overlay">
-    <div className="settings-modal instagram-settings">
+    <div className={`settings-modal instagram-settings ${mobileSectionDetail ? "mobile-settings-detail" : ""}`}>
       <div className="settings-topbar"><button className="settings-back" onClick={onClose}><X /></button><h2>Settings and activity</h2></div>
       <div className="settings-search"><Search /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search settings" /></div>
+
+      <div className="settings-mobile-sections" aria-label="Settings sections">
+        <div className="settings-mobile-sections-title">
+          <b>Settings</b>
+          <span>All ReelsGo settings</span>
+        </div>
+        <div className="settings-mobile-section-list">
+          {visible.map(s => {
+            const Icon = s.icon;
+            return (
+              <button
+                type="button"
+                key={s.id}
+                className={section === s.id ? "active" : ""}
+                onClick={() => { setSection(s.id); setSelectedItem(""); setMobileSectionDetail(true); }}
+              >
+                <span className="settings-mobile-section-icon"><Icon /></span>
+                <span className="settings-mobile-section-copy">
+                  <b>{s.title}</b>
+                  <small>{s.items.length} options</small>
+                </span>
+                <ChevronRight />
+              </button>
+            );
+          })}
+          <button type="button" className="settings-mobile-logout" onClick={onLogout}>
+            <span className="settings-mobile-section-icon"><LogOut /></span>
+            <span className="settings-mobile-section-copy"><b>Log out</b><small>Sign out of ReelsGo</small></span>
+            <ChevronRight />
+          </button>
+        </div>
+      </div>
+
       <div className="settings-layout">
         <aside className="settings-sidebar">
           {visible.map(s => {
             const Icon = s.icon;
-            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); }}>
+            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); setMobileSectionDetail(true); }}>
               <Icon /><span>{s.title}</span><ChevronRight />
             </button>;
           })}
@@ -1818,6 +1865,14 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
         </aside>
 
         <section className="settings-content">
+          <button
+            type="button"
+            className="settings-mobile-content-back"
+            onClick={() => { setMobileSectionDetail(false); setSelectedItem(""); }}
+          >
+            <ArrowLeft />
+            <span>All settings</span>
+          </button>
           <div className="settings-section-title">
             <h1>{settingsSections.find(x => x.id === section)?.title}</h1>
             <p>Manage your ReelsGo experience.</p>
