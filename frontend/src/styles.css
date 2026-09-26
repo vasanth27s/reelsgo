@@ -5430,3 +5430,525 @@ textarea{
     border-radius: 50%;
   }
 }
+
+
+/* ============================================================
+   FINAL REELSGO SETTINGS FIX
+   Mobile gets a real settings category screen + detail screen.
+   Desktop keeps the two-column settings layout.
+   ============================================================ */
+
+.settings-topbar {
+  position: relative !important;
+  flex: 0 0 64px !important;
+  background: #0b0d10 !important;
+  color: #fff !important;
+  border-bottom: 1px solid #252932 !important;
+  z-index: 20 !important;
+}
+
+.settings-topbar h2 {
+  color: #fff !important;
+}
+
+.settings-back {
+  left: 14px !important;
+  color: #fff !important;
+  z-index: 3 !important;
+}
+
+.settings-back-icon {
+  width: 25px !important;
+  height: 25px !important;
+  stroke-width: 2.2 !important;
+}
+
+.settings-close-desktop {
+  position: absolute !important;
+  right: 14px !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.settings-close-desktop svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.settings-search {
+  flex: 0 0 52px !important;
+  color: #aeb4bf !important;
+  background: #171a20 !important;
+  border: 1px solid #2a2f38 !important;
+  box-sizing: border-box !important;
+}
+
+.settings-search input {
+  color: #fff !important;
+  outline: none !important;
+}
+
+.settings-search input::placeholder {
+  color: #8f96a3 !important;
+}
+
+.settings-search > svg {
+  color: #aeb4bf !important;
+  flex: 0 0 auto !important;
+}
+
+.settings-search-clear {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: #2a2f38 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 30px !important;
+}
+
+.settings-search-clear svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.settings-layout {
+  min-height: 0 !important;
+}
+
+.settings-mobile {
+  display: none;
+}
+
+.setting-detail {
+  color: #fff !important;
+  background: #181c23 !important;
+  border: 1px solid #2c323c !important;
+}
+
+.setting-detail-back {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-bottom: 14px !important;
+  color: #b9c0cb !important;
+  background: transparent !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 700px) {
+  .settings-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    padding: 0 !important;
+    background: #080a0d !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    z-index: 1000 !important;
+    overflow: hidden !important;
+  }
+
+  .settings-modal.instagram-settings {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    background: #080a0d !important;
+    color: #fff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-top: env(safe-area-inset-top) !important;
+    box-sizing: border-box !important;
+  }
+
+  .settings-topbar {
+    flex: 0 0 56px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 0 52px !important;
+    background: #080a0d !important;
+    border-bottom: 1px solid #242932 !important;
+  }
+
+  .settings-topbar h2 {
+    max-width: calc(100vw - 120px) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 17px !important;
+  }
+
+  .settings-back {
+    left: 9px !important;
+    width: 42px !important;
+    height: 42px !important;
+    color: #fff !important;
+    background: transparent !important;
+  }
+
+  .settings-back:active {
+    background: #1a1e25 !important;
+  }
+
+  .settings-back-icon {
+    width: 27px !important;
+    height: 27px !important;
+  }
+
+  .settings-close-desktop {
+    display: none !important;
+  }
+
+  .settings-search {
+    flex: 0 0 50px !important;
+    width: calc(100% - 28px) !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    margin: 12px auto !important;
+    border-radius: 14px !important;
+    background: #171a20 !important;
+    border: 1px solid #2c323b !important;
+  }
+
+  .settings-search input {
+    min-width: 0 !important;
+    font-size: 16px !important;
+  }
+
+  .settings-layout {
+    display: block !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .settings-sidebar,
+  .settings-content {
+    display: none !important;
+  }
+
+  .settings-mobile {
+    display: block !important;
+    width: 100% !important;
+    height: calc(100% - 0px) !important;
+    overflow: hidden !important;
+    background: #080a0d !important;
+  }
+
+  .settings-mobile-list {
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 8px 14px calc(32px + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .settings-mobile-heading {
+    padding: 8px 4px 16px !important;
+  }
+
+  .settings-mobile-heading h1 {
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 26px !important;
+    line-height: 1.15 !important;
+  }
+
+  .settings-mobile-heading p {
+    margin: 6px 0 0 !important;
+    color: #9299a5 !important;
+    font-size: 13px !important;
+  }
+
+  .settings-mobile-categories {
+    width: 100% !important;
+    border-top: 1px solid #242932 !important;
+  }
+
+  .settings-mobile-category {
+    width: 100% !important;
+    min-height: 72px !important;
+    padding: 10px 2px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: transparent !important;
+    color: #fff !important;
+    border: 0 !important;
+    border-bottom: 1px solid #242932 !important;
+    text-align: left !important;
+  }
+
+  .settings-mobile-category:active {
+    background: #11151a !important;
+  }
+
+  .settings-mobile-category-icon {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    border-radius: 50% !important;
+    background: #1b2028 !important;
+    color: #aeb6c3 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .settings-mobile-category-icon svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .settings-mobile-category-copy {
+    min-width: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  .settings-mobile-category-copy b {
+    color: #fff !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+  }
+
+  .settings-mobile-category-copy small {
+    color: #8e96a3 !important;
+    font-size: 11px !important;
+  }
+
+  .settings-mobile-category > svg {
+    width: 19px !important;
+    height: 19px !important;
+    color: #7d8693 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .settings-mobile-logout {
+    width: 100% !important;
+    min-height: 52px !important;
+    margin-top: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 8px !important;
+    background: #171116 !important;
+    color: #ff5f6d !important;
+    border: 1px solid #3b252d !important;
+    border-radius: 13px !important;
+    font-weight: 700 !important;
+  }
+
+  .settings-mobile-logout svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .settings-mobile-detail {
+    width: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0 14px calc(32px + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .settings-mobile-detail-head {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    min-height: 62px !important;
+    margin: 0 -14px 10px !important;
+    padding: 8px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(8,10,13,.96) !important;
+    border-bottom: 1px solid #242932 !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .settings-mobile-detail-head > button {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    color: #fff !important;
+  }
+
+  .settings-mobile-detail-head > button svg {
+    width: 25px !important;
+    height: 25px !important;
+  }
+
+  .settings-mobile-detail-head h1 {
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 19px !important;
+  }
+
+  .settings-mobile-detail-head p {
+    margin: 3px 0 0 !important;
+    color: #8f97a4 !important;
+    font-size: 11px !important;
+  }
+
+  .settings-mobile-detail .settings-panel {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row {
+    padding: 15px 0 !important;
+    gap: 11px !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row .avatar {
+    width: 58px !important;
+    height: 58px !important;
+    flex: 0 0 58px !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row > div {
+    min-width: 0 !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row b {
+    color: #fff !important;
+    font-size: 14px !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row span {
+    color: #9098a5 !important;
+    font-size: 11px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .settings-mobile-detail .settings-profile-row .secondary {
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .settings-mobile-detail .setting-row {
+    min-height: 70px !important;
+    padding: 12px 0 !important;
+    background: transparent !important;
+    color: #fff !important;
+    border-bottom-color: #242932 !important;
+  }
+
+  .settings-mobile-detail .setting-row-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background: #1b2028 !important;
+    color: #aeb6c3 !important;
+  }
+
+  .settings-mobile-detail .setting-row-text b {
+    color: #fff !important;
+    font-size: 14px !important;
+  }
+
+  .settings-mobile-detail .setting-row-text small {
+    color: #8e96a3 !important;
+    font-size: 11px !important;
+  }
+
+  .settings-mobile-detail .setting-row > svg {
+    color: #747e8b !important;
+  }
+
+  .settings-mobile-detail .settings-card-highlight {
+    background: #151920 !important;
+    border: 1px solid #2b313b !important;
+    color: #fff !important;
+  }
+
+  .settings-mobile-detail .settings-card-highlight p {
+    color: #8f97a4 !important;
+  }
+
+  .settings-mobile-detail .privacy-toggle-row,
+  .settings-mobile-detail .setting-switch {
+    border-bottom-color: #242932 !important;
+  }
+
+  .settings-mobile-detail .privacy-toggle-row b,
+  .settings-mobile-detail .setting-switch b,
+  .settings-mobile-detail .setting-switch span {
+    color: #fff !important;
+  }
+
+  .settings-mobile-detail .privacy-toggle-row span:not(.toggle-knob),
+  .settings-mobile-detail .setting-switch small {
+    color: #8f97a4 !important;
+  }
+
+  .settings-mobile-detail .setting-detail {
+    margin-top: 14px !important;
+    padding: 16px !important;
+    border-radius: 14px !important;
+    background: #171b22 !important;
+    border-color: #2b313b !important;
+  }
+
+  .settings-mobile-detail .setting-detail b {
+    display: block !important;
+    margin-bottom: 7px !important;
+    color: #fff !important;
+  }
+
+  .settings-mobile-detail .setting-detail p {
+    color: #9ca4b1 !important;
+    line-height: 1.5 !important;
+  }
+
+  .settings-mobile-detail .setting-detail-back {
+    color: #b9c1cd !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .settings-mobile-category {
+    min-height: 66px !important;
+  }
+
+  .settings-mobile-category-icon {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+
+  .settings-mobile-category-copy b {
+    font-size: 14px !important;
+  }
+
+  .settings-mobile-category-copy small {
+    font-size: 10px !important;
+  }
+}

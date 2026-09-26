@@ -1770,19 +1770,47 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   const [section, setSection] = useState("account");
   const [search, setSearch] = useState("");
   const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
-  const [dark, setDark] = useState(false);
   const [selectedItem, setSelectedItem] = useState("");
+  const [mobileSectionOpen, setMobileSectionOpen] = useState(false);
 
   const visible = settingsSections.filter(s =>
-    !search || s.title.toLowerCase().includes(search.toLowerCase()) || s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
+    !search ||
+    s.title.toLowerCase().includes(search.toLowerCase()) ||
+    s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
   );
+
+  function openSection(id) {
+    setSection(id);
+    setSelectedItem("");
+    setMobileSectionOpen(true);
+    window.requestAnimationFrame(() => {
+      const el = document.querySelector(".settings-content");
+      if (el) el.scrollTop = 0;
+    });
+  }
+
+  function handleSettingsBack() {
+    if (mobileSectionOpen) {
+      setMobileSectionOpen(false);
+      setSelectedItem("");
+      return;
+    }
+    onClose();
+  }
 
   async function savePrivacy() {
     try {
-      const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: privateAccount }) });
-      setUser(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user));
+      const d = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPrivate: privateAccount })
+      });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
       alert("Privacy updated");
-    } catch (e) { alert(e.message); }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function togglePrivateAccount(next) {
@@ -1802,42 +1830,384 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
     }
   }
 
-  return <div className="overlay settings-overlay">
-    <div className="settings-modal instagram-settings">
-      <div className="settings-topbar"><button className="settings-back" onClick={onClose}><X /></button><h2>Settings and activity</h2></div>
-      <div className="settings-search"><Search /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search settings" /></div>
-      <div className="settings-layout">
-        <aside className="settings-sidebar">
-          {visible.map(s => {
-            const Icon = s.icon;
-            return <button key={s.id} className={section === s.id ? "active" : ""} onClick={() => { setSection(s.id); setSelectedItem(""); }}>
-              <Icon /><span>{s.title}</span><ChevronRight />
-            </button>;
-          })}
-          <button className="settings-logout" onClick={onLogout}><LogOut /><span>Log out</span></button>
-        </aside>
+  const activeSection = settingsSections.find(x => x.id === section);
 
-        <section className="settings-content">
-          <div className="settings-section-title">
-            <h1>{settingsSections.find(x => x.id === section)?.title}</h1>
-            <p>Manage your ReelsGo experience.</p>
-          </div>
+  return (
+    <div className="overlay settings-overlay">
+      <div className="settings-modal instagram-settings">
+        <div className="settings-topbar">
+          <button
+            className="settings-back"
+            onClick={handleSettingsBack}
+            type="button"
+            aria-label={mobileSectionOpen ? "Back to settings" : "Back to home"}
+          >
+            <ChevronRight
+              className="settings-back-icon"
+              style={{ transform: "rotate(180deg)" }}
+            />
+          </button>
 
-          {section === "account" && <AccountSettings user={user} onSelect={setSelectedItem} />}
-          {section === "privacy" && <PrivacySettings privateAccount={privateAccount} setPrivateAccount={setPrivateAccount} togglePrivateAccount={togglePrivateAccount} savePrivacy={savePrivacy} onSelect={setSelectedItem} />}
-          {section === "security" && <SecuritySettings onSelect={setSelectedItem} />}
-          {section === "notifications" && <ToggleSettings title="Notifications" items={["Likes", "Comments", "Followers and follow requests", "Messages", "Story replies", "Reels interactions", "Live notifications", "Email notifications"]} />}
-          {section === "messages" && <ToggleSettings title="Messages and replies" items={["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing"]} />}
-          {section === "content" && <ToggleSettings title="What you see" items={["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites"]} />}
-          {section === "media" && <ToggleSettings title="Media quality" items={["Upload at highest quality", "Use less mobile data", "Autoplay videos", "Save original photos", "Save original videos"]} />}
-          {section === "accessibility" && <ToggleSettings title="Accessibility" items={["Reduce motion", "Captions", "Text-to-speech", "Sound effects", "Large text"]} />}
-          {section === "language" && <ToggleSettings title="Language" items={["English", "Automatic translations", "Translate captions", "Translate comments"]} />}
-          {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
-          {selectedItem && <div className="setting-detail"><b>{selectedItem}</b><p>This option is currently represented in the ReelsGo interface. Account changes are saved only where a backend endpoint is connected.</p></div>}
-        </section>
+          <h2>{mobileSectionOpen ? activeSection?.title : "Settings and activity"}</h2>
+
+          <button
+            className="settings-close-desktop"
+            onClick={onClose}
+            type="button"
+            aria-label="Close settings"
+          >
+            <X />
+          </button>
+        </div>
+
+        <div className="settings-search">
+          <Search />
+          <input
+            value={search}
+            onChange={e => {
+              setSearch(e.target.value);
+              if (mobileSectionOpen) setMobileSectionOpen(false);
+            }}
+            placeholder="Search settings"
+            aria-label="Search settings"
+          />
+          {search && (
+            <button
+              className="settings-search-clear"
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+            >
+              <X />
+            </button>
+          )}
+        </div>
+
+        {/* Desktop / tablet settings navigation */}
+        <div className="settings-layout">
+          <aside className="settings-sidebar">
+            {visible.map(s => {
+              const Icon = s.icon;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={section === s.id ? "active" : ""}
+                  onClick={() => {
+                    setSection(s.id);
+                    setSelectedItem("");
+                  }}
+                >
+                  <Icon />
+                  <span>{s.title}</span>
+                  <ChevronRight />
+                </button>
+              );
+            })}
+
+            <button className="settings-logout" onClick={onLogout} type="button">
+              <LogOut />
+              <span>Log out</span>
+            </button>
+          </aside>
+
+          <section className="settings-content">
+            <div className="settings-section-title">
+              <h1>{activeSection?.title}</h1>
+              <p>Manage your ReelsGo experience.</p>
+            </div>
+
+            {section === "account" && (
+              <AccountSettings user={user} onSelect={setSelectedItem} />
+            )}
+            {section === "privacy" && (
+              <PrivacySettings
+                privateAccount={privateAccount}
+                setPrivateAccount={setPrivateAccount}
+                togglePrivateAccount={togglePrivateAccount}
+                savePrivacy={savePrivacy}
+                onSelect={setSelectedItem}
+              />
+            )}
+            {section === "security" && (
+              <SecuritySettings onSelect={setSelectedItem} />
+            )}
+            {section === "notifications" && (
+              <ToggleSettings
+                title="Notifications"
+                items={[
+                  "Likes",
+                  "Comments",
+                  "Followers and follow requests",
+                  "Messages",
+                  "Story replies",
+                  "Reels interactions",
+                  "Live notifications",
+                  "Email notifications"
+                ]}
+              />
+            )}
+            {section === "messages" && (
+              <ToggleSettings
+                title="Messages and replies"
+                items={[
+                  "Message requests",
+                  "Read receipts",
+                  "Typing indicator",
+                  "Group message requests",
+                  "Story replies",
+                  "Allow sharing"
+                ]}
+              />
+            )}
+            {section === "content" && (
+              <ToggleSettings
+                title="What you see"
+                items={[
+                  "Sensitive content",
+                  "Autoplay videos",
+                  "Suggested posts",
+                  "Show political content",
+                  "Use less mobile data",
+                  "Favorites"
+                ]}
+              />
+            )}
+            {section === "media" && (
+              <ToggleSettings
+                title="Media quality"
+                items={[
+                  "Upload at highest quality",
+                  "Use less mobile data",
+                  "Autoplay videos",
+                  "Save original photos",
+                  "Save original videos"
+                ]}
+              />
+            )}
+            {section === "accessibility" && (
+              <ToggleSettings
+                title="Accessibility"
+                items={[
+                  "Reduce motion",
+                  "Captions",
+                  "Text-to-speech",
+                  "Sound effects",
+                  "Large text"
+                ]}
+              />
+            )}
+            {section === "language" && (
+              <ToggleSettings
+                title="Language"
+                items={[
+                  "English",
+                  "Automatic translations",
+                  "Translate captions",
+                  "Translate comments"
+                ]}
+              />
+            )}
+            {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
+
+            {selectedItem && (
+              <div className="setting-detail">
+                <button
+                  type="button"
+                  className="setting-detail-back"
+                  onClick={() => setSelectedItem("")}
+                >
+                  <ChevronRight style={{ transform: "rotate(180deg)" }} />
+                  Back to {activeSection?.title}
+                </button>
+                <b>{selectedItem}</b>
+                <p>
+                  This option is currently represented in the ReelsGo
+                  interface. Account changes are saved only where a backend
+                  endpoint is connected.
+                </p>
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* Mobile settings category list. Nothing is hidden behind the desktop sidebar. */}
+        <div className={`settings-mobile ${mobileSectionOpen ? "section-open" : "section-list-open"}`}>
+          {!mobileSectionOpen ? (
+            <div className="settings-mobile-list">
+              <div className="settings-mobile-heading">
+                <h1>Settings and activity</h1>
+                <p>All ReelsGo settings</p>
+              </div>
+
+              <div className="settings-mobile-categories">
+                {visible.map(s => {
+                  const Icon = s.icon;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className="settings-mobile-category"
+                      onClick={() => openSection(s.id)}
+                    >
+                      <span className="settings-mobile-category-icon">
+                        <Icon />
+                      </span>
+                      <span className="settings-mobile-category-copy">
+                        <b>{s.title}</b>
+                        <small>{s.items.length} settings</small>
+                      </span>
+                      <ChevronRight />
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                className="settings-mobile-logout"
+                type="button"
+                onClick={onLogout}
+              >
+                <LogOut />
+                <span>Log out</span>
+              </button>
+            </div>
+          ) : (
+            <section className="settings-mobile-detail">
+              <div className="settings-mobile-detail-head">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileSectionOpen(false);
+                    setSelectedItem("");
+                  }}
+                  aria-label="Back to all settings"
+                >
+                  <ChevronRight style={{ transform: "rotate(180deg)" }} />
+                </button>
+                <div>
+                  <h1>{activeSection?.title}</h1>
+                  <p>{activeSection?.items.length || 0} settings</p>
+                </div>
+              </div>
+
+              {section === "account" && (
+                <AccountSettings user={user} onSelect={setSelectedItem} />
+              )}
+              {section === "privacy" && (
+                <PrivacySettings
+                  privateAccount={privateAccount}
+                  setPrivateAccount={setPrivateAccount}
+                  togglePrivateAccount={togglePrivateAccount}
+                  savePrivacy={savePrivacy}
+                  onSelect={setSelectedItem}
+                />
+              )}
+              {section === "security" && (
+                <SecuritySettings onSelect={setSelectedItem} />
+              )}
+              {section === "notifications" && (
+                <ToggleSettings
+                  title="Notifications"
+                  items={[
+                    "Likes",
+                    "Comments",
+                    "Followers and follow requests",
+                    "Messages",
+                    "Story replies",
+                    "Reels interactions",
+                    "Live notifications",
+                    "Email notifications"
+                  ]}
+                />
+              )}
+              {section === "messages" && (
+                <ToggleSettings
+                  title="Messages and replies"
+                  items={[
+                    "Message requests",
+                    "Read receipts",
+                    "Typing indicator",
+                    "Group message requests",
+                    "Story replies",
+                    "Allow sharing"
+                  ]}
+                />
+              )}
+              {section === "content" && (
+                <ToggleSettings
+                  title="What you see"
+                  items={[
+                    "Sensitive content",
+                    "Autoplay videos",
+                    "Suggested posts",
+                    "Show political content",
+                    "Use less mobile data",
+                    "Favorites"
+                  ]}
+                />
+              )}
+              {section === "media" && (
+                <ToggleSettings
+                  title="Media quality"
+                  items={[
+                    "Upload at highest quality",
+                    "Use less mobile data",
+                    "Autoplay videos",
+                    "Save original photos",
+                    "Save original videos"
+                  ]}
+                />
+              )}
+              {section === "accessibility" && (
+                <ToggleSettings
+                  title="Accessibility"
+                  items={[
+                    "Reduce motion",
+                    "Captions",
+                    "Text-to-speech",
+                    "Sound effects",
+                    "Large text"
+                  ]}
+                />
+              )}
+              {section === "language" && (
+                <ToggleSettings
+                  title="Language"
+                  items={[
+                    "English",
+                    "Automatic translations",
+                    "Translate captions",
+                    "Translate comments"
+                  ]}
+                />
+              )}
+              {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
+
+              {selectedItem && (
+                <div className="setting-detail">
+                  <button
+                    type="button"
+                    className="setting-detail-back"
+                    onClick={() => setSelectedItem("")}
+                  >
+                    <ChevronRight style={{ transform: "rotate(180deg)" }} />
+                    Back to {activeSection?.title}
+                  </button>
+                  <b>{selectedItem}</b>
+                  <p>
+                    This option is currently represented in the ReelsGo
+                    interface. Account changes are saved only where a backend
+                    endpoint is connected.
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
+        </div>
       </div>
     </div>
-  </div>;
+  );
 }
 
 function AccountSettings({ user, onSelect }) {
