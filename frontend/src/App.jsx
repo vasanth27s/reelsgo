@@ -1604,7 +1604,7 @@ function ProfilePage({ user, setUser }) {
             </button>
           </div>
           <b>{user?.name}</b>
-          <p>{user?.bio || "Welcome to ReelsGo."}</p>
+          <p>{user?.bio || ""}</p>
           {user?.website && <a href={user.website} target="_blank" rel="noreferrer"><LinkIcon /> {user.website}</a>}
         </div>
       </div>
@@ -2383,7 +2383,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
           </div>
 
           <b>{u.name}</b>
-          <p>{u.bio || "Welcome to ReelsGo."}</p>
+          <p>{u?.bio || ""}</p>
           {u.website && <a href={u.website} target="_blank" rel="noreferrer"><LinkIcon /> {u.website}</a>}
 
           {u.isPrivate && !canView && !isSelf && (
