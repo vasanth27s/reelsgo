@@ -144,7 +144,7 @@ function ReelsGoBranding() {
 }
 
 function ReelsGoLogo({ className = "" }) {
-  return <span className={`reelsgo-text-logo ${className}`}>REELSGO</span>;
+  return <span className={`reelsgo-text-logo ${className}`}>REELGO</span>;
 }
 
 function App() {
