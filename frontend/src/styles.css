@@ -75,9 +75,9 @@ svg{stroke-width:1.9}
  width:70px;height:70px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#ff9d00,#e1306c,#833ab4);
  position:relative;margin-bottom:6px;overflow:hidden;isolation:isolate
 }
-.story-ring .avatar,.story-ring img{width:100%;height:100%;border-radius:50%;border:3px solid #fff;object-fit:cover}
-.story-ring i{position:absolute;right:-1px;bottom:0;width:23px;height:23px;border-radius:50%;background:#4f46e5;color:#fff;border:2px solid #fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:17px}
-.story-placeholder{display:flex;align-items:center;justify-content:center;color:#fff;background:#111827;border:3px solid #fff;font-size:22px;font-weight:800}
+.story-ring .avatar,.story-ring img{width:100%;height:100%;border-radius:50%;border:0 !important;object-fit:cover}
+.story-ring i{position:absolute;right:-1px;bottom:0;width:23px;height:23px;border-radius:50%;background:#4f46e5;color:#fff;border:0 !important;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:17px}
+.story-placeholder{display:flex;align-items:center;justify-content:center;color:#fff;background:#111827;border:0 !important;font-size:22px;font-weight:800}
 .quick-create{
  display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px;margin-bottom:14px
 }
@@ -389,13 +389,13 @@ svg{stroke-width:1.9}
   inset:3px;
   width:calc(100% - 6px);
   height:calc(100% - 6px);
-  border:3px solid #fff;
+  border:0 !important;
   border-radius:50%;
   object-fit:cover;
   overflow:hidden;
   background:#111827;
 }
-.story-ring .avatar{position:absolute;inset:3px;width:calc(100% - 6px)!important;height:calc(100% - 6px)!important;border:3px solid #fff}
+.story-ring .avatar{position:absolute;inset:3px;width:calc(100% - 6px)!important;height:calc(100% - 6px)!important;border:0 !important}
 .story-text-thumb{display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
 
 /* Full story viewer */
@@ -8188,4 +8188,26 @@ div[style*="min-width: 170px"]{
     width: 100% !important;
     height: 100% !important;
   }
+}
+
+
+/* Story profile: remove white borders while keeping the Instagram gradient ring */
+.story-ring .avatar,
+.story-ring .avatar img,
+.story-ring > img {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.story-ring i {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.story-placeholder {
+  border: 0 !important;
 }
