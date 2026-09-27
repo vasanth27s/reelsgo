@@ -5148,12 +5148,14 @@ textarea{
   .instagram-chat-messages{flex:1!important;min-height:0!important;height:auto!important;overflow-y:auto;overflow-x:hidden;padding:18px 12px 12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#08090b}
   .message-line{width:100%;display:flex;align-items:flex-end;gap:7px;margin:5px 0}
   .message-line.mine{justify-content:flex-end}.message-line.received{justify-content:flex-start}
-  .message-line .bubble{max-width:min(78%,310px);min-width:0;padding:9px 12px;border-radius:18px;margin:0;overflow-wrap:anywhere;word-break:break-word;background:#25282e;color:#f4f5f7}
-  .message-line .bubble.mine{background:#356dff;color:#fff;border-bottom-right-radius:6px}
+  .message-line .bubble{width:fit-content;max-width:min(78%,310px);min-width:0;box-sizing:border-box;padding:9px 12px 7px;border-radius:18px;margin:0;overflow:hidden;overflow-wrap:anywhere;word-break:break-word;background:#25282e;color:#f4f5f7}
+  .message-line .bubble.mine{background:linear-gradient(135deg,#6d45e8 0%,#8b5cf6 100%);color:#fff;border-bottom-right-radius:6px;box-shadow:0 7px 20px rgba(109,69,232,.22)}
   .message-line.received .bubble{border-bottom-left-radius:6px}
-  .message-line .bubble>span{display:block;font-size:14px;line-height:1.4}
-  .message-meta{display:flex;justify-content:flex-end;gap:5px;margin-top:4px;opacity:.65}
-  .message-meta small{font-size:8px;white-space:nowrap}
+  .message-line .bubble>span{display:block;min-width:0;font-size:14px;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
+  .message-meta{width:100%;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-top:4px;opacity:.7;overflow:hidden}
+  .message-meta small{display:block;min-width:0;max-width:100%;font-size:8px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .message-line .bubble.mine .message-meta{justify-content:flex-end}
+  .message-line .bubble.mine .message-meta small{color:#d9ceff!important}
   .chat-no-messages{min-height:100%;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8f96a1}
   .chat-no-messages h2{margin:0;color:#f4f5f7;font-size:20px}
   .chat-no-messages p{margin:4px 0;color:#9ba1ab;font-size:13px}
@@ -6069,5 +6071,42 @@ textarea{
   .message-action-menu button{
     min-height:44px;
     font-size:14px;
+  }
+}
+
+
+/* Final mobile DM bubble fix: keep timestamp/status INSIDE the bubble. */
+@media (max-width:700px){
+  .messages-page .message-line .bubble{
+    width:fit-content!important;
+    max-width:min(82%,310px)!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .messages-page .message-line .bubble .message-meta{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:5px!important;
+    margin:4px 0 0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+  .messages-page .message-line .bubble .message-meta small{
+    min-width:0!important;
+    max-width:100%!important;
+    flex:0 1 auto!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    line-height:1.1!important;
+  }
+  .messages-page .message-line .bubble.mine .message-meta small{
+    color:#d9ceff!important;
   }
 }
