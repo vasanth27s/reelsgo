@@ -2029,6 +2029,7 @@ function ProfilePage({ user, setUser }) {
       setReels((r.reels || []).filter(x => x.author?._id === user?._id));
     } catch (e) { console.error(e); }
   }
+
   useEffect(() => { load(); }, [user?._id]);
 
   async function avatarUpload(e) {
@@ -2036,119 +2037,205 @@ function ProfilePage({ user, setUser }) {
     if (!file) return;
     if (!file.type.startsWith("image/")) return alert("Select an image");
     if (file.size > 10 * 1024 * 1024) return alert("Image must be below 10 MB");
-    const fd = new FormData(); fd.append("avatar", file);
+
+    const fd = new FormData();
+    fd.append("avatar", file);
+
     try {
       setSaving(true);
       const d = await api("/users/me/avatar", { method: "POST", body: fd });
       setUser(d.user);
       localStorage.setItem("vk_user", JSON.stringify(d.user));
-    } catch (e) { alert(e.message); }
-    finally { setSaving(false); e.target.value = ""; }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSaving(false);
+      e.target.value = "";
+    }
   }
 
   async function saveProfile() {
     try {
       setSaving(true);
       const d = await api("/users/me", {
-        method: "PUT", headers: { "Content-Type": "application/json" },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, bio, website, isPrivate })
       });
-      setUser(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user));
+
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
       setEditOpen(false);
-    } catch (e) { alert(e.message); } finally { setSaving(false); }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const visiblePosts = posts;
+
   return (
     <div className="page profile-page">
       <div className="profile-header">
         <div className="profile-avatar-wrap">
           <Avatar user={user} size={96} className="profile-avatar" />
-          <button className="avatar-camera" onClick={() => input.current?.click()} disabled={saving}><Camera /></button>
-          <input ref={input} hidden type="file" accept="image/jpeg,image/png,image/webp" onChange={avatarUpload} />
+          <button
+            className="avatar-camera"
+            onClick={() => input.current?.click()}
+            disabled={saving}
+          >
+            <Camera />
+          </button>
+          <input
+            ref={input}
+            hidden
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={avatarUpload}
+          />
         </div>
+
         <div className="profile-details">
           <div className="profile-line">
             <h1>{user?.username}</h1>
-            <button className="secondary" onClick={() => setEditOpen(v => !v)}><Edit3 /> Edit profile</button>
-            <button className="icon-button profile-more"><MoreHorizontal /></button>
+            <button
+              className="secondary"
+              onClick={() => setEditOpen(true)}
+            >
+              <Edit3 /> Edit profile
+            </button>
+            <button className="icon-button profile-more">
+              <MoreHorizontal />
+            </button>
           </div>
+
           <div className="profile-stats">
-            <span><b>{user?.postsCount || posts.length}</b><small>posts</small></span>
-            <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("followers")} aria-label="View followers">
-              <b>{user?.followersCount || 0}</b><small>followers</small>
+            <span>
+              <b>{user?.postsCount || posts.length}</b>
+              <small>posts</small>
+            </span>
+
+            <button
+              type="button"
+              className="profile-stat-button"
+              onClick={() => setConnectionsOpen("followers")}
+              aria-label="View followers"
+            >
+              <b>{user?.followersCount || 0}</b>
+              <small>followers</small>
             </button>
-            <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("following")} aria-label="View following">
-              <b>{user?.followingCount || 0}</b><small>following</small>
+
+            <button
+              type="button"
+              className="profile-stat-button"
+              onClick={() => setConnectionsOpen("following")}
+              aria-label="View following"
+            >
+              <b>{user?.followingCount || 0}</b>
+              <small>following</small>
             </button>
           </div>
+
           <b>{user?.name}</b>
           <p>{user?.bio || ""}</p>
-          {user?.website && <a href={user.website} target="_blank" rel="noreferrer"><LinkIcon /> {user.website}</a>}
+
+          {user?.website && (
+            <a href={user.website} target="_blank" rel="noreferrer">
+              <LinkIcon /> {user.website}
+            </a>
+          )}
         </div>
       </div>
 
       <div className="profile-tabs">
-        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
-        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}><Film /> Reels</button>
-        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}><Users /> Tagged</button>
-        <button className={tab === "saved" ? "active" : ""} onClick={() => setTab("saved")}><Bookmark /> Saved</button>
+        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>
+          <Grid3X3 /> Posts
+        </button>
+        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}>
+          <Film /> Reels
+        </button>
+        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}>
+          <Users /> Tagged
+        </button>
+        <button className={tab === "saved" ? "active" : ""} onClick={() => setTab("saved")}>
+          <Bookmark /> Saved
+        </button>
       </div>
-
-      {editOpen && (
-        <div className="edit-card">
-          <div className="card-title-row"><h2>Edit profile</h2><button onClick={() => setEditOpen(false)}><X /></button></div>
-          <label>Name</label><input value={name} onChange={e => setName(e.target.value)} />
-          <label>Bio</label><textarea value={bio} maxLength={150} onChange={e => setBio(e.target.value)} /><small>{bio.length}/150</small>
-          <label>Website</label><input value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://example.com" />
-          <div className="privacy-toggle-row">
-        <div><b>Private account</b><span>Only people you approve can follow you and see your posts and stories.</span></div>
-        <Toggle checked={isPrivate} onChange={setIsPrivate} />
-      </div>
-          <button className="primary" onClick={saveProfile} disabled={saving}>{saving ? "Saving..." : "Save changes"}</button>
-        </div>
-      )}
 
       {tab === "posts" && (
         visiblePosts.length
-          ? <div className="profile-grid">{visiblePosts.map(p => (
-              <GridMedia
-                key={p._id}
-                post={p}
-                user={user}
-                onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-              />
-            ))}</div>
+          ? (
+            <div className="profile-grid">
+              {visiblePosts.map(p => (
+                <GridMedia
+                  key={p._id}
+                  post={p}
+                  user={user}
+                  onDeleted={(id) =>
+                    setPosts(current =>
+                      current.filter(item => String(item._id) !== String(id))
+                    )
+                  }
+                />
+              ))}
+            </div>
+          )
           : <EmptyTab icon={<CameraOff />} title="No posts yet" text="Share your first photo or video." />
       )}
 
       {tab === "reels" && (
         reels.length
-          ? <div className="profile-grid reels-profile-grid">
+          ? (
+            <div className="profile-grid reels-profile-grid">
               {reels.map(r => (
                 <ProfileReelCard
                   key={r._id}
                   reel={r}
                   user={user}
-                  onDeleted={(id) => setReels(current => current.filter(item => String(item._id) !== String(id)))}
+                  onDeleted={(id) =>
+                    setReels(current =>
+                      current.filter(item => String(item._id) !== String(id))
+                    )
+                  }
                 />
               ))}
             </div>
+          )
           : <EmptyTab icon={<Film />} title="No Reels yet" text="Your published Reels will appear here." />
       )}
 
       {tab === "tagged" && (
-        posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).length
-          ? <div className="profile-grid">{posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).map(p => (
-            <GridMedia
-              key={p._id}
-              post={p}
-              user={user}
-              onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-            />
-          ))}</div>
+        posts.filter(p =>
+          (p.mentions || []).some(
+            m => String(m?._id || m) === String(user?._id)
+          )
+        ).length
+          ? (
+            <div className="profile-grid">
+              {posts
+                .filter(p =>
+                  (p.mentions || []).some(
+                    m => String(m?._id || m) === String(user?._id)
+                  )
+                )
+                .map(p => (
+                  <GridMedia
+                    key={p._id}
+                    post={p}
+                    user={user}
+                    onDeleted={(id) =>
+                      setPosts(current =>
+                        current.filter(item => String(item._id) !== String(id))
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          )
           : <EmptyTab icon={<Users />} title="Photos of you" text="Posts where you are tagged will appear here." />
       )}
+
       {tab === "saved" && <SavedPage embedded user={user} />}
 
       {connectionsOpen && (
@@ -2158,6 +2245,232 @@ function ProfilePage({ user, setUser }) {
           onClose={() => setConnectionsOpen(null)}
         />
       )}
+
+      {editOpen && (
+        <EditProfilePage
+          user={user}
+          name={name}
+          setName={setName}
+          bio={bio}
+          setBio={setBio}
+          website={website}
+          setWebsite={setWebsite}
+          isPrivate={isPrivate}
+          setIsPrivate={setIsPrivate}
+          saving={saving}
+          onClose={() => setEditOpen(false)}
+          onAvatarClick={() => input.current?.click()}
+          onSave={saveProfile}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditProfilePage({
+  user,
+  name,
+  setName,
+  bio,
+  setBio,
+  website,
+  setWebsite,
+  isPrivate,
+  setIsPrivate,
+  saving,
+  onClose,
+  onAvatarClick,
+  onSave
+}) {
+  const [pronouns, setPronouns] = useState(user?.pronouns || "");
+  const [gender, setGender] = useState(user?.gender || "Man");
+  const [aiCreator, setAiCreator] = useState(!!user?.aiCreator);
+
+  return (
+    <div className="edit-profile-overlay" role="dialog" aria-modal="true">
+      <div className="edit-profile-screen">
+        <header className="edit-profile-topbar">
+          <button
+            type="button"
+            className="edit-profile-back"
+            onClick={onClose}
+            aria-label="Back"
+          >
+            <ChevronRight />
+          </button>
+
+          <h1>Edit profile</h1>
+
+          <button
+            type="button"
+            className="edit-profile-done"
+            onClick={onSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Done"}
+          </button>
+        </header>
+
+        <main className="edit-profile-scroll">
+          <section className="edit-profile-photo-section">
+            <div className="edit-profile-photo-row">
+              <button
+                type="button"
+                className="edit-profile-photo-button"
+                onClick={onAvatarClick}
+                disabled={saving}
+                aria-label="Change profile picture"
+              >
+                <Avatar user={user} size={168} />
+              </button>
+
+              <button
+                type="button"
+                className="edit-profile-avatar-button"
+                onClick={() => alert("Avatar selection can be connected to your avatar system later.")}
+                aria-label="Choose avatar"
+              >
+                <CircleUser />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="edit-profile-photo-link"
+              onClick={onAvatarClick}
+            >
+              Edit picture or avatar
+            </button>
+          </section>
+
+          <section className="edit-profile-fields">
+            <div className="edit-profile-field-row">
+              <label>Name</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Name"
+                  autoComplete="name"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row">
+              <label>Username</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={user?.username || ""}
+                  readOnly
+                  aria-label="Username"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row">
+              <label>Pronouns</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={pronouns}
+                  onChange={e => setPronouns(e.target.value)}
+                  placeholder="Pronouns"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row edit-profile-bio-row">
+              <label>Bio</label>
+              <div className="edit-profile-field-control edit-profile-bio-control">
+                <textarea
+                  value={bio}
+                  maxLength={150}
+                  onChange={e => setBio(e.target.value)}
+                  placeholder="Bio"
+                />
+                <span>{bio.length}/150</span>
+              </div>
+            </div>
+
+            <button type="button" className="edit-profile-action-row">
+              <span>Links</span>
+              <span className="edit-profile-action-value">
+                {website || "Add links"}
+                <ChevronRight />
+              </span>
+            </button>
+
+            <button type="button" className="edit-profile-action-row">
+              <span className="edit-profile-action-stack">
+                <b>Banners</b>
+                <small>Add music, profiles and more.</small>
+              </span>
+              <span className="edit-profile-action-value">
+                Add banners
+                <ChevronRight />
+              </span>
+            </button>
+
+            <button type="button" className="edit-profile-action-row">
+              <span>Reorder grid</span>
+              <ChevronRight />
+            </button>
+
+            <button
+              type="button"
+              className="edit-profile-action-row"
+              onClick={() => {
+                const next = gender === "Man" ? "Woman" : gender === "Woman" ? "Prefer not to say" : "Man";
+                setGender(next);
+              }}
+            >
+              <span>Gender</span>
+              <span className="edit-profile-action-value">
+                {gender}
+                <ChevronRight />
+              </span>
+            </button>
+
+            <div className="edit-profile-ai-row">
+              <div>
+                <b>AI creator</b>
+                <span>
+                  Add this label if your profile features an AI-generated person.{" "}
+                  <a href="#ai-info" onClick={e => e.preventDefault()}>Learn more</a>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className={`edit-profile-toggle ${aiCreator ? "on" : ""}`}
+                aria-pressed={aiCreator}
+                onClick={() => setAiCreator(v => !v)}
+              >
+                <span />
+              </button>
+            </div>
+
+            <button type="button" className="edit-profile-professional">
+              Switch to professional account
+            </button>
+
+            <div className="edit-profile-privacy">
+              <div>
+                <b>Private account</b>
+                <span>Only people you approve can follow you and see your posts and stories.</span>
+              </div>
+
+              <button
+                type="button"
+                className={`edit-profile-toggle ${isPrivate ? "on" : ""}`}
+                aria-pressed={isPrivate}
+                onClick={() => setIsPrivate(v => !v)}
+              >
+                <span />
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
