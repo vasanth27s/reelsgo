@@ -185,16 +185,6 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
-    const openSettings = () => {
-      setSettingsOpen(true);
-      setMenuOpen(false);
-    };
-    window.addEventListener("vk-open-settings", openSettings);
-    return () => window.removeEventListener("vk-open-settings", openSettings);
-  }, [token]);
-
-  useEffect(() => {
-    if (!token) return;
     api("/users/me")
       .then(d => {
         setUser(d.user);
@@ -293,7 +283,7 @@ function App() {
         {page === "explore" && <ExplorePage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
-        {page === "notifications" && <NotificationsPage onNavigate={navigate} />}
+        {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
@@ -415,7 +405,6 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeStory, setActiveStory] = useState(null);
-  const [activeNotificationPost, setActiveNotificationPost] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -430,41 +419,6 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
     }
   }
   useEffect(() => { load(); }, [refreshKey]);
-
-  useEffect(() => {
-    const openPost = async event => {
-      const id = event?.detail?.id;
-      if (!id) return;
-      try {
-        const d = await api("/posts");
-        const found = (d.posts || []).find(item => String(item._id) === String(id));
-        if (found) setActiveStory(null), setPosts(current => {
-          const exists = current.some(item => String(item._id) === String(found._id));
-          return exists ? current : [found, ...current];
-        });
-        if (found) window.setTimeout(() => window.dispatchEvent(new CustomEvent("vk-open-post-viewer", { detail: { post: found } })), 0);
-      } catch {}
-    };
-    const openStoryTarget = async event => {
-      const id = event?.detail?.id;
-      if (!id) return;
-      try {
-        const d = await api("/stories");
-        const found = (d.stories || []).find(item => String(item._id) === String(id));
-        if (found) openStory(found);
-      } catch {}
-    };
-    const openPostViewer = event => setActiveNotificationPost(event?.detail?.post || null);
-    window.addEventListener("vk-open-post", openPost);
-    window.addEventListener("vk-open-story", openStoryTarget);
-    window.addEventListener("vk-open-post-viewer", openPostViewer);
-    return () => {
-      window.removeEventListener("vk-open-post", openPost);
-      window.removeEventListener("vk-open-story", openStoryTarget);
-      window.removeEventListener("vk-open-post-viewer", openPostViewer);
-    };
-  }, []);
-
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
@@ -523,13 +477,6 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
                 setActiveStory(null);
                 load();
               }}
-            />
-          )}
-          {activeNotificationPost && (
-            <MediaViewer
-              media={activeNotificationPost.media?.[0]}
-              post={activeNotificationPost}
-              onClose={() => setActiveNotificationPost(null)}
             />
           )}
         </section>
@@ -2674,16 +2621,6 @@ function ReelsPage({ onCreate }) {
   }
 
   useEffect(() => { load(); }, []);
-  useEffect(() => {
-    const openReel = event => {
-      const id = event?.detail?.id;
-      if (!id) return;
-      const index = reels.findIndex(item => String(item._id) === String(id));
-      if (index >= 0) goToReel(index);
-    };
-    window.addEventListener("vk-open-reel", openReel);
-    return () => window.removeEventListener("vk-open-reel", openReel);
-  }, [reels]);
 
   useEffect(() => {
     if (!reels.length) return;
@@ -3377,20 +3314,6 @@ function MessagesPage({ openConversationId = null }) {
   }
 
   useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
-  useEffect(() => {
-    const openRequests = () => { setRequestsOpen(true); loadRequests(); };
-    const openConversation = event => {
-      const id = event?.detail?.id;
-      if (!id) return;
-      loadConversations(id);
-    };
-    window.addEventListener("vk-open-follow-requests", openRequests);
-    window.addEventListener("vk-open-conversation", openConversation);
-    return () => {
-      window.removeEventListener("vk-open-follow-requests", openRequests);
-      window.removeEventListener("vk-open-conversation", openConversation);
-    };
-  }, []);
 
   // Refresh unread state and the active conversation periodically.
   // This also picks up the exact seenAt time from the server so the
@@ -3870,263 +3793,292 @@ function MessagesPage({ openConversationId = null }) {
   );
 }
 
-function notificationKind(notification) {
-  const raw = String(
-    notification?.type ||
-    notification?.kind ||
-    notification?.eventType ||
-    notification?.action ||
-    ""
-  ).toLowerCase().replace(/[\s-]+/g, "_");
-
-  if (raw.includes("follow") && raw.includes("request")) return "follow_request";
-  if (raw === "request" || raw === "followrequest") return "follow_request";
-  if (raw.includes("comment")) return "comment";
-  if (raw.includes("like")) return "like";
-  if (raw.includes("message") || raw.includes("dm")) return "message";
-  if (raw.includes("story") && (raw.includes("reply") || raw.includes("comment"))) return "story_reply";
-  if (raw.includes("story")) return "story";
-  if (raw.includes("reel")) return "reel";
-  if (raw.includes("follow")) return "follow";
-  if (raw.includes("tag") || raw.includes("mention")) return "mention";
-
-  const text = String(notification?.text || "").toLowerCase();
-  if (text.includes("follow request") || text.includes("requested to follow")) return "follow_request";
-  if (text.includes("comment")) return "comment";
-  if (text.includes("liked") || text.includes("like your")) return "like";
-  if (text.includes("message")) return "message";
-  if (text.includes("follow")) return "follow";
-  return "other";
-}
-
-function notificationTargetId(notification, kind) {
-  const candidates = kind === "reel"
-    ? [notification?.reelId, notification?.reel?._id, notification?.targetId, notification?.target?._id, notification?.mediaId]
-    : kind === "story" || kind === "story_reply"
-      ? [notification?.storyId, notification?.story?._id, notification?.targetId, notification?.target?._id]
-      : [notification?.postId, notification?.post?._id, notification?.targetId, notification?.target?._id, notification?.contentId, notification?.mediaId];
-
-  return candidates.find(Boolean) || null;
-}
-
-function notificationConversationId(notification) {
-  return notification?.conversationId || notification?.conversation?._id || notification?.message?.conversationId || null;
-}
-
-function NotificationThumbnail({ notification }) {
-  const media = notification?.media || notification?.target?.media?.[0] || notification?.post?.media?.[0] || null;
-  const url = media?.url ? `${SERVER}${media.url}` : notification?.thumbnailUrl || notification?.target?.thumbnailUrl || "";
-  if (!url) return null;
-  return (
-    <div className="notification-target-thumb">
-      {media?.kind === "video" || notification?.target?.kind === "video" ? (
-        <video src={url} muted playsInline preload="metadata" />
-      ) : (
-        <img src={url} alt="" />
-      )}
-    </div>
-  );
-}
-
-function notificationRelativeTime(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
-  if (seconds < 60) return "now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d`;
-  const weeks = Math.floor(days / 7);
-  if (weeks < 5) return `${weeks}w`;
-  return date.toLocaleDateString([], { month: "short", day: "numeric" });
-}
-
-function notificationDayGroup(value) {
-  const date = new Date(value);
-  const now = new Date();
-  if (Number.isNaN(date.getTime())) return "Earlier";
-  const start = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const diff = Math.floor((start(now) - start(date)) / 86400000);
-  if (diff <= 0) return "Today";
-  if (diff === 1) return "Yesterday";
-  if (diff < 7) return "Last 7 days";
-  return "Earlier";
-}
-
-function NotificationsPage({ onNavigate }) {
+function NotificationsPage() {
+  const me = getUser();
   const [items, setItems] = useState([]);
-  const [filter, setFilter] = useState("all");
+  const [requests, setRequests] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [requestActionId, setRequestActionId] = useState(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    api("/notifications")
-      .then(d => {
-        if (!cancelled) setItems(d.notifications || []);
-      })
-      .catch(e => {
-        if (!cancelled) setError(e.message || "Unable to load notifications");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
-
-  const filters = [
-    ["all", "All"],
-    ["following", "People you follow"],
-    ["comment", "Comments"],
-    ["follow", "Follows"]
-  ];
-
-  const filtered = useMemo(() => {
-    if (filter === "all") return items;
-    return items.filter(n => {
-      const kind = notificationKind(n);
-      if (filter === "comment") return kind === "comment" || kind === "story_reply";
-      if (filter === "follow") return kind === "follow" || kind === "follow_request";
-      if (filter === "following") {
-        return !!(n.actor?.isFollowing || n.isFollowing || n.fromFollowing || n.actorFollowingViewer);
-      }
-      return true;
-    });
-  }, [items, filter]);
-
-  const grouped = useMemo(() => {
-    const groups = new Map();
-    [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(n => {
-      const key = notificationDayGroup(n.createdAt);
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(n);
-    });
-    return ["Today", "Yesterday", "Last 7 days", "Earlier"]
-      .filter(key => groups.has(key))
-      .map(key => ({ key, items: groups.get(key) }));
-  }, [filtered]);
-
-  function openTarget(notification) {
-    const kind = notificationKind(notification);
-    const postId = notificationTargetId(notification, "post");
-    const reelId = notificationTargetId(notification, "reel");
-    const storyId = notificationTargetId(notification, "story");
-    const conversationId = notificationConversationId(notification);
-    const requestId = notification?.requestId || notification?.followRequestId || notification?.follow?.requestId || notification?.request?._id;
-    const actorId = notification?.actor?._id || notification?.actorId || notification?.userId || notification?.fromUserId;
-
-    if (kind === "follow_request" || requestId) {
-      onNavigate?.("messages");
-      window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("vk-open-follow-requests"));
-      }, 80);
-      return;
-    }
-
-    if (kind === "message" || conversationId) {
-      onNavigate?.("messages");
-      window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("vk-open-conversation", { detail: { id: conversationId } }));
-      }, 80);
-      return;
-    }
-
-    if ((kind === "reel" || notification?.reelId || notification?.reel) && reelId) {
-      onNavigate?.("reels");
-      window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("vk-open-reel", { detail: { id: String(reelId) } }));
-      }, 80);
-      return;
-    }
-
-    if ((kind === "story" || kind === "story_reply") && storyId) {
-      onNavigate?.("home");
-      window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("vk-open-story", { detail: { id: String(storyId) } }));
-      }, 80);
-      return;
-    }
-
-    if ((kind === "like" || kind === "comment" || kind === "mention") && postId) {
-      onNavigate?.("home");
-      window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("vk-open-post", { detail: { id: String(postId) } }));
-      }, 80);
-      return;
-    }
-
-    if (actorId) {
-      openUserProfile(actorId);
-      return;
+  async function loadNotifications() {
+    try {
+      const d = await api("/notifications");
+      setItems(d.notifications || []);
+    } catch (e) {
+      console.error("Unable to load notifications", e);
+      setItems([]);
+    } finally {
+      setLoading(false);
     }
   }
+
+  async function loadRequests() {
+    setRequestsLoading(true);
+    try {
+      const d = await api("/follows/requests");
+      setRequests(d.requests || []);
+    } catch (e) {
+      console.error("Unable to load follow requests", e);
+      setRequests([]);
+    } finally {
+      setRequestsLoading(false);
+    }
+  }
+
+  async function loadFollowing() {
+    if (!me?._id) return;
+    try {
+      const d = await api(`/follows/${me._id}/following`);
+      setFollowing(d.following || d.users || []);
+    } catch {
+      setFollowing([]);
+    }
+  }
+
+  useEffect(() => {
+    loadNotifications();
+    loadRequests();
+    loadFollowing();
+  }, []);
+
+  async function acceptFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/accept`, { method: "POST" });
+      setRequests(current => current.filter(r => String(r._id) !== String(requestId)));
+      await loadNotifications();
+    } catch (e) {
+      alert(e.message || "Unable to accept follow request");
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  async function rejectFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/decline`, { method: "POST" });
+      setRequests(current => current.filter(r => String(r._id) !== String(requestId)));
+    } catch (e) {
+      alert(e.message || "Unable to reject follow request");
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  const followingIds = useMemo(
+    () => new Set(following.map(u => String(u?._id || u))),
+    [following]
+  );
+
+  const normalNotifications = useMemo(() => {
+    return items.filter(n => {
+      const type = String(n?.type || n?.kind || "").toLowerCase();
+      const text = String(n?.text || "").toLowerCase();
+
+      if (activeFilter === "comments") {
+        return type.includes("comment") || text.includes("commented");
+      }
+
+      if (activeFilter === "follows") {
+        return (
+          type.includes("follow") ||
+          text.includes("followed") ||
+          text.includes("started following")
+        );
+      }
+
+      if (activeFilter === "following") {
+        const actorId = n?.actor?._id || n?.actor;
+        return actorId && followingIds.has(String(actorId));
+      }
+
+      return true;
+    });
+  }, [items, activeFilter, followingIds]);
+
+  const filters = [
+    { id: "all", label: "All" },
+    { id: "following", label: "People you follow" },
+    { id: "comments", label: "Comments" },
+    { id: "follows", label: "Follows" },
+    { id: "requests", label: "Requests", count: requests.length }
+  ];
 
   return (
     <div className="page notifications-page">
       <div className="notifications-topbar">
-        <button className="notifications-back" type="button" onClick={() => onNavigate?.("home")} aria-label="Back">
-          <ChevronRight style={{ transform: "rotate(180deg)" }} />
-        </button>
+        <div />
         <div className="notifications-title-wrap">
           <h1>Notifications</h1>
-          <span>Activity on your account</span>
+          <span>Stay up to date with your ReelsGo activity</span>
         </div>
-        <button className="notifications-settings" type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-settings"))} aria-label="Notification settings">
+        <button
+          type="button"
+          className="notifications-settings"
+          onClick={() => {
+            loadNotifications();
+            loadRequests();
+          }}
+          aria-label="Refresh notifications"
+          title="Refresh notifications"
+        >
           <Bell />
         </button>
       </div>
 
       <div className="notification-filters" role="tablist" aria-label="Notification filters">
-        {filters.map(([id, label]) => (
-          <button key={id} type="button" className={filter === id ? "active" : ""} onClick={() => setFilter(id)}>{label}</button>
+        {filters.map(filter => (
+          <button
+            key={filter.id}
+            type="button"
+            className={activeFilter === filter.id ? "active" : ""}
+            onClick={() => setActiveFilter(filter.id)}
+            role="tab"
+            aria-selected={activeFilter === filter.id}
+          >
+            <span>{filter.label}</span>
+            {filter.id === "requests" && filter.count > 0 && (
+              <span className="notification-filter-count">{filter.count}</span>
+            )}
+          </button>
         ))}
       </div>
 
-      {loading ? (
-        <div className="notifications-loading"><div className="notification-loader" />Loading notifications...</div>
-      ) : error ? (
-        <div className="empty"><Bell /><h2>Unable to load notifications</h2><p>{error}</p></div>
-      ) : !filtered.length ? (
-        <div className="notifications-empty"><Bell /><b>No notifications</b><span>New activity will appear here.</span></div>
-      ) : (
-        <div className="notifications-list">
-          {grouped.map(group => (
-            <section className="notification-group" key={group.key}>
-              <h2>{group.key}</h2>
-              {group.items.map(n => {
-                const kind = notificationKind(n);
-                const hasTarget = !!(
-                  notificationTargetId(n, kind === "reel" ? "reel" : kind === "story" || kind === "story_reply" ? "story" : "post") ||
-                  notificationConversationId(n) ||
-                  n.requestId || n.followRequestId || n.actor?._id
-                );
+      {activeFilter === "requests" ? (
+        <section className="notification-group notification-requests-group">
+          <div className="notification-section-heading">
+            <div>
+              <h2>Follow requests</h2>
+              <p>People who want to follow you</p>
+            </div>
+            <button
+              type="button"
+              className="notification-refresh-button"
+              onClick={loadRequests}
+              disabled={requestsLoading}
+            >
+              {requestsLoading ? "Loading..." : "Refresh"}
+            </button>
+          </div>
+
+          {requestsLoading ? (
+            <div className="notifications-loading">
+              <span className="notification-loader" />
+              <span>Loading follow requests...</span>
+            </div>
+          ) : requests.length ? (
+            <div className="notification-request-list">
+              {requests.map(request => {
+                const person =
+                  request?.follower ||
+                  request?.requester ||
+                  request?.actor ||
+                  {};
+                const busy = String(requestActionId || "") === String(request._id);
+
                 return (
-                  <button
-                    type="button"
-                    className={`notification-row ${hasTarget ? "clickable" : ""}`}
-                    key={n._id}
-                    onClick={() => openTarget(n)}
-                    aria-label={`Open notification from ${n.actor?.username || "user"}`}
-                  >
-                    <Avatar user={n.actor} size={54} />
-                    <span className="notification-copy">
-                      <span className="notification-message"><UserLink user={n.actor} /> <span>{n.text}</span></span>
-                      <small>{notificationRelativeTime(n.createdAt)}</small>
-                    </span>
-                    {kind === "follow_request" && <span className="notification-action-pill">Request</span>}
-                    {kind === "follow" && !n?.requestId && <span className="notification-action-pill">Message</span>}
-                    {kind !== "follow_request" && kind !== "follow" && <NotificationThumbnail notification={n} />}
-                    <ChevronRight className="notification-chevron" />
-                  </button>
+                  <div className="notification-request-row" key={request._id}>
+                    <Avatar user={person} size={54} />
+
+                    <div className="notification-request-copy">
+                      <UserLink user={person} />
+                      <span>wants to follow you</span>
+                      <small>
+                        {request?.createdAt
+                          ? new Date(request.createdAt).toLocaleString()
+                          : "Follow request"}
+                      </small>
+                    </div>
+
+                    <div className="notification-request-actions">
+                      <button
+                        type="button"
+                        className="notification-request-accept"
+                        disabled={!!requestActionId}
+                        onClick={() => acceptFollowRequest(request._id)}
+                      >
+                        {busy ? "..." : "Accept"}
+                      </button>
+                      <button
+                        type="button"
+                        className="notification-request-reject"
+                        disabled={!!requestActionId}
+                        onClick={() => rejectFollowRequest(request._id)}
+                      >
+                        {busy ? "..." : "Reject"}
+                      </button>
+                    </div>
+                  </div>
                 );
               })}
-            </section>
-          ))}
-        </div>
+            </div>
+          ) : (
+            <div className="notifications-empty notification-requests-empty">
+              <UserPlus />
+              <b>No follow requests</b>
+              <span>New follow requests will appear here.</span>
+            </div>
+          )}
+        </section>
+      ) : (
+        <section className="notification-group">
+          <h2>
+            {activeFilter === "all"
+              ? "Recent activity"
+              : activeFilter === "following"
+                ? "People you follow"
+                : activeFilter === "comments"
+                  ? "Comments"
+                  : "Follows"}
+          </h2>
+
+          {loading ? (
+            <div className="notifications-loading">
+              <span className="notification-loader" />
+              <span>Loading notifications...</span>
+            </div>
+          ) : normalNotifications.length ? (
+            <div className="notifications-list">
+              {normalNotifications.map(n => (
+                <div className="notification-row" key={n._id}>
+                  <Avatar user={n.actor} size={54} />
+                  <div className="notification-copy">
+                    <div className="notification-message">
+                      <UserLink user={n.actor} />{" "}
+                      <span>{n.text}</span>
+                    </div>
+                    <small>
+                      {n.createdAt
+                        ? new Date(n.createdAt).toLocaleString()
+                        : ""}
+                    </small>
+                  </div>
+                  {n.type && (
+                    <span className="notification-action-pill">
+                      {String(n.type).replace(/_/g, " ")}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="notifications-empty">
+              <Bell />
+              <b>No notifications</b>
+              <span>
+                {activeFilter === "following"
+                  ? "Activity from people you follow will appear here."
+                  : "New activity will appear here."}
+              </span>
+            </div>
+          )}
+        </section>
       )}
     </div>
   );
