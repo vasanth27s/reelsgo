@@ -7135,3 +7135,207 @@ textarea{
     gap: 1px !important;
   }
 }
+
+
+/* ============================================================
+   REELSGO — INSTAGRAM STYLE DELETE MENUS
+   Added only for Post / Reel / Saved / Profile / Story delete UI.
+   Existing application styles and responsive rules remain unchanged.
+   ============================================================ */
+
+/* Three-dot popup used by Post and Reel delete actions */
+div[style*="min-width: 170px"]{
+  min-width:220px !important;
+  width:220px !important;
+  padding:6px !important;
+  border-radius:16px !important;
+  background:rgba(255,255,255,.98) !important;
+  border:1px solid rgba(0,0,0,.10) !important;
+  box-shadow:0 12px 38px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08) !important;
+  backdrop-filter:blur(18px) !important;
+  -webkit-backdrop-filter:blur(18px) !important;
+  overflow:hidden !important;
+}
+
+/* Delete / Cancel rows inside the popup */
+div[style*="min-width: 170px"] > button{
+  width:100% !important;
+  min-height:44px !important;
+  margin:0 !important;
+  padding:11px 13px !important;
+  border:0 !important;
+  border-radius:11px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  background:transparent !important;
+  font-size:14px !important;
+  font-weight:650 !important;
+  line-height:1.2 !important;
+  text-align:left !important;
+  transition:background .16s ease,transform .16s ease !important;
+}
+
+div[style*="min-width: 170px"] > button:hover{
+  background:#f3f3f5 !important;
+  transform:none !important;
+}
+
+div[style*="min-width: 170px"] > button:active{
+  background:#e9e9ed !important;
+}
+
+div[style*="min-width: 170px"] > button:first-child{
+  color:#ed4956 !important;
+}
+
+div[style*="min-width: 170px"] > button:first-child:hover{
+  background:#fff0f1 !important;
+}
+
+div[style*="min-width: 170px"] > button:first-child svg{
+  width:17px !important;
+  height:17px !important;
+  flex:0 0 17px !important;
+  stroke-width:2.1 !important;
+}
+
+div[style*="min-width: 170px"] > button:last-child{
+  color:#26262a !important;
+}
+
+div[style*="min-width: 170px"] > button:last-child:hover{
+  background:#f3f3f5 !important;
+}
+
+/* Owner three-dot button */
+.post-head .icon-button[aria-label="More options"]{
+  position:relative;
+  width:38px !important;
+  height:38px !important;
+  border-radius:50% !important;
+  color:#26262a !important;
+  transition:background .16s ease,transform .16s ease !important;
+}
+
+.post-head .icon-button[aria-label="More options"]:hover{
+  background:#f1f1f2 !important;
+  transform:none !important;
+}
+
+.post-head .icon-button[aria-label="More options"]:active{
+  background:#e7e7e9 !important;
+}
+
+/* Story viewer top-right delete / close buttons */
+.story-viewer-top-actions{
+  display:flex !important;
+  align-items:center !important;
+  gap:7px !important;
+}
+
+.story-viewer-top-actions > button{
+  width:42px !important;
+  height:42px !important;
+  min-width:42px !important;
+  border-radius:50% !important;
+  background:rgba(255,255,255,.12) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  color:#fff !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  transition:background .16s ease,transform .16s ease !important;
+}
+
+.story-viewer-top-actions > button:hover{
+  background:rgba(255,255,255,.22) !important;
+  transform:none !important;
+}
+
+.story-viewer-top-actions > button:first-child{
+  color:#ff5264 !important;
+}
+
+.story-viewer-top-actions > button:first-child:hover{
+  background:rgba(255,82,100,.18) !important;
+}
+
+.story-viewer-top-actions > button svg{
+  width:20px !important;
+  height:20px !important;
+}
+
+/* Reel three-dot button */
+.reel-card button[aria-label="More options"],
+.reels-page button[aria-label="More options"]{
+  border-radius:50% !important;
+  transition:background .16s ease !important;
+}
+
+.reel-card button[aria-label="More options"]:hover,
+.reels-page button[aria-label="More options"]:hover{
+  background:rgba(255,255,255,.14) !important;
+}
+
+/* Make delete menu stay above media and other cards */
+.post-card,
+.reel-card,
+.grid-media,
+.grid-reel{
+  position:relative;
+}
+
+div[style*="min-width: 170px"]{
+  isolation:isolate;
+}
+
+/* Mobile: compact Instagram-like bottom/right popup */
+@media (max-width:700px){
+  div[style*="min-width: 170px"]{
+    min-width:205px !important;
+    width:205px !important;
+    max-width:calc(100vw - 28px) !important;
+    border-radius:17px !important;
+    padding:6px !important;
+    box-shadow:0 16px 45px rgba(0,0,0,.45) !important;
+    background:rgba(28,29,34,.98) !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    color:#fff !important;
+  }
+
+  div[style*="min-width: 170px"] > button{
+    min-height:45px !important;
+    border-radius:11px !important;
+    color:#f4f4f6 !important;
+    font-size:14px !important;
+  }
+
+  div[style*="min-width: 170px"] > button:hover{
+    background:rgba(255,255,255,.09) !important;
+  }
+
+  div[style*="min-width: 170px"] > button:first-child,
+  div[style*="min-width: 170px"] > button:first-child:hover{
+    color:#ff5b6e !important;
+    background:rgba(255,80,100,.08) !important;
+  }
+
+  div[style*="min-width: 170px"] > button:last-child{
+    color:#f4f4f6 !important;
+  }
+
+  .story-viewer-top-actions > button{
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+  }
+}
+
+/* Small phones */
+@media (max-width:390px){
+  div[style*="min-width: 170px"]{
+    min-width:190px !important;
+    width:190px !important;
+  }
+}
