@@ -1339,43 +1339,6 @@ function InstagramMediaOptionsSheet({
 
   const isReel = mediaType === "reel";
 
-  const options = isReel
-    ? [
-        [CircleMinus, "Remove from grid"],
-        [HeartOff, "Hide likes"],
-        [SendHorizontal, "Hide share count"],
-        [Archive, "Archive"],
-        [MessageCircle, "Turn On Commenting"],
-        [ShoppingBag, "Suggested products"],
-        [Download, "Turn off downloading"],
-        [Edit3, "Edit"],
-        [Maximize2, "Adjust preview"],
-        [Link2, "Link a reel"],
-        [Handshake, "Partnership label and ads"],
-        [PinOff, "Unpin from main grid"],
-        [QrCode, "QR code"]
-      ]
-    : [
-        [CircleMinus, "Remove from grid"],
-        [HeartOff, "Hide likes"],
-        [SendHorizontal, "Hide share count"],
-        [Archive, "Archive"],
-        [MessageCircle, "Turn On Commenting"],
-        [ShoppingBag, "Suggested products"],
-        [Download, "Turn off downloading"],
-        [Edit3, "Edit"],
-        [Maximize2, "Adjust preview"],
-        [Link2, "Add location / link"]
-      ];
-
-  const handleUnavailable = (label) => {
-    if (label === "Edit") {
-      alert(`Edit ${isReel ? "Reel" : "Post"} can be connected to the existing editor.`);
-    } else {
-      alert(`${label} is available in the menu UI. Connect its backend action when you want to enable it.`);
-    }
-  };
-
   return (
     <div
       className="ig-options-backdrop"
@@ -1386,32 +1349,26 @@ function InstagramMediaOptionsSheet({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="ig-options-sheet" onMouseDown={e => e.stopPropagation()}>
+      <div className="ig-options-sheet ig-delete-only-sheet" onMouseDown={e => e.stopPropagation()}>
         <div className="ig-options-handle" />
-        <div className="ig-options-list">
-          {options.map(([Icon, label]) => (
-            <button
-              key={label}
-              type="button"
-              className="ig-option-row"
-              onClick={() => handleUnavailable(label)}
-            >
-              <Icon size={27} strokeWidth={1.9} />
-              <span>{label}</span>
-            </button>
-          ))}
 
-          <button
-            type="button"
-            className="ig-option-row ig-option-delete"
-            disabled={deleting}
-            onClick={onDelete}
-          >
-            <Trash2 size={27} strokeWidth={1.9} />
-            <span>{deleting ? `Deleting ${isReel ? "Reel" : "post"}...` : `Delete ${isReel ? "Reel" : "post"}`}</span>
-          </button>
-        </div>
-        <button type="button" className="ig-options-cancel" onClick={onClose}>Cancel</button>
+        <button
+          type="button"
+          className="ig-option-row ig-option-delete"
+          disabled={deleting}
+          onClick={onDelete}
+        >
+          <Trash2 size={27} strokeWidth={1.9} />
+          <span>
+            {deleting
+              ? `Deleting ${isReel ? "Reel" : "post"}...`
+              : `Delete ${isReel ? "Reel" : "post"}`}
+          </span>
+        </button>
+
+        <button type="button" className="ig-options-cancel" onClick={onClose}>
+          Cancel
+        </button>
       </div>
     </div>
   );
