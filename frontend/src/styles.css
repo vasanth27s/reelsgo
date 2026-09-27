@@ -8419,3 +8419,155 @@ div[style*="min-width: 170px"]{
     background: transparent !important;
   }
 }
+
+
+/* ============================================================
+   FINAL STORY VIEWERS DARK THEME
+   - Story viewers sheet is dark on mobile and desktop
+   - Dark rows, text, separators and close button
+   - Keeps the existing Story viewer functionality unchanged
+   ============================================================ */
+
+.story-viewers-sheet {
+  background: #111318 !important;
+  color: #f5f5f7 !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  box-shadow: 0 -20px 70px rgba(0,0,0,.75) !important;
+}
+
+.story-viewers-head {
+  background: #111318 !important;
+  border-bottom: 1px solid rgba(255,255,255,.10) !important;
+  color: #fff !important;
+}
+
+.story-viewers-head h2,
+.story-viewers-head b,
+.story-viewers-head strong {
+  color: #fff !important;
+}
+
+.story-viewers-head span {
+  color: #9297a3 !important;
+}
+
+.story-viewers-head button {
+  background: rgba(255,255,255,.09) !important;
+  color: #f5f5f7 !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+}
+
+.story-viewers-head button:hover {
+  background: rgba(255,255,255,.16) !important;
+}
+
+.story-viewers-list {
+  background: #111318 !important;
+}
+
+.story-viewer-row {
+  background: #111318 !important;
+  border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  color: #f5f5f7 !important;
+}
+
+.story-viewer-row:hover {
+  background: rgba(255,255,255,.045) !important;
+}
+
+.story-viewer-user-info b {
+  color: #fff !important;
+}
+
+.story-viewer-user-info span {
+  color: #969ba6 !important;
+}
+
+.story-viewer-row > small {
+  color: #777d88 !important;
+}
+
+.story-viewers-empty {
+  background: #111318 !important;
+  color: #9297a3 !important;
+}
+
+.story-viewers-empty b {
+  color: #fff !important;
+}
+
+.story-viewers-empty span {
+  color: #8d929d !important;
+}
+
+.story-viewers-empty svg {
+  color: #aeb3bd !important;
+}
+
+.story-viewers-sheet .avatar {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #252832 !important;
+}
+
+.story-viewers-sheet .avatar img {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+@media (max-width: 700px) {
+  .story-viewers-sheet {
+    width: 100% !important;
+    max-height: 72vh !important;
+    border-radius: 24px 24px 0 0 !important;
+    background: #111318 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+  }
+
+  .story-viewers-head {
+    height: 68px !important;
+    background: #111318 !important;
+  }
+
+  .story-viewers-list {
+    background: #111318 !important;
+    max-height: calc(72vh - 68px) !important;
+    padding-bottom: 18px !important;
+  }
+
+  .story-viewer-row {
+    background: #111318 !important;
+    padding: 12px 10px !important;
+  }
+
+  .story-viewer-row:active {
+    background: rgba(255,255,255,.07) !important;
+  }
+
+  .story-viewers-empty {
+    background: #111318 !important;
+  }
+}
+
+/* Story viewer itself stays completely dark. */
+.story-viewer {
+  background: rgba(5,6,9,.97) !important;
+}
+
+.story-viewer-content {
+  background: #050609 !important;
+}
+
+.story-viewer-top > button {
+  background: rgba(255,255,255,.10) !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  color: #fff !important;
+}
+
+.story-viewer-top > button:hover {
+  background: rgba(255,255,255,.18) !important;
+}
