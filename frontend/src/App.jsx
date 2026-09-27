@@ -1240,12 +1240,165 @@ function ShareSheet({ post, onClose }) {
   );
 }
 
+function TagPeoplePicker({ selected = [], setSelected, onClose }) {
+  const [query, setQuery] = useState("");
+  const [people, setPeople] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadPeople(search = "") {
+    setLoading(true);
+    setError("");
+    try {
+      let users = [];
+      if (search.trim()) {
+        const d = await api(`/users/search?q=${encodeURIComponent(search.trim())}`);
+        users = d.users || d.results || [];
+      } else {
+        try {
+          const current = getUser();
+          if (current?._id) {
+            const d = await api(`/follows/${current._id}/following`);
+            users = d.following || d.users || [];
+          }
+        } catch {}
+        if (!users.length) {
+          const d = await api(`/users/search?q=${encodeURIComponent("a")}`);
+          users = d.users || d.results || [];
+        }
+      }
+
+      const currentId = String(getUser()?._id || "");
+      const unique = [];
+      const seen = new Set();
+      for (const item of users) {
+        const person = item?.user || item;
+        if (!person?._id) continue;
+        const id = String(person._id);
+        if (id === currentId || seen.has(id)) continue;
+        seen.add(id);
+        unique.push(person);
+      }
+      setPeople(unique);
+    } catch (e) {
+      console.error(e);
+      setPeople([]);
+      setError(e.message || "Unable to load people");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => loadPeople(query), query.trim() ? 250 : 0);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  function togglePerson(person) {
+    const id = String(person._id);
+    const exists = selected.some(p => String(p._id) === id);
+    if (exists) {
+      setSelected(selected.filter(p => String(p._id) !== id));
+      return;
+    }
+    if (selected.length >= 20) {
+      alert("You can tag up to 20 people.");
+      return;
+    }
+    setSelected([...selected, person]);
+  }
+
+  return (
+    <div className="tag-people-panel">
+      <div className="tag-people-head">
+        <div>
+          <b>Tag people</b>
+          <span>{selected.length ? `${selected.length} selected` : "Choose people to tag"}</span>
+        </div>
+        <button type="button" className="icon-button" onClick={onClose} aria-label="Close tag people">
+          <X />
+        </button>
+      </div>
+
+      {selected.length > 0 && (
+        <div className="tag-selected-list">
+          {selected.map(person => (
+            <button
+              key={person._id}
+              type="button"
+              className="tag-selected-chip"
+              onClick={() => togglePerson(person)}
+              title={`Remove @${person.username}`}
+            >
+              <Avatar user={person} size={30} />
+              <span>@{person.username}</span>
+              <X />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="tag-people-search">
+        <Search />
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search people by name or username"
+          autoFocus
+        />
+        {query && <button type="button" onClick={() => setQuery("")}><X /></button>}
+      </div>
+
+      <div className="tag-people-results">
+        {loading ? (
+          <div className="tag-people-state">Searching people...</div>
+        ) : error ? (
+          <div className="tag-people-state">{error}</div>
+        ) : people.length ? (
+          people.map(person => {
+            const active = selected.some(p => String(p._id) === String(person._id));
+            return (
+              <button
+                key={person._id}
+                type="button"
+                className={`tag-person-row ${active ? "selected" : ""}`}
+                onClick={() => togglePerson(person)}
+              >
+                <Avatar user={person} size={46} />
+                <span className="tag-person-info">
+                  <b>{person.username ? `@${person.username}` : person.name || "ReelsGo user"}</b>
+                  <small>{person.name || "ReelsGo user"}</small>
+                </span>
+                <span className={`tag-person-check ${active ? "active" : ""}`}>
+                  {active ? <Check /> : null}
+                </span>
+              </button>
+            );
+          })
+        ) : (
+          <div className="tag-people-state">
+            <Users />
+            <b>No people found</b>
+            <span>Search for a ReelsGo user to tag.</span>
+          </div>
+        )}
+      </div>
+
+      <button type="button" className="primary full" onClick={onClose}>
+        <Check /> Done
+      </button>
+    </div>
+  );
+}
+
 function PostComposer({ user, onClose, onDone }) {
   const input = useRef(null);
   const [files, setFiles] = useState([]);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const [taggedPeople, setTaggedPeople] = useState([]);
+  const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function publish() {
@@ -1255,6 +1408,7 @@ function PostComposer({ user, onClose, onDone }) {
       const fd = new FormData();
       files.forEach(f => fd.append("media", f));
       fd.append("caption", caption); fd.append("location", location); fd.append("hashtags", hashtags);
+      fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
       await api("/posts", { method: "POST", body: fd });
       onDone();
       alert("Post shared");
@@ -1266,6 +1420,10 @@ function PostComposer({ user, onClose, onDone }) {
     <textarea className="composer-text" placeholder="What's on your mind?" value={caption} onChange={e => setCaption(e.target.value)} />
     {files.length > 0 && <div className="file-preview">{files.map((f, i) => <div key={i}><ImageIcon /> <span>{f.name}</span></div>)}</div>}
     <div className="form-row"><input placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} /><input placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} /></div>
+    <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
+      <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
+    </button>
+    {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
     <input ref={input} type="file" multiple accept="image/*,video/*" hidden onChange={e => setFiles(Array.from(e.target.files || []))} />
     <button className="secondary full" onClick={() => input.current?.click()}><ImageIcon /> Photos / Videos</button>
     <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Sharing..." : "Share"}</button>
@@ -1306,6 +1464,8 @@ function ReelComposer({ onClose, onDone }) {
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const [taggedPeople, setTaggedPeople] = useState([]);
+  const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function publish() {
@@ -1315,6 +1475,7 @@ function ReelComposer({ onClose, onDone }) {
     try {
       const fd = new FormData();
       fd.append("video", file); fd.append("caption", caption); fd.append("hashtags", hashtags);
+      fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
       await api("/reels", { method: "POST", body: fd });
       onDone(); alert("Reel published");
     } catch (e) { alert(e.message); } finally { setLoading(false); }
@@ -1331,6 +1492,10 @@ function ReelComposer({ onClose, onDone }) {
     <button className="secondary full" onClick={() => input.current?.click()}><Upload /> Choose video</button>
     <input className="normal-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} />
     <input className="normal-input" placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+    <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
+      <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
+    </button>
+    {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
     <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Publishing..." : "Publish Reel"}</button>
   </Modal>;
 }

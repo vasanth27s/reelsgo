@@ -8835,3 +8835,260 @@ div[style*="min-width: 170px"]{
   font-size: 30px !important;
   letter-spacing: -2.5px !important;
 }
+
+/* =========================================================
+   REELSGO - TAG PEOPLE / MENTION PICKER
+   ========================================================= */
+.tag-people-trigger {
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.tag-people-trigger.has-tags {
+  border-color: rgba(0,149,246,.45) !important;
+}
+
+.tag-people-panel {
+  width: 100%;
+  margin: 10px 0 12px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  background: rgba(20,22,28,.98);
+  box-sizing: border-box;
+}
+
+.tag-people-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tag-people-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tag-people-head b {
+  color: #fff;
+  font-size: 15px;
+}
+
+.tag-people-head span {
+  color: #9499a5;
+  font-size: 12px;
+}
+
+.tag-selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 10px;
+}
+
+.tag-selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 3px 8px 3px 4px;
+  border: 1px solid rgba(0,149,246,.35);
+  border-radius: 999px;
+  background: rgba(0,149,246,.10);
+  color: #f5f7fa;
+  cursor: pointer;
+}
+
+.tag-selected-chip span {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.tag-selected-chip > svg {
+  width: 14px;
+  height: 14px;
+  color: #aeb5c1;
+  flex: 0 0 auto;
+}
+
+.tag-people-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  background: rgba(255,255,255,.055);
+  box-sizing: border-box;
+}
+
+.tag-people-search > svg {
+  width: 17px;
+  height: 17px;
+  color: #8e94a0;
+  flex: 0 0 auto;
+}
+
+.tag-people-search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+}
+
+.tag-people-search input::placeholder {
+  color: #777d88;
+}
+
+.tag-people-search > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  color: #dfe3ea;
+  cursor: pointer;
+}
+
+.tag-people-search > button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tag-people-results {
+  width: 100%;
+  max-height: 245px;
+  margin: 9px 0 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 12px;
+}
+
+.tag-person-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 60px;
+  padding: 7px 8px;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.tag-person-row:hover,
+.tag-person-row.selected {
+  background: rgba(255,255,255,.065);
+}
+
+.tag-person-row .avatar {
+  flex: 0 0 46px;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.tag-person-info {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tag-person-info b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 13px;
+}
+
+.tag-person-info small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #858b97;
+  font-size: 11px;
+}
+
+.tag-person-check {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.tag-person-check.active {
+  border-color: #0095f6;
+  background: #0095f6;
+  color: #fff;
+}
+
+.tag-person-check svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tag-people-state {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #858b97;
+  text-align: center;
+  font-size: 12px;
+}
+
+.tag-people-state svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 2px;
+}
+
+.tag-people-state b {
+  color: #e8ebf0;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .tag-people-panel {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .tag-people-results {
+    max-height: 220px;
+  }
+
+  .tag-person-row {
+    min-height: 58px;
+  }
+}
