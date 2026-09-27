@@ -7,7 +7,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Volume2, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, ShoppingBag, Download, Maximize2, Link2, Handshake, PinOff, QrCode
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -1328,6 +1328,164 @@ function ReelComposer({ onClose, onDone }) {
   </Modal>;
 }
 
+function InstagramMediaOptionsSheet({
+  open,
+  onClose,
+  mediaType = "post",
+  onDelete,
+  deleting = false
+}) {
+  if (!open) return null;
+
+  const isReel = mediaType === "reel";
+
+  const options = isReel
+    ? [
+        [CircleMinus, "Remove from grid"],
+        [HeartOff, "Hide likes"],
+        [SendHorizontal, "Hide share count"],
+        [Archive, "Archive"],
+        [MessageCircle, "Turn On Commenting"],
+        [ShoppingBag, "Suggested products"],
+        [Download, "Turn off downloading"],
+        [Edit3, "Edit"],
+        [Maximize2, "Adjust preview"],
+        [Link2, "Link a reel"],
+        [Handshake, "Partnership label and ads"],
+        [PinOff, "Unpin from main grid"],
+        [QrCode, "QR code"]
+      ]
+    : [
+        [CircleMinus, "Remove from grid"],
+        [HeartOff, "Hide likes"],
+        [SendHorizontal, "Hide share count"],
+        [Archive, "Archive"],
+        [MessageCircle, "Turn On Commenting"],
+        [ShoppingBag, "Suggested products"],
+        [Download, "Turn off downloading"],
+        [Edit3, "Edit"],
+        [Maximize2, "Adjust preview"],
+        [Link2, "Add location / link"]
+      ];
+
+  const handleUnavailable = (label) => {
+    if (label === "Edit") {
+      alert(`Edit ${isReel ? "Reel" : "Post"} can be connected to the existing editor.`);
+    } else {
+      alert(`${label} is available in the menu UI. Connect its backend action when you want to enable it.`);
+    }
+  };
+
+  return (
+    <div
+      className="ig-options-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${isReel ? "Reel" : "Post"} options`}
+      onMouseDown={e => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="ig-options-sheet" onMouseDown={e => e.stopPropagation()}>
+        <div className="ig-options-handle" />
+        <div className="ig-options-list">
+          {options.map(([Icon, label]) => (
+            <button
+              key={label}
+              type="button"
+              className="ig-option-row"
+              onClick={() => handleUnavailable(label)}
+            >
+              <Icon size={27} strokeWidth={1.9} />
+              <span>{label}</span>
+            </button>
+          ))}
+
+          <button
+            type="button"
+            className="ig-option-row ig-option-delete"
+            disabled={deleting}
+            onClick={onDelete}
+          >
+            <Trash2 size={27} strokeWidth={1.9} />
+            <span>{deleting ? `Deleting ${isReel ? "Reel" : "post"}...` : `Delete ${isReel ? "Reel" : "post"}`}</span>
+          </button>
+        </div>
+        <button type="button" className="ig-options-cancel" onClick={onClose}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+function ProfileReelCard({ reel, user, onDeleted }) {
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const isOwner = String(reel.author?._id || reel.author) === String(user?._id);
+
+  async function deleteReel() {
+    if (!isOwner || deleting) return;
+    const confirmed = window.confirm("Delete this Reel? This action cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      await api(`/reels/${reel._id}`, { method: "DELETE" });
+      setOptionsOpen(false);
+      onDeleted?.(reel._id);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="profile-reel-card">
+        <video
+          src={`${SERVER}${reel.mediaUrl}`}
+          muted
+          playsInline
+          controls
+          preload="metadata"
+          onClick={e => e.stopPropagation()}
+        />
+        <div className="profile-reel-overlay">
+          <div className="profile-reel-caption">
+            <Film size={16} />
+            <span>{reel.caption || "Reel"}</span>
+          </div>
+          {isOwner && (
+            <button
+              type="button"
+              className="profile-media-more"
+              aria-label="Reel options"
+              title="Reel options"
+              onClick={e => {
+                e.stopPropagation();
+                setOptionsOpen(true);
+              }}
+            >
+              <MoreHorizontal size={21} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isOwner && (
+        <InstagramMediaOptionsSheet
+          open={optionsOpen}
+          onClose={() => setOptionsOpen(false)}
+          mediaType="reel"
+          onDelete={deleteReel}
+          deleting={deleting}
+        />
+      )}
+    </>
+  );
+}
+
 function ProfilePage({ user, setUser }) {
   const [tab, setTab] = useState("posts");
   const [posts, setPosts] = useState([]);
@@ -1438,13 +1596,29 @@ function ProfilePage({ user, setUser }) {
 
       {tab === "reels" && (
         reels.length
-          ? <div className="profile-grid reels-profile-grid">{reels.map(r => <div className="grid-reel" key={r._id}><video src={`${SERVER}${r.mediaUrl}`} controls /></div>)}</div>
+          ? <div className="profile-grid reels-profile-grid">
+              {reels.map(r => (
+                <ProfileReelCard
+                  key={r._id}
+                  reel={r}
+                  user={user}
+                  onDeleted={(id) => setReels(current => current.filter(item => String(item._id) !== String(id)))}
+                />
+              ))}
+            </div>
           : <EmptyTab icon={<Film />} title="No Reels yet" text="Your published Reels will appear here." />
       )}
 
       {tab === "tagged" && (
         posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).length
-          ? <div className="profile-grid">{posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).map(p => <GridMedia key={p._id} post={p} />)}</div>
+          ? <div className="profile-grid">{posts.filter(p => (p.mentions || []).some(m => String(m?._id || m) === String(user?._id))).map(p => (
+            <GridMedia
+              key={p._id}
+              post={p}
+              user={user}
+              onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+            />
+          ))}</div>
           : <EmptyTab icon={<Users />} title="Photos of you" text="Posts where you are tagged will appear here." />
       )}
       {tab === "saved" && <SavedPage embedded user={user} />}
@@ -1537,89 +1711,28 @@ function GridMedia({ post, user, onDeleted }) {
         </button>
 
         {isOwner && (
-          <div
-            style={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              zIndex: 10
+          <button
+            type="button"
+            className="profile-media-more grid-post-more"
+            aria-label="Post options"
+            title="Post options"
+            onClick={e => {
+              e.stopPropagation();
+              setMenuOpen(true);
             }}
           >
-            <button
-              type="button"
-              aria-label="Post options"
-              title="Post options"
-              onClick={e => {
-                e.stopPropagation();
-                setMenuOpen(v => !v);
-              }}
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: "50%",
-                background: "rgba(0,0,0,.62)",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <MoreHorizontal size={18} />
-            </button>
+            <MoreHorizontal size={20} />
+          </button>
+        )}
 
-            {menuOpen && (
-              <div
-                onClick={e => e.stopPropagation()}
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: 40,
-                  minWidth: 155,
-                  padding: 6,
-                  borderRadius: 12,
-                  background: "#171b21",
-                  border: "1px solid rgba(255,255,255,.12)",
-                  boxShadow: "0 18px 45px rgba(0,0,0,.5)"
-                }}
-              >
-                <button
-                  type="button"
-                  disabled={deleting}
-                  onClick={deletePost}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "10px 11px",
-                    borderRadius: 9,
-                    background: "transparent",
-                    color: "#ff5c70",
-                    textAlign: "left",
-                    fontWeight: 750
-                  }}
-                >
-                  <Trash2 size={16} />
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 11px",
-                    borderRadius: 9,
-                    background: "transparent",
-                    color: "#fff",
-                    textAlign: "left"
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-          </div>
+        {isOwner && (
+          <InstagramMediaOptionsSheet
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            mediaType="post"
+            onDelete={deletePost}
+            deleting={deleting}
+          />
         )}
       </div>
 
