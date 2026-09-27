@@ -433,7 +433,6 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
       <div className="home-layout">
         <section className="home-feed-column">
           <div className="page-heading">
-            <div><h1>Home</h1><p>Your latest updates</p></div>
             <button className="desktop-create" onClick={onCreate}><PlusSquare /> Create</button>
           </div>
 
