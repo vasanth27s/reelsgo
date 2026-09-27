@@ -488,12 +488,12 @@ function SuggestionsRail({ user, posts }) {
       for (const post of posts || []) add(post?.author);
 
       try {
-        const d = await api('/follows/following');
+        const d = await api(`/follows/${user._id}/following`);
         for (const item of (d.following || d.users || [])) add(item?.user || item);
       } catch {}
 
       try {
-        const d = await api('/follows/followers');
+        const d = await api(`/follows/${user._id}/followers`);
         for (const item of (d.followers || d.users || [])) add(item?.user || item);
       } catch {}
 
@@ -1143,8 +1143,11 @@ function ShareSheet({ post, onClose }) {
     try {
       let users = [];
       try {
-        const d = await api("/follows/following");
-        users = d.following || d.users || d.followers || [];
+        const currentUser = getUser();
+        if (currentUser?._id) {
+          const d = await api(`/follows/${currentUser._id}/following`);
+          users = d.following || d.users || d.followers || [];
+        }
       } catch {}
 
       if (!users.length) {
@@ -1455,7 +1458,9 @@ function ConnectionsModal({ user, type, onClose }) {
       try {
         setLoading(true);
         setError("");
-        const endpoint = type === "followers" ? "/follows/followers" : "/follows/following";
+        const endpoint = type === "followers"
+          ? `/follows/${user?._id}/followers`
+          : `/follows/${user?._id}/following`;
         const data = await api(endpoint);
         const raw = type === "followers"
           ? (data.followers || data.users || [])
