@@ -3794,21 +3794,23 @@ function MessagesPage({ openConversationId = null }) {
 }
 
 function NotificationsPage() {
-  const me = getUser();
   const [items, setItems] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [following, setFollowing] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");
+  const [followingIds, setFollowingIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
-  const [requestsLoading, setRequestsLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(false);
   const [requestActionId, setRequestActionId] = useState(null);
 
+  const me = getUser();
+
   async function loadNotifications() {
+    setLoading(true);
     try {
       const d = await api("/notifications");
       setItems(d.notifications || []);
     } catch (e) {
-      console.error("Unable to load notifications", e);
+      console.error(e);
       setItems([]);
     } finally {
       setLoading(false);
@@ -3821,7 +3823,7 @@ function NotificationsPage() {
       const d = await api("/follows/requests");
       setRequests(d.requests || []);
     } catch (e) {
-      console.error("Unable to load follow requests", e);
+      console.error(e);
       setRequests([]);
     } finally {
       setRequestsLoading(false);
@@ -3829,22 +3831,29 @@ function NotificationsPage() {
   }
 
   async function loadFollowing() {
-    if (!me?._id) return;
     try {
+      if (!me?._id) return;
       const d = await api(`/follows/${me._id}/following`);
-      setFollowing(d.following || d.users || []);
-    } catch {
-      setFollowing([]);
+      const rows = d.following || d.users || [];
+      const ids = new Set();
+      rows.forEach(item => {
+        const user = item?.user || item;
+        if (user?._id) ids.add(String(user._id));
+      });
+      setFollowingIds(ids);
+    } catch (e) {
+      console.error(e);
+      setFollowingIds(new Set());
     }
   }
 
   useEffect(() => {
     loadNotifications();
-    loadRequests();
     loadFollowing();
+    loadRequests();
   }, []);
 
-  async function acceptFollowRequest(requestId) {
+  async function acceptRequest(requestId) {
     if (!requestId || requestActionId) return;
     setRequestActionId(requestId);
     try {
@@ -3858,12 +3867,13 @@ function NotificationsPage() {
     }
   }
 
-  async function rejectFollowRequest(requestId) {
+  async function rejectRequest(requestId) {
     if (!requestId || requestActionId) return;
     setRequestActionId(requestId);
     try {
       await api(`/follows/requests/${requestId}/decline`, { method: "POST" });
       setRequests(current => current.filter(r => String(r._id) !== String(requestId)));
+      await loadNotifications();
     } catch (e) {
       alert(e.message || "Unable to reject follow request");
     } finally {
@@ -3871,40 +3881,35 @@ function NotificationsPage() {
     }
   }
 
-  const followingIds = useMemo(
-    () => new Set(following.map(u => String(u?._id || u))),
-    [following]
-  );
+  function notificationType(n) {
+    const type = String(n?.type || n?.kind || n?.event || "").toLowerCase();
+    const text = String(n?.text || n?.message || "").toLowerCase();
+    if (type.includes("comment") || text.includes("comment")) return "comment";
+    if (type.includes("follow") || text.includes("follow")) return "follow";
+    if (type.includes("like") || text.includes("liked") || text.includes("like")) return "like";
+    if (type.includes("message") || text.includes("message")) return "message";
+    if (type.includes("reel")) return "reel";
+    if (type.includes("story")) return "story";
+    if (type.includes("mention") || text.includes("mention")) return "mention";
+    return "other";
+  }
 
-  const normalNotifications = useMemo(() => {
-    return items.filter(n => {
-      const type = String(n?.type || n?.kind || "").toLowerCase();
-      const text = String(n?.text || "").toLowerCase();
-
-      if (activeFilter === "comments") {
-        return type.includes("comment") || text.includes("commented");
-      }
-
-      if (activeFilter === "follows") {
-        return (
-          type.includes("follow") ||
-          text.includes("followed") ||
-          text.includes("started following")
-        );
-      }
-
-      if (activeFilter === "following") {
-        const actorId = n?.actor?._id || n?.actor;
+  const filteredItems = useMemo(() => {
+    if (activeTab === "comments") return items.filter(n => notificationType(n) === "comment");
+    if (activeTab === "follows") return items.filter(n => notificationType(n) === "follow");
+    if (activeTab === "likes") return items.filter(n => notificationType(n) === "like");
+    if (activeTab === "people") {
+      return items.filter(n => {
+        const actorId = n?.actor?._id || n?.actorId || n?.userId;
         return actorId && followingIds.has(String(actorId));
-      }
+      });
+    }
+    return items;
+  }, [items, activeTab, followingIds]);
 
-      return true;
-    });
-  }, [items, activeFilter, followingIds]);
-
-  const filters = [
+  const tabs = [
     { id: "all", label: "All" },
-    { id: "following", label: "People you follow" },
+    { id: "people", label: "People you follow" },
     { id: "comments", label: "Comments" },
     { id: "follows", label: "Follows" },
     { id: "requests", label: "Requests", count: requests.length }
@@ -3912,105 +3917,65 @@ function NotificationsPage() {
 
   return (
     <div className="page notifications-page">
-      <div className="notifications-topbar">
-        <div />
-        <div className="notifications-title-wrap">
+      <div className="notifications-center-head">
+        <div>
           <h1>Notifications</h1>
-          <span>Stay up to date with your ReelsGo activity</span>
+          <p>Stay updated with activity on your account</p>
         </div>
-        <button
-          type="button"
-          className="notifications-settings"
-          onClick={() => {
-            loadNotifications();
-            loadRequests();
-          }}
-          aria-label="Refresh notifications"
-          title="Refresh notifications"
-        >
+        <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
           <Bell />
         </button>
       </div>
 
-      <div className="notification-filters" role="tablist" aria-label="Notification filters">
-        {filters.map(filter => (
+      <div className="notification-tabs" role="tablist" aria-label="Notification filters">
+        {tabs.map(tab => (
           <button
-            key={filter.id}
+            key={tab.id}
             type="button"
-            className={activeFilter === filter.id ? "active" : ""}
-            onClick={() => setActiveFilter(filter.id)}
             role="tab"
-            aria-selected={activeFilter === filter.id}
+            aria-selected={activeTab === tab.id}
+            className={activeTab === tab.id ? "active" : ""}
+            onClick={() => {
+              setActiveTab(tab.id);
+              if (tab.id === "requests") loadRequests();
+            }}
           >
-            <span>{filter.label}</span>
-            {filter.id === "requests" && filter.count > 0 && (
-              <span className="notification-filter-count">{filter.count}</span>
-            )}
+            <span>{tab.label}</span>
+            {tab.count > 0 && <b className="notification-tab-count">{tab.count > 99 ? "99+" : tab.count}</b>}
           </button>
         ))}
       </div>
 
-      {activeFilter === "requests" ? (
-        <section className="notification-group notification-requests-group">
-          <div className="notification-section-heading">
+      {activeTab === "requests" ? (
+        <section className="notification-request-center">
+          <div className="notification-section-title">
             <div>
               <h2>Follow requests</h2>
               <p>People who want to follow you</p>
             </div>
-            <button
-              type="button"
-              className="notification-refresh-button"
-              onClick={loadRequests}
-              disabled={requestsLoading}
-            >
-              {requestsLoading ? "Loading..." : "Refresh"}
-            </button>
+            <button type="button" onClick={loadRequests}>Refresh</button>
           </div>
 
           {requestsLoading ? (
-            <div className="notifications-loading">
-              <span className="notification-loader" />
-              <span>Loading follow requests...</span>
-            </div>
+            <div className="notification-center-state">Loading requests...</div>
           ) : requests.length ? (
-            <div className="notification-request-list">
+            <div className="notification-requests-list">
               {requests.map(request => {
-                const person =
-                  request?.follower ||
-                  request?.requester ||
-                  request?.actor ||
-                  {};
+                const person = request?.follower || request?.requester || request?.actor || request?.user || {};
                 const busy = String(requestActionId || "") === String(request._id);
-
                 return (
                   <div className="notification-request-row" key={request._id}>
-                    <Avatar user={person} size={54} />
-
+                    <Avatar user={person} size={52} />
                     <div className="notification-request-copy">
                       <UserLink user={person} />
                       <span>wants to follow you</span>
-                      <small>
-                        {request?.createdAt
-                          ? new Date(request.createdAt).toLocaleString()
-                          : "Follow request"}
-                      </small>
+                      <small>{request.createdAt ? new Date(request.createdAt).toLocaleString() : "Follow request"}</small>
                     </div>
-
                     <div className="notification-request-actions">
-                      <button
-                        type="button"
-                        className="notification-request-accept"
-                        disabled={!!requestActionId}
-                        onClick={() => acceptFollowRequest(request._id)}
-                      >
+                      <button type="button" className="notification-request-accept" disabled={!!requestActionId} onClick={() => acceptRequest(request._id)}>
                         {busy ? "..." : "Accept"}
                       </button>
-                      <button
-                        type="button"
-                        className="notification-request-reject"
-                        disabled={!!requestActionId}
-                        onClick={() => rejectFollowRequest(request._id)}
-                      >
+                      <button type="button" className="notification-request-reject" disabled={!!requestActionId} onClick={() => rejectRequest(request._id)}>
                         {busy ? "..." : "Reject"}
                       </button>
                     </div>
@@ -4019,63 +3984,36 @@ function NotificationsPage() {
               })}
             </div>
           ) : (
-            <div className="notifications-empty notification-requests-empty">
+            <div className="notification-center-state notification-center-empty">
               <UserPlus />
-              <b>No follow requests</b>
-              <span>New follow requests will appear here.</span>
+              <h3>No follow requests</h3>
+              <p>New follow requests will appear here.</p>
             </div>
           )}
         </section>
       ) : (
-        <section className="notification-group">
-          <h2>
-            {activeFilter === "all"
-              ? "Recent activity"
-              : activeFilter === "following"
-                ? "People you follow"
-                : activeFilter === "comments"
-                  ? "Comments"
-                  : "Follows"}
-          </h2>
-
+        <section className="notification-feed">
           {loading ? (
-            <div className="notifications-loading">
-              <span className="notification-loader" />
-              <span>Loading notifications...</span>
-            </div>
-          ) : normalNotifications.length ? (
-            <div className="notifications-list">
-              {normalNotifications.map(n => (
-                <div className="notification-row" key={n._id}>
-                  <Avatar user={n.actor} size={54} />
-                  <div className="notification-copy">
-                    <div className="notification-message">
-                      <UserLink user={n.actor} />{" "}
-                      <span>{n.text}</span>
-                    </div>
-                    <small>
-                      {n.createdAt
-                        ? new Date(n.createdAt).toLocaleString()
-                        : ""}
-                    </small>
-                  </div>
-                  {n.type && (
-                    <span className="notification-action-pill">
-                      {String(n.type).replace(/_/g, " ")}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+            <div className="notification-center-state">Loading notifications...</div>
+          ) : filteredItems.length ? (
+            filteredItems.map(n => (
+              <button type="button" className="notification notification-card" key={n._id} onClick={() => {
+                const actorId = n?.actor?._id || n?.actorId;
+                if (actorId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: actorId } }));
+              }}>
+                <Avatar user={n.actor} size={48} />
+                <span className="notification-copy">
+                  <span><UserLink user={n.actor} /> {n.text || n.message || "New activity on your account"}</span>
+                  <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
+                </span>
+                <ChevronRight className="notification-arrow" />
+              </button>
+            ))
           ) : (
-            <div className="notifications-empty">
+            <div className="notification-center-state notification-center-empty">
               <Bell />
-              <b>No notifications</b>
-              <span>
-                {activeFilter === "following"
-                  ? "Activity from people you follow will appear here."
-                  : "New activity will appear here."}
-              </span>
+              <h3>No notifications</h3>
+              <p>New activity will appear here.</p>
             </div>
           )}
         </section>
