@@ -3918,10 +3918,7 @@ function NotificationsPage() {
   return (
     <div className="page notifications-page">
       <div className="notifications-center-head">
-        <div>
-          <h1>Notifications</h1>
-          <p>Stay updated with activity on your account</p>
-        </div>
+        <h1>Notifications</h1>
         <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
           <Bell />
         </button>
