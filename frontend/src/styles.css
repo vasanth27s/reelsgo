@@ -6804,3 +6804,27 @@ textarea{
     padding-right: 28px !important;
   }
 }
+
+
+/* ============================================================
+   FINAL LAPTOP WIDTH FIX
+   Fill the complete available desktop canvas.
+   Mobile is untouched.
+   ============================================================ */
+
+@media (min-width: 701px) {
+  .main > .page.messages-page {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .main > .page.messages-page .instagram-chat-layout {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+}
