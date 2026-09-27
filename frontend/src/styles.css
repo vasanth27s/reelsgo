@@ -8762,3 +8762,76 @@ div[style*="min-width: 170px"]{
     font-size: 20px !important;
   }
 }
+
+/* =========================================================
+   REELSGO TEXT WORDMARK — FINAL MOBILE WIDTH FIX
+   The mobile header buttons have a global 40px width rule.
+   Override that rule so the full REELSGO wordmark is visible.
+   ========================================================= */
+.mobile-header > .mobile-brand,
+.mobile-header > button.mobile-brand {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+}
+
+.mobile-header > .mobile-brand .reelsgo-text-logo,
+.mobile-header > button.mobile-brand .reelsgo-text-logo {
+  display: inline-block !important;
+  width: max-content !important;
+  max-width: none !important;
+  min-width: max-content !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  font-size: 27px !important;
+  letter-spacing: -2.2px !important;
+  line-height: .86 !important;
+  transform: none !important;
+}
+
+@media (max-width: 430px) {
+  .mobile-header > .mobile-brand,
+  .mobile-header > button.mobile-brand {
+    width: auto !important;
+    min-width: 145px !important;
+    max-width: calc(100vw - 120px) !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+
+  .mobile-header > .mobile-brand .reelsgo-text-logo,
+  .mobile-header > button.mobile-brand .reelsgo-text-logo {
+    font-size: 25px !important;
+    letter-spacing: -2px !important;
+  }
+}
+
+@media (min-width: 431px) and (max-width: 700px) {
+  .mobile-header > .mobile-brand,
+  .mobile-header > button.mobile-brand {
+    min-width: 155px !important;
+  }
+}
+
+/* Make the desktop sidebar wordmark wide enough for the complete name. */
+.brand .reelsgo-text-logo {
+  width: max-content !important;
+  max-width: none !important;
+  min-width: max-content !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  flex: 0 0 auto !important;
+  transform: none !important;
+  font-size: 30px !important;
+  letter-spacing: -2.5px !important;
+}
