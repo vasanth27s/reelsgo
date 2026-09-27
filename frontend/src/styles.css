@@ -7848,3 +7848,137 @@ div[style*="min-width: 170px"]{
   .connection-info a{font-size:13px}
   .connection-info>span{max-width:220px}
 }
+
+
+/* =========================================================
+   REELSGO - FOLLOWERS / FOLLOWING DARK THEME OVERRIDE
+   Only the connections modal/list is changed to dark UI.
+   ========================================================= */
+
+.connections-overlay{
+  background:rgba(0,0,0,.78) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+
+.connections-modal{
+  background:#111318 !important;
+  color:#f5f7fa !important;
+  border:1px solid #2b2f38 !important;
+  box-shadow:0 28px 90px rgba(0,0,0,.70) !important;
+}
+
+.connections-header{
+  background:#111318 !important;
+  border-bottom:1px solid #2b2f38 !important;
+}
+
+.connections-header h2{
+  color:#f5f7fa !important;
+}
+
+.connections-header span{
+  color:#8e949f !important;
+}
+
+.connections-header>button{
+  background:#22262d !important;
+  color:#f5f7fa !important;
+}
+
+.connections-header>button:hover{
+  background:#2c3139 !important;
+}
+
+.connections-body{
+  background:#111318 !important;
+  scrollbar-color:#3a3f48 #111318;
+}
+
+.connections-list{
+  background:#111318 !important;
+}
+
+.connection-row{
+  background:transparent !important;
+  color:#f5f7fa !important;
+  border-bottom:1px solid #252932 !important;
+  border-radius:0 !important;
+  transition:background .18s ease;
+}
+
+.connection-row:hover{
+  background:#191c22 !important;
+}
+
+.connection-info a{
+  color:#f5f7fa !important;
+}
+
+.connection-info>span{
+  color:#8e949f !important;
+}
+
+.connections-state{
+  background:#111318 !important;
+  color:#8e949f !important;
+}
+
+.connections-state b{
+  color:#f5f7fa !important;
+}
+
+.connections-state span{
+  color:#8e949f !important;
+}
+
+.connections-spinner{
+  border-color:#30353e !important;
+  border-top-color:#f5f7fa !important;
+}
+
+.connections-error b{
+  color:#ff667d !important;
+}
+
+.connections-error svg{
+  color:#ff667d !important;
+}
+
+@media(max-width:700px){
+  .connections-overlay{
+    background:rgba(0,0,0,.82) !important;
+  }
+
+  .connections-modal{
+    background:#111318 !important;
+    border-top:1px solid #30343c !important;
+    border-radius:26px 26px 0 0 !important;
+    box-shadow:0 -22px 80px rgba(0,0,0,.75) !important;
+  }
+
+  .connections-header{
+    background:#111318 !important;
+    border-bottom:1px solid #2b2f38 !important;
+  }
+
+  .connections-body{
+    background:#111318 !important;
+  }
+
+  .connections-list{
+    padding:4px 8px 16px !important;
+    background:#111318 !important;
+  }
+
+  .connection-row{
+    min-height:72px !important;
+    background:transparent !important;
+    border-bottom:1px solid #252932 !important;
+  }
+
+  .connection-row:hover,
+  .connection-row:active{
+    background:#191c22 !important;
+  }
+}
