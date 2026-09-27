@@ -7708,3 +7708,143 @@ div[style*="min-width: 170px"]{
     height: 38px !important;
   }
 }
+
+
+/* =========================================================
+   Profile Followers / Following modal
+   Opens from the profile stat counters and stays outside
+   the profile grid so the list is never clipped.
+   ========================================================= */
+.profile-stat-button{
+  appearance:none;
+  -webkit-appearance:none;
+  border:0;
+  background:transparent;
+  color:inherit;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+  cursor:pointer;
+  text-align:left;
+  font:inherit;
+}
+.profile-stat-button:hover b{opacity:.78}
+.profile-stat-button:active{transform:scale(.98)}
+.profile-stat-button b{font-size:16px;line-height:1;font-weight:800}
+.profile-stat-button small{color:#8b8f99;font-size:13px;line-height:1}
+.connections-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  background:rgba(0,0,0,.68);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.connections-modal{
+  width:min(100%,460px);
+  max-height:min(78vh,680px);
+  background:#fff;
+  color:#111318;
+  border:1px solid #e7e8ec;
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.42);
+  display:flex;
+  flex-direction:column;
+}
+.connections-header{
+  min-height:72px;
+  padding:13px 16px 13px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid #ececf0;
+  flex:0 0 auto;
+}
+.connections-header h2{margin:0;font-size:18px;font-weight:800}
+.connections-header span{display:block;margin-top:3px;color:#8a8f99;font-size:11px}
+.connections-header>button{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:#f1f2f4;
+  color:#222;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.connections-header>button svg{width:20px;height:20px}
+.connections-body{min-height:250px;overflow:auto;overscroll-behavior:contain}
+.connections-list{padding:6px 8px 12px}
+.connection-row{
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:9px 10px;
+  border-radius:14px;
+}
+.connection-row:hover{background:#f6f6f8}
+.connection-info{min-width:0;display:flex;flex-direction:column;gap:3px}
+.connection-info a{font-size:14px;font-weight:750;color:inherit;text-decoration:none}
+.connection-info>span{font-size:11px;color:#858a94;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.connections-state{
+  min-height:270px;
+  padding:35px 25px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:8px;
+  color:#8a8f99;
+}
+.connections-state svg{width:38px;height:38px;margin-bottom:3px}
+.connections-state b{color:#202228;font-size:15px}
+.connections-state span{font-size:11px;max-width:280px;line-height:1.45}
+.connections-error b{color:#dc2626}
+.connections-spinner{
+  width:28px;
+  height:28px;
+  border:3px solid #e1e2e6;
+  border-top-color:#111318;
+  border-radius:50%;
+  animation:connectionsSpin .75s linear infinite;
+}
+@keyframes connectionsSpin{to{transform:rotate(360deg)}}
+
+@media(max-width:700px){
+  .profile-stat-button{align-items:flex-start}
+  .profile-stat-button b{font-size:14px}
+  .profile-stat-button small{font-size:10px}
+  .connections-overlay{
+    align-items:flex-end;
+    padding:0;
+    background:rgba(0,0,0,.58);
+  }
+  .connections-modal{
+    width:100%;
+    max-height:82vh;
+    border-radius:24px 24px 0 0;
+    border:0;
+    box-shadow:0 -20px 70px rgba(0,0,0,.5);
+  }
+  .connections-header{
+    min-height:68px;
+    padding:12px 16px 12px 20px;
+  }
+  .connections-header h2{font-size:17px}
+  .connections-body{max-height:calc(82vh - 68px)}
+  .connection-row{min-height:68px;padding:8px 13px}
+  .connection-info a{font-size:13px}
+  .connection-info>span{max-width:220px}
+}

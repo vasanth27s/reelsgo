@@ -1443,6 +1443,87 @@ function ProfileReelCard({ reel, user, onDeleted }) {
   );
 }
 
+
+function ConnectionsModal({ user, type, onClose }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadConnections() {
+      try {
+        setLoading(true);
+        setError("");
+        const endpoint = type === "followers" ? "/follows/followers" : "/follows/following";
+        const data = await api(endpoint);
+        const raw = type === "followers"
+          ? (data.followers || data.users || [])
+          : (data.following || data.users || data.followers || []);
+        const normalized = raw
+          .map(item => item?.user || item?.follower || item?.following || item)
+          .filter(person => person?._id)
+          .filter((person, index, arr) => arr.findIndex(x => String(x._id) === String(person._id)) === index);
+        if (!cancelled) setItems(normalized);
+      } catch (e) {
+        if (!cancelled) setError(e.message || "Unable to load list");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadConnections();
+    return () => { cancelled = true; };
+  }, [type]);
+
+  const title = type === "followers" ? "Followers" : "Following";
+
+  return (
+    <div className="connections-overlay" onClick={onClose}>
+      <div className="connections-modal" onClick={e => e.stopPropagation()}>
+        <div className="connections-header">
+          <div>
+            <h2>{title}</h2>
+            <span>{user?.username ? `@${user.username}` : "ReelsGo"}</span>
+          </div>
+          <button type="button" onClick={onClose} aria-label={`Close ${title}`}><X /></button>
+        </div>
+        <div className="connections-body">
+          {loading ? (
+            <div className="connections-state">
+              <div className="connections-spinner" />
+              <span>Loading {title.toLowerCase()}...</span>
+            </div>
+          ) : error ? (
+            <div className="connections-state connections-error">
+              <AlertTriangle />
+              <b>Unable to load {title.toLowerCase()}</b>
+              <span>{error}</span>
+            </div>
+          ) : !items.length ? (
+            <div className="connections-state">
+              <Users />
+              <b>No {title.toLowerCase()} yet</b>
+              <span>{type === "followers" ? "People who follow you will appear here." : "People you follow will appear here."}</span>
+            </div>
+          ) : (
+            <div className="connections-list">
+              {items.map(person => (
+                <div className="connection-row" key={person._id}>
+                  <Avatar user={person} size={52} />
+                  <div className="connection-info">
+                    <UserLink user={person} />
+                    {person?.name && <span>{person.name}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProfilePage({ user, setUser }) {
   const [tab, setTab] = useState("posts");
   const [posts, setPosts] = useState([]);
@@ -1454,6 +1535,7 @@ function ProfilePage({ user, setUser }) {
   const [bio, setBio] = useState(user?.bio || "");
   const [website, setWebsite] = useState(user?.website || "");
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
+  const [connectionsOpen, setConnectionsOpen] = useState(null);
 
   async function load() {
     try {
@@ -1508,8 +1590,12 @@ function ProfilePage({ user, setUser }) {
           </div>
           <div className="profile-stats">
             <span><b>{user?.postsCount || posts.length}</b><small>posts</small></span>
-            <span><b>{user?.followersCount || 0}</b><small>followers</small></span>
-            <span><b>{user?.followingCount || 0}</b><small>following</small></span>
+            <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("followers")} aria-label="View followers">
+              <b>{user?.followersCount || 0}</b><small>followers</small>
+            </button>
+            <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("following")} aria-label="View following">
+              <b>{user?.followingCount || 0}</b><small>following</small>
+            </button>
           </div>
           <b>{user?.name}</b>
           <p>{user?.bio || "Welcome to ReelsGo."}</p>
@@ -1579,6 +1665,14 @@ function ProfilePage({ user, setUser }) {
           : <EmptyTab icon={<Users />} title="Photos of you" text="Posts where you are tagged will appear here." />
       )}
       {tab === "saved" && <SavedPage embedded user={user} />}
+
+      {connectionsOpen && (
+        <ConnectionsModal
+          user={user}
+          type={connectionsOpen}
+          onClose={() => setConnectionsOpen(null)}
+        />
+      )}
     </div>
   );
 }
