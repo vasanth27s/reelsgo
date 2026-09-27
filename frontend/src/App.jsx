@@ -163,9 +163,25 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
-    const openMessages = () => navigate("messages");
+
+    const openMessages = (event) => {
+      const conversationId = event?.detail?.conversationId || null;
+      if (conversationId) setOpenConversationId(conversationId);
+      navigate("messages");
+    };
+
+    const openHome = () => navigate("home");
+    const openSettings = () => setSettingsOpen(true);
+
     window.addEventListener("vk-open-messages", openMessages);
-    return () => window.removeEventListener("vk-open-messages", openMessages);
+    window.addEventListener("vk-open-home", openHome);
+    window.addEventListener("vk-open-settings", openSettings);
+
+    return () => {
+      window.removeEventListener("vk-open-messages", openMessages);
+      window.removeEventListener("vk-open-home", openHome);
+      window.removeEventListener("vk-open-settings", openSettings);
+    };
   }, [token]);
 
   useEffect(() => {
@@ -3795,8 +3811,303 @@ function MessagesPage({ openConversationId = null }) {
 
 function NotificationsPage() {
   const [items, setItems] = useState([]);
-  useEffect(() => { api("/notifications").then(d => setItems(d.notifications || [])).catch(() => {}); }, []);
-  return <div className="page"><div className="page-heading"><div><h1>Notifications</h1><p>Likes, comments, follows and more</p></div></div>{items.map(n => <div className="notification" key={n._id}><Avatar user={n.actor} /><div><UserLink user={n.actor} /> {n.text}<small>{new Date(n.createdAt).toLocaleString()}</small></div></div>)}{!items.length && <div className="empty"><Bell /><h2>No notifications</h2><p>New activity will appear here.</p></div>}</div>;
+  const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadNotifications() {
+      setLoading(true);
+      try {
+        const d = await api("/notifications");
+        if (!cancelled) setItems(Array.isArray(d.notifications) ? d.notifications : []);
+      } catch (error) {
+        if (!cancelled) setItems([]);
+        console.error("Unable to load notifications:", error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadNotifications();
+    return () => { cancelled = true; };
+  }, []);
+
+  const getNotificationType = (notification) => {
+    const raw = [
+      notification?.type,
+      notification?.kind,
+      notification?.category,
+      notification?.action,
+      notification?.event
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    const text = String(notification?.text || notification?.message || "").toLowerCase();
+    const value = `${raw} ${text}`;
+
+    if (value.includes("comment")) return "comments";
+    if (
+      value.includes("follow request") ||
+      value.includes("started following") ||
+      value.includes("accepted your follow") ||
+      value.includes("following you") ||
+      value.includes("followed you") ||
+      value.includes("follow")
+    ) return "follows";
+
+    if (
+      notification?.fromFollowing === true ||
+      notification?.isFromFollowing === true ||
+      notification?.actor?.isFollowing === true
+    ) return "following";
+
+    return "other";
+  };
+
+  const filteredItems = useMemo(() => {
+    if (filter === "all") return items;
+    return items.filter(notification => {
+      const type = getNotificationType(notification);
+      if (filter === "comments") return type === "comments";
+      if (filter === "follows") return type === "follows";
+      if (filter === "following") {
+        return type === "following" ||
+          notification?.fromFollowing === true ||
+          notification?.isFromFollowing === true ||
+          notification?.actor?.isFollowing === true;
+      }
+      return true;
+    });
+  }, [items, filter]);
+
+  function relativeTime(dateValue) {
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+    if (seconds < 60) return `${seconds || 1}s`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) return `${weeks}w`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months}mo`;
+    return `${Math.floor(days / 365)}y`;
+  }
+
+  function groupLabel(dateValue) {
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return "Earlier";
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const itemDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.floor((today.getTime() - itemDay.getTime()) / 86400000);
+
+    if (diffDays <= 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return "Last 7 days";
+    return "Earlier";
+  }
+
+  function mediaSource(notification) {
+    const candidate =
+      notification?.mediaUrl ||
+      notification?.media?.url ||
+      notification?.media?.mediaUrl ||
+      notification?.post?.mediaUrl ||
+      notification?.post?.imageUrl ||
+      notification?.post?.image ||
+      notification?.reel?.mediaUrl ||
+      notification?.reel?.videoUrl ||
+      notification?.story?.mediaUrl ||
+      notification?.story?.imageUrl ||
+      notification?.thumbnail ||
+      notification?.thumbnailUrl ||
+      "";
+
+    if (!candidate) return "";
+    if (/^https?:\/\//i.test(candidate)) return candidate;
+    return `${SERVER}${String(candidate).startsWith("/") ? "" : "/"}${candidate}`;
+  }
+
+  function notificationText(notification) {
+    return notification?.text || notification?.message || "You have a new notification.";
+  }
+
+  function shouldShowMessageButton(notification) {
+    const type = getNotificationType(notification);
+    return type === "follows" &&
+      !String(notification?.text || notification?.message || "").toLowerCase().includes("accepted");
+  }
+
+  const groups = useMemo(() => {
+    const order = ["Today", "Yesterday", "Last 7 days", "Earlier"];
+    const map = new Map(order.map(label => [label, []]));
+
+    filteredItems
+      .slice()
+      .sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0))
+      .forEach(notification => {
+        const label = groupLabel(notification?.createdAt);
+        if (!map.has(label)) map.set(label, []);
+        map.get(label).push(notification);
+      });
+
+    return order
+      .map(label => ({ label, items: map.get(label) || [] }))
+      .filter(group => group.items.length);
+  }, [filteredItems]);
+
+  const filters = [
+    { id: "all", label: "All" },
+    { id: "following", label: "People you follow" },
+    { id: "comments", label: "Comments" },
+    { id: "follows", label: "Follows" }
+  ];
+
+  return (
+    <div className="notifications-page">
+      <div className="notifications-topbar">
+        <button
+          type="button"
+          className="notifications-back"
+          aria-label="Back"
+          onClick={() => window.history.length > 1 ? window.history.back() : window.dispatchEvent(new CustomEvent("vk-open-home"))}
+        >
+          <ChevronRight style={{ transform: "rotate(180deg)" }} />
+        </button>
+
+        <h1>Notifications</h1>
+
+        <button
+          type="button"
+          className="notifications-top-action"
+          aria-label="Notification settings"
+          onClick={() => window.dispatchEvent(new CustomEvent("vk-open-settings"))}
+        >
+          <Bell />
+          <Settings />
+        </button>
+      </div>
+
+      <div className="notifications-filter-wrap">
+        <div className="notifications-filters" role="tablist" aria-label="Notification filters">
+          {filters.map(item => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={filter === item.id}
+              className={filter === item.id ? "active" : ""}
+              onClick={() => setFilter(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="notifications-content">
+        {loading ? (
+          <div className="notifications-loading">Loading notifications...</div>
+        ) : !filteredItems.length ? (
+          <div className="notifications-empty">
+            <Bell />
+            <h2>No notifications</h2>
+            <p>New activity will appear here.</p>
+          </div>
+        ) : (
+          groups.map(group => (
+            <section className="notification-group" key={group.label}>
+              <h2>{group.label}</h2>
+
+              <div className="notification-group-list">
+                {group.items.map(notification => {
+                  const media = mediaSource(notification);
+                  const actor = notification?.actor || notification?.user || null;
+                  const messageButton = shouldShowMessageButton(notification);
+
+                  return (
+                    <article className="notification-row" key={notification._id}>
+                      <button
+                        type="button"
+                        className="notification-avatar-button"
+                        onClick={() => actor?._id && openUserProfile(actor._id)}
+                        aria-label={actor?.username ? `Open ${actor.username}` : "Open profile"}
+                      >
+                        <Avatar user={actor} size={58} />
+                      </button>
+
+                      <div className="notification-copy">
+                        <div className="notification-main-text">
+                          {actor?._id ? <UserLink user={actor} /> : null}
+                          <span className="notification-message">
+                            {actor?._id ? " " : ""}
+                            {notificationText(notification)}
+                          </span>
+                          <span className="notification-time">
+                            {relativeTime(notification?.createdAt)}
+                          </span>
+                        </div>
+
+                        {messageButton && actor?._id && (
+                          <button
+                            type="button"
+                            className="notification-message-button"
+                            onClick={async () => {
+                              try {
+                                const d = await api("/messages/conversations", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ members: [actor._id] })
+                                });
+                                window.dispatchEvent(new CustomEvent("vk-open-messages", {
+                                  detail: { conversationId: d.conversation?._id || null }
+                                }));
+                              } catch (error) {
+                                alert(error.message);
+                              }
+                            }}
+                          >
+                            Message
+                          </button>
+                        )}
+                      </div>
+
+                      {media ? (
+                        <button
+                          type="button"
+                          className="notification-media"
+                          onClick={() => {
+                            if (notification?.post?._id) {
+                              window.dispatchEvent(new CustomEvent("vk-open-post", { detail: { id: notification.post._id } }));
+                            } else if (notification?.reel?._id) {
+                              window.dispatchEvent(new CustomEvent("vk-open-reel", { detail: { id: notification.reel._id } }));
+                            }
+                          }}
+                          aria-label="Open notification media"
+                        >
+                          <img src={media} alt="" />
+                        </button>
+                      ) : (
+                        <ChevronRight className="notification-chevron" />
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ))
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SavedPage({ user, embedded = false }) {
