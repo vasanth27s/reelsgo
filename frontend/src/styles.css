@@ -7000,3 +7000,138 @@ textarea{
     white-space: nowrap !important;
   }
 }
+
+
+/* ============================================================
+   REELSGO — TIMESTAMP ABOVE SENT / SEEN
+   ALL DEVICES
+   Layout:
+      😍
+      10:51 AM
+      Seen
+   or
+      😍
+      10:51 AM
+      Sent
+   ============================================================ */
+
+.messages-page .message-line .bubble .message-meta {
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: 100% !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+
+  gap: 1px !important;
+  margin-top: 4px !important;
+
+  white-space: nowrap !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+
+  overflow: visible !important;
+}
+
+.messages-page .message-line .bubble .message-meta small {
+  display: block !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  flex: 0 0 auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 8px !important;
+  line-height: 1.25 !important;
+
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Keep the timestamp and Sent/Seen clearly separated. */
+.messages-page .message-line .bubble .message-meta small:first-child {
+  order: 1 !important;
+}
+
+.messages-page .message-line .bubble .message-meta small:nth-child(2) {
+  order: 2 !important;
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width: 700px) {
+
+  .messages-page .message-line .bubble .message-meta {
+    width: max-content !important;
+    min-width: max-content !important;
+    max-width: 100% !important;
+
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+
+    gap: 1px !important;
+    overflow: visible !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta small {
+    width: max-content !important;
+    min-width: max-content !important;
+    max-width: none !important;
+
+    flex: 0 0 auto !important;
+
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+@media (min-width: 701px) and (max-width: 1100px) {
+
+  .messages-page .message-line .bubble .message-meta {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end !important;
+    gap: 1px !important;
+  }
+}
+
+/* ============================================================
+   LAPTOP / DESKTOP
+   ============================================================ */
+@media (min-width: 1101px) {
+
+  .messages-page .message-line .bubble .message-meta {
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-end !important;
+    gap: 1px !important;
+  }
+}
