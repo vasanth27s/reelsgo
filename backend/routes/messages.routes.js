@@ -72,12 +72,12 @@ router.get(
           .lean();
 
       /*
-       * UNREAD MESSAGE FEATURE
+       * Count unread messages.
        *
-       * Count only messages:
-       * - from another user
-       * - not seen by current user
-       * - not deleted for current user
+       * A message is unread when:
+       * - It was sent by another user
+       * - Current user has not seen it
+       * - It was not deleted for current user
        */
 
       const conversationsWithUnread =
@@ -145,6 +145,9 @@ router.post(
           ? req.body.members
           : [];
 
+      /*
+       * Always include current user.
+       */
       const uniqueMembers = [
         ...new Set([
           String(req.user.id),
@@ -159,6 +162,9 @@ router.post(
         });
       }
 
+      /*
+       * Verify all users exist.
+       */
       const users =
         await User.find({
           _id: {
@@ -178,12 +184,16 @@ router.post(
         });
       }
 
+      /*
+       * Find existing conversation.
+       */
       let conversation =
         await Conversation.findOne({
           members: {
             $all:
               uniqueMembers
           },
+
           $expr: {
             $eq: [
               {
@@ -195,6 +205,9 @@ router.post(
           }
         });
 
+      /*
+       * Create if it does not exist.
+       */
       if (!conversation) {
         conversation =
           await Conversation.create({
@@ -238,6 +251,9 @@ router.get(
         conversationId
       } = req.params;
 
+      /*
+       * Validate conversation ID.
+       */
       if (
         !mongoose.Types.ObjectId.isValid(
           conversationId
@@ -249,6 +265,9 @@ router.get(
         });
       }
 
+      /*
+       * Find conversation.
+       */
       const conversation =
         await Conversation.findById(
           conversationId
@@ -261,6 +280,9 @@ router.get(
         });
       }
 
+      /*
+       * Verify membership.
+       */
       if (
         !isMember(
           conversation,
@@ -273,10 +295,20 @@ router.get(
         });
       }
 
+      /*
+       * Load messages.
+       *
+       * seenAt is automatically included.
+       */
       const messages =
         await Message.find({
           conversation:
-            conversationId
+            conversationId,
+
+          deletedFor: {
+            $ne:
+              req.user.id
+          }
         })
           .populate(
             "sender",
@@ -322,6 +354,9 @@ router.post(
           req.body.text || ""
         ).trim();
 
+      /*
+       * Message cannot be empty.
+       */
       if (!text) {
         return res.status(400).json({
           message:
@@ -329,6 +364,9 @@ router.post(
         });
       }
 
+      /*
+       * Validate conversation ID.
+       */
       if (
         !mongoose.Types.ObjectId.isValid(
           conversationId
@@ -340,6 +378,9 @@ router.post(
         });
       }
 
+      /*
+       * Find conversation.
+       */
       const conversation =
         await Conversation.findById(
           conversationId
@@ -352,6 +393,9 @@ router.post(
         });
       }
 
+      /*
+       * Verify membership.
+       */
       if (
         !isMember(
           conversation,
@@ -364,6 +408,15 @@ router.post(
         });
       }
 
+      /*
+       * Create message.
+       *
+       * Sender has already seen their
+       * own message.
+       *
+       * seenAt stays null because the
+       * receiver has not seen it yet.
+       */
       const message =
         await Message.create({
           conversation:
@@ -374,20 +427,24 @@ router.post(
 
           text,
 
-          /*
-           * Sender has already seen
-           * their own message.
-           */
           seenBy: [
             req.user.id
-          ]
+          ],
+
+          seenAt: null
         });
 
+      /*
+       * Update last message.
+       */
       conversation.lastMessage =
         message._id;
 
       await conversation.save();
 
+      /*
+       * Populate sender.
+       */
       await message.populate(
         "sender",
         "-password -avatar.data"
@@ -423,6 +480,23 @@ router.post(
         messageId
       } = req.params;
 
+      /*
+       * Validate message ID.
+       */
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          messageId
+        )
+      ) {
+        return res.status(400).json({
+          message:
+            "Invalid message ID"
+        });
+      }
+
+      /*
+       * Find message.
+       */
       const message =
         await Message.findById(
           messageId
@@ -435,6 +509,9 @@ router.post(
         });
       }
 
+      /*
+       * Find conversation.
+       */
       const conversation =
         await Conversation.findById(
           message.conversation
@@ -447,6 +524,10 @@ router.post(
         });
       }
 
+      /*
+       * Verify that current user belongs
+       * to the conversation.
+       */
       if (
         !isMember(
           conversation,
@@ -459,6 +540,10 @@ router.post(
         });
       }
 
+      /*
+       * Check whether current user already
+       * exists in seenBy.
+       */
       const alreadySeen =
         (message.seenBy || []).some(
           id =>
@@ -466,6 +551,13 @@ router.post(
             String(req.user.id)
         );
 
+      /*
+       * If this is the first time this
+       * message is seen by the receiver:
+       *
+       * 1. Add receiver to seenBy
+       * 2. Store exact current time in seenAt
+       */
       if (!alreadySeen) {
         message.seenBy =
           message.seenBy || [];
@@ -474,11 +566,29 @@ router.post(
           req.user.id
         );
 
+        message.seenAt =
+          new Date();
+
+        await message.save();
+      }
+
+      /*
+       * For older messages that already
+       * have seenBy but don't have seenAt,
+       * create a seenAt value.
+       */
+      else if (!message.seenAt) {
+        message.seenAt =
+          new Date();
+
         await message.save();
       }
 
       res.json({
-        ok: true
+        ok: true,
+
+        seenAt:
+          message.seenAt
       });
     } catch (e) {
       console.error(e);
@@ -496,11 +606,6 @@ router.post(
 =========================================================
 DELETE MY MESSAGE
 =========================================================
-
-Only the person who originally sent the
-message can delete it.
-
-=========================================================
 */
 
 router.delete(
@@ -512,6 +617,9 @@ router.delete(
         messageId
       } = req.params;
 
+      /*
+       * Validate message ID.
+       */
       if (
         !mongoose.Types.ObjectId.isValid(
           messageId
@@ -523,6 +631,9 @@ router.delete(
         });
       }
 
+      /*
+       * Find message.
+       */
       const message =
         await Message.findById(
           messageId
@@ -536,9 +647,9 @@ router.delete(
       }
 
       /*
-       * Only sender can delete.
+       * Only original sender can delete
+       * their own message.
        */
-
       if (
         String(message.sender) !==
         String(req.user.id)
@@ -549,6 +660,9 @@ router.delete(
         });
       }
 
+      /*
+       * Find conversation.
+       */
       const conversation =
         await Conversation.findById(
           message.conversation
@@ -561,6 +675,9 @@ router.delete(
         });
       }
 
+      /*
+       * Verify membership.
+       */
       if (
         !isMember(
           conversation,
@@ -576,16 +693,19 @@ router.delete(
       const deletedId =
         message._id;
 
+      /*
+       * Permanently delete the message.
+       */
       await Message.deleteOne({
-        _id: deletedId
+        _id:
+          deletedId
       });
 
       /*
-       * If deleted message was the
+       * If the deleted message was the
        * conversation's last message,
-       * find previous message.
+       * restore the previous message.
        */
-
       if (
         String(
           conversation.lastMessage

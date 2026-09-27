@@ -1645,19 +1645,69 @@ function MessagesPage({ openConversationId = null }) {
 
   useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
 
-  // Refresh the conversation list so a newly received message can show
-  // an unread indicator without changing the existing messaging UI.
+  // Refresh unread state and the active conversation periodically.
+  // This also picks up the exact seenAt time from the server so the
+  // sender can see "Seen 1 min ago" without refreshing the page.
   useEffect(() => {
     let cancelled = false;
-    const refreshUnread = async () => {
+
+    const refreshMessagesState = async () => {
       try {
-        const d = await api('/messages/conversations');
-        if (!cancelled) setConversations(d.conversations || []);
+        const cd = await api('/messages/conversations');
+        if (cancelled) return;
+
+        setConversations(cd.conversations || []);
+
+        if (!active?._id) return;
+
+        const md = await api(`/messages/conversations/${active._id}/messages`);
+        if (cancelled) return;
+
+        const rows = md.messages || [];
+        setMessages(rows);
+
+        const unseen = rows
+          .filter(
+            m =>
+              String(m.sender?._id) !== String(me?._id) &&
+              !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+          )
+          .slice(-50);
+
+        if (unseen.length) {
+          const seenNow = new Date().toISOString();
+
+          await Promise.all(
+            unseen.map(m =>
+              api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+            )
+          );
+
+          if (!cancelled) {
+            setMessages(current =>
+              current.map(m =>
+                unseen.some(u => String(u._id) === String(m._id))
+                  ? {
+                      ...m,
+                      seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                      seenAt: m.seenAt || seenNow
+                    }
+                  : m
+              )
+            );
+          }
+        }
       } catch {}
     };
-    const timer = setInterval(refreshUnread, 4000);
-    return () => { cancelled = true; clearInterval(timer); };
-  }, []);
+
+    refreshMessagesState();
+    const timer = setInterval(refreshMessagesState, 4000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [active?._id, me?._id]);
 
   useEffect(() => {
     if (!emojiOpen) return;
@@ -1694,11 +1744,28 @@ function MessagesPage({ openConversationId = null }) {
               !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
           )
           .slice(-50);
+        const seenNow = new Date().toISOString();
+
         await Promise.all(
           unseen.map(m =>
             api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
           )
         );
+
+        if (unseen.length) {
+          setMessages(current =>
+            current.map(m =>
+              unseen.some(u => String(u._id) === String(m._id))
+                ? {
+                    ...m,
+                    seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                    seenAt: m.seenAt || seenNow
+                  }
+                : m
+            )
+          );
+        }
+
         setConversations(current =>
           current.map(item =>
             String(item._id) === String(openConversationId)
@@ -1726,11 +1793,27 @@ function MessagesPage({ openConversationId = null }) {
         )
         .slice(-50);
 
+      const seenNow = new Date().toISOString();
+
       await Promise.all(
         unseen.map(m =>
           api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
         )
       );
+
+      if (unseen.length) {
+        setMessages(current =>
+          current.map(m =>
+            unseen.some(u => String(u._id) === String(m._id))
+              ? {
+                  ...m,
+                  seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                  seenAt: m.seenAt || seenNow
+                }
+              : m
+          )
+        );
+      }
 
       // Remove the unread indicator immediately after the receiver opens the chat.
       setConversations(current =>
@@ -1795,6 +1878,30 @@ function MessagesPage({ openConversationId = null }) {
   function time(value) {
     if (!value) return '';
     return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function seenTime(value) {
+    if (!value) return 'Seen';
+    const seenAt = new Date(value).getTime();
+    if (!Number.isFinite(seenAt)) return 'Seen';
+
+    const seconds = Math.max(0, Math.floor((Date.now() - seenAt) / 1000));
+
+    if (seconds < 10) return 'Seen just now';
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Seen ${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Seen ${hours} ${hours === 1 ? 'hr' : 'hrs'} ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `Seen ${days} ${days === 1 ? 'day' : 'days'} ago`;
+
+    return `Seen ${new Date(value).toLocaleDateString([], {
+      day: 'numeric',
+      month: 'short'
+    })}`;
   }
 
   const myNote = notes.find(n => String(n.author?._id) === String(me?._id));
@@ -1905,7 +2012,10 @@ function MessagesPage({ openConversationId = null }) {
                       onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
                     >
                       <span>{m.text}</span>
-                      <div className="message-meta"><small>{time(m.createdAt)}</small>{mine && <small>{seen ? 'Seen' : 'Sent'}</small>}</div>
+                      <div className="message-meta">
+                        <small>{time(m.createdAt)}</small>
+                        {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
+                      </div>
                     </div>
                     {mine && messageMenuId === m._id && (
                       <div className="message-action-menu" onClick={(e) => e.stopPropagation()}>
