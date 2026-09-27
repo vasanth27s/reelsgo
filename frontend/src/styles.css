@@ -9490,3 +9490,104 @@ div[style*="min-width: 170px"]{
     height:86px !important;
   }
 }
+
+/* =========================================================
+   AUTH LOGO — SMALL ROUNDED APP-ICON STYLE
+   ========================================================= */
+.auth-showcase-logo{
+  width:64px !important;
+  height:64px !important;
+  margin:0 0 18px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border-radius:18px !important;
+  overflow:hidden !important;
+}
+
+.auth-showcase-image{
+  width:64px !important;
+  height:64px !important;
+  max-width:64px !important;
+  max-height:64px !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  display:block !important;
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  border-radius:18px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.auth-logo{
+  width:58px !important;
+  height:58px !important;
+  margin:0 auto 10px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+}
+
+.auth-page-image{
+  width:58px !important;
+  height:58px !important;
+  max-width:58px !important;
+  max-height:58px !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  display:block !important;
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  border-radius:16px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.auth-title{
+  margin-top:2px !important;
+}
+
+@media(max-width:700px){
+  .auth-showcase-logo{
+    width:58px !important;
+    height:58px !important;
+    margin-bottom:16px !important;
+    border-radius:16px !important;
+  }
+
+  .auth-showcase-image{
+    width:58px !important;
+    height:58px !important;
+    max-width:58px !important;
+    max-height:58px !important;
+    border-radius:16px !important;
+  }
+
+  .auth-logo{
+    width:52px !important;
+    height:52px !important;
+    margin-bottom:9px !important;
+    border-radius:15px !important;
+  }
+
+  .auth-page-image{
+    width:52px !important;
+    height:52px !important;
+    max-width:52px !important;
+    max-height:52px !important;
+    border-radius:15px !important;
+  }
+}
