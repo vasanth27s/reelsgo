@@ -10683,3 +10683,300 @@ div[style*="min-width: 170px"]{
     min-height:46px!important;
   }
 }
+
+
+
+/* ============================================================
+   FINAL MOBILE NOTIFICATIONS HEADER — COMPACT
+   Removes the large desktop-style Notifications hero on phones.
+   Existing desktop/tablet notification UI remains unchanged.
+   ============================================================ */
+
+@media (max-width:700px){
+
+  .notifications-page{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:8px 12px calc(82px + env(safe-area-inset-bottom))!important;
+    overflow-x:hidden!important;
+  }
+
+  .notifications-page .notifications-topbar{
+    position:static!important;
+    top:auto!important;
+    z-index:auto!important;
+
+    width:100%!important;
+    height:48px!important;
+    min-height:48px!important;
+
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+
+    margin:0 0 8px!important;
+    padding:0!important;
+
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+
+    grid-template-columns:none!important;
+  }
+
+  /*
+    The desktop layout has three grid columns:
+    back button | centered title | bell.
+    On mobile there is no large centered hero.
+  */
+  .notifications-page .notifications-topbar > .notifications-back{
+    display:flex!important;
+    order:0!important;
+    width:36px!important;
+    min-width:36px!important;
+    height:36px!important;
+    min-height:36px!important;
+    border-radius:50%!important;
+    background:#171c23!important;
+  }
+
+  .notifications-page .notifications-title-wrap{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    text-align:left!important;
+    padding:0 8px!important;
+  }
+
+  .notifications-page .notifications-title-wrap h1{
+    margin:0!important;
+    padding:0!important;
+    font-size:21px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:-.35px!important;
+    color:#fff!important;
+    white-space:nowrap!important;
+    text-align:left!important;
+  }
+
+  /*
+    This is the text visible in the screenshot:
+    "Stay up to date with your ReelsGo activity"
+    It is intentionally hidden on mobile.
+  */
+  .notifications-page .notifications-title-wrap span{
+    display:none!important;
+  }
+
+  .notifications-page .notifications-settings{
+    order:2!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    min-width:38px!important;
+    max-width:38px!important;
+    height:38px!important;
+    min-height:38px!important;
+    max-height:38px!important;
+    margin:0!important;
+    padding:0!important;
+    border-radius:50%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#171c23!important;
+    color:#f5f7fb!important;
+    border:1px solid rgba(255,255,255,.08)!important;
+    box-shadow:none!important;
+  }
+
+  .notifications-page .notifications-settings svg{
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+    min-height:20px!important;
+  }
+
+  .notifications-page .notification-filters{
+    width:calc(100% + 24px)!important;
+    margin:0 -12px!important;
+    padding:3px 12px 12px!important;
+    display:flex!important;
+    gap:7px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  .notifications-page .notification-filters::-webkit-scrollbar{
+    display:none!important;
+  }
+
+  .notifications-page .notification-filters button{
+    flex:0 0 auto!important;
+    min-height:38px!important;
+    height:38px!important;
+    padding:0 13px!important;
+    border-radius:11px!important;
+    font-size:11px!important;
+  }
+
+  .notifications-page .notification-group{
+    margin-top:4px!important;
+  }
+
+  .notifications-page .notification-group h2{
+    margin:13px 2px 7px!important;
+    font-size:16px!important;
+  }
+
+  .notifications-page .notification-row{
+    grid-template-columns:46px minmax(0,1fr) auto auto!important;
+    min-height:68px!important;
+    gap:8px!important;
+    padding:8px 2px!important;
+  }
+
+  .notifications-page .notification-row .avatar{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    min-height:46px!important;
+  }
+
+  .notifications-page .notification-message{
+    font-size:12px!important;
+    line-height:1.35!important;
+  }
+
+  .notifications-page .notification-copy small{
+    font-size:9px!important;
+  }
+
+  .notifications-page .notification-target-thumb{
+    width:40px!important;
+    height:40px!important;
+    min-width:40px!important;
+  }
+
+  .notifications-page .notification-action-pill{
+    min-width:58px!important;
+    height:30px!important;
+    padding:0 8px!important;
+    border-radius:9px!important;
+    font-size:10px!important;
+  }
+
+  .notifications-page .notification-chevron{
+    width:17px!important;
+    height:17px!important;
+    min-width:17px!important;
+  }
+
+  .notifications-page .notification-section-heading{
+    margin:12px 2px 8px!important;
+    gap:8px!important;
+  }
+
+  .notifications-page .notification-section-heading h2{
+    font-size:16px!important;
+  }
+
+  .notifications-page .notification-section-heading p{
+    font-size:10px!important;
+  }
+
+  .notifications-page .notification-refresh-button{
+    height:32px!important;
+    min-height:32px!important;
+    padding:0 10px!important;
+    font-size:10px!important;
+  }
+
+  .notifications-page .notification-request-row{
+    grid-template-columns:46px minmax(0,1fr)!important;
+    gap:9px!important;
+    min-height:0!important;
+    padding:10px 3px!important;
+  }
+
+  .notifications-page .notification-request-row>.avatar{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    min-height:46px!important;
+  }
+
+  .notifications-page .notification-request-actions{
+    grid-column:2!important;
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:6px!important;
+    margin-top:1px!important;
+  }
+
+  .notifications-page .notification-request-actions button{
+    width:100%!important;
+    min-width:0!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 8px!important;
+    border-radius:9px!important;
+    font-size:10px!important;
+  }
+}
+
+@media (max-width:390px){
+
+  .notifications-page{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  .notifications-page .notifications-topbar{
+    height:46px!important;
+    min-height:46px!important;
+  }
+
+  .notifications-page .notifications-title-wrap{
+    padding-left:6px!important;
+    padding-right:6px!important;
+  }
+
+  .notifications-page .notifications-title-wrap h1{
+    font-size:20px!important;
+  }
+
+  .notifications-page .notifications-settings{
+    width:36px!important;
+    min-width:36px!important;
+    max-width:36px!important;
+    height:36px!important;
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+
+  .notifications-page .notification-filters{
+    width:calc(100% + 20px)!important;
+    margin-left:-10px!important;
+    margin-right:-10px!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  .notifications-page .notification-row{
+    grid-template-columns:44px minmax(0,1fr) auto!important;
+    gap:7px!important;
+  }
+
+  .notifications-page .notification-row .avatar{
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
+  }
+}
