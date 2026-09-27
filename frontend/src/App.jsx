@@ -440,10 +440,26 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
       </div>
 
       {loading ? <div className="empty">Loading feed...</div> :
-        posts.length ? posts.map(p => <Post key={p._id} post={p} user={user} />) :
+        posts.length ? posts.map(p => (
+          <Post
+            key={p._id}
+            post={p}
+            user={user}
+            onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+          />
+        )) :
         <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
-          {activeStory && <StoryViewer story={activeStory} onClose={() => setActiveStory(null)} />}
+          {activeStory && (
+            <StoryViewer
+              story={activeStory}
+              onClose={() => setActiveStory(null)}
+              onDeleted={() => {
+                setActiveStory(null);
+                load();
+              }}
+            />
+          )}
         </section>
 
         <SuggestionsRail user={user} posts={posts} />
@@ -549,13 +565,31 @@ function SuggestionsRail({ user, posts }) {
   );
 }
 
-function StoryViewer({ story, onClose }) {
+function StoryViewer({ story, onClose, onDeleted }) {
   const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
   const [viewersOpen, setViewersOpen] = useState(false);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function deleteStory() {
+    if (!isOwner || deleting) return;
+    const confirmed = window.confirm("Delete this story? This action cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      await api(`/stories/${story._id}`, { method: "DELETE" });
+      if (onDeleted) onDeleted(story._id);
+      else onClose();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   async function openViewers() {
     if (!isOwner) return;
@@ -588,7 +622,28 @@ function StoryViewer({ story, onClose }) {
             <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
-        <button onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+        <div
+          className="story-viewer-top-actions"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8
+          }}
+        >
+          {isOwner && (
+            <button
+              type="button"
+              title="Delete story"
+              aria-label="Delete story"
+              disabled={deleting}
+              onClick={e => { e.stopPropagation(); deleteStory(); }}
+              style={{ color: "#ff5c70" }}
+            >
+              <Trash2 />
+            </button>
+          )}
+          <button type="button" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+        </div>
       </div>
       <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
         {mediaUrl && story.kind === 'video' ? (
@@ -631,7 +686,7 @@ function StoryViewer({ story, onClose }) {
   );
 }
 
-function Post({ post, user }) {
+function Post({ post, user, onDeleted }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [comments, setComments] = useState([]);
@@ -639,17 +694,29 @@ function Post({ post, user }) {
   const [showComments, setShowComments] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const media = post.media?.[0];
   const mediaUrl = media?.url ? `${SERVER}${media.url}` : "";
+  const isOwner = String(post.author?._id || post.author) === String(user?._id);
 
   async function like() {
-    try { const d = await api(`/posts/${post._id}/like`, { method: "POST" }); setLiked(d.liked); }
-    catch (e) { alert(e.message); }
+    try {
+      const d = await api(`/posts/${post._id}/like`, { method: "POST" });
+      setLiked(d.liked);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function save() {
-    try { const d = await api(`/posts/${post._id}/save`, { method: "POST" }); setSaved(d.saved); }
-    catch (e) { alert(e.message); }
+    try {
+      const d = await api(`/posts/${post._id}/save`, { method: "POST" });
+      setSaved(d.saved);
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function loadComments() {
@@ -657,7 +724,9 @@ function Post({ post, user }) {
       const d = await api(`/posts/${post._id}/comments`);
       setComments(d.comments || []);
       setShowComments(true);
-    } catch (e) { alert(e.message); }
+    } catch (e) {
+      alert(e.message);
+    }
   }
 
   async function comment() {
@@ -670,7 +739,40 @@ function Post({ post, user }) {
       });
       setText("");
       await loadComments();
-    } catch (e) { alert(e.message); }
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function deletePost() {
+    if (!isOwner || deleting) return;
+
+    const confirmed = window.confirm(
+      "Delete this post? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setMenuOpen(false);
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await api(`/posts/${post._id}`, {
+        method: "DELETE"
+      });
+
+      setMenuOpen(false);
+
+      if (onDeleted) {
+        onDeleted(post._id);
+      }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   return (
@@ -679,52 +781,211 @@ function Post({ post, user }) {
         <div className="post-head">
           <div className="post-user">
             <Avatar user={post.author} size={42} />
-            <div><UserLink user={post.author} /><span>{post.location || "ReelsGo"}</span></div>
+            <div>
+              <UserLink user={post.author} />
+              <span>{post.location || "ReelsGo"}</span>
+            </div>
           </div>
-          <button className="icon-button" type="button"><MoreHorizontal /></button>
+
+          <div style={{ position: "relative" }}>
+            <button
+              className="icon-button"
+              type="button"
+              aria-label="More options"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(v => !v)}
+            >
+              <MoreHorizontal />
+            </button>
+
+            {menuOpen && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "42px",
+                  zIndex: 40,
+                  minWidth: 170,
+                  padding: 6,
+                  borderRadius: 14,
+                  background: "#171b21",
+                  border: "1px solid rgba(255,255,255,.12)",
+                  boxShadow: "0 18px 50px rgba(0,0,0,.45)"
+                }}
+              >
+                {isOwner ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={deletePost}
+                      disabled={deleting}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 9,
+                        padding: "11px 12px",
+                        borderRadius: 10,
+                        background: "transparent",
+                        color: "#ff5c70",
+                        textAlign: "left",
+                        fontWeight: 750
+                      }}
+                    >
+                      <Trash2 size={17} />
+                      {deleting ? "Deleting..." : "Delete post"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        width: "100%",
+                        padding: "11px 12px",
+                        borderRadius: 10,
+                        background: "transparent",
+                        color: "#fff",
+                        textAlign: "left"
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      width: "100%",
+                      padding: "11px 12px",
+                      borderRadius: 10,
+                      background: "transparent",
+                      color: "#fff",
+                      textAlign: "left"
+                    }}
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {mediaUrl && (
-          <button className="post-media-button" type="button" onClick={() => setViewerOpen(true)} aria-label="Open post">
+          <button
+            className="post-media-button"
+            type="button"
+            onClick={() => setViewerOpen(true)}
+            aria-label="Open post"
+          >
             {media.kind === "video" ? (
-              <video className="post-media" src={mediaUrl} muted playsInline preload="metadata" />
+              <video
+                className="post-media"
+                src={mediaUrl}
+                muted
+                playsInline
+                preload="metadata"
+              />
             ) : (
-              <img className="post-media" src={mediaUrl} alt={post.caption || "Post"} />
+              <img
+                className="post-media"
+                src={mediaUrl}
+                alt={post.caption || "Post"}
+              />
             )}
-            {media.kind === "video" && <span className="media-play-overlay"><Play fill="currentColor" /></span>}
+            {media.kind === "video" && (
+              <span className="media-play-overlay">
+                <Play fill="currentColor" />
+              </span>
+            )}
           </button>
         )}
 
         <div className="actions">
           <div>
-            <button className={liked ? "liked" : ""} onClick={like} type="button" aria-label="Like">
+            <button
+              className={liked ? "liked" : ""}
+              onClick={like}
+              type="button"
+              aria-label="Like"
+            >
               <Heart fill={liked ? "currentColor" : "none"} />
             </button>
-            <button onClick={loadComments} type="button" aria-label="Comments"><MessageCircle /></button>
-            <button onClick={() => setShareOpen(true)} type="button" aria-label="Share"><Send /></button>
+
+            <button
+              onClick={loadComments}
+              type="button"
+              aria-label="Comments"
+            >
+              <MessageCircle />
+            </button>
+
+            <button
+              onClick={() => setShareOpen(true)}
+              type="button"
+              aria-label="Share"
+            >
+              <Send />
+            </button>
           </div>
-          <button className={saved ? "saved" : ""} onClick={save} type="button" aria-label="Save">
+
+          <button
+            className={saved ? "saved" : ""}
+            onClick={save}
+            type="button"
+            aria-label="Save"
+          >
             <Bookmark fill={saved ? "currentColor" : "none"} />
           </button>
         </div>
 
         <div className="post-body">
           {!post.hideLikeCount && <b>{post.likesCount || 0} likes</b>}
-          {post.caption && <p><UserLink user={post.author} /> {post.caption}</p>}
-          <button className="comments-link" onClick={loadComments} type="button">View all comments</button>
+
+          {post.caption && (
+            <p>
+              <UserLink user={post.author} /> {post.caption}
+            </p>
+          )}
+
+          <button
+            className="comments-link"
+            onClick={loadComments}
+            type="button"
+          >
+            View all comments
+          </button>
 
           {showComments && (
             <div className="comments">
               {comments.map(c => (
                 <div className="comment" key={c._id}>
                   <Avatar user={c.author} size={28} />
-                  <div><UserLink user={c.author} /><span>{c.text}</span></div>
+                  <div>
+                    <UserLink user={c.author} />
+                    <span>{c.text}</span>
+                  </div>
                 </div>
               ))}
+
               {!post.commentsDisabled && (
                 <div className="comment-input">
-                  <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); comment(); } }} placeholder="Add a comment..." />
-                  <button onClick={comment} type="button">Post</button>
+                  <input
+                    value={text}
+                    onChange={e => setText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        comment();
+                      }
+                    }}
+                    placeholder="Add a comment..."
+                  />
+                  <button onClick={comment} type="button">
+                    Post
+                  </button>
                 </div>
               )}
             </div>
@@ -732,8 +993,20 @@ function Post({ post, user }) {
         </div>
       </article>
 
-      {shareOpen && <ShareSheet post={post} onClose={() => setShareOpen(false)} />}
-      {viewerOpen && <MediaViewer media={media} post={post} onClose={() => setViewerOpen(false)} />}
+      {shareOpen && (
+        <ShareSheet
+          post={post}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
+
+      {viewerOpen && (
+        <MediaViewer
+          media={media}
+          post={post}
+          onClose={() => setViewerOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -1152,7 +1425,14 @@ function ProfilePage({ user, setUser }) {
 
       {tab === "posts" && (
         visiblePosts.length
-          ? <div className="profile-grid">{visiblePosts.map(p => <GridMedia key={p._id} post={p} />)}</div>
+          ? <div className="profile-grid">{visiblePosts.map(p => (
+              <GridMedia
+                key={p._id}
+                post={p}
+                user={user}
+                onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+              />
+            ))}</div>
           : <EmptyTab icon={<CameraOff />} title="No posts yet" text="Share your first photo or video." />
       )}
 
@@ -1172,17 +1452,184 @@ function ProfilePage({ user, setUser }) {
   );
 }
 
-function GridMedia({ post }) {
+function GridMedia({ post, user, onDeleted }) {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const m = post.media?.[0];
+
   if (!m?.url) return null;
+
+  const isOwner =
+    String(post.author?._id || post.author) === String(user?._id);
+
+  async function deletePost() {
+    if (!isOwner || deleting) return;
+
+    const confirmed = window.confirm(
+      "Delete this post? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setMenuOpen(false);
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await api(`/posts/${post._id}`, {
+        method: "DELETE"
+      });
+
+      setMenuOpen(false);
+
+      if (onDeleted) {
+        onDeleted(post._id);
+      }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <>
-      <button className="grid-media grid-media-button" type="button" onClick={() => setOpen(true)} aria-label="Open media">
-        {m.kind === "video" ? <video src={`${SERVER}${m.url}`} muted playsInline preload="metadata" /> : <img src={`${SERVER}${m.url}`} alt={post.caption || ""} />}
-        {m.kind === "video" && <span className="grid-video-icon"><Play fill="currentColor" /></span>}
-      </button>
-      {open && <MediaViewer media={m} post={post} onClose={() => setOpen(false)} />}
+      <div
+        style={{
+          position: "relative",
+          aspectRatio: "1 / 1",
+          overflow: "hidden",
+          background: "#15181d"
+        }}
+      >
+        <button
+          className="grid-media grid-media-button"
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open media"
+          style={{
+            width: "100%",
+            height: "100%"
+          }}
+        >
+          {m.kind === "video" ? (
+            <video
+              src={`${SERVER}${m.url}`}
+              muted
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            <img
+              src={`${SERVER}${m.url}`}
+              alt={post.caption || ""}
+            />
+          )}
+
+          {m.kind === "video" && (
+            <span className="grid-video-icon">
+              <Play fill="currentColor" />
+            </span>
+          )}
+        </button>
+
+        {isOwner && (
+          <div
+            style={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              zIndex: 10
+            }}
+          >
+            <button
+              type="button"
+              aria-label="Post options"
+              title="Post options"
+              onClick={e => {
+                e.stopPropagation();
+                setMenuOpen(v => !v);
+              }}
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                background: "rgba(0,0,0,.62)",
+                color: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <MoreHorizontal size={18} />
+            </button>
+
+            {menuOpen && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: 40,
+                  minWidth: 155,
+                  padding: 6,
+                  borderRadius: 12,
+                  background: "#171b21",
+                  border: "1px solid rgba(255,255,255,.12)",
+                  boxShadow: "0 18px 45px rgba(0,0,0,.5)"
+                }}
+              >
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={deletePost}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "10px 11px",
+                    borderRadius: 9,
+                    background: "transparent",
+                    color: "#ff5c70",
+                    textAlign: "left",
+                    fontWeight: 750
+                  }}
+                >
+                  <Trash2 size={16} />
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 11px",
+                    borderRadius: 9,
+                    background: "transparent",
+                    color: "#fff",
+                    textAlign: "left"
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {open && (
+        <MediaViewer
+          media={m}
+          post={post}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -1195,8 +1642,11 @@ function ReelsPage({ onCreate }) {
   const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
+  const me = getUser();
 
   async function load() {
     try {
@@ -1238,9 +1688,55 @@ function ReelsPage({ onCreate }) {
   function goToReel(index) {
     const next = Math.max(0, Math.min(index, reels.length - 1));
     const card = cardRefs.current[next];
+
     if (card) {
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      card.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
       setActiveIndex(next);
+    }
+  }
+
+  async function deleteReel(reel) {
+    const isOwner =
+      String(reel.author?._id || reel.author) === String(me?._id);
+
+    if (!isOwner || deletingId) return;
+
+    const confirmed = window.confirm(
+      "Delete this Reel? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setOpenMenuId(null);
+      return;
+    }
+
+    setDeletingId(reel._id);
+
+    try {
+      await api(`/reels/${reel._id}`, {
+        method: "DELETE"
+      });
+
+      setOpenMenuId(null);
+
+      setReels(current => {
+        const next = current.filter(
+          item => String(item._id) !== String(reel._id)
+        );
+
+        setActiveIndex(index =>
+          next.length ? Math.min(index, next.length - 1) : 0
+        );
+
+        return next;
+      });
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -1251,6 +1747,7 @@ function ReelsPage({ onCreate }) {
           <h1>Reels</h1>
           <p>Short videos from ReelsGo</p>
         </div>
+
         <button className="desktop-create" onClick={onCreate}>
           <Film /> Create Reel
         </button>
@@ -1261,79 +1758,232 @@ function ReelsPage({ onCreate }) {
           <Film />
           <h2>No Reels yet</h2>
           <p>Upload your first short video.</p>
-          <button className="primary small" onClick={onCreate}>Upload Reel</button>
+          <button
+            className="primary small"
+            onClick={onCreate}
+          >
+            Upload Reel
+          </button>
         </div>
       ) : (
         <div className="reels-stage">
           <div className="reels-scroll" ref={scrollRef}>
-            {reels.map((r, index) => (
-              <article
-                className={`reel-feed-card ${index === activeIndex ? "active" : ""}`}
-                key={r._id}
-                ref={el => { cardRefs.current[index] = el; }}
-                data-index={index}
-              >
-                <div className="reel-feed-media">
-                  <video
-                    src={`${SERVER}${r.mediaUrl}`}
-                    muted
-                    playsInline
-                    controls
-                    preload={index === activeIndex ? "auto" : "metadata"}
-                    autoPlay={index === activeIndex}
-                    loop
-                  />
+            {reels.map((r, index) => {
+              const isOwner =
+                String(r.author?._id || r.author) === String(me?._id);
 
-                  <div className="reel-feed-top">
-                    <Avatar user={r.author} size={42} />
-                    <div>
-                      <UserLink user={r.author} />
-                      <span>{r.caption || "Reel"}</span>
+              return (
+                <article
+                  className={`reel-feed-card ${
+                    index === activeIndex ? "active" : ""
+                  }`}
+                  key={r._id}
+                  ref={el => {
+                    cardRefs.current[index] = el;
+                  }}
+                  data-index={index}
+                >
+                  <div className="reel-feed-media">
+                    <video
+                      src={`${SERVER}${r.mediaUrl}`}
+                      muted
+                      playsInline
+                      controls
+                      preload={
+                        index === activeIndex ? "auto" : "metadata"
+                      }
+                      autoPlay={index === activeIndex}
+                      loop
+                    />
+
+                    <div className="reel-feed-top">
+                      <Avatar user={r.author} size={42} />
+
+                      <div>
+                        <UserLink user={r.author} />
+                        <span>{r.caption || "Reel"}</span>
+                      </div>
+
+                      <div
+                        style={{
+                          marginLeft: "auto",
+                          position: "relative"
+                        }}
+                      >
+                        <button
+                          type="button"
+                          aria-label="Reel options"
+                          title="Reel options"
+                          onClick={e => {
+                            e.stopPropagation();
+                            setOpenMenuId(current =>
+                              String(current) === String(r._id)
+                                ? null
+                                : r._id
+                            );
+                          }}
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            background: "rgba(0,0,0,.45)",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                        >
+                          <MoreHorizontal />
+                        </button>
+
+                        {openMenuId === r._id && (
+                          <div
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              position: "absolute",
+                              right: 0,
+                              top: 44,
+                              zIndex: 50,
+                              minWidth: 170,
+                              padding: 6,
+                              borderRadius: 14,
+                              background: "#171b21",
+                              border:
+                                "1px solid rgba(255,255,255,.12)",
+                              boxShadow:
+                                "0 18px 50px rgba(0,0,0,.5)"
+                            }}
+                          >
+                            {isOwner ? (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled={deletingId === r._id}
+                                  onClick={() => deleteReel(r)}
+                                  style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 9,
+                                    padding: "11px 12px",
+                                    borderRadius: 10,
+                                    background: "transparent",
+                                    color: "#ff5c70",
+                                    textAlign: "left",
+                                    fontWeight: 750
+                                  }}
+                                >
+                                  <Trash2 size={17} />
+                                  {deletingId === r._id
+                                    ? "Deleting..."
+                                    : "Delete Reel"}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setOpenMenuId(null)
+                                  }
+                                  style={{
+                                    width: "100%",
+                                    padding: "11px 12px",
+                                    borderRadius: 10,
+                                    background: "transparent",
+                                    color: "#fff",
+                                    textAlign: "left"
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenMenuId(null)
+                                }
+                                style={{
+                                  width: "100%",
+                                  padding: "11px 12px",
+                                  borderRadius: 10,
+                                  background: "transparent",
+                                  color: "#fff",
+                                  textAlign: "left"
+                                }}
+                              >
+                                Close
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="reel-feed-bottom">
+                      <button
+                        type="button"
+                        title="Previous Reel"
+                        aria-label="Previous Reel"
+                        onClick={() =>
+                          goToReel(activeIndex - 1)
+                        }
+                        disabled={activeIndex <= 0}
+                      >
+                        <ChevronUp />
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Next Reel"
+                        aria-label="Next Reel"
+                        onClick={() =>
+                          goToReel(activeIndex + 1)
+                        }
+                        disabled={
+                          activeIndex >= reels.length - 1
+                        }
+                      >
+                        <ChevronDown />
+                      </button>
                     </div>
                   </div>
-
-                  <div className="reel-feed-bottom">
-                    <button
-                      type="button"
-                      title="Previous Reel"
-                      aria-label="Previous Reel"
-                      onClick={() => goToReel(activeIndex - 1)}
-                      disabled={activeIndex <= 0}
-                    >
-                      <ChevronUp />
-                    </button>
-                    <button
-                      type="button"
-                      title="Next Reel"
-                      aria-label="Next Reel"
-                      onClick={() => goToReel(activeIndex + 1)}
-                      disabled={activeIndex >= reels.length - 1}
-                    >
-                      <ChevronDown />
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
-          <div className="reels-side-controls" aria-label="Reel navigation">
+          <div
+            className="reels-side-controls"
+            aria-label="Reel navigation"
+          >
             <button
               type="button"
               title="Previous Reel"
               aria-label="Previous Reel"
-              onClick={() => goToReel(activeIndex - 1)}
+              onClick={() =>
+                goToReel(activeIndex - 1)
+              }
               disabled={activeIndex <= 0}
             >
               <ChevronUp />
             </button>
-            <span>{reels.length ? `${activeIndex + 1} / ${reels.length}` : ""}</span>
+
+            <span>
+              {reels.length
+                ? `${activeIndex + 1} / ${reels.length}`
+                : ""}
+            </span>
+
             <button
               type="button"
               title="Next Reel"
               aria-label="Next Reel"
-              onClick={() => goToReel(activeIndex + 1)}
-              disabled={activeIndex >= reels.length - 1}
+              onClick={() =>
+                goToReel(activeIndex + 1)
+              }
+              disabled={
+                activeIndex >= reels.length - 1
+              }
             >
               <ChevronDown />
             </button>
@@ -1343,6 +1993,7 @@ function ReelsPage({ onCreate }) {
     </div>
   );
 }
+
 function ReelViewer({ reel, onClose }) {
   return (
     <div className="reel-viewer-overlay" onClick={onClose}>
@@ -2102,7 +2753,14 @@ function SavedPage({ user, embedded = false }) {
   const body = loading
     ? <div className="empty"><Bookmark /><p>Loading saved posts...</p></div>
     : posts.length
-      ? <div className="profile-grid">{posts.slice(0, 30).map(p => <GridMedia key={p._id} post={p} />)}</div>
+      ? <div className="profile-grid">{posts.slice(0, 30).map(p => (
+        <GridMedia
+          key={p._id}
+          post={p}
+          user={user}
+          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+        />
+      ))}</div>
       : <EmptyTab icon={<Bookmark />} title="Saved posts" text="Posts you save will appear here." />;
   if (embedded) return <div className="embedded-saved">{body}</div>;
   return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved collection</p></div></div>{body}</div>;
