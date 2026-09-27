@@ -5953,246 +5953,121 @@ textarea{
   }
 }
 
-/* =========================================================
-   ReelsGo AUTH MOBILE FIT FIX
-   Keeps the existing login/signup design unchanged.
-   Only fixes viewport sizing, scrolling and compact spacing
-   so both forms remain usable on short phones.
-   ========================================================= */
-
-.auth-page,
-.auth-card,
-.auth-page *{
-  box-sizing:border-box;
+/* ==========================================================
+   REELSGO PROFILE USERNAME LINKS + MESSAGE DELETE
+   ========================================================== */
+.profile-username-link{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  color:#f5f7fa !important;
+  font-weight:800;
+  cursor:pointer;
+  text-decoration:none;
+  transition:opacity .15s ease, text-decoration-color .15s ease;
+}
+.profile-username-link:hover{
+  opacity:.78;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.profile-username-link:focus-visible{
+  outline:2px solid #8b7cff;
+  outline-offset:3px;
+  border-radius:4px;
+}
+.story-username{
+  display:block;
+  max-width:100px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#b7bdc7 !important;
+  font-size:12px;
+  font-weight:650;
+}
+.rail-username{
+  display:block;
+  max-width:150px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.conversation-username{
+  display:block;
+  max-width:180px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
+}
+.message-bubble-wrap{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  max-width:min(78%, 520px);
+}
+.message-bubble-wrap.mine{
+  align-items:flex-end;
+}
+.message-action-menu{
+  position:absolute;
+  right:0;
+  top:calc(100% + 7px);
+  z-index:50;
+  min-width:165px;
+  padding:5px;
+  border:1px solid #343a44;
+  border-radius:12px;
+  background:#171b21;
+  box-shadow:0 12px 32px rgba(0,0,0,.45);
+}
+.message-action-menu button{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  border:0;
+  border-radius:9px;
+  padding:0 11px;
+  background:transparent;
+  color:#ff6479;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+.message-action-menu button:hover{
+  background:#252a31;
+}
+.message-action-menu button:disabled{
+  opacity:.55;
+  cursor:wait;
+}
+.message-action-menu svg{
+  width:17px;
+  height:17px;
+  flex:0 0 17px;
+}
+.message-bubble-wrap .bubble{
+  cursor:pointer;
 }
 
-.auth-page{
-  overflow-x:hidden;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-@media (max-width:700px){
-  .auth-page{
-    width:100%;
-    min-height:100svh !important;
-    min-height:100dvh !important;
-    height:auto !important;
-    max-height:none !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    align-items:center !important;
-    justify-content:flex-start !important;
-    padding-top:max(16px,env(safe-area-inset-top)) !important;
-    padding-right:max(12px,env(safe-area-inset-right)) !important;
-    padding-bottom:max(16px,env(safe-area-inset-bottom)) !important;
-    padding-left:max(12px,env(safe-area-inset-left)) !important;
+@media(max-width:700px){
+  .profile-username-link{
+    -webkit-tap-highlight-color:transparent;
   }
-
-  .auth-card{
-    width:min(100%,430px) !important;
-    max-width:430px !important;
-    flex:0 0 auto !important;
-    margin:auto !important;
-    padding:24px 18px !important;
-    gap:12px !important;
+  .message-bubble-wrap{
+    max-width:82%;
   }
-
-  .auth-logo{
-    flex:0 0 auto;
-    margin-bottom:3px !important;
+  .message-action-menu{
+    right:0;
+    min-width:155px;
   }
-
-  .auth-logo-img{
-    display:block;
-    width:58px !important;
-    height:58px !important;
-    max-width:58px !important;
-    max-height:58px !important;
-    object-fit:contain !important;
-  }
-
-  .auth-card h2{
-    line-height:1.18;
-    margin:0 !important;
-    font-size:24px;
-  }
-
-  .auth-subtitle{
-    line-height:1.35;
-    margin:0 0 7px !important;
-    font-size:13px;
-  }
-
-  .field-wrap{
-    width:100%;
-    min-width:0;
-    height:49px !important;
-    flex:0 0 49px;
-  }
-
-  .password-field{
-    width:100%;
-    min-width:0;
-  }
-
-  .password-field>.field-wrap{
-    width:100%;
-  }
-
-  .forgot{
-    min-height:32px;
-    padding:5px 0;
-    line-height:1.2;
-  }
-
-  .auth-submit{
-    min-height:47px;
-    height:47px;
-    flex:0 0 47px;
-  }
-
-  .auth-divider{
-    flex:0 0 30px;
-    height:30px;
-  }
-
-  .auth-switch{
-    min-height:45px;
-    height:45px;
-    flex:0 0 45px;
-  }
-
-  .error{
-    width:100%;
-    overflow-wrap:anywhere;
-  }
-}
-
-/* iPhone / small Android widths: same visual design, slightly tighter only
-   where necessary so the signup fields do not push controls off-screen. */
-@media (max-width:430px){
-  .auth-card{
-    padding:21px 15px !important;
-    gap:10px !important;
-    border-radius:20px !important;
-  }
-
-  .auth-logo-img{
-    width:56px !important;
-    height:56px !important;
-    max-width:56px !important;
-    max-height:56px !important;
-  }
-
-  .auth-card h2{
-    font-size:22px;
-  }
-
-  .auth-subtitle{
-    font-size:12.5px;
-    margin-bottom:5px !important;
-  }
-
-  .field-wrap{
-    height:47px !important;
-    flex-basis:47px;
-    border-radius:11px;
-  }
-
-  .password-field>button{
-    top:4px;
-  }
-
-  .auth-submit{
-    height:46px;
-    min-height:46px;
-    flex-basis:46px;
-  }
-
-  .auth-switch{
-    height:44px;
+  .message-action-menu button{
     min-height:44px;
-    flex-basis:44px;
-  }
-}
-
-/* Very short phones: keep the exact same controls, but let the page scroll
-   instead of clipping the top/bottom of the authentication card. */
-@media (max-width:430px) and (max-height:760px){
-  .auth-page{
-    padding-top:max(10px,env(safe-area-inset-top)) !important;
-    padding-bottom:max(10px,env(safe-area-inset-bottom)) !important;
-  }
-
-  .auth-card{
-    padding:16px 13px !important;
-    gap:8px !important;
-  }
-
-  .auth-logo{
-    margin-bottom:0 !important;
-  }
-
-  .auth-logo-img{
-    width:50px !important;
-    height:50px !important;
-    max-width:50px !important;
-    max-height:50px !important;
-  }
-
-  .auth-card h2{
-    font-size:20px;
-  }
-
-  .auth-subtitle{
-    font-size:12px;
-    margin-bottom:3px !important;
-  }
-
-  .field-wrap{
-    height:44px !important;
-    flex-basis:44px;
-  }
-
-  .password-field>button{
-    top:2px;
-    height:38px;
-  }
-
-  .forgot{
-    min-height:27px;
-    padding:2px 0;
-  }
-
-  .auth-submit{
-    height:43px;
-    min-height:43px;
-    flex-basis:43px;
-  }
-
-  .auth-divider{
-    height:25px;
-    flex-basis:25px;
-  }
-
-  .auth-switch{
-    height:42px;
-    min-height:42px;
-    flex-basis:42px;
-  }
-}
-
-/* Landscape phones: the whole auth card can be scrolled vertically. */
-@media (max-width:900px) and (orientation:landscape){
-  .auth-page{
-    align-items:flex-start !important;
-    justify-content:flex-start !important;
-    padding-top:max(10px,env(safe-area-inset-top)) !important;
-    padding-bottom:max(10px,env(safe-area-inset-bottom)) !important;
-  }
-
-  .auth-card{
-    margin:10px auto !important;
+    font-size:14px;
   }
 }

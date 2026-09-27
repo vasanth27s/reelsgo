@@ -1,195 +1,226 @@
 import express from "express";
+import mongoose from "mongoose";
+
 import auth from "../middleware/auth.js";
+
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
-import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 
 const router = express.Router();
 
 /*
-|--------------------------------------------------------------------------
-| Helper
-|--------------------------------------------------------------------------
+=========================================================
+HELPERS
+=========================================================
 */
 
-function uniqueIds(ids = []) {
-  return [...new Set(ids.map(String))];
+function safeUser(user) {
+  if (!user) return null;
+
+  const obj =
+    user.toObject
+      ? user.toObject()
+      : { ...user };
+
+  delete obj.password;
+
+  if (obj.avatar) {
+    delete obj.avatar.data;
+  }
+
+  return obj;
 }
 
 function isMember(conversation, userId) {
-  return conversation.members.some(
-    id => String(id?._id || id) === String(userId)
+  return (
+    conversation?.members || []
+  ).some(
+    member =>
+      String(
+        member?._id ||
+        member
+      ) === String(userId)
   );
 }
 
 /*
-|--------------------------------------------------------------------------
-| GET CONVERSATIONS
-|--------------------------------------------------------------------------
-*/
-
-router.get("/conversations", auth, async (req, res) => {
-  try {
-    const conversations = await Conversation.find({
-      members: req.user.id
-    })
-      .populate(
-        "members",
-        "name username isPrivate updatedAt"
-      )
-      .populate({
-        path: "lastMessage",
-        populate: {
-          path: "sender",
-          select: "name username"
-        }
-      })
-      .sort({
-        updatedAt: -1
-      })
-      .lean();
-
-    const result = conversations.map(c => ({
-      ...c,
-
-      members: c.members || [],
-
-      lastMessage: c.lastMessage
-        ? {
-            ...c.lastMessage,
-            text: c.lastMessage.text || "",
-            createdAt: c.lastMessage.createdAt
-          }
-        : null
-    }));
-
-    res.json({
-      conversations: result
-    });
-  } catch (error) {
-    console.error("GET conversations:", error);
-
-    res.status(500).json({
-      message: error.message
-    });
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
-| CREATE / FIND ONE-TO-ONE CONVERSATION
-|--------------------------------------------------------------------------
-*/
-
-router.post("/conversations", auth, async (req, res) => {
-  try {
-    const requestedMembers = Array.isArray(req.body.members)
-      ? req.body.members
-      : [];
-
-    const memberIds = uniqueIds([
-      req.user.id,
-      ...requestedMembers
-    ]);
-
-    if (memberIds.length < 2) {
-      return res.status(400).json({
-        message: "Select another user to start a conversation"
-      });
-    }
-
-    /*
-     * This project supports one-to-one and group conversations.
-     */
-
-    const existing = await Conversation.findOne({
-      members: {
-        $all: memberIds,
-        $size: memberIds.length
-      }
-    })
-      .populate(
-        "members",
-        "name username isPrivate updatedAt"
-      )
-      .populate("lastMessage");
-
-    if (existing) {
-      return res.json({
-        conversation: existing
-      });
-    }
-
-    /*
-     * Verify users actually exist.
-     */
-
-    const users = await User.find({
-      _id: {
-        $in: memberIds
-      }
-    }).select(
-      "name username isPrivate"
-    );
-
-    if (users.length !== memberIds.length) {
-      return res.status(404).json({
-        message: "One or more users were not found"
-      });
-    }
-
-    const conversation =
-      await Conversation.create({
-        members: memberIds,
-        group: memberIds.length > 2,
-        title: req.body.title || "",
-        admins: [req.user.id]
-      });
-
-    const populated =
-      await Conversation.findById(
-        conversation._id
-      )
-        .populate(
-          "members",
-          "name username isPrivate updatedAt"
-        )
-        .populate("lastMessage");
-
-    res.status(201).json({
-      conversation: populated
-    });
-  } catch (error) {
-    console.error(
-      "CREATE conversation:",
-      error
-    );
-
-    res.status(500).json({
-      message: error.message
-    });
-  }
-});
-
-/*
-|--------------------------------------------------------------------------
-| GET MESSAGES
-|--------------------------------------------------------------------------
+=========================================================
+GET CONVERSATIONS
+=========================================================
 */
 
 router.get(
-  "/conversations/:id/messages",
+  "/conversations",
   auth,
   async (req, res) => {
     try {
-      const conversation =
-        await Conversation.findOne({
-          _id: req.params.id,
+      const conversations =
+        await Conversation.find({
           members: req.user.id
+        })
+          .populate(
+            "members",
+            "-password -avatar.data"
+          )
+          .populate(
+            "lastMessage"
+          )
+          .sort({
+            updatedAt: -1
+          })
+          .lean();
+
+      res.json({
+        conversations
+      });
+    } catch (e) {
+      console.error(e);
+
+      res.status(500).json({
+        message:
+          e.message ||
+          "Unable to load conversations"
+      });
+    }
+  }
+);
+
+/*
+=========================================================
+CREATE / FIND CONVERSATION
+=========================================================
+*/
+
+router.post(
+  "/conversations",
+  auth,
+  async (req, res) => {
+    try {
+      const members =
+        Array.isArray(req.body.members)
+          ? req.body.members
+          : [];
+
+      const uniqueMembers = [
+        ...new Set([
+          String(req.user.id),
+          ...members.map(String)
+        ])
+      ];
+
+      if (uniqueMembers.length < 2) {
+        return res.status(400).json({
+          message:
+            "A conversation needs another user"
+        });
+      }
+
+      const users =
+        await User.find({
+          _id: {
+            $in: uniqueMembers
+          }
+        }).select(
+          "_id name username isPrivate"
+        );
+
+      if (
+        users.length !==
+        uniqueMembers.length
+      ) {
+        return res.status(404).json({
+          message:
+            "One or more users were not found"
+        });
+      }
+
+      let conversation =
+        await Conversation.findOne({
+          members: {
+            $all: uniqueMembers
+          },
+          $expr: {
+            $eq: [
+              {
+                $size: "$members"
+              },
+              uniqueMembers.length
+            ]
+          }
         });
 
       if (!conversation) {
+        conversation =
+          await Conversation.create({
+            members: uniqueMembers
+          });
+      }
+
+      await conversation.populate(
+        "members",
+        "-password -avatar.data"
+      );
+
+      res.json({
+        conversation
+      });
+    } catch (e) {
+      console.error(e);
+
+      res.status(500).json({
+        message:
+          e.message ||
+          "Unable to create conversation"
+      });
+    }
+  }
+);
+
+/*
+=========================================================
+GET MESSAGES
+=========================================================
+*/
+
+router.get(
+  "/conversations/:conversationId/messages",
+  auth,
+  async (req, res) => {
+    try {
+      const {
+        conversationId
+      } = req.params;
+
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          conversationId
+        )
+      ) {
+        return res.status(400).json({
+          message:
+            "Invalid conversation ID"
+        });
+      }
+
+      const conversation =
+        await Conversation.findById(
+          conversationId
+        );
+
+      if (!conversation) {
+        return res.status(404).json({
+          message:
+            "Conversation not found"
+        });
+      }
+
+      if (
+        !isMember(
+          conversation,
+          req.user.id
+        )
+      ) {
         return res.status(403).json({
           message:
             "You are not a member of this conversation"
@@ -198,97 +229,105 @@ router.get(
 
       const messages =
         await Message.find({
-          conversation: conversation._id,
-
-          deletedFor: {
-            $ne: req.user.id
-          }
+          conversation:
+            conversationId
         })
           .populate(
             "sender",
-            "name username isPrivate updatedAt"
+            "-password -avatar.data"
           )
-          .populate({
-            path: "replyTo",
-            populate: {
-              path: "sender",
-              select: "name username"
-            }
-          })
           .sort({
             createdAt: 1
           })
-          .limit(500);
+          .lean();
 
       res.json({
         messages
       });
-    } catch (error) {
-      console.error(
-        "GET messages:",
-        error
-      );
+    } catch (e) {
+      console.error(e);
 
       res.status(500).json({
-        message: error.message
+        message:
+          e.message ||
+          "Unable to load messages"
       });
     }
   }
 );
 
 /*
-|--------------------------------------------------------------------------
-| SEND MESSAGE
-|--------------------------------------------------------------------------
+=========================================================
+SEND MESSAGE
+=========================================================
 */
 
 router.post(
-  "/conversations/:id/messages",
+  "/conversations/:conversationId/messages",
   auth,
   async (req, res) => {
     try {
-      const conversation =
-        await Conversation.findOne({
-          _id: req.params.id,
-          members: req.user.id
+      const {
+        conversationId
+      } = req.params;
+
+      const text =
+        String(
+          req.body.text || ""
+        ).trim();
+
+      if (!text) {
+        return res.status(400).json({
+          message:
+            "Message cannot be empty"
         });
+      }
+
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          conversationId
+        )
+      ) {
+        return res.status(400).json({
+          message:
+            "Invalid conversation ID"
+        });
+      }
+
+      const conversation =
+        await Conversation.findById(
+          conversationId
+        );
 
       if (!conversation) {
+        return res.status(404).json({
+          message:
+            "Conversation not found"
+        });
+      }
+
+      if (
+        !isMember(
+          conversation,
+          req.user.id
+        )
+      ) {
         return res.status(403).json({
           message:
             "You are not a member of this conversation"
         });
       }
 
-      const text = String(
-        req.body.text || ""
-      ).trim();
-
-      if (!text) {
-        return res.status(400).json({
-          message: "Message cannot be empty"
-        });
-      }
-
-      if (text.length > 5000) {
-        return res.status(400).json({
-          message:
-            "Message must be 5000 characters or less"
-        });
-      }
-
       const message =
         await Message.create({
           conversation:
-            conversation._id,
-
+            conversationId,
           sender:
             req.user.id,
-
           text,
-
-          replyTo:
-            req.body.replyTo || null
+          seenBy: [
+            req.user.id
+          ]
         });
 
       conversation.lastMessage =
@@ -296,186 +335,239 @@ router.post(
 
       await conversation.save();
 
-      const populated =
-        await Message.findById(
-          message._id
-        )
-          .populate(
-            "sender",
-            "name username isPrivate updatedAt"
-          )
-          .populate({
-            path: "replyTo",
-            populate: {
-              path: "sender",
-              select: "name username"
-            }
-          });
-
-      /*
-       * Create notification for every other
-       * conversation member.
-       */
-
-      const recipients =
-        conversation.members
-          .map(id => String(id))
-          .filter(
-            id =>
-              id !==
-              String(req.user.id)
-          );
-
-      if (recipients.length) {
-        await Notification.insertMany(
-          recipients.map(recipient => ({
-            recipient,
-
-            actor:
-              req.user.id,
-
-            type: "message",
-
-            targetId:
-              conversation._id,
-
-            text:
-              "sent you a message"
-          }))
-        );
-      }
-
-      res.status(201).json({
-        message: populated,
-
-        conversation
-      });
-    } catch (error) {
-      console.error(
-        "SEND message:",
-        error
+      await message.populate(
+        "sender",
+        "-password -avatar.data"
       );
 
+      res.status(201).json({
+        message
+      });
+    } catch (e) {
+      console.error(e);
+
       res.status(500).json({
-        message: error.message
+        message:
+          e.message ||
+          "Unable to send message"
       });
     }
   }
 );
 
 /*
-|--------------------------------------------------------------------------
-| MARK MESSAGE SEEN
-|--------------------------------------------------------------------------
+=========================================================
+MARK MESSAGE AS SEEN
+=========================================================
 */
 
 router.post(
-  "/messages/:id/seen",
+  "/messages/:messageId/seen",
   auth,
   async (req, res) => {
     try {
+      const {
+        messageId
+      } = req.params;
+
       const message =
         await Message.findById(
-          req.params.id
+          messageId
         );
 
       if (!message) {
         return res.status(404).json({
-          message: "Message not found"
+          message:
+            "Message not found"
         });
       }
 
       const conversation =
-        await Conversation.findOne({
-          _id: message.conversation,
-          members: req.user.id
-        });
+        await Conversation.findById(
+          message.conversation
+        );
 
       if (!conversation) {
-        return res.status(403).json({
+        return res.status(404).json({
           message:
-            "You are not a member of this conversation"
+            "Conversation not found"
         });
       }
 
-      await Message.findByIdAndUpdate(
-        message._id,
-        {
-          $addToSet: {
-            seenBy: req.user.id
-          }
-        }
-      );
+      if (
+        !isMember(
+          conversation,
+          req.user.id
+        )
+      ) {
+        return res.status(403).json({
+          message:
+            "Not allowed"
+        });
+      }
+
+      const alreadySeen =
+        (message.seenBy || []).some(
+          id =>
+            String(id) ===
+            String(req.user.id)
+        );
+
+      if (!alreadySeen) {
+        message.seenBy =
+          message.seenBy || [];
+
+        message.seenBy.push(
+          req.user.id
+        );
+
+        await message.save();
+      }
 
       res.json({
         ok: true
       });
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
+
       res.status(500).json({
-        message: error.message
+        message:
+          e.message ||
+          "Unable to mark message as seen"
       });
     }
   }
 );
 
 /*
-|--------------------------------------------------------------------------
-| MESSAGE REACTION
-|--------------------------------------------------------------------------
+=========================================================
+DELETE MY MESSAGE
+=========================================================
+
+Only the person who originally sent the
+message can delete it.
+=========================================================
 */
 
-router.post(
-  "/messages/:id/react",
+router.delete(
+  "/messages/:messageId",
   auth,
   async (req, res) => {
     try {
+      const {
+        messageId
+      } = req.params;
+
+      if (
+        !mongoose.Types.ObjectId.isValid(
+          messageId
+        )
+      ) {
+        return res.status(400).json({
+          message:
+            "Invalid message ID"
+        });
+      }
+
       const message =
         await Message.findById(
-          req.params.id
+          messageId
         );
 
       if (!message) {
         return res.status(404).json({
-          message: "Message not found"
+          message:
+            "Message not found"
+        });
+      }
+
+      /*
+       * IMPORTANT:
+       * Only the sender can delete
+       * their own message.
+       */
+
+      if (
+        String(message.sender) !==
+        String(req.user.id)
+      ) {
+        return res.status(403).json({
+          message:
+            "You can only delete your own messages"
         });
       }
 
       const conversation =
-        await Conversation.findOne({
-          _id: message.conversation,
-          members: req.user.id
-        });
+        await Conversation.findById(
+          message.conversation
+        );
 
       if (!conversation) {
+        return res.status(404).json({
+          message:
+            "Conversation not found"
+        });
+      }
+
+      if (
+        !isMember(
+          conversation,
+          req.user.id
+        )
+      ) {
         return res.status(403).json({
           message:
             "You are not a member of this conversation"
         });
       }
 
-      message.reactions =
-        message.reactions.filter(
-          reaction =>
-            String(
-              reaction.user
-            ) !==
-            String(req.user.id)
-        );
+      const deletedId =
+        message._id;
 
-      message.reactions.push({
-        user: req.user.id,
-        emoji:
-          req.body.emoji || "❤️"
+      await Message.deleteOne({
+        _id: deletedId
       });
 
-      await message.save();
+      /*
+       * If the deleted message was
+       * the conversation's last message,
+       * find the previous message.
+       */
+
+      if (
+        String(
+          conversation.lastMessage
+        ) ===
+        String(deletedId)
+      ) {
+        const previous =
+          await Message.findOne({
+            conversation:
+              conversation._id
+          })
+            .sort({
+              createdAt: -1
+            })
+            .select("_id");
+
+        conversation.lastMessage =
+          previous?._id || null;
+
+        await conversation.save();
+      }
 
       res.json({
-        message
+        ok: true,
+        messageId:
+          String(deletedId)
       });
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
+
       res.status(500).json({
-        message: error.message
+        message:
+          e.message ||
+          "Unable to delete message"
       });
     }
   }

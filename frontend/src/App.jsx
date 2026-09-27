@@ -59,6 +59,28 @@ function Avatar({ user, size = 42, className = "" }) {
 }
 
 
+function openUserProfile(userId) {
+  if (!userId) return;
+  window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: userId } }));
+}
+
+function UserLink({ user, className = "" }) {
+  const label = user?.username || user?.name || "User";
+  if (!user?._id) return <span className={className}>{label}</span>;
+  return (
+    <span
+      className={`profile-username-link ${className}`}
+      role="button"
+      tabIndex={0}
+      onClick={(e) => { e.stopPropagation(); openUserProfile(user._id); }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); openUserProfile(user._id); } }}
+    >
+      {label}
+    </span>
+  );
+}
+
+
 /* ReelsGo responsive viewport guard */
 function ReelsGoViewport() {
   useEffect(() => {
@@ -108,6 +130,21 @@ function App() {
     const openMessages = () => navigate("messages");
     window.addEventListener("vk-open-messages", openMessages);
     return () => window.removeEventListener("vk-open-messages", openMessages);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    const openProfile = (event) => {
+      const id = event?.detail?.id;
+      if (!id) return;
+      setProfileUserId(String(id));
+      setPage("user-profile");
+      setMenuOpen(false);
+      setSettingsOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("vk-open-profile", openProfile);
+    return () => window.removeEventListener("vk-open-profile", openProfile);
   }, [token]);
 
   useEffect(() => {
@@ -359,7 +396,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
                 s.kind === "video" ? <video src={`${SERVER}${s.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${s.mediaUrl}`} alt="" />
               ) : <div className="story-text-thumb">Aa</div>}
             </div>
-            <span>{s.author?.username || "Story"}</span>
+            <UserLink user={s.author} className="story-username" />
           </button>
         ))}
       </div>
@@ -434,7 +471,7 @@ function SuggestionsRail({ user, posts }) {
       <div className="rail-account">
         <Avatar user={user} size={56} />
         <div className="rail-account-info">
-          <b>@{user?.username}</b>
+          <UserLink user={user} className="rail-username" />
           <span>{user?.name || "ReelsGo user"}</span>
         </div>
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Switch</button>
@@ -452,7 +489,7 @@ function SuggestionsRail({ user, posts }) {
             <div className="suggestion-row" key={person._id}>
               <Avatar user={person} size={42} />
               <div className="suggestion-copy">
-                <b>@{person.username}</b>
+                <UserLink user={person} />
                 <span>Suggested for you</span>
               </div>
               <button className={isFollowing ? "following" : "follow"} onClick={() => !isFollowing && follow(person)}>
@@ -515,7 +552,7 @@ function StoryViewer({ story, onClose }) {
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
           <div>
-            <b>@{story.author?.username || 'user'}</b>
+            <UserLink user={story.author} />
             <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
@@ -548,7 +585,7 @@ function StoryViewer({ story, onClose }) {
               {viewers.map(v => (
                 <div className="story-viewer-row" key={v._id}>
                   <Avatar user={v} size={50} />
-                  <div className="story-viewer-user-info"><b>@{v.username}</b><span>{v.name || 'ReelsGo user'}</span></div>
+                  <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || 'ReelsGo user'}</span></div>
                   {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
                 </div>
               ))}
@@ -610,7 +647,7 @@ function Post({ post, user }) {
         <div className="post-head">
           <div className="post-user">
             <Avatar user={post.author} size={42} />
-            <div><b>{post.author?.username}</b><span>{post.location || "ReelsGo"}</span></div>
+            <div><UserLink user={post.author} /><span>{post.location || "ReelsGo"}</span></div>
           </div>
           <button className="icon-button" type="button"><MoreHorizontal /></button>
         </div>
@@ -641,7 +678,7 @@ function Post({ post, user }) {
 
         <div className="post-body">
           {!post.hideLikeCount && <b>{post.likesCount || 0} likes</b>}
-          {post.caption && <p><b>{post.author?.username}</b> {post.caption}</p>}
+          {post.caption && <p><UserLink user={post.author} /> {post.caption}</p>}
           <button className="comments-link" onClick={loadComments} type="button">View all comments</button>
 
           {showComments && (
@@ -649,7 +686,7 @@ function Post({ post, user }) {
               {comments.map(c => (
                 <div className="comment" key={c._id}>
                   <Avatar user={c.author} size={28} />
-                  <div><b>{c.author?.username}</b><span>{c.text}</span></div>
+                  <div><UserLink user={c.author} /><span>{c.text}</span></div>
                 </div>
               ))}
               {!post.commentsDisabled && (
@@ -712,7 +749,7 @@ function MediaViewer({ media, post, onClose }) {
         <div className="media-screen-user">
           <Avatar user={post?.author} size={40} />
           <div>
-            <b>@{post?.author?.username || "user"}</b>
+            <UserLink user={post?.author} />
             <span>{post?.location || "ReelsGo"}</span>
           </div>
         </div>
@@ -773,7 +810,7 @@ function MediaViewer({ media, post, onClose }) {
 
         {post?.caption && (
           <div className="media-screen-caption">
-            <b>@{post.author?.username}</b>{" "}
+            <UserLink user={post.author} />{" "}
             <span>{post.caption}</span>
           </div>
         )}
@@ -1218,7 +1255,7 @@ function ReelsPage({ onCreate }) {
                   <div className="reel-feed-top">
                     <Avatar user={r.author} size={42} />
                     <div>
-                      <b>@{r.author?.username}</b>
+                      <UserLink user={r.author} />
                       <span>{r.caption || "Reel"}</span>
                     </div>
                   </div>
@@ -1281,7 +1318,7 @@ function ReelViewer({ reel, onClose }) {
       <div className="reel-viewer-card" onClick={e => e.stopPropagation()}>
         <div className="reel-viewer-user">
           <Avatar user={reel.author} size={42} />
-          <div><b>@{reel.author?.username}</b><span>{reel.caption || "Reel"}</span></div>
+          <div><UserLink user={reel.author} /><span>{reel.caption || "Reel"}</span></div>
         </div>
         <video src={`${SERVER}${reel.mediaUrl}`} controls autoPlay loop playsInline />
       </div>
@@ -1547,6 +1584,8 @@ function MessagesPage({ openConversationId = null }) {
   const [sending, setSending] = useState(false);
   const [mobileChat, setMobileChat] = useState(false);
   const [conversationQuery, setConversationQuery] = useState('');
+  const [messageMenuId, setMessageMenuId] = useState(null);
+  const [deletingMessageId, setDeletingMessageId] = useState(null);
 
   async function loadConversations(selectId = null) {
     try {
@@ -1613,6 +1652,26 @@ function MessagesPage({ openConversationId = null }) {
     finally { setSending(false); }
   }
 
+  async function deleteMessage(messageId) {
+    if (!messageId || deletingMessageId) return;
+    const confirmed = window.confirm("Delete this message? It will be removed from the chat for everyone.");
+    if (!confirmed) {
+      setMessageMenuId(null);
+      return;
+    }
+    setDeletingMessageId(messageId);
+    try {
+      await api(`/messages/messages/${messageId}`, { method: "DELETE" });
+      setMessages(current => current.filter(message => String(message._id) !== String(messageId)));
+      setMessageMenuId(null);
+      if (active?._id) await loadConversations(active._id);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeletingMessageId(null);
+    }
+  }
+
   function other(c) {
     return (c?.members || []).find(x => String(x._id) !== String(me?._id));
   }
@@ -1670,7 +1729,7 @@ function MessagesPage({ openConversationId = null }) {
             const c = conversations.find(x => x.members?.some(m => String(m._id) === String(note.author?._id)));
             return <button className="message-note-card" key={note._id} type="button" onClick={() => c && openConversation(c)}>
               <div className="message-note-bubble">{note.text}</div><div className="message-note-avatar"><Avatar user={note.author} size={58} /></div>
-              <b>{note.author?.username || note.author?.name || 'User'}</b><span>{note.music || 'Note'}</span>
+              <UserLink user={note.author} /><span>{note.music || 'Note'}</span>
             </button>;
           })}
           {!otherNotes.length && <div className="notes-empty">Follow people and their notes will appear here.</div>}
@@ -1681,7 +1740,7 @@ function MessagesPage({ openConversationId = null }) {
         <div className="messages-requests-head"><b>Follow requests</b><button onClick={() => setRequestsOpen(false)}><X /></button></div>
         {!requests.length ? <div className="requests-empty"><UserPlus /><b>No requests</b><span>New requests will appear here.</span></div> : <div className="requests-list">{requests.map(r => {
           const u = r.follower || r.requester || r.actor;
-          return <div className="request-row" key={r._id}><Avatar user={u} size={48} /><div><b>@{u?.username || u?.name}</b><span>wants to follow you</span></div></div>;
+          return <div className="request-row" key={r._id}><Avatar user={u} size={48} /><div><UserLink user={u} /><span>wants to follow you</span></div></div>;
         })}</div>}
       </div></div>}
 
@@ -1697,7 +1756,7 @@ function MessagesPage({ openConversationId = null }) {
             {filteredConversations.map(c => {
               const u = other(c); const selected = String(active?._id) === String(c._id);
               return <button className={`conversation-item ${selected ? 'active' : ''}`} key={c._id} onClick={() => openConversation(c)}>
-                <Avatar user={u} size={58} /><div className="conversation-copy"><b>{name(c)}</b><span>{c.lastMessage?.text || 'Start a conversation'}</span>{c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}</div>
+                <Avatar user={u} size={58} /><div className="conversation-copy"><UserLink user={u} className="conversation-username" /><span>{c.lastMessage?.text || 'Start a conversation'}</span>{c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}</div>
               </button>;
             })}
           </div> : <div className="chat-empty-list"><MessageCircle /><b>Start a conversation</b><span>Send a message to someone you follow.</span><small>Open a profile and tap Message.</small></div>}
@@ -1707,7 +1766,7 @@ function MessagesPage({ openConversationId = null }) {
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
               <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
-              <Avatar user={other(active)} size={44} /><div><b>@{other(active)?.username || other(active)?.name}</b><span>Active now</span></div>
+              <Avatar user={other(active)} size={44} /><div><UserLink user={other(active)} /><span>Active now</span></div>
             </div>
             <div className="chat-messages instagram-chat-messages">
               {messages.length ? messages.map(m => {
@@ -1715,7 +1774,27 @@ function MessagesPage({ openConversationId = null }) {
                 const seen = (m.seenBy || []).some(x => String(x?._id || x) !== String(me?._id));
                 return <div key={m._id} className={`message-line ${mine ? 'mine' : 'received'}`}>
                   {!mine && <Avatar user={m.sender} size={30} />}
-                  <div className={`bubble ${mine ? 'mine' : ''}`}><span>{m.text}</span><div className="message-meta"><small>{time(m.createdAt)}</small>{mine && <small>{seen ? 'Seen' : 'Sent'}</small>}</div></div>
+                  <div className={`message-bubble-wrap ${mine ? 'mine' : ''}`}>
+                    <div
+                      className={`bubble ${mine ? 'mine' : ''}`}
+                      onContextMenu={(e) => {
+                        if (!mine) return;
+                        e.preventDefault();
+                        setMessageMenuId(messageMenuId === m._id ? null : m._id);
+                      }}
+                      onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
+                    >
+                      <span>{m.text}</span>
+                      <div className="message-meta"><small>{time(m.createdAt)}</small>{mine && <small>{seen ? 'Seen' : 'Sent'}</small>}</div>
+                    </div>
+                    {mine && messageMenuId === m._id && (
+                      <div className="message-action-menu" onClick={(e) => e.stopPropagation()}>
+                        <button type="button" onClick={() => deleteMessage(m._id)} disabled={deletingMessageId === m._id}>
+                          <Trash2 /> {deletingMessageId === m._id ? "Deleting..." : "Delete message"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>;
               }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><p>@{other(active)?.username}</p><span>Start a conversation with this person.</span></div>}
             </div>
@@ -1734,7 +1813,7 @@ function MessagesPage({ openConversationId = null }) {
 function NotificationsPage() {
   const [items, setItems] = useState([]);
   useEffect(() => { api("/notifications").then(d => setItems(d.notifications || [])).catch(() => {}); }, []);
-  return <div className="page"><div className="page-heading"><div><h1>Notifications</h1><p>Likes, comments, follows and more</p></div></div>{items.map(n => <div className="notification" key={n._id}><Avatar user={n.actor} /><div><b>{n.actor?.username}</b> {n.text}<small>{new Date(n.createdAt).toLocaleString()}</small></div></div>)}{!items.length && <div className="empty"><Bell /><h2>No notifications</h2><p>New activity will appear here.</p></div>}</div>;
+  return <div className="page"><div className="page-heading"><div><h1>Notifications</h1><p>Likes, comments, follows and more</p></div></div>{items.map(n => <div className="notification" key={n._id}><Avatar user={n.actor} /><div><UserLink user={n.actor} /> {n.text}<small>{new Date(n.createdAt).toLocaleString()}</small></div></div>)}{!items.length && <div className="empty"><Bell /><h2>No notifications</h2><p>New activity will appear here.</p></div>}</div>;
 }
 
 function SavedPage({ user, embedded = false }) {
