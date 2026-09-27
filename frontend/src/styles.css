@@ -7615,3 +7615,96 @@ div[style*="min-width: 170px"]{
     min-width:28px !important;
   }
 }
+
+/* =========================================================
+   PRIVATE ACCOUNT FOLLOW REQUESTS - ACCEPT / REJECT
+   ========================================================= */
+.messages-requests-modal .request-row {
+  display: grid !important;
+  grid-template-columns: 48px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 13px 16px !important;
+}
+
+.messages-requests-modal .request-row-copy {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+.messages-requests-modal .request-row-copy span {
+  color: #888 !important;
+  font-size: 11px !important;
+  margin-top: 3px !important;
+}
+
+.messages-requests-modal .request-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.messages-requests-modal .request-actions button {
+  height: 36px !important;
+  min-width: 76px !important;
+  padding: 0 13px !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: transform .15s ease, opacity .15s ease, background .15s ease !important;
+}
+
+.messages-requests-modal .request-actions button:active {
+  transform: scale(.97) !important;
+}
+
+.messages-requests-modal .request-actions button:disabled {
+  opacity: .55 !important;
+  cursor: not-allowed !important;
+}
+
+.messages-requests-modal .request-accept-btn {
+  background: #0095f6 !important;
+  color: #fff !important;
+}
+
+.messages-requests-modal .request-accept-btn:hover:not(:disabled) {
+  background: #1877f2 !important;
+}
+
+.messages-requests-modal .request-reject-btn {
+  background: #efefef !important;
+  color: #111827 !important;
+}
+
+.messages-requests-modal .request-reject-btn:hover:not(:disabled) {
+  background: #e2e2e2 !important;
+}
+
+@media (max-width: 700px) {
+  .messages-requests-modal .request-row {
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    padding: 13px 14px !important;
+  }
+
+  .messages-requests-modal .request-actions {
+    grid-column: 2 !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    margin-top: 4px !important;
+  }
+
+  .messages-requests-modal .request-actions button {
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    height: 38px !important;
+  }
+}

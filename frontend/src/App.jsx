@@ -2332,6 +2332,7 @@ function MessagesPage({ openConversationId = null }) {
   const [notes, setNotes] = useState([]);
   const [requests, setRequests] = useState([]);
   const [requestsOpen, setRequestsOpen] = useState(false);
+  const [requestActionId, setRequestActionId] = useState(null);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -2361,7 +2362,41 @@ function MessagesPage({ openConversationId = null }) {
   }
 
   async function loadRequests() {
-    try { const d = await api('/follows/requests'); setRequests(d.requests || []); } catch { setRequests([]); }
+    try {
+      const d = await api('/follows/requests');
+      setRequests(d.requests || []);
+    } catch {
+      setRequests([]);
+    }
+  }
+
+  async function acceptFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/accept`, { method: 'POST' });
+      setRequests(prev => prev.filter(r => String(r._id) !== String(requestId)));
+      // Refresh conversations/notes as the newly accepted follower relationship
+      // can immediately affect available messaging and activity state.
+      await loadConversations();
+    } catch (e) {
+      alert(e.message || 'Unable to accept follow request');
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  async function declineFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/decline`, { method: 'POST' });
+      setRequests(prev => prev.filter(r => String(r._id) !== String(requestId)));
+    } catch (e) {
+      alert(e.message || 'Unable to reject follow request');
+    } finally {
+      setRequestActionId(null);
+    }
   }
 
   useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
@@ -2677,10 +2712,47 @@ function MessagesPage({ openConversationId = null }) {
 
       {requestsOpen && <div className="messages-requests-overlay" onClick={() => setRequestsOpen(false)}><div className="messages-requests-modal" onClick={e => e.stopPropagation()}>
         <div className="messages-requests-head"><b>Follow requests</b><button onClick={() => setRequestsOpen(false)}><X /></button></div>
-        {!requests.length ? <div className="requests-empty"><UserPlus /><b>No requests</b><span>New requests will appear here.</span></div> : <div className="requests-list">{requests.map(r => {
-          const u = r.follower || r.requester || r.actor;
-          return <div className="request-row" key={r._id}><Avatar user={u} size={48} /><div><UserLink user={u} /><span>wants to follow you</span></div></div>;
-        })}</div>}
+        {!requests.length ? (
+          <div className="requests-empty">
+            <UserPlus />
+            <b>No requests</b>
+            <span>New follow requests will appear here.</span>
+          </div>
+        ) : (
+          <div className="requests-list">
+            {requests.map(r => {
+              const u = r.follower || r.requester || r.actor || {};
+              const busy = String(requestActionId || '') === String(r._id);
+              return (
+                <div className="request-row" key={r._id}>
+                  <Avatar user={u} size={48} />
+                  <div className="request-row-copy">
+                    <UserLink user={u} />
+                    <span>wants to follow you</span>
+                  </div>
+                  <div className="request-actions">
+                    <button
+                      type="button"
+                      className="request-accept-btn"
+                      disabled={!!requestActionId}
+                      onClick={() => acceptFollowRequest(r._id)}
+                    >
+                      {busy ? '...' : 'Accept'}
+                    </button>
+                    <button
+                      type="button"
+                      className="request-reject-btn"
+                      disabled={!!requestActionId}
+                      onClick={() => declineFollowRequest(r._id)}
+                    >
+                      {busy ? '...' : 'Reject'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div></div>}
 
       <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`}>
