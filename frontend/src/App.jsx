@@ -1400,34 +1400,287 @@ function PostComposer({ user, onClose, onDone }) {
   const [taggedPeople, setTaggedPeople] = useState([]);
   const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTool, setActiveTool] = useState("");
 
   async function publish() {
-    if (!files.length && !caption.trim()) return alert("Add a photo/video or caption");
+    if (!files.length && !caption.trim()) {
+      alert("Add a photo/video or caption");
+      return;
+    }
+
     setLoading(true);
     try {
       const fd = new FormData();
-      files.forEach(f => fd.append("media", f));
-      fd.append("caption", caption); fd.append("location", location); fd.append("hashtags", hashtags);
+      files.forEach(file => fd.append("media", file));
+      fd.append("caption", caption);
+      fd.append("location", location);
+      fd.append("hashtags", hashtags);
       fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
+
       await api("/posts", { method: "POST", body: fd });
       onDone();
       alert("Post shared");
-    } catch (e) { alert(e.message); } finally { setLoading(false); }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  return <Modal title="Create new post" onClose={onClose}>
-    <div className="composer-user"><Avatar user={user} /><div><b>{user?.username}</b><span>Share with your followers</span></div></div>
-    <textarea className="composer-text" placeholder="What's on your mind?" value={caption} onChange={e => setCaption(e.target.value)} />
-    {files.length > 0 && <div className="file-preview">{files.map((f, i) => <div key={i}><ImageIcon /> <span>{f.name}</span></div>)}</div>}
-    <div className="form-row"><input placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} /><input placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} /></div>
-    <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
-      <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
-    </button>
-    {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
-    <input ref={input} type="file" multiple accept="image/*,video/*" hidden onChange={e => setFiles(Array.from(e.target.files || []))} />
-    <button className="secondary full" onClick={() => input.current?.click()}><ImageIcon /> Photos / Videos</button>
-    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Sharing..." : "Share"}</button>
-  </Modal>;
+  function chooseFiles(event) {
+    const selected = Array.from(event.target.files || []);
+    setFiles(selected);
+    event.target.value = "";
+  }
+
+  function removeFile(index) {
+    setFiles(current => current.filter((_, i) => i !== index));
+  }
+
+  function openPoll() {
+    setActiveTool("poll");
+    setCaption(current => current || "Poll: ");
+  }
+
+  function openPrompt() {
+    setActiveTool("prompt");
+    setCaption(current => current || "Prompt: ");
+  }
+
+  function openAudio() {
+    alert("Audio selection can be connected to your music library/API here.");
+  }
+
+  function openProducts() {
+    alert("Product tagging can be connected when your product catalog is available.");
+  }
+
+  return (
+    <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New post">
+      <div className="publish-page">
+        <header className="publish-page-header">
+          <button
+            type="button"
+            className="publish-back-button"
+            onClick={onClose}
+            aria-label="Go back"
+          >
+            <ChevronRight style={{ transform: "rotate(180deg)" }} />
+          </button>
+          <h1>New post</h1>
+          <div className="publish-header-spacer" />
+        </header>
+
+        <div className="publish-scroll-area">
+          <section className="publish-media-section">
+            {files.length ? (
+              <div className={`publish-media-preview ${files.length > 1 ? "multiple" : ""}`}>
+                {files.map((file, index) => {
+                  const url = URL.createObjectURL(file);
+                  const isVideo = file.type.startsWith("video/");
+                  return (
+                    <div className="publish-media-item" key={`${file.name}-${file.lastModified}-${index}`}>
+                      {isVideo ? (
+                        <video src={url} muted playsInline controls preload="metadata" />
+                      ) : (
+                        <img src={url} alt={file.name} />
+                      )}
+                      <button
+                        type="button"
+                        className="publish-media-remove"
+                        onClick={() => removeFile(index)}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X />
+                      </button>
+                      {files.length > 1 && <span className="publish-media-count">{index + 1}/{files.length}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="publish-empty-media"
+                onClick={() => input.current?.click()}
+              >
+                <ImageIcon />
+                <b>Add photos or videos</b>
+                <span>Choose media from your device</span>
+              </button>
+            )}
+          </section>
+
+          <section className="publish-caption-section">
+            <div className="publish-user-row">
+              <Avatar user={user} size={42} />
+              <div>
+                <b>{user?.username || user?.name || "You"}</b>
+                <span>New post</span>
+              </div>
+            </div>
+
+            <textarea
+              className="publish-caption"
+              placeholder="Add a caption..."
+              value={caption}
+              onChange={e => setCaption(e.target.value)}
+              maxLength={2200}
+            />
+            <div className="publish-caption-meta">
+              <span>{hashtags ? "Hashtags added" : ""}</span>
+              <span>{caption.length}/2,200</span>
+            </div>
+          </section>
+
+          <section className="publish-pills">
+            <button
+              type="button"
+              className={activeTool === "poll" ? "active" : ""}
+              onClick={openPoll}
+            >
+              <SlidersHorizontal />
+              <span>Poll</span>
+            </button>
+            <button
+              type="button"
+              className={activeTool === "prompt" ? "active" : ""}
+              onClick={openPrompt}
+            >
+              <MessageSquareText />
+              <span>Prompt</span>
+            </button>
+          </section>
+
+          <section className="publish-options-card">
+            <button type="button" className="publish-option-row" onClick={openAudio}>
+              <span className="publish-option-icon publish-audio-icon"><Volume2 /></span>
+              <span className="publish-option-copy">
+                <b>Add audio</b>
+                <small>Choose music or original audio</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className={`publish-option-row ${taggedPeople.length ? "selected" : ""}`}
+              onClick={() => setTagPeopleOpen(true)}
+            >
+              <span className="publish-option-icon"><UserPlus /></span>
+              <span className="publish-option-copy">
+                <b>Tag people</b>
+                <small>{taggedPeople.length ? `${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"} tagged` : "Tag people in this post"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button type="button" className="publish-option-row" onClick={openProducts}>
+              <span className="publish-option-icon"><ShoppingBag /></span>
+              <span className="publish-option-copy">
+                <b>Add products</b>
+                <small>Tag products in your post</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className={`publish-option-row ${location.trim() ? "selected" : ""}`}
+              onClick={() => setActiveTool(activeTool === "location" ? "" : "location")}
+            >
+              <span className="publish-option-icon"><PinOff /></span>
+              <span className="publish-option-copy">
+                <b>Add location</b>
+                <small>{location.trim() || "Add where this post was taken"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            {activeTool === "location" && (
+              <div className="publish-inline-field">
+                <PinOff />
+                <input
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  placeholder="Search or enter a location"
+                  autoFocus
+                />
+                {location && (
+                  <button type="button" onClick={() => setLocation("")} aria-label="Clear location">
+                    <X />
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className="publish-option-row"
+              onClick={() => input.current?.click()}
+            >
+              <span className="publish-option-icon"><ImageIcon /></span>
+              <span className="publish-option-copy">
+                <b>Add more media</b>
+                <small>{files.length ? `${files.length} selected` : "Choose photos or videos"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+          </section>
+
+          <section className="publish-hashtags-section">
+            <label htmlFor="publish-hashtags">Hashtags</label>
+            <input
+              id="publish-hashtags"
+              value={hashtags}
+              onChange={e => setHashtags(e.target.value)}
+              placeholder="#reelsgo #photo #life"
+            />
+          </section>
+
+          <input
+            ref={input}
+            type="file"
+            multiple
+            accept="image/*,video/*"
+            hidden
+            onChange={chooseFiles}
+          />
+        </div>
+
+        <div className="publish-bottom-bar">
+          <button
+            type="button"
+            className="publish-share-button"
+            disabled={loading || (!files.length && !caption.trim())}
+            onClick={publish}
+          >
+            {loading ? "Sharing..." : "Share"}
+          </button>
+        </div>
+
+        {tagPeopleOpen && (
+          <div className="publish-tag-overlay">
+            <div className="publish-tag-card">
+              <TagPeoplePicker
+                selected={taggedPeople}
+                setSelected={setTaggedPeople}
+                onClose={() => setTagPeopleOpen(false)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function StoryComposer({ onClose, onDone }) {
