@@ -13,6 +13,38 @@ import {
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
 
+
+// Built-in emoji picker: no external package required, so it works on desktop,
+// Android, iPhone/iPad and small-screen browsers without extra dependencies.
+const REELSGO_EMOJI_CATEGORIES = {
+  Smileys: [
+    "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑"
+  ],
+  People: [
+    "👋","🤚","🖐️","✋","🖖","👌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🙏","💪","🫶","❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","✨","💫","⭐","🌟","🔥","💯","🎉","🎊","🥳"
+  ],
+  Animals: [
+    "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈","🙉","🙊","🐒","🐔","🐧","🐦","🐤","🐣","🐥","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🪲","🦋","🐌","🐞","🐜","🕷️","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦀","🐠","🐟","🐡","🐬","🐳","🦈","🐊","🐘","🦏","🦛","🐪","🐫","🦒","🦘","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌"
+  ],
+  Food: [
+    "🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🌽","🥕","🧄","🧅","🥔","🍠","🥐","🥯","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🥪","🥙","🌮","🌯","🥗","🍿","🍣","🍤","🍜","🍝","🍚","🍙","🍱","🥟","🍦","🍧","🍨","🍩","🍪","🎂","🍰","🧁","🍫","🍭","🍬","🍮","☕","🧋","🥤","🍹","🍺","🍻","🍷","🥂"
+  ],
+  Travel: [
+    "🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🛵","🏍️","🚲","✈️","🛫","🛬","🚁","🚀","🛸","🚢","⛵","🚤","🗺️","🗽","🗼","🏰","🏯","🏝️","🏖️","🏜️","🌋","⛰️","🏔️","🌅","🌄","🌇","🌃","🌌","🌠","🌍","🌎","🌏","🏕️","⛺","🎡","🎢","🎠","🎭","🎨","🎬","🎤","🎧","🎮","🎲","⚽","🏀","🏈","⚾","🎾","🏆"
+  ],
+  Objects: [
+    "📱","💻","🖥️","⌨️","🖱️","🖨️","📷","📸","📹","🎥","☎️","📞","📺","📻","⏰","⌚","💡","🔦","🕯️","📚","📖","✏️","📝","📌","📎","🔒","🔓","🔑","🔨","🛠️","⚙️","🔧","🔗","💎","💰","💵","💳","🎁","🎈","🎀","🧸","🪄","🎯","🚨","⚡","☀️","🌙","☁️","☔","❄️","☃️","🌈","💥","💦","💨"
+  ],
+  Symbols: [
+    "❤️","🩷","🧡","💛","💚","💙","🩵","💜","🤎","🖤","🩶","🤍","💔","❤️‍🔥","❤️‍🩹","💋","💯","💢","💥","💫","💦","💨","🕳️","💣","💬","👁️‍🗨️","💤","✔️","☑️","❌","❗","❓","‼️","⁉️","⭕","🚫","⚠️","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔶","🔷","🔸","🔹","⭐","🌟","✨","⚡","🔥","🎉","🎊","💖","💘","💝"
+  ],
+  Flags: [
+    "🏳️","🏴","🏁","🚩","🏳️‍🌈","🏳️‍⚧️","🇮🇳","🇺🇸","🇬🇧","🇨🇦","🇦🇺","🇯🇵","🇰🇷","🇸🇬","🇦🇪","🇩🇪","🇫🇷","🇮🇹","🇪🇸","🇧🇷","🇲🇽","🇿🇦","🇳🇿","🇵🇭","🇮🇩","🇹🇭","🇻🇳","🇸🇦","🇹🇷","🇨🇭","🇳🇱","🇸🇪","🇳🇴","🇩🇰","🇫🇮","🇮🇪","🇵🇹","🇬🇷","🇷🇺","🇺🇦","🇵🇱","🇦🇹","🇧🇪","🇦🇷","🇨🇱","🇨🇴","🇵🇪","🇪🇬","🇳🇬","🇰🇪"
+  ]
+};
+
+const REELSGO_EMOJI_TABS = Object.keys(REELSGO_EMOJI_CATEGORIES);
+
 const getToken = () => localStorage.getItem("vk_token");
 const getUser = () => {
   try { return JSON.parse(localStorage.getItem("vk_user") || "null"); } catch { return null; }
@@ -1586,6 +1618,9 @@ function MessagesPage({ openConversationId = null }) {
   const [conversationQuery, setConversationQuery] = useState('');
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [emojiCategory, setEmojiCategory] = useState("Smileys");
+  const emojiPickerRef = useRef(null);
 
   async function loadConversations(selectId = null) {
     try {
@@ -1609,6 +1644,17 @@ function MessagesPage({ openConversationId = null }) {
   }
 
   useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
+
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const closeOnOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setEmojiOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    return () => document.removeEventListener("pointerdown", closeOnOutside);
+  }, [emojiOpen]);
 
   useEffect(() => {
     if (!openConversationId) return;
@@ -1636,6 +1682,11 @@ function MessagesPage({ openConversationId = null }) {
       setMessages(rows);
       await Promise.all(rows.filter(m => String(m.sender?._id) !== String(me?._id) && !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))).slice(-50).map(m => api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})));
     } catch (e) { alert(e.message); }
+  }
+
+  function insertEmoji(emoji) {
+    setText(current => `${current}${emoji}`);
+    setEmojiOpen(true);
   }
 
   async function sendMessage() {
@@ -1798,10 +1849,56 @@ function MessagesPage({ openConversationId = null }) {
                 </div>;
               }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><p>@{other(active)?.username}</p><span>Start a conversation with this person.</span></div>}
             </div>
-            <div className="chat-input instagram-chat-input">
-              <button type="button" className="chat-attach-button"><Paperclip /></button>
-              <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Message..." disabled={sending} />
-              {text.trim() ? <button className="chat-send-button" onClick={sendMessage} disabled={sending}><Send /></button> : <button className="chat-smile-button"><Smile /></button>}
+            <div className="chat-input instagram-chat-input" ref={emojiPickerRef}>
+              <button type="button" className="chat-attach-button" aria-label="Attach" title="Attach"><Paperclip /></button>
+              <div className="chat-message-field">
+                <input
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                  onFocus={() => {}}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                  placeholder="Message..."
+                  disabled={sending}
+                  aria-label="Message"
+                />
+                <button
+                  type="button"
+                  className={`chat-smile-button ${emojiOpen ? 'active' : ''}`}
+                  onClick={() => setEmojiOpen(value => !value)}
+                  aria-label="Emoji"
+                  title="Emoji"
+                >
+                  <Smile />
+                </button>
+                {emojiOpen && (
+                  <div className="reelsgo-emoji-picker" role="dialog" aria-label="Emoji picker">
+                    <div className="reelsgo-emoji-picker-head">
+                      <b>Emojis</b>
+                      <button type="button" onClick={() => setEmojiOpen(false)} aria-label="Close emoji picker"><X /></button>
+                    </div>
+                    <div className="reelsgo-emoji-tabs" role="tablist">
+                      {REELSGO_EMOJI_TABS.map(category => (
+                        <button
+                          type="button"
+                          key={category}
+                          className={emojiCategory === category ? 'active' : ''}
+                          onClick={() => setEmojiCategory(category)}
+                          aria-label={category}
+                          title={category}
+                        >
+                          {category === 'Smileys' ? '😀' : category === 'People' ? '👍' : category === 'Animals' ? '🐶' : category === 'Food' ? '🍕' : category === 'Travel' ? '✈️' : category === 'Objects' ? '💡' : category === 'Symbols' ? '❤️' : '🇮🇳'}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="reelsgo-emoji-grid">
+                      {REELSGO_EMOJI_CATEGORIES[emojiCategory].map((emoji, index) => (
+                        <button type="button" key={`${emoji}-${index}`} onClick={() => insertEmoji(emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {text.trim() && <button type="button" className="chat-send-button" onClick={sendMessage} disabled={sending} aria-label="Send"><Send /></button>}
             </div>
           </>}
         </div>
