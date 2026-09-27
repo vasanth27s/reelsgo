@@ -6828,3 +6828,175 @@ textarea{
     box-sizing: border-box !important;
   }
 }
+
+
+/* ============================================================
+   REELSGO — MESSAGE TIMESTAMP / SEEN TEXT FIX
+   ALL DEVICES: MOBILE + TABLET + LAPTOP + DESKTOP
+
+   Keeps:
+   - timestamp horizontal
+   - Sent / Seen horizontal
+   - timestamp below the message text
+   - timestamp and status on the same row
+   - no vertical character stacking
+   - existing message functionality unchanged
+   ============================================================ */
+
+.messages-page .message-line .bubble {
+  box-sizing: border-box !important;
+}
+
+.messages-page .message-line .bubble .message-meta {
+  width: 100% !important;
+  min-width: max-content !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 12px !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 6px !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+
+  white-space: nowrap !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+
+  overflow: visible !important;
+}
+
+.messages-page .message-line .bubble .message-meta small {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  font-size: 8px !important;
+  line-height: 1.2 !important;
+
+  white-space: nowrap !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Make short messages large enough to contain timestamp + Seen/Sent. */
+.messages-page .message-line .bubble {
+  min-width: max-content !important;
+}
+
+/* Do not allow long message text to force the entire bubble off-screen. */
+.messages-page .message-line .bubble > span {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* Keep the meta row below the message text. */
+.messages-page .message-line .bubble > .message-meta {
+  position: static !important;
+  clear: both !important;
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width: 700px) {
+
+  .messages-page .message-line .bubble {
+    width: fit-content !important;
+    max-width: min(82%, 310px) !important;
+    min-width: max-content !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta {
+    width: max-content !important;
+    max-width: 100% !important;
+    min-width: max-content !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 5px !important;
+    overflow: visible !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta small {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .messages-page .message-line .bubble.mine .message-meta {
+    justify-content: flex-end !important;
+  }
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+@media (min-width: 701px) and (max-width: 1100px) {
+
+  .messages-page .message-line .bubble {
+    min-width: max-content !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta {
+    flex-wrap: nowrap !important;
+    min-width: max-content !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta small {
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ============================================================
+   LAPTOP / DESKTOP
+   ============================================================ */
+@media (min-width: 1101px) {
+
+  .messages-page .message-line .bubble {
+    min-width: max-content !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    min-width: max-content !important;
+  }
+
+  .messages-page .message-line .bubble .message-meta small {
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+  }
+}
