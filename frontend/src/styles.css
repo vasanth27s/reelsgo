@@ -8571,3 +8571,194 @@ div[style*="min-width: 170px"]{
 .story-viewer-top > button:hover {
   background: rgba(255,255,255,.18) !important;
 }
+
+/* ============================================================
+   REELSGO WORDMARK — USE THE STYLISH REELSGO IMAGE
+   The supplied 222x93 wordmark is shown without cropping.
+   ============================================================ */
+.reelsgo-wordmark {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  flex: 0 0 auto !important;
+}
+
+.brand {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+.brand-wordmark {
+  width: 148px !important;
+  height: auto !important;
+  max-height: 50px !important;
+  object-fit: contain !important;
+}
+
+.mobile-brand {
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+.mobile-brand-wordmark {
+  width: 118px !important;
+  height: auto !important;
+  max-height: 42px !important;
+  object-fit: contain !important;
+}
+
+.auth-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  flex-wrap: wrap !important;
+}
+
+.auth-inline-wordmark {
+  display: inline-block !important;
+  width: 112px !important;
+  height: auto !important;
+  max-height: 40px !important;
+  vertical-align: middle !important;
+}
+
+.auth-inline-wordmark-small {
+  width: 92px !important;
+  max-height: 34px !important;
+}
+
+@media (min-width: 701px) {
+  .brand-wordmark {
+    width: 150px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .mobile-brand-wordmark {
+    width: 112px !important;
+    max-height: 40px !important;
+  }
+
+  .auth-inline-wordmark {
+    width: 100px !important;
+    max-height: 36px !important;
+  }
+
+  .auth-inline-wordmark-small {
+    width: 86px !important;
+    max-height: 32px !important;
+  }
+}
+
+
+/* =========================================================
+   REELSGO — TEXT-ONLY CINEMATIC WORDMARK
+   No logo image is used anywhere.
+   ========================================================= */
+.reelsgo-text-logo {
+  display: inline-block !important;
+  position: relative !important;
+  white-space: nowrap !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-weight: 900 !important;
+  font-style: normal !important;
+  letter-spacing: -2.8px !important;
+  line-height: .86 !important;
+  color: #f7f8fb !important;
+  text-transform: uppercase !important;
+  text-rendering: geometricPrecision !important;
+  -webkit-font-smoothing: antialiased !important;
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.72),
+    0 2px 0 rgba(255,255,255,.20),
+    0 3px 3px rgba(0,0,0,.55) !important;
+}
+
+.reelsgo-text-logo::first-letter {
+  letter-spacing: -3.2px !important;
+}
+
+.brand .reelsgo-text-logo {
+  font-size: 30px !important;
+  transform: scaleX(.93) !important;
+  transform-origin: left center !important;
+}
+
+.mobile-brand .reelsgo-text-logo {
+  font-size: 24px !important;
+  letter-spacing: -2.3px !important;
+  transform: scaleX(.94) !important;
+  transform-origin: left center !important;
+}
+
+.auth-showcase-wordmark {
+  font-size: clamp(42px, 5vw, 68px) !important;
+  letter-spacing: -5px !important;
+  transform: scaleX(.92) !important;
+  transform-origin: center center !important;
+}
+
+.auth-page-wordmark {
+  font-size: 42px !important;
+  letter-spacing: -4px !important;
+  transform: scaleX(.92) !important;
+  transform-origin: center center !important;
+}
+
+.auth-inline-wordmark {
+  font-size: 25px !important;
+  letter-spacing: -2.5px !important;
+  vertical-align: middle !important;
+  line-height: .9 !important;
+}
+
+.auth-inline-wordmark-small {
+  font-size: 22px !important;
+  letter-spacing: -2.2px !important;
+}
+
+/* Override the old image-wordmark sizing rules */
+.brand-wordmark,
+.mobile-brand-wordmark,
+.auth-inline-wordmark {
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: initial !important;
+}
+
+@media (max-width: 700px) {
+  .brand .reelsgo-text-logo { font-size: 27px !important; }
+  .mobile-brand .reelsgo-text-logo {
+    font-size: 23px !important;
+    letter-spacing: -2.2px !important;
+  }
+  .auth-showcase-wordmark {
+    font-size: 45px !important;
+    letter-spacing: -4px !important;
+  }
+  .auth-page-wordmark {
+    font-size: 38px !important;
+    letter-spacing: -3.5px !important;
+  }
+  .auth-inline-wordmark {
+    font-size: 23px !important;
+    letter-spacing: -2.2px !important;
+  }
+  .auth-inline-wordmark-small {
+    font-size: 20px !important;
+  }
+}

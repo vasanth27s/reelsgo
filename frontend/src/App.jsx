@@ -1,4 +1,3 @@
-import reelsGoLogo from "../image.png";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
@@ -139,9 +138,13 @@ function ReelsGoBranding() {
       icon.dataset.reelsgoFavicon = "true";
       document.head.appendChild(icon);
     }
-    icon.href = reelsGoLogo;
+    icon.remove();
   }, []);
   return null;
+}
+
+function ReelsGoLogo({ className = "" }) {
+  return <span className={`reelsgo-text-logo ${className}`}>REELSGO</span>;
 }
 
 function App() {
@@ -221,7 +224,7 @@ function App() {
       <div className="app">
       <aside className="sidebar">
         <button className="brand" onClick={() => navigate("home")} aria-label="ReelsGo home">
-          <img className="brand-logo-img" src={reelsGoLogo} alt="ReelsGo" /><span>ReelsGo</span>
+          <ReelsGoLogo className="brand-wordmark" />
         </button>
 
         <div className="sidebar-main-nav">
@@ -243,7 +246,7 @@ function App() {
       </aside>
 
       <header className="mobile-header">
-        <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><img className="mobile-brand-logo" src={reelsGoLogo} alt="ReelsGo" /><span>ReelsGo</span></button>
+        <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
         <div className="mobile-header-actions">
           <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
           <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
@@ -342,16 +345,16 @@ function Auth({ onLogin }) {
   return (
     <div className="auth-page">
       <div className="auth-showcase">
-        <div className="auth-showcase-logo"><img className="auth-logo-img" src={reelsGoLogo} alt="ReelsGo" /></div>
+        <div className="auth-showcase-logo"><ReelsGoLogo className="auth-showcase-wordmark" /></div>
         <h1>Share your world.</h1>
         <p>Photos, Reels, Stories, messages and the people you care about — all in one social space.</p>
         <div className="auth-pills"><span>Posts</span><span>Stories</span><span>Reels</span><span>Messages</span></div>
       </div>
 
       <form className="auth-card" onSubmit={submit}>
-        <div className="auth-logo"><img className="auth-logo-img" src={reelsGoLogo} alt="ReelsGo" /></div>
-        <h2>{mode === "login" ? "Log in to ReelsGo" : "Create an account"}</h2>
-        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : "Join ReelsGo and start sharing."}</p>
+        <div className="auth-logo"><ReelsGoLogo className="auth-page-wordmark" /></div>
+        <h2 className="auth-title">{mode === "login" ? <>Log in to <ReelsGoLogo className="auth-inline-wordmark" /></> : "Create an account"}</h2>
+        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : <>Join <ReelsGoLogo className="auth-inline-wordmark auth-inline-wordmark-small" /> and start sharing.</>}</p>
 
         {mode === "signup" && <>
           <Field icon={<CircleUser />} placeholder="Full name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
