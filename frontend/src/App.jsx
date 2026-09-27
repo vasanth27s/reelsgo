@@ -305,7 +305,7 @@ function App() {
 }
 
 function Nav({ icon, label, active, onClick }) {
-  return <button className={`nav ${active ? "active" : ""}`} onClick={onClick}><span>{icon}</span>{label}</button>;
+  return <button className={`nav ${active ? "active" : ""} ${label === "Messages" ? "messages-nav-item" : ""}`} onClick={onClick}><span>{icon}</span>{label}</button>;
 }
 
 function NavMobile({ icon, label, active, onClick }) {
@@ -1645,6 +1645,20 @@ function MessagesPage({ openConversationId = null }) {
 
   useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
 
+  // Refresh the conversation list so a newly received message can show
+  // an unread indicator without changing the existing messaging UI.
+  useEffect(() => {
+    let cancelled = false;
+    const refreshUnread = async () => {
+      try {
+        const d = await api('/messages/conversations');
+        if (!cancelled) setConversations(d.conversations || []);
+      } catch {}
+    };
+    const timer = setInterval(refreshUnread, 4000);
+    return () => { cancelled = true; clearInterval(timer); };
+  }, []);
+
   useEffect(() => {
     if (!emojiOpen) return;
     const closeOnOutside = (event) => {
@@ -1667,20 +1681,66 @@ function MessagesPage({ openConversationId = null }) {
         const rows = cd.conversations || [];
         setConversations(rows);
         const c = rows.find(x => String(x._id) === String(openConversationId));
-        if (c) { setActive(c); setMobileChat(true); }
-        setMessages(md.messages || []);
+        if (c) {
+          setActive({ ...c, unreadCount: 0 });
+          setMobileChat(true);
+        }
+        const openedMessages = md.messages || [];
+        setMessages(openedMessages);
+        const unseen = openedMessages
+          .filter(
+            m =>
+              String(m.sender?._id) !== String(me?._id) &&
+              !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+          )
+          .slice(-50);
+        await Promise.all(
+          unseen.map(m =>
+            api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+          )
+        );
+        setConversations(current =>
+          current.map(item =>
+            String(item._id) === String(openConversationId)
+              ? { ...item, unreadCount: 0 }
+              : item
+          )
+        );
       } catch (e) { console.error(e); }
     })();
   }, [openConversationId]);
 
   async function openConversation(c) {
-    setActive(c);
+    setActive({ ...c, unreadCount: 0 });
     setMobileChat(true);
     try {
       const d = await api(`/messages/conversations/${c._id}/messages`);
       const rows = d.messages || [];
       setMessages(rows);
-      await Promise.all(rows.filter(m => String(m.sender?._id) !== String(me?._id) && !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))).slice(-50).map(m => api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})));
+
+      const unseen = rows
+        .filter(
+          m =>
+            String(m.sender?._id) !== String(me?._id) &&
+            !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+        )
+        .slice(-50);
+
+      await Promise.all(
+        unseen.map(m =>
+          api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+        )
+      );
+
+      // Remove the unread indicator immediately after the receiver opens the chat.
+      setConversations(current =>
+        current.map(item =>
+          String(item._id) === String(c._id)
+            ? { ...item, unreadCount: 0 }
+            : item
+        )
+      );
+      setActive(current => current ? { ...current, unreadCount: 0 } : current);
     } catch (e) { alert(e.message); }
   }
 
@@ -1806,8 +1866,17 @@ function MessagesPage({ openConversationId = null }) {
           {loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
             {filteredConversations.map(c => {
               const u = other(c); const selected = String(active?._id) === String(c._id);
-              return <button className={`conversation-item ${selected ? 'active' : ''}`} key={c._id} onClick={() => openConversation(c)}>
-                <Avatar user={u} size={58} /><div className="conversation-copy"><UserLink user={u} className="conversation-username" /><span>{c.lastMessage?.text || 'Start a conversation'}</span>{c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}</div>
+              const unread = Number(c.unreadCount || 0) > 0;
+              return <button className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''}`} key={c._id} onClick={() => openConversation(c)}>
+                <div className="conversation-avatar-wrap">
+                  <Avatar user={u} size={58} />
+                  {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
+                </div>
+                <div className="conversation-copy">
+                  <UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />
+                  <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
+                  {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
+                </div>
               </button>;
             })}
           </div> : <div className="chat-empty-list"><MessageCircle /><b>Start a conversation</b><span>Send a message to someone you follow.</span><small>Open a profile and tap Message.</small></div>}

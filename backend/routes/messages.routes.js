@@ -71,8 +71,51 @@ router.get(
           })
           .lean();
 
+      /*
+       * UNREAD MESSAGE FEATURE
+       *
+       * Count only messages:
+       * - from another user
+       * - not seen by current user
+       * - not deleted for current user
+       */
+
+      const conversationsWithUnread =
+        await Promise.all(
+          conversations.map(
+            async conversation => {
+              const unreadCount =
+                await Message.countDocuments({
+                  conversation:
+                    conversation._id,
+
+                  sender: {
+                    $ne:
+                      req.user.id
+                  },
+
+                  seenBy: {
+                    $ne:
+                      req.user.id
+                  },
+
+                  deletedFor: {
+                    $ne:
+                      req.user.id
+                  }
+                });
+
+              return {
+                ...conversation,
+                unreadCount
+              };
+            }
+          )
+        );
+
       res.json({
-        conversations
+        conversations:
+          conversationsWithUnread
       });
     } catch (e) {
       console.error(e);
@@ -138,12 +181,14 @@ router.post(
       let conversation =
         await Conversation.findOne({
           members: {
-            $all: uniqueMembers
+            $all:
+              uniqueMembers
           },
           $expr: {
             $eq: [
               {
-                $size: "$members"
+                $size:
+                  "$members"
               },
               uniqueMembers.length
             ]
@@ -153,7 +198,8 @@ router.post(
       if (!conversation) {
         conversation =
           await Conversation.create({
-            members: uniqueMembers
+            members:
+              uniqueMembers
           });
       }
 
@@ -322,9 +368,16 @@ router.post(
         await Message.create({
           conversation:
             conversationId,
+
           sender:
             req.user.id,
+
           text,
+
+          /*
+           * Sender has already seen
+           * their own message.
+           */
           seenBy: [
             req.user.id
           ]
@@ -446,6 +499,7 @@ DELETE MY MESSAGE
 
 Only the person who originally sent the
 message can delete it.
+
 =========================================================
 */
 
@@ -482,9 +536,7 @@ router.delete(
       }
 
       /*
-       * IMPORTANT:
-       * Only the sender can delete
-       * their own message.
+       * Only sender can delete.
        */
 
       if (
@@ -529,9 +581,9 @@ router.delete(
       });
 
       /*
-       * If the deleted message was
-       * the conversation's last message,
-       * find the previous message.
+       * If deleted message was the
+       * conversation's last message,
+       * find previous message.
        */
 
       if (
@@ -551,13 +603,15 @@ router.delete(
             .select("_id");
 
         conversation.lastMessage =
-          previous?._id || null;
+          previous?._id ||
+          null;
 
         await conversation.save();
       }
 
       res.json({
         ok: true,
+
         messageId:
           String(deletedId)
       });
