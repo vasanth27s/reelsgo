@@ -9359,3 +9359,46 @@ div[style*="min-width: 170px"]{
   .publish-page{max-width:760px;margin:0 auto;border-left:1px solid rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.05);box-shadow:0 0 90px rgba(0,0,0,.38)}
   .publish-page-overlay{background:#030507}
 }
+
+/* ============================================================
+   NEW STORY — SAME PUBLISH INTERFACE AS NEW POST
+   ============================================================ */
+.story-publish-page .publish-media-section{
+  margin-bottom:22px;
+}
+.story-publish-preview{
+  width:min(100%,560px);
+  overflow:hidden;
+  padding:2px 2px 8px;
+}
+.story-publish-preview .publish-media-item{
+  flex:0 0 min(100%,430px);
+}
+.story-publish-media-item{
+  aspect-ratio:4/5;
+}
+.story-empty-media{
+  cursor:pointer;
+}
+.story-empty-media svg{
+  width:42px;
+  height:42px;
+}
+.story-publish-caption{
+  min-height:90px;
+}
+.story-publish-page .publish-option-icon{
+  background:#20242c;
+}
+
+@media(max-width:700px){
+  .story-publish-preview .publish-media-item{
+    flex-basis:min(100%,430px);
+  }
+  .story-publish-media-item{
+    border-radius:16px;
+  }
+  .story-publish-caption{
+    min-height:82px;
+  }
+}

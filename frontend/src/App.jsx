@@ -5,8 +5,8 @@ import {
   Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
-  Link as LinkIcon, AtSign, UserRoundCheck, Volume2, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, ShoppingBag, Download, Maximize2, Link2, Handshake, PinOff, QrCode
+  Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -1407,7 +1407,6 @@ function PostComposer({ user, onClose, onDone }) {
       alert("Add a photo/video or caption");
       return;
     }
-
     setLoading(true);
     try {
       const fd = new FormData();
@@ -1416,7 +1415,6 @@ function PostComposer({ user, onClose, onDone }) {
       fd.append("location", location);
       fd.append("hashtags", hashtags);
       fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
-
       await api("/posts", { method: "POST", body: fd });
       onDone();
       alert("Post shared");
@@ -1438,33 +1436,20 @@ function PostComposer({ user, onClose, onDone }) {
   }
 
   function openPoll() {
-    setActiveTool("poll");
+    setActiveTool(current => current === "poll" ? "" : "poll");
     setCaption(current => current || "Poll: ");
   }
 
   function openPrompt() {
-    setActiveTool("prompt");
+    setActiveTool(current => current === "prompt" ? "" : "prompt");
     setCaption(current => current || "Prompt: ");
-  }
-
-  function openAudio() {
-    alert("Audio selection can be connected to your music library/API here.");
-  }
-
-  function openProducts() {
-    alert("Product tagging can be connected when your product catalog is available.");
   }
 
   return (
     <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New post">
       <div className="publish-page">
         <header className="publish-page-header">
-          <button
-            type="button"
-            className="publish-back-button"
-            onClick={onClose}
-            aria-label="Go back"
-          >
+          <button type="button" className="publish-back-button" onClick={onClose} aria-label="Go back">
             <ChevronRight style={{ transform: "rotate(180deg)" }} />
           </button>
           <h1>New post</h1>
@@ -1485,12 +1470,7 @@ function PostComposer({ user, onClose, onDone }) {
                       ) : (
                         <img src={url} alt={file.name} />
                       )}
-                      <button
-                        type="button"
-                        className="publish-media-remove"
-                        onClick={() => removeFile(index)}
-                        aria-label={`Remove ${file.name}`}
-                      >
+                      <button type="button" className="publish-media-remove" onClick={() => removeFile(index)} aria-label={`Remove ${file.name}`}>
                         <X />
                       </button>
                       {files.length > 1 && <span className="publish-media-count">{index + 1}/{files.length}</span>}
@@ -1499,11 +1479,7 @@ function PostComposer({ user, onClose, onDone }) {
                 })}
               </div>
             ) : (
-              <button
-                type="button"
-                className="publish-empty-media"
-                onClick={() => input.current?.click()}
-              >
+              <button type="button" className="publish-empty-media" onClick={() => input.current?.click()}>
                 <ImageIcon />
                 <b>Add photos or videos</b>
                 <span>Choose media from your device</span>
@@ -1519,7 +1495,6 @@ function PostComposer({ user, onClose, onDone }) {
                 <span>New post</span>
               </div>
             </div>
-
             <textarea
               className="publish-caption"
               placeholder="Add a caption..."
@@ -1534,36 +1509,17 @@ function PostComposer({ user, onClose, onDone }) {
           </section>
 
           <section className="publish-pills">
-            <button
-              type="button"
-              className={activeTool === "poll" ? "active" : ""}
-              onClick={openPoll}
-            >
+            <button type="button" className={activeTool === "poll" ? "active" : ""} onClick={openPoll}>
               <SlidersHorizontal />
               <span>Poll</span>
             </button>
-            <button
-              type="button"
-              className={activeTool === "prompt" ? "active" : ""}
-              onClick={openPrompt}
-            >
+            <button type="button" className={activeTool === "prompt" ? "active" : ""} onClick={openPrompt}>
               <MessageSquareText />
               <span>Prompt</span>
             </button>
           </section>
 
           <section className="publish-options-card">
-            <button type="button" className="publish-option-row" onClick={openAudio}>
-              <span className="publish-option-icon publish-audio-icon"><Volume2 /></span>
-              <span className="publish-option-copy">
-                <b>Add audio</b>
-                <small>Choose music or original audio</small>
-              </span>
-              <ChevronRight />
-            </button>
-
-            <div className="publish-option-divider" />
-
             <button
               type="button"
               className={`publish-option-row ${taggedPeople.length ? "selected" : ""}`}
@@ -1573,17 +1529,6 @@ function PostComposer({ user, onClose, onDone }) {
               <span className="publish-option-copy">
                 <b>Tag people</b>
                 <small>{taggedPeople.length ? `${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"} tagged` : "Tag people in this post"}</small>
-              </span>
-              <ChevronRight />
-            </button>
-
-            <div className="publish-option-divider" />
-
-            <button type="button" className="publish-option-row" onClick={openProducts}>
-              <span className="publish-option-icon"><ShoppingBag /></span>
-              <span className="publish-option-copy">
-                <b>Add products</b>
-                <small>Tag products in your post</small>
               </span>
               <ChevronRight />
             </button>
@@ -1606,12 +1551,7 @@ function PostComposer({ user, onClose, onDone }) {
             {activeTool === "location" && (
               <div className="publish-inline-field">
                 <PinOff />
-                <input
-                  value={location}
-                  onChange={e => setLocation(e.target.value)}
-                  placeholder="Search or enter a location"
-                  autoFocus
-                />
+                <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Search or enter a location" autoFocus />
                 {location && (
                   <button type="button" onClick={() => setLocation("")} aria-label="Clear location">
                     <X />
@@ -1622,11 +1562,7 @@ function PostComposer({ user, onClose, onDone }) {
 
             <div className="publish-option-divider" />
 
-            <button
-              type="button"
-              className="publish-option-row"
-              onClick={() => input.current?.click()}
-            >
+            <button type="button" className="publish-option-row" onClick={() => input.current?.click()}>
               <span className="publish-option-icon"><ImageIcon /></span>
               <span className="publish-option-copy">
                 <b>Add more media</b>
@@ -1638,31 +1574,14 @@ function PostComposer({ user, onClose, onDone }) {
 
           <section className="publish-hashtags-section">
             <label htmlFor="publish-hashtags">Hashtags</label>
-            <input
-              id="publish-hashtags"
-              value={hashtags}
-              onChange={e => setHashtags(e.target.value)}
-              placeholder="#reelsgo #photo #life"
-            />
+            <input id="publish-hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} placeholder="#reelsgo #photo #life" />
           </section>
 
-          <input
-            ref={input}
-            type="file"
-            multiple
-            accept="image/*,video/*"
-            hidden
-            onChange={chooseFiles}
-          />
+          <input ref={input} type="file" multiple accept="image/*,video/*" hidden onChange={chooseFiles} />
         </div>
 
         <div className="publish-bottom-bar">
-          <button
-            type="button"
-            className="publish-share-button"
-            disabled={loading || (!files.length && !caption.trim())}
-            onClick={publish}
-          >
+          <button type="button" className="publish-share-button" disabled={loading || (!files.length && !caption.trim())} onClick={publish}>
             {loading ? "Sharing..." : "Share"}
           </button>
         </div>
@@ -1670,11 +1589,7 @@ function PostComposer({ user, onClose, onDone }) {
         {tagPeopleOpen && (
           <div className="publish-tag-overlay">
             <div className="publish-tag-card">
-              <TagPeoplePicker
-                selected={taggedPeople}
-                setSelected={setTaggedPeople}
-                onClose={() => setTagPeopleOpen(false)}
-              />
+              <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />
             </div>
           </div>
         )}
@@ -1685,31 +1600,158 @@ function PostComposer({ user, onClose, onDone }) {
 
 function StoryComposer({ onClose, onDone }) {
   const input = useRef(null);
+  const currentUser = getUser();
   const [file, setFile] = useState(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [activeTool, setActiveTool] = useState("");
 
   async function publish() {
-    if (!file && !text.trim()) return alert("Add a photo/video or text");
+    if (!file && !text.trim()) {
+      alert("Add a photo/video or text");
+      return;
+    }
     setLoading(true);
     try {
       const fd = new FormData();
       if (file) fd.append("media", file);
       fd.append("text", text);
       await api("/stories", { method: "POST", body: fd });
-      onDone(); alert("Story shared");
-    } catch (e) { alert(e.message); } finally { setLoading(false); }
+      onDone();
+      alert("Story shared");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  return <Modal title="Create story" onClose={onClose}>
-    <div className="story-editor">
-      {file ? <div className="selected-file"><Check /> {file.name}</div> : <div className="story-editor-placeholder"><ImageIcon /><b>Add to your story</b><span>Photo, video or text</span></div>}
-      <textarea placeholder="Write something..." value={text} onChange={e => setText(e.target.value)} />
+  function chooseFile(event) {
+    setFile(event.target.files?.[0] || null);
+    event.target.value = "";
+  }
+
+  return (
+    <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New story">
+      <div className="publish-page story-publish-page">
+        <header className="publish-page-header">
+          <button type="button" className="publish-back-button" onClick={onClose} aria-label="Go back">
+            <ChevronRight style={{ transform: "rotate(180deg)" }} />
+          </button>
+          <h1>New story</h1>
+          <div className="publish-header-spacer" />
+        </header>
+
+        <div className="publish-scroll-area">
+          <section className="publish-media-section">
+            {file ? (
+              <div className="publish-media-preview story-publish-preview">
+                <div className="publish-media-item story-publish-media-item">
+                  {file.type.startsWith("video/") ? (
+                    <video src={URL.createObjectURL(file)} muted playsInline controls preload="metadata" />
+                  ) : (
+                    <img src={URL.createObjectURL(file)} alt={file.name} />
+                  )}
+                  <button type="button" className="publish-media-remove" onClick={() => setFile(null)} aria-label="Remove story media">
+                    <X />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" className="publish-empty-media story-empty-media" onClick={() => input.current?.click()}>
+                <Camera />
+                <b>Add to your story</b>
+                <span>Photo, video or text</span>
+              </button>
+            )}
+          </section>
+
+          <section className="publish-caption-section">
+            <div className="publish-user-row">
+              <Avatar user={currentUser} size={42} />
+              <div>
+                <b>{currentUser?.username || currentUser?.name || "You"}</b>
+                <span>New story</span>
+              </div>
+            </div>
+            <textarea
+              className="publish-caption story-publish-caption"
+              placeholder="Add text to your story..."
+              value={text}
+              onChange={e => setText(e.target.value)}
+              maxLength={1000}
+            />
+            <div className="publish-caption-meta">
+              <span>Share a photo, video or text</span>
+              <span>{text.length}/1,000</span>
+            </div>
+          </section>
+
+          <section className="publish-pills">
+            <button
+              type="button"
+              className={activeTool === "text" ? "active" : ""}
+              onClick={() => {
+                setActiveTool(activeTool === "text" ? "" : "text");
+                setTimeout(() => document.querySelector(".story-publish-caption")?.focus(), 0);
+              }}
+            >
+              <MessageSquareText />
+              <span>Add text</span>
+            </button>
+            <button
+              type="button"
+              className={activeTool === "gallery" ? "active" : ""}
+              onClick={() => {
+                setActiveTool("gallery");
+                input.current?.click();
+              }}
+            >
+              <Camera />
+              <span>Gallery</span>
+            </button>
+          </section>
+
+          <section className="publish-options-card">
+            <button type="button" className="publish-option-row" onClick={() => input.current?.click()}>
+              <span className="publish-option-icon"><ImageIcon /></span>
+              <span className="publish-option-copy">
+                <b>Choose from gallery</b>
+                <small>{file ? file.name : "Select a photo or video"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className={`publish-option-row ${text.trim() ? "selected" : ""}`}
+              onClick={() => {
+                setActiveTool("text");
+                setTimeout(() => document.querySelector(".story-publish-caption")?.focus(), 0);
+              }}
+            >
+              <span className="publish-option-icon"><MessageSquareText /></span>
+              <span className="publish-option-copy">
+                <b>Add text</b>
+                <small>{text.trim() || "Write something on your story"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+          </section>
+
+          <input ref={input} type="file" accept="image/*,video/*" hidden onChange={chooseFile} />
+        </div>
+
+        <div className="publish-bottom-bar">
+          <button type="button" className="publish-share-button" disabled={loading || (!file && !text.trim())} onClick={publish}>
+            {loading ? "Sharing..." : "Share to story"}
+          </button>
+        </div>
+      </div>
     </div>
-    <input ref={input} type="file" accept="image/*,video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
-    <button className="secondary full" onClick={() => input.current?.click()}><Camera /> Choose from gallery</button>
-    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Sharing..." : "Share to story"}</button>
-  </Modal>;
+  );
 }
 
 function ReelComposer({ onClose, onDone }) {
