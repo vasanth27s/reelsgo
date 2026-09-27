@@ -9402,3 +9402,91 @@ div[style*="min-width: 170px"]{
     min-height:82px;
   }
 }
+
+
+/* =========================================================
+   AUTH — USE THE REAL REELSGO LOGO IMAGE
+   Login and Signup use image.png only for the brand mark.
+   ========================================================= */
+.auth-showcase-logo{
+  width:88px !important;
+  height:88px !important;
+  margin:0 0 24px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+}
+
+.auth-logo{
+  width:100px !important;
+  height:100px !important;
+  margin:0 auto 12px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+}
+
+.auth-logo-image{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+
+.auth-showcase-image{
+  width:88px !important;
+  height:88px !important;
+}
+
+.auth-page-image{
+  width:100px !important;
+  height:100px !important;
+}
+
+.auth-title{
+  margin-top:4px !important;
+}
+
+@media (max-width:700px){
+  .auth-showcase-logo{
+    width:76px !important;
+    height:76px !important;
+    margin-bottom:20px !important;
+  }
+
+  .auth-showcase-image{
+    width:76px !important;
+    height:76px !important;
+  }
+
+  .auth-logo{
+    width:86px !important;
+    height:86px !important;
+    margin-bottom:10px !important;
+  }
+
+  .auth-page-image{
+    width:86px !important;
+    height:86px !important;
+  }
+}

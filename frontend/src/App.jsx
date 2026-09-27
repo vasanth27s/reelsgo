@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
@@ -315,6 +316,17 @@ function NavMobile({ icon, label, active, onClick }) {
   return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
 }
 
+function AuthLogo({ className = "" }) {
+  return (
+    <img
+      src={reelsGoLogo}
+      alt="ReelsGo"
+      className={`auth-logo-image ${className}`}
+      draggable="false"
+    />
+  );
+}
+
 function Auth({ onLogin }) {
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
@@ -345,16 +357,20 @@ function Auth({ onLogin }) {
   return (
     <div className="auth-page">
       <div className="auth-showcase">
-        <div className="auth-showcase-logo"><ReelsGoLogo className="auth-showcase-wordmark" /></div>
+        <div className="auth-showcase-logo">
+          <AuthLogo className="auth-showcase-image" />
+        </div>
         <h1>Share your world.</h1>
         <p>Photos, Reels, Stories, messages and the people you care about — all in one social space.</p>
         <div className="auth-pills"><span>Posts</span><span>Stories</span><span>Reels</span><span>Messages</span></div>
       </div>
 
       <form className="auth-card" onSubmit={submit}>
-        <div className="auth-logo"><ReelsGoLogo className="auth-page-wordmark" /></div>
-        <h2 className="auth-title">{mode === "login" ? <>Log in to <ReelsGoLogo className="auth-inline-wordmark" /></> : "Create an account"}</h2>
-        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : <>Join <ReelsGoLogo className="auth-inline-wordmark auth-inline-wordmark-small" /> and start sharing.</>}</p>
+        <div className="auth-logo">
+          <AuthLogo className="auth-page-image" />
+        </div>
+        <h2 className="auth-title">{mode === "login" ? "Log in" : "Create an account"}</h2>
+        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : "Join and start sharing."}</p>
 
         {mode === "signup" && <>
           <Field icon={<CircleUser />} placeholder="Full name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
