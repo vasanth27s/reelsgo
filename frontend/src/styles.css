@@ -8092,3 +8092,100 @@ div[style*="min-width: 170px"]{
     min-height:52px !important;
   }
 }
+
+/* FINAL STORY AVATAR FIX - full circular profile image */
+.story-ring {
+  width: 70px !important;
+  height: 70px !important;
+  min-width: 70px !important;
+  min-height: 70px !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+  padding: 3px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  flex: 0 0 70px !important;
+  isolation: isolate !important;
+}
+
+.story-ring .avatar {
+  position: absolute !important;
+  inset: 3px !important;
+  width: calc(100% - 6px) !important;
+  height: calc(100% - 6px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 3px solid #fff !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  background: #111827 !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+.story-ring .avatar img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+}
+
+.story-ring > img,
+.story-ring > video,
+.story-ring > .story-text-thumb {
+  position: absolute !important;
+  inset: 3px !important;
+  width: calc(100% - 6px) !important;
+  height: calc(100% - 6px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border: 3px solid #fff !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.story-ring i {
+  z-index: 5 !important;
+}
+
+@media (max-width: 700px) {
+  .story-ring {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+    flex-basis: 68px !important;
+  }
+
+  .story-ring .avatar {
+    inset: 3px !important;
+    width: calc(100% - 6px) !important;
+    height: calc(100% - 6px) !important;
+  }
+
+  .story-ring .avatar img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
