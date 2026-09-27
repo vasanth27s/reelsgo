@@ -2275,6 +2275,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [tab, setTab] = useState("posts");
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
+  const [connectionsOpen, setConnectionsOpen] = useState(null);
 
   async function load() {
     setLoading(true);
@@ -2320,6 +2321,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const u = profile.user;
   const isSelf = String(u._id) === String(currentUser?._id);
   const canView = !!profile.canViewContent;
+  const canViewConnections = isSelf || !!profile.canViewConnections;
   const posts = profile.posts || [];
   const reels = profile.reels || [];
   const tagged = profile.tagged || [];
@@ -2362,8 +2364,21 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
           <div className="profile-stats">
             <span><b>{u.postsCount || posts.length}</b><small>posts</small></span>
-            <span><b>{u.followersCount || 0}</b><small>followers</small></span>
-            <span><b>{u.followingCount || 0}</b><small>following</small></span>
+            {canViewConnections ? (
+              <>
+                <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("followers")} aria-label={`View ${u.username || "user"} followers`}>
+                  <b>{u.followersCount || 0}</b><small>followers</small>
+                </button>
+                <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("following")} aria-label={`View ${u.username || "user"} following`}>
+                  <b>{u.followingCount || 0}</b><small>following</small>
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="profile-stat-locked"><b>{u.followersCount || 0}</b><small>followers</small></span>
+                <span className="profile-stat-locked"><b>{u.followingCount || 0}</b><small>following</small></span>
+              </>
+            )}
           </div>
 
           <b>{u.name}</b>
@@ -2414,6 +2429,14 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
               : <EmptyTab icon={<Users />} title="Photos of you" text="Tagged posts will appear here." />
           )}
         </>
+      )}
+
+      {connectionsOpen && (
+        <ConnectionsModal
+          user={u}
+          type={connectionsOpen}
+          onClose={() => setConnectionsOpen(null)}
+        />
       )}
     </div>
   );

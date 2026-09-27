@@ -7982,3 +7982,113 @@ div[style*="min-width: 170px"]{
     background:#191c22 !important;
   }
 }
+
+/* =========================================================
+   REELSGO - MUTUAL FOLLOW CONNECTION ACCESS
+   Private profile stats are clickable only when the relationship
+   is mutual (both users follow each other with accepted status).
+   ========================================================= */
+.profile-stat-locked{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+  min-width:64px;
+  color:#f5f7fa;
+  opacity:.9;
+}
+
+.profile-stat-locked b{
+  font-size:16px;
+  line-height:1;
+  font-weight:800;
+}
+
+.profile-stat-locked small{
+  color:#8e949f;
+  font-size:13px;
+  line-height:1;
+}
+
+.profile-stat-button{
+  appearance:none;
+  -webkit-appearance:none;
+  border:0;
+  background:transparent;
+  color:#f5f7fa;
+  padding:0;
+  min-width:64px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:5px;
+  cursor:pointer;
+  font:inherit;
+  text-align:left;
+}
+
+.profile-stat-button b{
+  color:#f5f7fa;
+}
+
+.profile-stat-button small{
+  color:#8e949f;
+}
+
+.profile-stat-button:hover b{
+  color:#ffffff;
+  opacity:1;
+}
+
+.connection-row .avatar{
+  flex:0 0 auto;
+  width:52px !important;
+  height:52px !important;
+  min-width:52px !important;
+  min-height:52px !important;
+  aspect-ratio:1 / 1 !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  border:2px solid #303640 !important;
+  background:#191d24 !important;
+}
+
+.connection-row .avatar img{
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  aspect-ratio:1 / 1 !important;
+  object-fit:cover !important;
+  object-position:center !important;
+  border-radius:50% !important;
+  display:block !important;
+}
+
+@media(max-width:700px){
+  .profile-stat-locked,
+  .profile-stat-button{
+    min-width:54px;
+  }
+
+  .profile-stat-locked b,
+  .profile-stat-button b{
+    font-size:14px;
+  }
+
+  .profile-stat-locked small,
+  .profile-stat-button small{
+    font-size:10px;
+  }
+
+  .connection-row .avatar{
+    width:52px !important;
+    height:52px !important;
+    min-width:52px !important;
+    min-height:52px !important;
+  }
+}
