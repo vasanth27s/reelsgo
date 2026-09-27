@@ -8211,3 +8211,211 @@ div[style*="min-width: 170px"]{
 .story-placeholder {
   border: 0 !important;
 }
+
+
+/* ============================================================
+   FINAL REELSGO STORY FIX
+   - No pink/orange/purple story ring
+   - No white border
+   - Full circular profile image
+   - + button sits OUTSIDE the photo
+   - Does not clip the + button
+   ============================================================ */
+
+.story-ring,
+.story-placeholder {
+  width: 70px !important;
+  height: 70px !important;
+  min-width: 70px !important;
+  min-height: 70px !important;
+  flex: 0 0 70px !important;
+  aspect-ratio: 1 / 1 !important;
+  position: relative !important;
+  padding: 0 !important;
+  margin-bottom: 6px !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  overflow: visible !important;
+  isolation: isolate !important;
+}
+
+.story-ring .avatar {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 70px !important;
+  height: 70px !important;
+  min-width: 70px !important;
+  min-height: 70px !important;
+  max-width: 70px !important;
+  max-height: 70px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  background: #111318 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+.story-ring .avatar img {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+}
+
+.story-ring > img,
+.story-ring > video,
+.story-ring > .story-text-thumb {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 70px !important;
+  height: 70px !important;
+  min-width: 70px !important;
+  min-height: 70px !important;
+  max-width: 70px !important;
+  max-height: 70px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+  background: #111318 !important;
+}
+
+.story-ring .story-text-thumb {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+}
+
+.story-ring i {
+  position: absolute !important;
+  right: -5px !important;
+  bottom: -4px !important;
+  z-index: 20 !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: #0095f6 !important;
+  color: #fff !important;
+  border: 2px solid #111318 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-style: normal !important;
+  font-size: 17px !important;
+  line-height: 1 !important;
+  overflow: visible !important;
+}
+
+.story-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  background: #111318 !important;
+}
+
+@media (max-width: 700px) {
+  .story-ring,
+  .story-placeholder {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+    flex-basis: 68px !important;
+  }
+
+  .story-ring .avatar {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+    max-width: 68px !important;
+    max-height: 68px !important;
+  }
+
+  .story-ring > img,
+  .story-ring > video,
+  .story-ring > .story-text-thumb {
+    width: 68px !important;
+    height: 68px !important;
+    min-width: 68px !important;
+    min-height: 68px !important;
+    max-width: 68px !important;
+    max-height: 68px !important;
+  }
+
+  .story-ring i {
+    right: -5px !important;
+    bottom: -4px !important;
+    width: 23px !important;
+    height: 23px !important;
+    min-width: 23px !important;
+    min-height: 23px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* Keep the Story row horizontal and prevent the outside + button
+   from being clipped by the stories container. */
+.stories-card {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.story {
+  overflow: visible !important;
+}
+
+.story > span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Final dark/mobile story appearance */
+@media (max-width: 700px) {
+  .stories-card {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .story-ring {
+    background: transparent !important;
+  }
+}

@@ -402,6 +402,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   useEffect(() => { load(); }, [refreshKey]);
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
+  const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
 
   async function openStory(story) {
     setActiveStory(story);
@@ -421,7 +422,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         <button className="story own" onClick={() => myStories.length ? openStory(myStories[myStories.length - 1]) : onStory()}>
           <div className="story-ring">{myStories.length && myStories[myStories.length - 1].mediaUrl ? (myStories[myStories.length - 1].kind === "video" ? <video src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />} {!myStories.length && <i>+</i>}</div><span>{myStories.length ? "Your story" : "Your story"}</span>
         </button>
-        {stories.map(s => (
+        {otherStories.map(s => (
           <button className="story" key={s._id} onClick={() => openStory(s)}>
             <div className="story-ring">
               {s.mediaUrl ? (
