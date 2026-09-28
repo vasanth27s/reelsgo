@@ -11184,480 +11184,310 @@ div[style*="min-width: 170px"]{
     min-height:42px!important;
   }
 }
+
+
 /* ============================================================
-   REELSGO PHONE VERIFICATION / BLUE TICK
-   Firebase Phone OTP UI
+   REELSGO CUSTOM BLUE VERIFICATION
    ============================================================ */
 
-/* Blue verified badge beside usernames */
 .verified-badge{
-  display:inline-block !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
   width:18px !important;
   height:18px !important;
   min-width:18px !important;
   min-height:18px !important;
-  flex:0 0 18px !important;
-  margin-left:5px !important;
-  vertical-align:-3px !important;
+  margin-left:4px !important;
   color:#fff !important;
-  fill:#1d9bf0 !important;
-  stroke:#fff !important;
-  stroke-width:2.4 !important;
-  overflow:visible !important;
-}
-
-/* Username + badge should stay together */
-.profile-username-link{
-  display:inline-flex !important;
-  align-items:center !important;
-  min-width:0 !important;
-}
-
-.profile-username-link .verified-badge{
+  vertical-align:middle !important;
   flex:0 0 auto !important;
 }
 
-/* Profile heading */
+.verified-badge svg{
+  width:18px !important;
+  height:18px !important;
+  fill:#168cff !important;
+  color:#fff !important;
+  stroke-width:2.3 !important;
+}
+
+.profile-username-link{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:2px !important;
+}
+
 .profile-line h1{
   display:flex !important;
   align-items:center !important;
-  flex-wrap:wrap !important;
+  gap:4px !important;
   min-width:0 !important;
 }
 
 .profile-line h1 .verified-badge{
-  flex:0 0 auto !important;
+  transform:translateY(1px);
 }
 
-/* Get verified button */
-.verification-profile-button{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:7px !important;
-  white-space:nowrap !important;
-}
-
-.verification-profile-button svg{
-  width:17px !important;
-  height:17px !important;
-  color:#1d9bf0 !important;
-  flex:0 0 auto !important;
-}
-
-/* Verification overlay */
 .verification-overlay{
   position:fixed !important;
   inset:0 !important;
-  z-index:3000 !important;
+  z-index:10000 !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
   padding:20px !important;
   background:rgba(0,0,0,.72) !important;
-  backdrop-filter:blur(15px) !important;
-  -webkit-backdrop-filter:blur(15px) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
 }
 
-/* Verification card */
 .verification-card{
-  position:relative !important;
-  width:min(100%,480px) !important;
+  width:min(100%,460px) !important;
   max-height:90vh !important;
   overflow:auto !important;
-  overscroll-behavior:contain !important;
-  background:#111318 !important;
-  color:#f5f7fa !important;
+  padding:26px !important;
   border:1px solid rgba(255,255,255,.12) !important;
   border-radius:24px !important;
-  padding:24px !important;
-  box-shadow:0 30px 100px rgba(0,0,0,.72) !important;
+  background:#111418 !important;
+  color:#f5f5f5 !important;
+  box-shadow:0 30px 100px rgba(0,0,0,.65) !important;
 }
 
-/* Scrollbar */
-.verification-card::-webkit-scrollbar{
-  width:5px !important;
-}
-.verification-card::-webkit-scrollbar-track{
-  background:transparent !important;
-}
-.verification-card::-webkit-scrollbar-thumb{
-  background:#3a3f49 !important;
-  border-radius:99px !important;
-}
-
-/* Header */
 .verification-head{
   display:flex !important;
   align-items:center !important;
   justify-content:space-between !important;
-  gap:12px !important;
-  margin-bottom:16px !important;
-}
-
-.verification-head > div{
-  display:flex !important;
-  align-items:center !important;
-  gap:12px !important;
-  min-width:0 !important;
+  margin-bottom:18px !important;
 }
 
 .verification-icon{
-  width:48px !important;
-  height:48px !important;
-  min-width:48px !important;
-  border-radius:50% !important;
+  width:58px !important;
+  height:58px !important;
   display:flex !important;
   align-items:center !important;
   justify-content:center !important;
-  background:rgba(29,155,240,.14) !important;
-  color:#1d9bf0 !important;
+  border-radius:50% !important;
+  background:rgba(22,140,255,.13) !important;
+  color:#168cff !important;
 }
 
 .verification-icon svg{
-  width:28px !important;
-  height:28px !important;
-}
-
-.verification-head button{
-  width:38px !important;
-  height:38px !important;
-  min-width:38px !important;
-  border-radius:50% !important;
-  background:rgba(255,255,255,.08) !important;
+  width:34px !important;
+  height:34px !important;
+  fill:#168cff !important;
   color:#fff !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
 }
 
-.verification-head button:hover{
-  background:rgba(255,255,255,.14) !important;
-}
-
-.verification-head button svg{
-  width:18px !important;
-  height:18px !important;
-}
-
-/* Text */
 .verification-card h2{
-  margin:0 !important;
+  margin:0 0 9px !important;
   color:#fff !important;
-  font-size:22px !important;
+  font-size:24px !important;
   line-height:1.2 !important;
-  letter-spacing:-.2px !important;
 }
 
 .verification-card > p{
-  color:#a7adb7 !important;
-  font-size:13px !important;
-  line-height:1.55 !important;
-  margin:0 0 18px !important;
+  margin:0 0 20px !important;
+  color:#a8adb6 !important;
+  font-size:14px !important;
+  line-height:1.6 !important;
 }
 
-/* Form */
 .verification-label{
   display:block !important;
-  color:#dce0e6 !important;
-  font-size:12px !important;
+  margin-bottom:7px !important;
+  color:#fff !important;
+  font-size:13px !important;
   font-weight:750 !important;
-  margin:0 0 7px !important;
 }
 
 .verification-input{
-  display:block !important;
   width:100% !important;
-  height:48px !important;
-  min-height:48px !important;
-  border:1px solid #353a43 !important;
+  height:50px !important;
+  border:1px solid #30353d !important;
   border-radius:12px !important;
-  outline:none !important;
-  background:#1a1e25 !important;
-  color:#fff !important;
   padding:0 13px !important;
-  box-shadow:none !important;
-  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease !important;
-}
-
-.verification-input::placeholder{
-  color:#737985 !important;
+  outline:none !important;
+  background:#0b0d10 !important;
+  color:#fff !important;
+  font-size:15px !important;
 }
 
 .verification-input:focus{
-  border-color:#1d9bf0 !important;
-  background:#1b2028 !important;
-  box-shadow:0 0 0 3px rgba(29,155,240,.14) !important;
+  border-color:#168cff !important;
+  box-shadow:0 0 0 3px rgba(22,140,255,.14) !important;
 }
 
-.verification-code{
-  text-align:center !important;
-  letter-spacing:7px !important;
-  font-size:20px !important;
-  font-weight:800 !important;
-  padding-left:20px !important;
-}
-
-.verification-code::placeholder{
-  letter-spacing:4px !important;
+.verification-input::placeholder{
+  color:#777e89 !important;
 }
 
 .verification-hint{
   display:block !important;
-  color:#818894 !important;
-  font-size:10px !important;
-  line-height:1.4 !important;
-  margin:7px 0 12px !important;
+  margin-top:7px !important;
+  color:#858b96 !important;
+  font-size:11px !important;
 }
 
-/* Verification buttons */
-.verification-card .primary{
-  width:100% !important;
-  min-height:46px !important;
-  margin-top:10px !important;
-  background:#1d9bf0 !important;
-  color:#fff !important;
-  border-radius:12px !important;
-  font-weight:800 !important;
-}
-
-.verification-card .primary:hover{
-  background:#168fe2 !important;
-}
-
-.verification-card .primary:disabled{
-  background:#2877a5 !important;
-  opacity:.55 !important;
-}
-
-.verification-back{
-  width:100% !important;
-  min-height:44px !important;
-  margin-top:8px !important;
-  background:#242932 !important;
-  color:#fff !important;
-  border-radius:11px !important;
-}
-
-.verification-back:hover{
-  background:#2d333d !important;
-}
-
-.verification-resend{
-  display:block !important;
-  margin:12px auto 0 !important;
-  padding:6px 10px !important;
-  background:transparent !important;
-  color:#4dafff !important;
-  font-size:12px !important;
-  font-weight:750 !important;
-}
-
-.verification-resend:hover{
-  color:#79c3ff !important;
-  text-decoration:underline !important;
-}
-
-/* Status messages */
-.verification-success,
 .verification-error{
-  width:100% !important;
   margin-top:12px !important;
-  padding:10px 12px !important;
+  padding:12px !important;
+  border:1px solid rgba(255,77,103,.22) !important;
   border-radius:10px !important;
-  font-size:12px !important;
-  line-height:1.45 !important;
-}
-
-.verification-success{
-  background:rgba(34,197,94,.10) !important;
-  color:#7ee2a0 !important;
-  border:1px solid rgba(34,197,94,.18) !important;
-}
-
-.verification-error{
-  background:rgba(239,68,68,.10) !important;
-  color:#ff9b9b !important;
-  border:1px solid rgba(239,68,68,.18) !important;
-}
-
-/* Security note */
-.verification-note{
-  display:flex !important;
-  align-items:flex-start !important;
-  gap:8px !important;
-  margin-top:18px !important;
-  padding-top:14px !important;
-  border-top:1px solid rgba(255,255,255,.08) !important;
-  color:#7f8691 !important;
-  font-size:10px !important;
+  background:rgba(255,77,103,.09) !important;
+  color:#ff7287 !important;
+  font-size:13px !important;
   line-height:1.5 !important;
 }
 
-.verification-note svg{
-  width:16px !important;
-  height:16px !important;
-  min-width:16px !important;
-  color:#8e96a2 !important;
+.verification-success{
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  margin-top:14px !important;
+  padding:13px !important;
+  border:1px solid rgba(34,197,94,.18) !important;
+  border-radius:11px !important;
+  background:rgba(34,197,94,.09) !important;
+  color:#63e08c !important;
+  font-size:13px !important;
 }
 
-/* Settings verification row */
-.setting-row .verified-badge{
-  width:19px !important;
-  height:19px !important;
-  min-width:19px !important;
-  min-height:19px !important;
-  margin:0 !important;
-}
-
-.settings-card-highlight .verified-badge{
+.verification-success svg{
   width:20px !important;
   height:20px !important;
-  min-width:20px !important;
-  min-height:20px !important;
+  fill:#168cff !important;
+  color:#fff !important;
+  flex:0 0 auto !important;
 }
 
-/* Firebase reCAPTCHA */
-#recaptcha-container{
-  min-height:0 !important;
-  margin-top:8px !important;
+.verification-note{
+  display:flex !important;
+  align-items:flex-start !important;
+  gap:9px !important;
+  margin-top:18px !important;
+  padding:12px !important;
+  border:1px solid #252a31 !important;
+  border-radius:11px !important;
+  background:#171a20 !important;
+  color:#9299a4 !important;
+  font-size:11px !important;
+  line-height:1.55 !important;
 }
 
-#recaptcha-container > div{
-  max-width:100% !important;
+.verification-note svg{
+  width:17px !important;
+  height:17px !important;
+  min-width:17px !important;
+  color:#168cff !important;
 }
 
-/* Prevent verification modal from being affected by dark mobile page */
-.verification-overlay,
-.verification-overlay *{
-  -webkit-tap-highlight-color:transparent;
+.verification-settings-card{
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  margin:14px 0 8px !important;
+  padding:15px !important;
+  border:1px solid rgba(22,140,255,.22) !important;
+  border-radius:15px !important;
+  background:linear-gradient(135deg,rgba(22,140,255,.10),rgba(22,140,255,.035)) !important;
 }
 
-/* ============================================================
-   PHONE VERIFICATION MOBILE
-   ============================================================ */
+.verification-settings-icon{
+  width:44px !important;
+  height:44px !important;
+  min-width:44px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:50% !important;
+  background:rgba(22,140,255,.13) !important;
+  color:#168cff !important;
+}
+
+.verification-settings-icon svg{
+  width:26px !important;
+  height:26px !important;
+  fill:#168cff !important;
+  color:#fff !important;
+}
+
+.verification-settings-copy{
+  min-width:0 !important;
+  flex:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:4px !important;
+}
+
+.verification-settings-copy b{
+  display:flex !important;
+  align-items:center !important;
+  color:#fff !important;
+  font-size:13px !important;
+}
+
+.verification-settings-copy span{
+  color:#9198a3 !important;
+  font-size:11px !important;
+  line-height:1.45 !important;
+}
+
+.verification-settings-button{
+  flex:0 0 auto !important;
+  margin:0 !important;
+  padding:9px 13px !important;
+  background:#168cff !important;
+}
+
+.verification-active-label{
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:5px !important;
+  flex:0 0 auto !important;
+  color:#168cff !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+}
+
+.verification-active-label svg{
+  width:18px !important;
+  height:18px !important;
+  fill:#168cff !important;
+  color:#fff !important;
+}
 
 @media(max-width:700px){
-
-  .verified-badge{
-    width:16px !important;
-    height:16px !important;
-    min-width:16px !important;
-    min-height:16px !important;
-    flex-basis:16px !important;
-    margin-left:4px !important;
-    vertical-align:-2px !important;
-  }
-
-  .profile-line{
-    align-items:center !important;
-  }
-
-  .profile-line h1{
-    align-items:center !important;
-  }
-
-  .verification-profile-button{
-    font-size:10px !important;
-    padding:7px 9px !important;
-    min-height:34px !important;
-  }
-
-  .verification-profile-button svg{
-    width:15px !important;
-    height:15px !important;
-  }
-
   .verification-overlay{
     align-items:flex-end !important;
-    justify-content:center !important;
     padding:0 !important;
   }
 
   .verification-card{
     width:100% !important;
-    max-width:none !important;
-    max-height:90vh !important;
+    max-height:94vh !important;
     border-radius:24px 24px 0 0 !important;
-    border-left:0 !important;
-    border-right:0 !important;
-    border-bottom:0 !important;
-    padding:20px 16px calc(20px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .verification-head{
-    margin-bottom:13px !important;
-  }
-
-  .verification-icon{
-    width:44px !important;
-    height:44px !important;
-    min-width:44px !important;
-  }
-
-  .verification-icon svg{
-    width:25px !important;
-    height:25px !important;
-  }
-
-  .verification-head button{
-    width:36px !important;
-    height:36px !important;
-    min-width:36px !important;
+    padding:23px 18px calc(23px + env(safe-area-inset-bottom)) !important;
   }
 
   .verification-card h2{
-    font-size:20px !important;
+    font-size:21px !important;
   }
 
-  .verification-card > p{
+  .verification-settings-card{
+    align-items:flex-start !important;
+  }
+
+  .verification-settings-button{
+    padding:8px 10px !important;
     font-size:12px !important;
-    line-height:1.5 !important;
-    margin-bottom:16px !important;
   }
 
-  .verification-input{
-    height:47px !important;
-    min-height:47px !important;
-    font-size:14px !important;
-  }
-
-  .verification-code{
-    font-size:19px !important;
-    letter-spacing:6px !important;
-  }
-
-  .verification-card .primary{
-    min-height:47px !important;
-  }
-
-  .verification-note{
-    margin-top:15px !important;
-    font-size:9px !important;
-  }
-}
-
-@media(max-width:390px){
-
-  .verification-card{
-    padding-left:13px !important;
-    padding-right:13px !important;
-  }
-
-  .verification-card h2{
-    font-size:18px !important;
-  }
-
-  .verification-card > p{
-    font-size:11px !important;
-  }
-
-  .verification-code{
-    letter-spacing:5px !important;
-    font-size:18px !important;
-  }
-
-  .verification-profile-button{
-    padding:6px 8px !important;
+  .verified-badge,
+  .verified-badge svg{
+    width:17px !important;
+    height:17px !important;
+    min-width:17px !important;
+    min-height:17px !important;
   }
 }
