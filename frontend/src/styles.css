@@ -11491,3 +11491,91 @@ div[style*="min-width: 170px"]{
     min-height:17px !important;
   }
 }
+
+
+/* ReelsGo verification success alert */
+.verification-alert{
+  position:fixed !important;
+  top:24px !important;
+  right:24px !important;
+  z-index:100000 !important;
+  width:min(430px,calc(100vw - 32px)) !important;
+  min-height:76px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:14px 15px !important;
+  background:#ecfdf3 !important;
+  border:1px solid #86efac !important;
+  border-left:5px solid #16a34a !important;
+  border-radius:14px !important;
+  box-shadow:0 16px 40px rgba(0,0,0,.22) !important;
+  color:#166534 !important;
+  animation:verificationAlertIn .28s ease-out both !important;
+}
+.verification-alert-icon{
+  width:42px !important;
+  height:42px !important;
+  flex:0 0 42px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:50% !important;
+  background:#22c55e !important;
+  color:#fff !important;
+}
+.verification-alert-icon svg{
+  width:25px !important;
+  height:25px !important;
+  color:#fff !important;
+  fill:#16a34a !important;
+}
+.verification-alert-copy{
+  min-width:0 !important;
+  flex:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:3px !important;
+}
+.verification-alert-copy strong{
+  color:#166534 !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+  line-height:1.3 !important;
+}
+.verification-alert-copy span{
+  color:#15803d !important;
+  font-size:12px !important;
+  line-height:1.4 !important;
+}
+.verification-alert-close{
+  width:30px !important;
+  height:30px !important;
+  flex:0 0 30px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border:0 !important;
+  background:transparent !important;
+  color:#15803d !important;
+  border-radius:8px !important;
+  cursor:pointer !important;
+}
+.verification-alert-close:hover{
+  background:#dcfce7 !important;
+}
+.verification-alert-close svg{
+  width:17px !important;
+  height:17px !important;
+}
+@keyframes verificationAlertIn{
+  from{opacity:0;transform:translateY(-12px) translateX(10px);}
+  to{opacity:1;transform:translateY(0) translateX(0);}
+}
+@media(max-width:700px){
+  .verification-alert{
+    top:14px !important;
+    right:14px !important;
+    width:calc(100vw - 28px) !important;
+  }
+}

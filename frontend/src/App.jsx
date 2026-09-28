@@ -390,6 +390,7 @@ function App() {
   const [profileUserId, setProfileUserId] = useState(null);
   const [openConversationId, setOpenConversationId] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
+  const [verificationAlert, setVerificationAlert] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -549,8 +550,29 @@ function App() {
           onClose={() => setVerificationOpen(false)}
           onVerified={() => {
             setVerificationOpen(false);
+            setVerificationAlert(true);
+            window.setTimeout(() => setVerificationAlert(false), 4500);
           }}
         />
+      )}
+      {verificationAlert && (
+        <div className="verification-alert" role="alert" aria-live="polite">
+          <div className="verification-alert-icon">
+            <BadgeCheck />
+          </div>
+          <div className="verification-alert-copy">
+            <strong>Your profile has been verified!</strong>
+            <span>Congratulations! Your ReelsGo blue tick is now active.</span>
+          </div>
+          <button
+            type="button"
+            className="verification-alert-close"
+            onClick={() => setVerificationAlert(false)}
+            aria-label="Close verification alert"
+          >
+            <X />
+          </button>
+        </div>
       )}
       </div>
     </>
