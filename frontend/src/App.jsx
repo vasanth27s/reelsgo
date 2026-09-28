@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "firebase/auth";
 import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
@@ -7,11 +9,70 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
+
+
+// Firebase Phone Authentication configuration.
+// Put these VITE_FIREBASE_* values in your frontend .env file.
+const FIREBASE_CONFIG = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || ""
+};
+
+let reelsGoFirebaseApp = null;
+let reelsGoFirebaseAuth = null;
+let reelsGoConfirmationResult = null;
+
+function getReelsGoFirebaseAuth() {
+  if (!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId || !FIREBASE_CONFIG.appId) {
+    throw new Error("Firebase Phone Authentication is not configured. Add the VITE_FIREBASE_* values to your frontend .env file and restart Vite.");
+  }
+
+  if (!reelsGoFirebaseApp) {
+    reelsGoFirebaseApp = getApps().length ? getApp() : initializeApp(FIREBASE_CONFIG);
+  }
+  if (!reelsGoFirebaseAuth) reelsGoFirebaseAuth = getAuth(reelsGoFirebaseApp);
+  return reelsGoFirebaseAuth;
+}
+
+function normalizeReelsGoPhone(value) {
+  let phone = String(value || "").trim().replace(/[\\s().-]/g, "");
+  // Convenience for Indian users: 10 digits become +91XXXXXXXXXX.
+  if (/^[6-9]\\d{9}$/.test(phone)) phone = `+91${phone}`;
+  if (!/^\\+[1-9]\\d{7,14}$/.test(phone)) {
+    throw new Error("Enter a valid international phone number, for example +919876543210.");
+  }
+  return phone;
+}
+
+function destroyReelsGoRecaptcha() {
+  try {
+    if (window.reelsGoRecaptchaVerifier) {
+      window.reelsGoRecaptchaVerifier.clear();
+      window.reelsGoRecaptchaVerifier = null;
+    }
+  } catch {}
+}
+
+function getReelsGoRecaptcha(auth) {
+  if (window.reelsGoRecaptchaVerifier) return window.reelsGoRecaptchaVerifier;
+  window.reelsGoRecaptchaVerifier = new RecaptchaVerifier(auth, "reelsgo-phone-recaptcha", {
+    size: "invisible",
+    callback: () => {},
+    "expired-callback": () => {
+      destroyReelsGoRecaptcha();
+    }
+  });
+  return window.reelsGoRecaptchaVerifier;
+}
 
 
 // Built-in emoji picker: no external package required, so it works on desktop,
@@ -96,6 +157,167 @@ function openUserProfile(userId) {
   window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: userId } }));
 }
 
+const verificationStatusCache = new Map();
+
+function VerifiedBadge({ userId, title = "Verified on ReelsGo" }) {
+  const [verified, setVerified] = useState(() => verificationStatusCache.get(String(userId)) === true);
+
+  useEffect(() => {
+    if (!userId) return;
+    const id = String(userId);
+    let cancelled = false;
+
+    const load = async () => {
+      if (verificationStatusCache.has(id)) {
+        if (!cancelled) setVerified(verificationStatusCache.get(id) === true);
+        return;
+      }
+      try {
+        const d = await api(`/verification/status/${id}`);
+        verificationStatusCache.set(id, !!d.verified);
+        if (!cancelled) setVerified(!!d.verified);
+      } catch {
+        verificationStatusCache.set(id, false);
+        if (!cancelled) setVerified(false);
+      }
+    };
+
+    load();
+    const refresh = () => {
+      verificationStatusCache.delete(id);
+      load();
+    };
+    window.addEventListener("reelsgo-verification-updated", refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("reelsgo-verification-updated", refresh);
+    };
+  }, [userId]);
+
+  if (!verified) return null;
+  return <BadgeCheck className="verified-badge" aria-label={title} title={title} />;
+}
+
+function PhoneVerificationModal({ onClose, onVerified }) {
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState("phone");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    return () => {
+      destroyReelsGoRecaptcha();
+      reelsGoConfirmationResult = null;
+    };
+  }, []);
+
+  async function sendCode(e) {
+    e?.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+    try {
+      const normalizedPhone = normalizeReelsGoPhone(phone);
+      const auth = getReelsGoFirebaseAuth();
+      const appVerifier = getReelsGoRecaptcha(auth);
+      reelsGoConfirmationResult = await signInWithPhoneNumber(auth, normalizedPhone, appVerifier);
+      setPhone(normalizedPhone);
+      setStep("code");
+      setMessage("Verification code sent by Firebase SMS.");
+    } catch (e) {
+      destroyReelsGoRecaptcha();
+      const msg = String(e?.message || "Unable to send verification code.");
+      setError(msg.includes("auth/too-many-requests")
+        ? "Too many attempts. Please wait and try again later."
+        : msg.includes("auth/quota-exceeded")
+          ? "Firebase SMS quota has been reached for this project. Try again later."
+          : msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function confirmCode(e) {
+    e?.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+    try {
+      if (!reelsGoConfirmationResult) throw new Error("Your verification session expired. Send a new code.");
+      const normalizedPhone = normalizeReelsGoPhone(phone);
+      const credentialResult = await reelsGoConfirmationResult.confirm(code);
+      const firebaseUser = credentialResult.user;
+      const firebasePhone = firebaseUser?.phoneNumber || "";
+      if (firebasePhone && firebasePhone !== normalizedPhone) {
+        throw new Error("The verified phone number does not match the number you entered.");
+      }
+      const firebaseIdToken = await firebaseUser.getIdToken(true);
+
+      const d = await api("/verification/phone/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Firebase-ID-Token": firebaseIdToken
+        },
+        body: JSON.stringify({ phone: normalizedPhone })
+      });
+
+      const id = String(getUser()?._id || "");
+      if (id) verificationStatusCache.set(id, true);
+      window.dispatchEvent(new CustomEvent("reelsgo-verification-updated"));
+      setMessage(d.message || "Phone verified successfully. Your blue tick is active.");
+      await signOut(getReelsGoFirebaseAuth()).catch(() => {});
+      reelsGoConfirmationResult = null;
+      onVerified?.(d);
+    } catch (e) {
+      const msg = String(e?.message || "Invalid or expired verification code.");
+      setError(msg.includes("auth/invalid-verification-code") ? "Invalid verification code. Please try again." : msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="verification-overlay" role="dialog" aria-modal="true" onMouseDown={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="verification-card" onMouseDown={e => e.stopPropagation()}>
+        <div className="verification-head">
+          <div className="verification-icon"><BadgeCheck /></div>
+          <button type="button" className="icon-button" onClick={onClose}><X /></button>
+        </div>
+        <h2>{step === "phone" ? "Verify your phone" : "Enter verification code"}</h2>
+        <p>{step === "phone"
+          ? "Link one phone number to your ReelsGo account. The same phone number can receive the ReelsGo blue tick on only one account."
+          : `Enter the 6-digit code sent to ${phone}.`}</p>
+
+        <div id="reelsgo-phone-recaptcha" className="reelsgo-phone-recaptcha" />
+
+        {step === "phone" ? (
+          <form onSubmit={sendCode}>
+            <label className="verification-label">Phone number</label>
+            <input className="verification-input" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 9876543210" autoComplete="tel" />
+            <small className="verification-hint">Indian 10-digit numbers are automatically treated as +91. Other countries should use +countrycode.</small>
+            <button className="primary full" type="submit" disabled={loading || !phone.trim()}>{loading ? "Sending SMS..." : "Send OTP"}</button>
+          </form>
+        ) : (
+          <form onSubmit={confirmCode}>
+            <label className="verification-label">6-digit code</label>
+            <input className="verification-input verification-code" type="text" inputMode="numeric" maxLength={6} value={code} onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="123456" autoComplete="one-time-code" />
+            <button className="primary full" type="submit" disabled={loading || code.length !== 6}>{loading ? "Verifying..." : "Verify and get blue tick"}</button>
+            <button className="secondary full verification-back" type="button" onClick={() => { destroyReelsGoRecaptcha(); reelsGoConfirmationResult = null; setStep("phone"); setCode(""); setError(""); setMessage(""); }}>Change phone number</button>
+            <button className="verification-resend" type="button" disabled={loading} onClick={sendCode}>Send a new code</button>
+          </form>
+        )}
+
+        {message && <div className="verification-success">{message}</div>}
+        {error && <div className="verification-error">{error}</div>}
+        <div className="verification-note"><Shield /> Firebase sends the OTP. ReelsGo stores only the verified phone identity/status needed to enforce one phone number per account; the number is not displayed publicly.</div>
+      </div>
+    </div>
+  );
+}
+
 function UserLink({ user, className = "" }) {
   const label = user?.username || user?.name || "User";
   if (!user?._id) return <span className={className}>{label}</span>;
@@ -107,7 +329,7 @@ function UserLink({ user, className = "" }) {
       onClick={(e) => { e.stopPropagation(); openUserProfile(user._id); }}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); openUserProfile(user._id); } }}
     >
-      {label}
+      {label}<VerifiedBadge userId={user._id} />
     </span>
   );
 }
@@ -2014,6 +2236,7 @@ function ProfilePage({ user, setUser }) {
   const [reels, setReels] = useState([]);
   const [saving, setSaving] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [verificationOpen, setVerificationOpen] = useState(false);
   const input = useRef(null);
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
@@ -2097,12 +2320,15 @@ function ProfilePage({ user, setUser }) {
 
         <div className="profile-details">
           <div className="profile-line">
-            <h1>{user?.username}</h1>
+            <h1>{user?.username} <VerifiedBadge userId={user?._id} /></h1>
             <button
               className="secondary"
               onClick={() => setEditOpen(true)}
             >
               <Edit3 /> Edit profile
+            </button>
+            <button className="secondary verification-profile-button" onClick={() => setVerificationOpen(true)}>
+              <BadgeCheck /> Get verified
             </button>
             <button className="icon-button profile-more">
               <MoreHorizontal />
@@ -2262,6 +2488,7 @@ function ProfilePage({ user, setUser }) {
           onSave={saveProfile}
         />
       )}
+      {verificationOpen && <PhoneVerificationModal onClose={() => setVerificationOpen(false)} onVerified={() => setVerificationOpen(false)} />}
     </div>
   );
 }
@@ -3131,7 +3358,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
         <div className="profile-details">
           <div className="profile-line">
-            <h1>{u.username}</h1>
+            <h1>{u.username} <VerifiedBadge userId={u._id} /></h1>
             {!isSelf && (
               <>
                 <button
@@ -3918,7 +4145,10 @@ function NotificationsPage() {
   return (
     <div className="page notifications-page">
       <div className="notifications-center-head">
-        <h1>Notifications</h1>
+        <div>
+          <h1>Notifications</h1>
+          <p>Stay updated with activity on your account</p>
+        </div>
         <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
           <Bell />
         </button>
@@ -4061,12 +4291,19 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
   const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
   const [selectedItem, setSelectedItem] = useState("");
   const [mobileSectionOpen, setMobileSectionOpen] = useState(false);
+  const [phoneVerificationOpen, setPhoneVerificationOpen] = useState(false);
 
   const visible = settingsSections.filter(s =>
     !search ||
     s.title.toLowerCase().includes(search.toLowerCase()) ||
     s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
   );
+
+  useEffect(() => {
+    const open = () => setPhoneVerificationOpen(true);
+    window.addEventListener("reelsgo-open-phone-verification", open);
+    return () => window.removeEventListener("reelsgo-open-phone-verification", open);
+  }, []);
 
   function openSection(id) {
     setSection(id);
@@ -4310,11 +4547,20 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
                   Back to {activeSection?.title}
                 </button>
                 <b>{selectedItem}</b>
-                <p>
-                  This option is currently represented in the ReelsGo
-                  interface. Account changes are saved only where a backend
-                  endpoint is connected.
-                </p>
+                {selectedItem === "Phone verification" ? (
+                  <div>
+                    <p>Verify one phone number with an SMS code. The same phone number cannot be verified on another ReelsGo account.</p>
+                    <button type="button" className="primary small" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-open-phone-verification"))}>
+                      <BadgeCheck /> Verify phone number
+                    </button>
+                  </div>
+                ) : (
+                  <p>
+                    This option is currently represented in the ReelsGo
+                    interface. Account changes are saved only where a backend
+                    endpoint is connected.
+                  </p>
+                )}
               </div>
             )}
           </section>
@@ -4484,17 +4730,27 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
                     Back to {activeSection?.title}
                   </button>
                   <b>{selectedItem}</b>
-                  <p>
-                    This option is currently represented in the ReelsGo
-                    interface. Account changes are saved only where a backend
-                    endpoint is connected.
-                  </p>
+                  {selectedItem === "Phone verification" ? (
+                    <div>
+                      <p>Verify one phone number with an SMS code. The same phone number cannot be verified on another ReelsGo account.</p>
+                      <button type="button" className="primary small" onClick={() => setPhoneVerificationOpen(true)}>
+                        <BadgeCheck /> Verify phone number
+                      </button>
+                    </div>
+                  ) : (
+                    <p>
+                      This option is currently represented in the ReelsGo
+                      interface. Account changes are saved only where a backend
+                      endpoint is connected.
+                    </p>
+                  )}
                 </div>
               )}
             </section>
           )}
         </div>
       </div>
+      {phoneVerificationOpen && <PhoneVerificationModal onClose={() => setPhoneVerificationOpen(false)} onVerified={() => setPhoneVerificationOpen(false)} />}
     </div>
   );
 }
@@ -4502,6 +4758,7 @@ function SettingsModal({ user, setUser, onClose, onLogout }) {
 function AccountSettings({ user, onSelect }) {
   return <div className="settings-panel">
     <div className="settings-profile-row"><Avatar user={user} size={72} /><div><b>{user?.username}</b><span>{user?.email}</span></div><button className="secondary" onClick={() => onSelect("Edit profile")}>Edit profile</button></div>
+    <SettingRow onClick={() => onSelect("Phone verification")} icon={<BadgeCheck />} title="Phone verification" description="Verify one phone number and get the ReelsGo blue tick" />
     <SettingRow onClick={() => onSelect("Personal information")} icon={<User />} title="Personal information" description="Name, email and profile information" />
     <SettingRow onClick={() => onSelect("Password")} icon={<KeyRound />} title="Password" description="Change your account password" />
     <SettingRow onClick={() => onSelect("Account privacy")} icon={<Lock />} title="Account privacy" description="Public or private account" />
