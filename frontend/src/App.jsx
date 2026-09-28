@@ -4652,7 +4652,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               </div>
 
               {section === "account" && (
-                <AccountSettings user={user} onSelect={setSelectedItem} />
+                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
               )}
               {section === "privacy" && (
                 <PrivacySettings
