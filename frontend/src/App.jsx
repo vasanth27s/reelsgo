@@ -2151,6 +2151,41 @@ function StoryComposer({ onClose, onDone }) {
   const [audience, setAudience] = useState("everyone");
   const [loading, setLoading] = useState(false);
   const [activeTool, setActiveTool] = useState("");
+  const [selectedContacts, setSelectedContacts] = useState([]);
+  const [excludedUsers, setExcludedUsers] = useState([]);
+  const [allowScreenshots, setAllowScreenshots] = useState(true);
+  const [keepOnMyPage, setKeepOnMyPage] = useState(false);
+  const [contactSearch, setContactSearch] = useState("");
+  const [contactResults, setContactResults] = useState([]);
+  const [contactPicker, setContactPicker] = useState("");
+  const [closeFriendCount, setCloseFriendCount] = useState(0);
+
+  useEffect(() => {
+    let live = true;
+    api("/users/me/close-friends")
+      .then(data => { if (live) setCloseFriendCount((data.users || []).length); })
+      .catch(() => { if (live) setCloseFriendCount(0); });
+    return () => { live = false; };
+  }, []);
+
+  useEffect(() => {
+    let live = true;
+    const query = contactSearch.trim();
+    if (query.length < 2) { setContactResults([]); return; }
+    const timer = setTimeout(() => {
+      api(`/users/search?q=${encodeURIComponent(query)}`)
+        .then(data => { if (live) setContactResults((data.users || []).filter(person => String(person._id) !== String(currentUser?._id))); })
+        .catch(() => { if (live) setContactResults([]); });
+    }, 250);
+    return () => { live = false; clearTimeout(timer); };
+  }, [contactSearch, currentUser?._id]);
+
+  function toggleStoryPerson(person) {
+    const setter = contactPicker === "excluded" ? setExcludedUsers : setSelectedContacts;
+    setter(current => current.some(value => String(value) === String(person._id))
+      ? current.filter(value => String(value) !== String(person._id))
+      : [...current, person._id]);
+  }
 
   async function publish() {
     if (!file && !text.trim()) {
@@ -2163,6 +2198,11 @@ function StoryComposer({ onClose, onDone }) {
       if (file) fd.append("media", file);
       fd.append("text", text);
       fd.append("audience", audience);
+      fd.append("closeFriends", String(audience === "close_friends"));
+      fd.append("selectedContacts", JSON.stringify(selectedContacts));
+      fd.append("excludedUsers", JSON.stringify(excludedUsers));
+      fd.append("allowScreenshots", String(allowScreenshots));
+      fd.append("keepOnMyPage", String(keepOnMyPage));
       await api("/stories", { method: "POST", body: fd });
       onDone();
       alert("Story shared");
@@ -2288,14 +2328,44 @@ function StoryComposer({ onClose, onDone }) {
             </button>
           </section>
 
-          <section className="publish-audience-section">
-            <label htmlFor="story-audience">Who can see this story?</label>
-            <select id="story-audience" value={audience} onChange={e => setAudience(e.target.value)}>
-              <option value="everyone">Everyone</option>
-              <option value="followers">Followers</option>
-              <option value="close_friends">Close friends</option>
-            </select>
-            <small>Close friends visibility must also be enforced by your backend.</small>
+          <section className="story-audience-card">
+            <h3>Who can view this story?</h3>
+            {[
+              { value: "everyone", icon: "➤", title: "Everyone", subtitle: "Anyone eligible to view your profile" },
+              { value: "contacts", icon: "●", title: "Contacts", subtitle: "Accepted followers" },
+              { value: "close_friends", icon: "★", title: "Close Friends", subtitle: `${closeFriendCount} people` },
+              { value: "selected_contacts", icon: "●●", title: "Selected Contacts", subtitle: `${selectedContacts.length} selected` }
+            ].map(option => (
+              <div className="story-audience-option" key={option.value}>
+                <button type="button" className={`story-audience-choice ${audience === option.value ? "active" : ""}`} onClick={() => setAudience(option.value)}>
+                  <span className="story-audience-radio">{audience === option.value ? "✓" : ""}</span>
+                  <span className={`story-audience-icon ${option.value}`}>{option.icon}</span>
+                  <span className="story-audience-copy"><strong>{option.title}</strong><small>{option.subtitle}</small></span>
+                </button>
+                {option.value === "close_friends" && <button type="button" className="story-audience-link" onClick={() => { onClose(); window.dispatchEvent(new CustomEvent("reelsgo-open-settings", { detail: { section: "Close friends" } })); }}>Manage Close Friends ›</button>}
+                {option.value === "selected_contacts" && <button type="button" className="story-audience-link" onClick={() => setContactPicker(value => value === "selected" ? "" : "selected")}>Edit list ›</button>}
+              </div>
+            ))}
+            <button type="button" className="story-audience-link story-exclude-link" onClick={() => setContactPicker(value => value === "excluded" ? "" : "excluded")}>Select people who will never see any of your stories ›</button>
+            {contactPicker && <div className="story-contact-picker">
+              <h4>{contactPicker === "excluded" ? "Exclude people" : "Selected Contacts"}</h4>
+              <input className="normal-input" value={contactSearch} onChange={event => setContactSearch(event.target.value)} placeholder="Search by name or username" />
+              {contactResults.map(person => {
+                const list = contactPicker === "excluded" ? excludedUsers : selectedContacts;
+                const chosen = list.some(value => String(value) === String(person._id));
+                return <button type="button" className="story-contact-row" key={person._id} onClick={() => toggleStoryPerson(person)}>
+                  <Avatar user={person} size={38} />
+                  <span className="story-contact-person"><strong>{person.name || person.username}</strong><small>@{person.username}</small></span>
+                  <span className={chosen ? "story-contact-selected" : "story-contact-select"}>{chosen ? "✓ Selected" : "Select"}</span>
+                </button>;
+              })}
+              {contactSearch.trim().length >= 2 && contactResults.length === 0 && <p className="story-picker-empty">No accounts found.</p>}
+              <button type="button" className="primary full" onClick={() => { setContactPicker(""); setContactSearch(""); setContactResults([]); }}>Done</button>
+            </div>}
+            <div className="story-extra-settings">
+              <label><span><strong>Allow Screenshots</strong><small>Allow viewers to capture this story</small></span><input type="checkbox" checked={allowScreenshots} onChange={event => setAllowScreenshots(event.target.checked)} /></label>
+              <label><span><strong>Keep on My Page</strong><small>Keep this story on your page after 24 hours</small></span><input type="checkbox" checked={keepOnMyPage} onChange={event => setKeepOnMyPage(event.target.checked)} /></label>
+            </div>
           </section>
           <input ref={input} type="file" accept="image/*,video/*" hidden onChange={chooseFile} />
         </div>
@@ -4594,7 +4664,7 @@ function SavedPage({ user, embedded = false }) {
 
 const settingsSections = [
   { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account"] },
-  { id: "privacy", title: "Privacy", icon: Lock, items: ["Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Close friends", "Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
   { id: "security", title: "Security", icon: Shield, items: ["Password", "Two-factor authentication", "Login activity", "Saved login information", "Emails from ReelsGo"] },
   { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Posts, stories and comments", "Following and followers", "Messages", "Calls", "Live and Reels"] },
   { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Messages", "Story replies", "Read receipts", "Typing indicator", "Group messages"] },
@@ -4849,7 +4919,8 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
             )}
             {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
-            {selectedItem && (
+            {selectedItem === "Close friends" && <CloseFriendsSettings />}
+            {selectedItem && selectedItem !== "Close friends" && (
               <div className="setting-detail">
                 <button
                   type="button"
@@ -5023,7 +5094,8 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               )}
               {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
-              {selectedItem && (
+              {selectedItem === "Close friends" && <CloseFriendsSettings />}
+              {selectedItem && selectedItem !== "Close friends" && (
                 <div className="setting-detail">
                   <button
                     type="button"
@@ -5047,6 +5119,73 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
       </div>
     </div>
   );
+}
+
+function CloseFriendsSettings() {
+  const [friends, setFriends] = useState([]);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    let live = true;
+    api("/users/me/close-friends").then(d => { if (live) setFriends(d.users || []); })
+      .catch(e => { if (live) setError(e.message || "Could not load Close Friends"); })
+      .finally(() => { if (live) setLoading(false); });
+    return () => { live = false; };
+  }, []);
+
+  useEffect(() => {
+    let live = true;
+    const q = query.trim();
+    if (q.length < 2) { setResults([]); return; }
+    const handle = setTimeout(() => {
+      api(`/users/search?q=${encodeURIComponent(q)}`).then(d => {
+        if (live) setResults((d.users || []).filter(u => !friends.some(f => String(f._id) === String(u._id))));
+      }).catch(e => { if (live) setError(e.message || "Search failed"); });
+    }, 250);
+    return () => { live = false; clearTimeout(handle); };
+  }, [query, friends]);
+
+  async function addFriend(person) {
+    setBusyId(String(person._id)); setError(""); setNotice("");
+    try {
+      const d = await api(`/users/me/close-friends/${person._id}`, { method: "POST" });
+      setFriends(d.users || []); setResults(list => list.filter(u => String(u._id) !== String(person._id)));
+      setNotice(`${person.username ? `@${person.username}` : person.name} added to Close Friends.`);
+    } catch (e) { setError(e.message || "Could not add user"); }
+    finally { setBusyId(""); }
+  }
+
+  async function removeFriend(person) {
+    setBusyId(String(person._id)); setError(""); setNotice("");
+    try {
+      const d = await api(`/users/me/close-friends/${person._id}`, { method: "DELETE" });
+      setFriends(d.users || []); setNotice(`${person.username ? `@${person.username}` : person.name} removed from Close Friends.`);
+    } catch (e) { setError(e.message || "Could not remove user"); }
+    finally { setBusyId(""); }
+  }
+
+  const personRow = (person, action, label) => <div className="cf-person" key={person._id}>
+    <Avatar user={person} size={44} />
+    <div className="cf-person-copy"><b>{person.name || person.username}</b><span>@{person.username}</span></div>
+    <button type="button" className={label === "Remove" ? "secondary cf-remove" : "primary cf-add"} disabled={!!busyId} onClick={() => action(person)}>{busyId === String(person._id) ? "Saving…" : label}</button>
+  </div>;
+
+  return <div className="settings-panel close-friends-panel">
+    <div className="cf-heading"><div className="cf-badge"><Users size={24} /></div><div><h2>Close Friends</h2><p>Share posts, Reels and stories with a smaller audience you choose.</p></div></div>
+    <div className="cf-count">Your list <strong>{friends.length}</strong></div>
+    <label className="cf-search-label" htmlFor="close-friends-search">Search people</label>
+    <input id="close-friends-search" className="normal-input cf-search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name or username" autoComplete="off" />
+    {error && <div className="cf-message error">{error}</div>}{notice && <div className="cf-message success">{notice}</div>}
+    {results.length > 0 && <div className="cf-section"><h3>People you can add</h3>{results.map(person => personRow(person, addFriend, "Add"))}</div>}
+    {query.trim().length >= 2 && !results.length && <p className="cf-empty">No new accounts found for that search.</p>}
+    <div className="cf-section"><h3>People on your list</h3>{loading ? <p className="cf-empty">Loading your Close Friends…</p> : friends.length ? friends.map(person => personRow(person, removeFriend, "Remove")) : <p className="cf-empty">Your Close Friends list is empty. Search for people above and tap Add.</p>}</div>
+    <div className="cf-info"><Lock size={18}/><span>Only add people you trust. To protect privacy, post and story APIs must also check this list before returning Close Friends content.</span></div>
+  </div>;
 }
 
 function AccountSettings({ user, onSelect, onOpenVerification }) {
