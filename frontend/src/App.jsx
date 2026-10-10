@@ -386,18 +386,17 @@ function ReelsGoLogo({ className = "" }) {
    ========================================================= */
 function ReelsGoAdvancedHub({ user }) {
   const tabs = [
-    { id: "control", label: "1. My Feed, My Rules", icon: SlidersHorizontal },
-    { id: "ai", label: "2. ReelsGo AI Assistant", icon: Languages },
-    { id: "creator", label: "3. Creator Super Studio", icon: Film },
-    { id: "privacy", label: "4. Privacy per post", icon: Lock },
-    { id: "community", label: "5. Communities", icon: Users },
-    { id: "wellbeing", label: "6. Smart Scroll & Focus", icon: Clock3 },
-    { id: "editor", label: "7. Advanced Reels Editor", icon: Camera },
-    { id: "earn", label: "8. Creator Earnings", icon: Handshake },
-    { id: "trust", label: "9. Trust & Scam Protection", icon: Shield },
-    { id: "collab", label: "10. Collaborative Content", icon: UserPlus },
-    { id: "library", label: "11. Smart Save Library", icon: Bookmark },
-    { id: "local", label: "12. Local Discovery & Events", icon: Compass }
+    { id: "control", label: "My Feed, My Rules", icon: SlidersHorizontal },
+    { id: "creator", label: "Creator Super Studio", icon: Film },
+    { id: "privacy", label: "Privacy per post", icon: Lock },
+    { id: "community", label: "Communities", icon: Users },
+    { id: "wellbeing", label: "Smart Scroll & Focus", icon: Clock3 },
+    { id: "editor", label: "Advanced Reels Editor", icon: Camera },
+    { id: "earn", label: "Creator Earnings", icon: Handshake },
+    { id: "trust", label: "Trust & Scam Protection", icon: Shield },
+    { id: "collab", label: "Collaborative Content", icon: UserPlus },
+    { id: "library", label: "Smart Save Library", icon: Bookmark },
+    { id: "local", label: "Local Discovery & Events", icon: Compass }
   ];
   const [tab, setTab] = useState("control");
   const [prefs, setPrefs] = useState(() => {
@@ -420,9 +419,6 @@ function ReelsGoAdvancedHub({ user }) {
   const [draftDate, setDraftDate] = useState("");
   const [saveTitle, setSaveTitle] = useState("");
   const [saveUrl, setSaveUrl] = useState("");
-  const [aiText, setAiText] = useState("");
-  const [aiResult, setAiResult] = useState("");
-  const [aiBusy, setAiBusy] = useState(false);
   const [focusActive, setFocusActive] = useState(false);
   const [focusSeconds, setFocusSeconds] = useState(0);
   const [notice, setNotice] = useState("");
@@ -480,20 +476,7 @@ function ReelsGoAdvancedHub({ user }) {
     setCommunities(items => [...items, { id: `${Date.now()}`, name: clean, members: 1, description: "A new community started by you" }]);
     flash("Community created locally.");
   }
-  async function runAI(kind) {
-    if (!aiText.trim()) { flash("Enter text or a video transcript first."); return; }
-    setAiBusy(true); setAiResult("");
-    try {
-      const result = await api("/ai/tools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task: kind, text: aiText.trim(), language: "English" })
-      });
-      setAiResult(result.result || result.summary || result.text || JSON.stringify(result));
-    } catch {
-      setAiResult("AI integration is not connected yet. Add a secure backend endpoint at POST /api/ai/tools and call your chosen AI provider from the server. Do not place API keys in React or expose them in VITE_ environment variables.");
-    } finally { setAiBusy(false); }
-  }
+
 
   const Toggle = ({ label, detail, checked, onChange }) => (
     <label className="rg-toggle-row">
@@ -602,15 +585,7 @@ function ReelsGoAdvancedHub({ user }) {
             <div className="rg-hub-callout"><Clock3 size={20}/><span><b>Take a break</b><small>Use a session target that feels helpful, not stressful.</small></span></div>
           </>}
 
-          {tab === "ai" && <>
-            <p className="rg-hub-intro">Generate summaries, captions and translations from text or a transcript. Connect a server-side AI provider to enable actual generation.</p>
-            <label className="rg-field-label">Paste text or a video transcript</label><textarea className="rg-ai-text" value={aiText} onChange={e=>setAiText(e.target.value)} placeholder="Paste a transcript, caption or content idea..."/>
-            <div className="rg-choice-grid"><button type="button" disabled={aiBusy} onClick={()=>runAI("summarize")}>Summarize</button><button type="button" disabled={aiBusy} onClick={()=>runAI("caption")}>Write caption</button><button type="button" disabled={aiBusy} onClick={()=>runAI("translate")}>Translate</button><button type="button" disabled={aiBusy} onClick={()=>runAI("hooks")}>Suggest hooks</button></div>
-            {aiBusy && <p className="rg-hub-muted">Working…</p>}{aiResult && <div className="rg-ai-result"><b>Result</b><p>{aiResult}</p><button className="secondary" type="button" onClick={()=>{navigator.clipboard?.writeText(aiResult);flash("Result copied when clipboard access is available.")}}>Copy result</button></div>}
-            <div className="rg-hub-callout"><Shield size={20}/><span><b>Keep API keys private</b><small>AI credentials belong on the backend, never in frontend source code.</small></span></div>
-          </>}
-
-          {tab === "trust" && <>
+                    {tab === "trust" && <>
             <p className="rg-hub-intro">A central place to review safety practices. These are quick links and recommendations; automated detection needs backend services.</p>
             <div className="rg-trust-grid"><article><Shield/><b>Account security</b><p>Use strong passwords, protect tokens, and review active sessions.</p></article><article><Flag/><b>Report harmful content</b><p>Use the report option on posts and profiles; add status tracking server-side.</p></article><article><Ban/><b>Block and restrict</b><p>Keep blocked users from messaging or interacting through server-enforced rules.</p></article><article><BadgeCheck/><b>Clear verification labels</b><p>A custom badge without ownership checks is not identity verification.</p></article></div>
             <button className="secondary" type="button" onClick={()=>flash("Safety checklist reviewed.")}>Mark checklist reviewed</button>
