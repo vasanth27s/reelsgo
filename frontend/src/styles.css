@@ -11698,3 +11698,40 @@ div[style*="min-width: 170px"]{
  .rg-hub-tabs button span{line-height:1.35}
  .rg-editor-preview video{width:88px}
 }
+
+
+/* Audience selector for posts, stories and reels */
+.publish-audience-section{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:16px 0;
+  padding:14px;
+  border:1px solid var(--line,#e6e7eb);
+  border-radius:14px;
+  background:var(--card,#fff);
+}
+.publish-audience-section label,
+.publish-audience-label{
+  display:block;
+  color:var(--text,#111318);
+  font-size:13px;
+  font-weight:750;
+}
+.publish-audience-section select,
+.publish-audience-label + select{
+  width:100%;
+  min-height:44px;
+  padding:10px 12px;
+  border:1px solid var(--line,#e6e7eb);
+  border-radius:10px;
+  background:var(--card,#fff);
+  color:var(--text,#111318);
+}
+.publish-audience-section small,
+.publish-audience-hint{
+  color:var(--muted,#737985);
+  font-size:11px;
+  line-height:1.45;
+}
+.publish-audience-label{margin-top:12px}

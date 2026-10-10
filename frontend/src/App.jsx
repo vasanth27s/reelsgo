@@ -1929,6 +1929,7 @@ function PostComposer({ user, onClose, onDone }) {
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const [audience, setAudience] = useState("everyone");
   const [taggedPeople, setTaggedPeople] = useState([]);
   const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1946,6 +1947,7 @@ function PostComposer({ user, onClose, onDone }) {
       fd.append("caption", caption);
       fd.append("location", location);
       fd.append("hashtags", hashtags);
+      fd.append("audience", audience);
       fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
       await api("/posts", { method: "POST", body: fd });
       onDone();
@@ -2104,6 +2106,17 @@ function PostComposer({ user, onClose, onDone }) {
             </button>
           </section>
 
+          <section className="publish-audience-section">
+            <label htmlFor="post-audience">Who can see this post?</label>
+            <select id="post-audience" value={audience} onChange={e => setAudience(e.target.value)}>
+              <option value="everyone">Everyone</option>
+              <option value="followers">Followers</option>
+              <option value="close_friends">Close friends</option>
+              <option value="only_me">Only me</option>
+            </select>
+            <small>Close friends visibility must also be enforced by your backend.</small>
+          </section>
+
           <section className="publish-hashtags-section">
             <label htmlFor="publish-hashtags">Hashtags</label>
             <input id="publish-hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} placeholder="#reelsgo #photo #life" />
@@ -2135,6 +2148,7 @@ function StoryComposer({ onClose, onDone }) {
   const currentUser = getUser();
   const [file, setFile] = useState(null);
   const [text, setText] = useState("");
+  const [audience, setAudience] = useState("everyone");
   const [loading, setLoading] = useState(false);
   const [activeTool, setActiveTool] = useState("");
 
@@ -2148,6 +2162,7 @@ function StoryComposer({ onClose, onDone }) {
       const fd = new FormData();
       if (file) fd.append("media", file);
       fd.append("text", text);
+      fd.append("audience", audience);
       await api("/stories", { method: "POST", body: fd });
       onDone();
       alert("Story shared");
@@ -2273,6 +2288,15 @@ function StoryComposer({ onClose, onDone }) {
             </button>
           </section>
 
+          <section className="publish-audience-section">
+            <label htmlFor="story-audience">Who can see this story?</label>
+            <select id="story-audience" value={audience} onChange={e => setAudience(e.target.value)}>
+              <option value="everyone">Everyone</option>
+              <option value="followers">Followers</option>
+              <option value="close_friends">Close friends</option>
+            </select>
+            <small>Close friends visibility must also be enforced by your backend.</small>
+          </section>
           <input ref={input} type="file" accept="image/*,video/*" hidden onChange={chooseFile} />
         </div>
 
@@ -2291,6 +2315,7 @@ function ReelComposer({ onClose, onDone }) {
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState("");
   const [hashtags, setHashtags] = useState("");
+  const [audience, setAudience] = useState("everyone");
   const [taggedPeople, setTaggedPeople] = useState([]);
   const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -2302,6 +2327,7 @@ function ReelComposer({ onClose, onDone }) {
     try {
       const fd = new FormData();
       fd.append("video", file); fd.append("caption", caption); fd.append("hashtags", hashtags);
+      fd.append("audience", audience);
       fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
       await api("/reels", { method: "POST", body: fd });
       onDone(); alert("Reel published");
@@ -2319,6 +2345,13 @@ function ReelComposer({ onClose, onDone }) {
     <button className="secondary full" onClick={() => input.current?.click()}><Upload /> Choose video</button>
     <input className="normal-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} />
     <input className="normal-input" placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+    <label className="publish-audience-label" htmlFor="reel-audience">Who can see this Reel?</label>
+    <select id="reel-audience" className="normal-input" value={audience} onChange={e => setAudience(e.target.value)}>
+      <option value="everyone">Everyone</option>
+      <option value="followers">Followers</option>
+      <option value="close_friends">Close friends</option>
+    </select>
+    <small className="publish-audience-hint">Close friends visibility must also be enforced by your backend.</small>
     <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
       <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
     </button>
