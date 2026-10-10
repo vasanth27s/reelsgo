@@ -386,15 +386,18 @@ function ReelsGoLogo({ className = "" }) {
    ========================================================= */
 function ReelsGoAdvancedHub({ user }) {
   const tabs = [
-    { id: "control", label: "Feed control", icon: SlidersHorizontal },
-    { id: "library", label: "Smart library", icon: Bookmark },
-    { id: "creator", label: "Creator studio", icon: Film },
-    { id: "community", label: "Communities", icon: Users },
-    { id: "wellbeing", label: "Focus & wellbeing", icon: Clock3 },
-    { id: "ai", label: "AI tools", icon: Languages },
-    { id: "trust", label: "Trust center", icon: Shield },
-    { id: "earn", label: "Creator earnings", icon: Handshake },
-    { id: "local", label: "Local discovery", icon: Compass }
+    { id: "control", label: "1. My Feed, My Rules", icon: SlidersHorizontal },
+    { id: "ai", label: "2. ReelsGo AI Assistant", icon: Languages },
+    { id: "creator", label: "3. Creator Super Studio", icon: Film },
+    { id: "privacy", label: "4. Privacy per post", icon: Lock },
+    { id: "community", label: "5. Communities", icon: Users },
+    { id: "wellbeing", label: "6. Smart Scroll & Focus", icon: Clock3 },
+    { id: "editor", label: "7. Advanced Reels Editor", icon: Camera },
+    { id: "earn", label: "8. Creator Earnings", icon: Handshake },
+    { id: "trust", label: "9. Trust & Scam Protection", icon: Shield },
+    { id: "collab", label: "10. Collaborative Content", icon: UserPlus },
+    { id: "library", label: "11. Smart Save Library", icon: Bookmark },
+    { id: "local", label: "12. Local Discovery & Events", icon: Compass }
   ];
   const [tab, setTab] = useState("control");
   const [prefs, setPrefs] = useState(() => {
@@ -423,6 +426,24 @@ function ReelsGoAdvancedHub({ user }) {
   const [focusActive, setFocusActive] = useState(false);
   const [focusSeconds, setFocusSeconds] = useState(0);
   const [notice, setNotice] = useState("");
+  const [privacyAudience, setPrivacyAudience] = useState("Everyone");
+  const [privacyComments, setPrivacyComments] = useState("Everyone");
+  const [privacyDownloads, setPrivacyDownloads] = useState(false);
+  const [privacyRemix, setPrivacyRemix] = useState(true);
+  const [collabTitle, setCollabTitle] = useState("");
+  const [collabUsername, setCollabUsername] = useState("");
+  const [collabItems, setCollabItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_collaboration_invites") || "[]"); } catch { return []; }
+  });
+  const [editorFile, setEditorFile] = useState(null);
+  const [editorCaption, setEditorCaption] = useState("");
+  const [editorMuted, setEditorMuted] = useState(false);
+  const [editorAutoCaptions, setEditorAutoCaptions] = useState(true);
+  const [localArea, setLocalArea] = useState("");
+  const [localEventTitle, setLocalEventTitle] = useState("");
+  const [localEvents, setLocalEvents] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_local_event_drafts") || "[]"); } catch { return []; }
+  });
 
   useEffect(() => { localStorage.setItem("reelsgo_advanced_prefs", JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { localStorage.setItem("reelsgo_smart_library", JSON.stringify(library)); }, [library]);
@@ -519,11 +540,52 @@ function ReelsGoAdvancedHub({ user }) {
           </>}
 
           {tab === "creator" && <>
-            <p className="rg-hub-intro">Plan drafts and publishing dates. Actual automatic publishing requires a supported platform API and backend job scheduler.</p>
+            <p className="rg-hub-intro">Plan content, keep a publishing calendar and review the creator dashboard. The figures below are demo placeholders until real post/view events are recorded by your backend.</p>
             <form className="rg-hub-form" onSubmit={addDraft}><label className="rg-field-label">Content title</label><input value={draftTitle} onChange={e=>setDraftTitle(e.target.value)} placeholder="e.g. 5 JavaScript interview tips" required/><label className="rg-field-label">Planned date (optional)</label><input type="datetime-local" value={draftDate} onChange={e=>setDraftDate(e.target.value)}/><button className="primary" type="submit"><PlusSquare size={16}/> Save draft plan</button></form>
-            <div className="rg-hub-stat-grid"><div><b>{drafts.length}</b><span>Planned items</span></div><div><b>{drafts.filter(d=>d.status==="Draft").length}</b><span>Unscheduled drafts</span></div><div><b>—</b><span>Live analytics</span></div></div>
+            <div className="rg-hub-stat-grid"><div><b>{drafts.length}</b><span>Planned items</span></div><div><b>{drafts.filter(d=>d.status==="Draft").length}</b><span>Unscheduled drafts</span></div><div><b>Not connected</b><span>Live analytics</span></div></div>
+            <div className="rg-trust-grid"><article><Film/><b>Watch time</b><p>Connect playback events to calculate average watch time and retention.</p></article><article><Users/><b>Audience growth</b><p>Track follower changes, reach and engagement from real data.</p></article><article><Clock3/><b>Best posting time</b><p>Recommend times only after enough historical engagement data exists.</p></article><article><CalendarDaysFallback/><b>Content calendar</b><p>Your planned items are listed below; automated publishing needs a scheduler.</p></article></div>
             <div className="rg-hub-list">{drafts.length ? drafts.map(d=><article className="rg-hub-list-item" key={d.id}><div><b>{d.title}</b><small>{d.date ? new Date(d.date).toLocaleString() : "No date set"} · {d.status}</small></div><button type="button" className="rg-danger-text" onClick={()=>setDrafts(items=>items.filter(x=>x.id!==d.id))}>Delete</button></article>) : <div className="rg-hub-empty"><Film/><b>Your creator planner is empty</b><span>Add a draft idea to start planning.</span></div>}</div>
             <div className="rg-hub-callout"><AlertTriangle size={20}/><span><b>Analytics integration needed</b><small>Watch time, retention and audience metrics must come from real post and view events in your backend.</small></span></div>
+          </>}
+
+          {tab === "privacy" && <>
+            <p className="rg-hub-intro">Choose defaults for the audience and interaction settings used when you create content. These are saved as local preferences; enforce each audience on the server before production.</p>
+            <label className="rg-field-label">Default audience for new posts</label>
+            <select value={privacyAudience} onChange={e=>setPrivacyAudience(e.target.value)}>
+              <option>Everyone</option><option>Followers</option><option>Close friends</option><option>Selected people</option><option>Only me</option>
+            </select>
+            <label className="rg-field-label">Who can comment?</label>
+            <select value={privacyComments} onChange={e=>setPrivacyComments(e.target.value)}>
+              <option>Everyone</option><option>People I follow</option><option>Followers</option><option>Off</option>
+            </select>
+            <Toggle label="Allow downloads" detail="Default preference for your own uploaded content." checked={privacyDownloads} onChange={setPrivacyDownloads}/>
+            <Toggle label="Allow remixes and collaborations" detail="Let others request to remix content when supported." checked={privacyRemix} onChange={setPrivacyRemix}/>
+            <div className="rg-hub-callout"><Lock size={20}/><span><b>Per-post audience controls</b><small>Choose the audience on every post too. The server must check audience permissions for feeds, direct links, downloads and APIs.</small></span></div>
+            <button className="primary" type="button" onClick={()=>{try{localStorage.setItem("reelsgo_privacy_defaults",JSON.stringify({privacyAudience,privacyComments,privacyDownloads,privacyRemix}));flash("Privacy defaults saved on this device.");}catch{flash("Could not save privacy settings.");}}}>Save privacy defaults</button>
+          </>}
+
+          {tab === "editor" && <>
+            <p className="rg-hub-intro">A starter editing workspace for selecting a local video, adding a caption and setting editing preferences. Multi-track editing, background removal, beat sync and rendered exports need a dedicated video-processing implementation.</p>
+            <label className="rg-field-label">Choose a video file</label>
+            <input type="file" accept="video/*" onChange={e=>{const f=e.target.files?.[0]; if(f) setEditorFile({name:f.name,size:f.size,url:URL.createObjectURL(f)});}}/>
+            {editorFile && <div className="rg-editor-preview"><video src={editorFile.url} controls playsInline/><div><b>{editorFile.name}</b><small>{(editorFile.size/1024/1024).toFixed(1)} MB · Preview on this device</small></div></div>}
+            <label className="rg-field-label">Caption / hook</label>
+            <textarea className="rg-ai-text" value={editorCaption} onChange={e=>setEditorCaption(e.target.value)} placeholder="Write a hook or caption for your reel..."/>
+            <Toggle label="Prepare auto-caption workflow" detail="Preference only; speech-to-text must be connected to generate subtitles." checked={editorAutoCaptions} onChange={setEditorAutoCaptions}/>
+            <Toggle label="Mute original audio" detail="Saved editing preference; an export pipeline is needed to apply it to a file." checked={editorMuted} onChange={setEditorMuted}/>
+            <div className="rg-choice-grid"><button type="button" onClick={()=>{navigator.clipboard?.writeText(editorCaption);flash("Caption copied when clipboard access is available.");}}>Copy caption</button><button type="button" onClick={()=>flash("Draft settings saved in this editing session.")}>Save edit settings</button></div>
+            <div className="rg-hub-callout"><Film size={20}/><span><b>Next editor integrations</b><small>Timeline tracks, trimming, transitions, audio mixing, subtitles, background removal and MP4 export.</small></span></div>
+          </>}
+
+          {tab === "collab" && <>
+            <p className="rg-hub-intro">Prepare collaboration invitations and ideas. Invitations created here are local drafts only; real invitations must be delivered and accepted through the backend.</p>
+            <form className="rg-hub-form" onSubmit={e=>{e.preventDefault();if(!collabTitle.trim()||!collabUsername.trim())return;setCollabItems(items=>[{id:String(Date.now()),title:collabTitle.trim(),username:collabUsername.trim().replace(/^@/,""),status:"Draft invitation",createdAt:new Date().toISOString()},...items]);setCollabTitle("");setCollabUsername("");flash("Collaboration invitation draft saved.");}}>
+              <label className="rg-field-label">Post or reel idea</label><input value={collabTitle} onChange={e=>setCollabTitle(e.target.value)} placeholder="e.g. React tips collaboration" required/>
+              <label className="rg-field-label">Creator username</label><input value={collabUsername} onChange={e=>setCollabUsername(e.target.value)} placeholder="@creatorname" required/>
+              <button className="primary" type="submit"><UserPlus size={16}/> Create collaboration draft</button>
+            </form>
+            <div className="rg-hub-list">{collabItems.length?collabItems.map(item=><article className="rg-hub-list-item" key={item.id}><div><b>{item.title}</b><small>Invite @{item.username} · {item.status}</small></div><button className="rg-danger-text" type="button" onClick={()=>setCollabItems(items=>items.filter(x=>x.id!==item.id))}>Remove</button></article>):<div className="rg-hub-empty"><UserPlus/><b>No collaboration drafts yet</b><span>Invite a co-author or plan a remix idea.</span></div>}</div>
+            <div className="rg-hub-callout"><Users size={20}/><span><b>Collaboration permissions</b><small>Production support needs accepted invites, co-author attribution, consent, removal rules and ownership checks.</small></span></div>
           </>}
 
           {tab === "community" && <>
@@ -562,12 +624,16 @@ function ReelsGoAdvancedHub({ user }) {
           </>}
 
           {tab === "local" && <>
-            <p className="rg-hub-intro">Discover public events and creators by a city or area the user chooses. This starter panel avoids collecting precise location automatically.</p>
-            <label className="rg-field-label">Choose a city or area</label><input id="rg-local-area" placeholder="e.g. Bengaluru, Tirupati, Hyderabad"/>
-            <div className="rg-trust-grid"><article><Compass/><b>Local creators</b><p>Directory of public profiles by selected area.</p></article><article><CalendarDaysFallback/><b>Events and meetups</b><p>Event listings with RSVP and organizer tools.</p></article></div>
-            <button className="primary" type="button" onClick={()=>flash("Connect a location/events API to load real nearby results.")}>Explore this area</button>
+            <p className="rg-hub-intro">Discover public events and creators by a city or area you choose. ReelsGo does not request precise device location for this feature.</p>
+            <label className="rg-field-label">Choose a city or area</label><input value={localArea} onChange={e=>setLocalArea(e.target.value)} placeholder="e.g. Bengaluru, Tirupati, Hyderabad"/>
+            <div className="rg-trust-grid"><article><Compass/><b>Local creators</b><p>Directory of public profiles filtered by a selected area.</p></article><article><CalendarDaysFallback/><b>Events and meetups</b><p>Draft public events and later add RSVP and organizer tools.</p></article></div>
+            <form className="rg-hub-form" onSubmit={e=>{e.preventDefault();if(!localEventTitle.trim())return;setLocalEvents(items=>[{id:String(Date.now()),title:localEventTitle.trim(),area:localArea.trim()||"Area not set",createdAt:new Date().toISOString()},...items]);setLocalEventTitle("");flash("Local event draft saved on this device.");}}>
+              <label className="rg-field-label">Create an event draft</label><input value={localEventTitle} onChange={e=>setLocalEventTitle(e.target.value)} placeholder="e.g. Bengaluru developers meetup" required/><button className="primary" type="submit">Save event draft</button>
+            </form>
+            <div className="rg-hub-list">{localEvents.length?localEvents.map(ev=><article className="rg-hub-list-item" key={ev.id}><div><b>{ev.title}</b><small>{ev.area} · Draft event</small></div><button className="rg-danger-text" type="button" onClick={()=>setLocalEvents(items=>items.filter(x=>x.id!==ev.id))}>Remove</button></article>):<div className="rg-hub-empty"><Compass/><b>No local event drafts</b><span>Create an event idea to start.</span></div>}</div>
+            <button className="secondary" type="button" onClick={()=>flash("Connect a backend location/events API to load real nearby results.")}>Find local creators and events</button>
           </>}
-          <div className="rg-hub-footnote">Some tools are working local MVPs. Cross-device sync, real AI, analytics, scheduled publishing, payment processing and server-enforced safety require backend implementation.</div>
+          <div className="rg-hub-footnote">All 12 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
         </section>
       </div>
     </div>

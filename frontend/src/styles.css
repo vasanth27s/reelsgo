@@ -11683,3 +11683,18 @@ div[style*="min-width: 170px"]{
  .rg-focus-card>strong{font-size:44px}
  .rg-hub-list-item{align-items:flex-start}
 }
+
+
+/* Additional ReelsGo Lab controls: privacy, editor, collaborations and local events */
+.rg-editor-preview{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin:12px 0;background:var(--bg);min-width:0}
+.rg-editor-preview video{width:110px;max-height:150px;object-fit:contain;background:#000;border-radius:8px;flex:none}
+.rg-editor-preview>div{display:flex;flex-direction:column;gap:5px;min-width:0;overflow-wrap:anywhere}
+.rg-editor-preview b{font-size:12px}
+.rg-editor-preview small{font-size:10px;color:var(--muted)}
+.rg-hub-panel input[type=file]{padding:10px}
+@media(max-width:700px){
+ .rg-hub-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .rg-hub-tabs button{min-height:48px;align-items:flex-start}
+ .rg-hub-tabs button span{line-height:1.35}
+ .rg-editor-preview video{width:88px}
+}
