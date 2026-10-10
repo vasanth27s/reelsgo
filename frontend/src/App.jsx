@@ -377,6 +377,208 @@ function ReelsGoLogo({ className = "" }) {
   return <span className={`reelsgo-text-logo ${className}`}>REELSGO</span>;
 }
 
+
+/* =========================================================
+   REELSGO ADVANCED HUB
+   Working MVP controls stored locally in this browser.
+   Server-dependent AI, payments and analytics are clearly
+   presented as integrations to connect before production.
+   ========================================================= */
+function ReelsGoAdvancedHub({ user }) {
+  const tabs = [
+    { id: "control", label: "Feed control", icon: SlidersHorizontal },
+    { id: "library", label: "Smart library", icon: Bookmark },
+    { id: "creator", label: "Creator studio", icon: Film },
+    { id: "community", label: "Communities", icon: Users },
+    { id: "wellbeing", label: "Focus & wellbeing", icon: Clock3 },
+    { id: "ai", label: "AI tools", icon: Languages },
+    { id: "trust", label: "Trust center", icon: Shield },
+    { id: "earn", label: "Creator earnings", icon: Handshake },
+    { id: "local", label: "Local discovery", icon: Compass }
+  ];
+  const [tab, setTab] = useState("control");
+  const [prefs, setPrefs] = useState(() => {
+    try { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false, ...JSON.parse(localStorage.getItem("reelsgo_advanced_prefs") || "{}") }; }
+    catch { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false }; }
+  });
+  const [library, setLibrary] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_smart_library") || "[]"); } catch { return []; }
+  });
+  const [drafts, setDrafts] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_creator_drafts") || "[]"); } catch { return []; }
+  });
+  const [communities, setCommunities] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_communities") || "[]"); } catch { return []; }
+  });
+  const [joined, setJoined] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_joined_communities") || "[]"); } catch { return []; }
+  });
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftDate, setDraftDate] = useState("");
+  const [saveTitle, setSaveTitle] = useState("");
+  const [saveUrl, setSaveUrl] = useState("");
+  const [aiText, setAiText] = useState("");
+  const [aiResult, setAiResult] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [focusActive, setFocusActive] = useState(false);
+  const [focusSeconds, setFocusSeconds] = useState(0);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => { localStorage.setItem("reelsgo_advanced_prefs", JSON.stringify(prefs)); }, [prefs]);
+  useEffect(() => { localStorage.setItem("reelsgo_smart_library", JSON.stringify(library)); }, [library]);
+  useEffect(() => { localStorage.setItem("reelsgo_creator_drafts", JSON.stringify(drafts)); }, [drafts]);
+  useEffect(() => { localStorage.setItem("reelsgo_communities", JSON.stringify(communities)); }, [communities]);
+  useEffect(() => { localStorage.setItem("reelsgo_joined_communities", JSON.stringify(joined)); }, [joined]);
+  useEffect(() => {
+    if (!focusActive) return;
+    const id = window.setInterval(() => setFocusSeconds(v => v + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [focusActive]);
+
+  function flash(message) {
+    setNotice(message);
+    window.setTimeout(() => setNotice(""), 2800);
+  }
+  function addLibraryItem(e) {
+    e.preventDefault();
+    if (!saveTitle.trim()) return;
+    setLibrary(items => [{ id: `${Date.now()}`, title: saveTitle.trim(), url: saveUrl.trim(), note: "", createdAt: new Date().toISOString() }, ...items]);
+    setSaveTitle(""); setSaveUrl("");
+    flash("Added to your Smart Save Library.");
+  }
+  function addDraft(e) {
+    e.preventDefault();
+    if (!draftTitle.trim()) return;
+    setDrafts(items => [{ id: `${Date.now()}`, title: draftTitle.trim(), date: draftDate, status: draftDate ? "Scheduled locally" : "Draft", createdAt: new Date().toISOString() }, ...items]);
+    setDraftTitle(""); setDraftDate("");
+    flash("Creator item saved on this device.");
+  }
+  function createCommunity(name) {
+    const clean = name.trim();
+    if (!clean) return;
+    setCommunities(items => [...items, { id: `${Date.now()}`, name: clean, members: 1, description: "A new community started by you" }]);
+    flash("Community created locally.");
+  }
+  async function runAI(kind) {
+    if (!aiText.trim()) { flash("Enter text or a video transcript first."); return; }
+    setAiBusy(true); setAiResult("");
+    try {
+      const result = await api("/ai/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task: kind, text: aiText.trim(), language: "English" })
+      });
+      setAiResult(result.result || result.summary || result.text || JSON.stringify(result));
+    } catch {
+      setAiResult("AI integration is not connected yet. Add a secure backend endpoint at POST /api/ai/tools and call your chosen AI provider from the server. Do not place API keys in React or expose them in VITE_ environment variables.");
+    } finally { setAiBusy(false); }
+  }
+
+  const Toggle = ({ label, detail, checked, onChange }) => (
+    <label className="rg-toggle-row">
+      <span><b>{label}</b><small>{detail}</small></span>
+      <input type="checkbox" checked={Boolean(checked)} onChange={e => onChange(e.target.checked)} />
+    </label>
+  );
+  const panelTitle = tabs.find(t => t.id === tab)?.label || "ReelsGo Lab";
+
+  return (
+    <div className="page rg-hub-page">
+      <div className="rg-hub-hero">
+        <div className="rg-hub-kicker"><Shield size={16} /> REELSGO LAB</div>
+        <h1>Make social media work for you.</h1>
+        <p>Personal controls, creator tools, communities and wellbeing in one place.</p>
+        <div className="rg-hub-chips"><span>Personalized</span><span>Creator-first</span><span>Privacy-aware</span></div>
+      </div>
+      {notice && <div className="rg-hub-notice" role="status">{notice}</div>}
+      <div className="rg-hub-layout">
+        <nav className="rg-hub-tabs" aria-label="ReelsGo advanced features">
+          {tabs.map(item => {
+            const Icon = item.icon;
+            return <button type="button" key={item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}><Icon size={18}/><span>{item.label}</span><ChevronRight size={16}/></button>;
+          })}
+        </nav>
+        <section className="rg-hub-panel">
+          <div className="rg-hub-panel-heading"><div><span>REELSGO TOOLS</span><h2>{panelTitle}</h2></div><span className="rg-hub-local-tag">MVP</span></div>
+
+          {tab === "control" && <>
+            <p className="rg-hub-intro">Choose the feed experience you want. These preferences are saved on this device; connect them to your backend feed query to apply them across devices.</p>
+            <label className="rg-field-label">Default feed</label>
+            <div className="rg-choice-grid">{["For you","Following","Close friends","Learning","Local","Reels only"].map(v => <button type="button" key={v} className={prefs.feed === v ? "selected" : ""} onClick={() => setPrefs(p => ({...p, feed:v}))}>{v}</button>)}</div>
+            <Toggle label="Chronological mode" detail="Prefer newest posts first when the backend supports it." checked={prefs.chronological} onChange={v => setPrefs(p=>({...p,chronological:v}))}/>
+            <Toggle label="Autoplay videos" detail="Turn automatic video playback on or off." checked={prefs.autoplay} onChange={v=>setPrefs(p=>({...p,autoplay:v}))}/>
+            <Toggle label="Suggested posts" detail="Choose whether to include recommendations." checked={prefs.suggestions} onChange={v=>setPrefs(p=>({...p,suggestions:v}))}/>
+            <Toggle label="Sponsored content" detail="Hide platform-controlled promotions where available." checked={prefs.sponsored} onChange={v=>setPrefs(p=>({...p,sponsored:v}))}/>
+            <div className="rg-hub-callout"><Shield size={20}/><span><b>Privacy by design</b><small>Audience controls should be enforced by the server, not just hidden in the interface.</small></span></div>
+          </>}
+
+          {tab === "library" && <>
+            <p className="rg-hub-intro">Keep links, tutorials and ideas together. These entries are stored in this browser, not synced to other devices yet.</p>
+            <form className="rg-hub-form" onSubmit={addLibraryItem}><label className="rg-field-label">Title</label><input value={saveTitle} onChange={e=>setSaveTitle(e.target.value)} placeholder="e.g. React interview preparation" required/><label className="rg-field-label">Link (optional)</label><input type="url" value={saveUrl} onChange={e=>setSaveUrl(e.target.value)} placeholder="https://..."/><button className="primary" type="submit"><Bookmark size={16}/> Save item</button></form>
+            <div className="rg-hub-list">{library.length ? library.map(item=><article className="rg-hub-list-item" key={item.id}><div><b>{item.title}</b>{item.url && <a href={item.url} target="_blank" rel="noreferrer">{item.url}</a>}<small>Saved {new Date(item.createdAt).toLocaleDateString()}</small></div><button type="button" className="rg-danger-text" onClick={()=>setLibrary(items=>items.filter(x=>x.id!==item.id))}>Remove</button></article>) : <div className="rg-hub-empty"><Bookmark/><b>Your library is ready</b><span>Add your first link or learning resource above.</span></div>}</div>
+          </>}
+
+          {tab === "creator" && <>
+            <p className="rg-hub-intro">Plan drafts and publishing dates. Actual automatic publishing requires a supported platform API and backend job scheduler.</p>
+            <form className="rg-hub-form" onSubmit={addDraft}><label className="rg-field-label">Content title</label><input value={draftTitle} onChange={e=>setDraftTitle(e.target.value)} placeholder="e.g. 5 JavaScript interview tips" required/><label className="rg-field-label">Planned date (optional)</label><input type="datetime-local" value={draftDate} onChange={e=>setDraftDate(e.target.value)}/><button className="primary" type="submit"><PlusSquare size={16}/> Save draft plan</button></form>
+            <div className="rg-hub-stat-grid"><div><b>{drafts.length}</b><span>Planned items</span></div><div><b>{drafts.filter(d=>d.status==="Draft").length}</b><span>Unscheduled drafts</span></div><div><b>—</b><span>Live analytics</span></div></div>
+            <div className="rg-hub-list">{drafts.length ? drafts.map(d=><article className="rg-hub-list-item" key={d.id}><div><b>{d.title}</b><small>{d.date ? new Date(d.date).toLocaleString() : "No date set"} · {d.status}</small></div><button type="button" className="rg-danger-text" onClick={()=>setDrafts(items=>items.filter(x=>x.id!==d.id))}>Delete</button></article>) : <div className="rg-hub-empty"><Film/><b>Your creator planner is empty</b><span>Add a draft idea to start planning.</span></div>}</div>
+            <div className="rg-hub-callout"><AlertTriangle size={20}/><span><b>Analytics integration needed</b><small>Watch time, retention and audience metrics must come from real post and view events in your backend.</small></span></div>
+          </>}
+
+          {tab === "community" && <>
+            <p className="rg-hub-intro">Start interest groups and join local demo communities. For a multi-user community, membership and permissions must be saved on the server.</p>
+            <form className="rg-hub-form rg-inline-form" onSubmit={e=>{e.preventDefault();createCommunity(e.currentTarget.elements.communityName.value);e.currentTarget.reset();}}><input name="communityName" placeholder="Community name, e.g. MERN Developers" required/><button className="primary" type="submit">Create</button></form>
+            <div className="rg-hub-community-grid">{[{id:"learn",name:"Learn & Build",description:"Share skills, projects and learning resources."},{id:"creators",name:"Creator Circle",description:"Feedback, collaboration and creator tips."},{id:"local",name:"Local Connect",description:"Meet people around shared interests."},...communities].map(c=><article className="rg-community-card" key={c.id}><div className="rg-community-avatar"><Users/></div><h3>{c.name}</h3><p>{c.description}</p><button className={joined.includes(c.id)?"secondary":"primary"} type="button" onClick={()=>setJoined(j=>j.includes(c.id)?j.filter(x=>x!==c.id):[...j,c.id])}>{joined.includes(c.id)?"Joined":"Join community"}</button></article>)}</div>
+          </>}
+
+          {tab === "wellbeing" && <>
+            <p className="rg-hub-intro">Set boundaries and use ReelsGo intentionally. The timer works while this page stays open.</p>
+            <div className="rg-focus-card"><span>YOUR FOCUS SESSION</span><strong>{String(Math.floor(focusSeconds/60)).padStart(2,"0")}:{String(focusSeconds%60).padStart(2,"0")}</strong><p>{focusActive?"Focus session is running.":"Ready when you are."}</p><div><button className="primary" onClick={()=>setFocusActive(v=>!v)}>{focusActive?"Pause session":"Start focus session"}</button><button className="secondary" onClick={()=>{setFocusActive(false);setFocusSeconds(0)}}>Reset</button></div></div>
+            <label className="rg-field-label">Daily reminder target</label><select value={prefs.sessionLimit} onChange={e=>setPrefs(p=>({...p,sessionLimit:Number(e.target.value)}))}><option value={10}>10 minutes</option><option value={20}>20 minutes</option><option value={30}>30 minutes</option><option value={45}>45 minutes</option><option value={60}>60 minutes</option></select>
+            <Toggle label="Bedtime quiet mode" detail="Preference saved locally; notification suppression must be connected separately." checked={prefs.bedtime} onChange={v=>setPrefs(p=>({...p,bedtime:v}))}/>
+            <div className="rg-hub-callout"><Clock3 size={20}/><span><b>Take a break</b><small>Use a session target that feels helpful, not stressful.</small></span></div>
+          </>}
+
+          {tab === "ai" && <>
+            <p className="rg-hub-intro">Generate summaries, captions and translations from text or a transcript. Connect a server-side AI provider to enable actual generation.</p>
+            <label className="rg-field-label">Paste text or a video transcript</label><textarea className="rg-ai-text" value={aiText} onChange={e=>setAiText(e.target.value)} placeholder="Paste a transcript, caption or content idea..."/>
+            <div className="rg-choice-grid"><button type="button" disabled={aiBusy} onClick={()=>runAI("summarize")}>Summarize</button><button type="button" disabled={aiBusy} onClick={()=>runAI("caption")}>Write caption</button><button type="button" disabled={aiBusy} onClick={()=>runAI("translate")}>Translate</button><button type="button" disabled={aiBusy} onClick={()=>runAI("hooks")}>Suggest hooks</button></div>
+            {aiBusy && <p className="rg-hub-muted">Working…</p>}{aiResult && <div className="rg-ai-result"><b>Result</b><p>{aiResult}</p><button className="secondary" type="button" onClick={()=>{navigator.clipboard?.writeText(aiResult);flash("Result copied when clipboard access is available.")}}>Copy result</button></div>}
+            <div className="rg-hub-callout"><Shield size={20}/><span><b>Keep API keys private</b><small>AI credentials belong on the backend, never in frontend source code.</small></span></div>
+          </>}
+
+          {tab === "trust" && <>
+            <p className="rg-hub-intro">A central place to review safety practices. These are quick links and recommendations; automated detection needs backend services.</p>
+            <div className="rg-trust-grid"><article><Shield/><b>Account security</b><p>Use strong passwords, protect tokens, and review active sessions.</p></article><article><Flag/><b>Report harmful content</b><p>Use the report option on posts and profiles; add status tracking server-side.</p></article><article><Ban/><b>Block and restrict</b><p>Keep blocked users from messaging or interacting through server-enforced rules.</p></article><article><BadgeCheck/><b>Clear verification labels</b><p>A custom badge without ownership checks is not identity verification.</p></article></div>
+            <button className="secondary" type="button" onClick={()=>flash("Safety checklist reviewed.")}>Mark checklist reviewed</button>
+          </>}
+
+          {tab === "earn" && <>
+            <p className="rg-hub-intro">Creator earnings dashboard preview. No payments are processed by this demo panel.</p>
+            <div className="rg-hub-stat-grid"><div><b>₹0</b><span>Available balance</span></div><div><b>0</b><span>Supporters</span></div><div><b>Not connected</b><span>Payments</span></div></div>
+            <div className="rg-trust-grid"><article><Heart/><b>Tips and gifts</b><p>Allow eligible viewers to support creators.</p></article><article><Users/><b>Memberships</b><p>Offer optional subscriber-only content.</p></article><article><LinkIcon/><b>Affiliate links</b><p>Disclose paid partnerships and track eligible referrals.</p></article><article><Handshake/><b>Brand collaborations</b><p>Let brands contact opted-in creators.</p></article></div>
+            <div className="rg-hub-callout"><AlertTriangle size={20}/><span><b>Before launch</b><small>Connect a compliant payment provider, creator eligibility checks, refunds, fraud monitoring and payout records.</small></span></div>
+          </>}
+
+          {tab === "local" && <>
+            <p className="rg-hub-intro">Discover public events and creators by a city or area the user chooses. This starter panel avoids collecting precise location automatically.</p>
+            <label className="rg-field-label">Choose a city or area</label><input id="rg-local-area" placeholder="e.g. Bengaluru, Tirupati, Hyderabad"/>
+            <div className="rg-trust-grid"><article><Compass/><b>Local creators</b><p>Directory of public profiles by selected area.</p></article><article><CalendarDaysFallback/><b>Events and meetups</b><p>Event listings with RSVP and organizer tools.</p></article></div>
+            <button className="primary" type="button" onClick={()=>flash("Connect a location/events API to load real nearby results.")}>Explore this area</button>
+          </>}
+          <div className="rg-hub-footnote">Some tools are working local MVPs. Cross-device sync, real AI, analytics, scheduled publishing, payment processing and server-enforced safety require backend implementation.</div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function CalendarDaysFallback() {
+  return <Clock3 />;
+}
+
+
 function App() {
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
@@ -472,6 +674,7 @@ function App() {
 
         <div className="nav-bottom">
           <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
+          <Nav icon={<SlidersHorizontal />} label="ReelsGo Lab" active={page === "advanced"} onClick={() => navigate("advanced")} />
           <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
           <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
         </div>
@@ -495,6 +698,7 @@ function App() {
             </div>
             <button onClick={() => navigate("profile")}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
+            <button onClick={() => navigate("advanced")}><SlidersHorizontal /> ReelsGo Lab</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
           </div>
@@ -516,6 +720,7 @@ function App() {
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
+        {page === "advanced" && <ReelsGoAdvancedHub user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
