@@ -141,48 +141,6 @@ router.put("/me", auth, async (req, res) => {
   }
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| ACCOUNT SETTINGS API
-|--------------------------------------------------------------------------
-| Preferences are stored on the authenticated user's MongoDB document.
-| GET /api/users/me/settings
-| PATCH /api/users/me/settings  { key: "notifications.Likes", value: true }
-*/
-router.get("/me/settings", auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("settings");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    return res.json({ settings: user.settings && typeof user.settings === "object" ? user.settings : {} });
-  } catch (error) {
-    console.error("Get settings error:", error);
-    return res.status(500).json({ message: "Unable to load settings" });
-  }
-});
-
-router.patch("/me/settings", auth, async (req, res) => {
-  try {
-    const { key, value } = req.body || {};
-    if (typeof key !== "string" || !/^[a-zA-Z0-9 ._-]{1,120}$/.test(key.trim())) {
-      return res.status(400).json({ message: "A valid setting key is required" });
-    }
-    if (!["boolean", "string", "number"].includes(typeof value) || (typeof value === "number" && !Number.isFinite(value)) || (typeof value === "string" && value.length > 500)) {
-      return res.status(400).json({ message: "Setting value must be a boolean, string, or finite number" });
-    }
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const current = user.settings && typeof user.settings === "object" ? { ...user.settings } : {};
-    current[key.trim()] = value;
-    user.set("settings", current);
-    await user.save();
-    return res.json({ message: "Setting saved", settings: current });
-  } catch (error) {
-    console.error("Save settings error:", error);
-    return res.status(500).json({ message: "Unable to save setting" });
-  }
-});
-
 /*
 |--------------------------------------------------------------------------
 | UPLOAD AVATAR
