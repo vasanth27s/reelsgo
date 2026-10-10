@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
@@ -7,7 +6,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, MapPin, Navigation, LocateFixed, ExternalLink, Map
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -384,20 +383,126 @@ function ReelsGoLogo({ className = "" }) {
    Server-dependent AI, payments and analytics are clearly
    presented as integrations to connect before production.
    ========================================================= */
+
+function ReelsGoMapsPage() {
+  const [query, setQuery] = useState("");
+  const [mapQuery, setMapQuery] = useState("New Delhi, India");
+  const [provider, setProvider] = useState("google");
+  const [coords, setCoords] = useState(null);
+  const [locationMessage, setLocationMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const encodedQuery = encodeURIComponent(mapQuery || "India");
+  const googleUrl = `https://www.google.com/maps/search/?api=1&query=${encodedQuery}`;
+  const appleUrl = `https://maps.apple.com/?q=${encodedQuery}`;
+  const osmUrl = coords
+    ? `https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lon}#map=15/${coords.lat}/${coords.lon}`
+    : `https://www.openstreetmap.org/search?query=${encodedQuery}`;
+  const embedUrl = coords
+    ? `https://maps.google.com/maps?q=${coords.lat},${coords.lon}&z=14&output=embed`
+    : `https://maps.google.com/maps?q=${encodedQuery}&z=13&output=embed`;
+
+  function searchPlace(e) {
+    e.preventDefault();
+    const clean = query.trim();
+    if (!clean) return;
+    setMapQuery(clean);
+    setCoords(null);
+    setProvider("google");
+    setLocationMessage(`Showing map results for “${clean}”.`);
+  }
+
+  function useMyLocation() {
+    if (!navigator.geolocation) {
+      setLocationMessage("Location is not supported by this browser.");
+      return;
+    }
+    setBusy(true);
+    setLocationMessage("Waiting for your location permission…");
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        setCoords({ lat, lon });
+        setMapQuery(`${lat}, ${lon}`);
+        setQuery("");
+        setProvider("google");
+        setLocationMessage("Your location is shown on the map. It is not saved by ReelsGo.");
+        setBusy(false);
+      },
+      error => {
+        const message = error.code === 1
+          ? "Location permission was denied. You can still search for a place manually."
+          : "Could not get your location. Check device location settings or search manually.";
+        setLocationMessage(message);
+        setBusy(false);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+    );
+  }
+
+  return (
+    <div className="page rg-maps-page">
+      <section className="rg-maps-hero">
+        <div className="rg-maps-kicker"><MapPin size={16}/> REELSGO MAPS</div>
+        <h1>Explore the world around you.</h1>
+        <p>Search a place, explore the map, or open directions in Google Maps or Apple Maps.</p>
+        <form className="rg-maps-search" onSubmit={searchPlace}>
+          <MapPin size={19}/>
+          <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search places, addresses or landmarks" aria-label="Search places"/>
+          <button type="submit">Search</button>
+        </form>
+        <button className="rg-maps-location-button" type="button" onClick={useMyLocation} disabled={busy}>
+          <LocateFixed size={17}/> {busy ? "Finding location…" : "Use my current location"}
+        </button>
+        {locationMessage && <p className="rg-maps-message" role="status">{locationMessage}</p>}
+      </section>
+
+      <section className="rg-maps-provider-row" aria-label="Map provider options">
+        <button type="button" className={provider==="google"?"active":""} onClick={()=>setProvider("google")}><Map size={18}/> Google Maps view</button>
+        <button type="button" className={provider==="apple"?"active":""} onClick={()=>setProvider("apple")}><Navigation size={18}/> Apple Maps</button>
+        <button type="button" className={provider==="osm"?"active":""} onClick={()=>setProvider("osm")}><Compass size={18}/> OpenStreetMap</button>
+      </section>
+
+      <section className="rg-maps-card">
+        <div className="rg-maps-card-head">
+          <div><span>MAP PREVIEW</span><h2>{mapQuery || "Explore places"}</h2></div>
+          <span className="rg-maps-live-dot">Map</span>
+        </div>
+        {provider === "google" && <iframe title="Google Maps preview" src={embedUrl} className="rg-maps-iframe" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen/>}
+        {provider === "apple" && <div className="rg-maps-provider-placeholder"><Navigation size={36}/><h3>Continue in Apple Maps</h3><p>Open Apple Maps for map browsing, directions and navigation supported by your device.</p><a href={appleUrl} target="_blank" rel="noreferrer"><ExternalLink size={16}/> Open Apple Maps</a></div>}
+        {provider === "osm" && <div className="rg-maps-provider-placeholder"><Compass size={36}/><h3>OpenStreetMap</h3><p>Use the open map to browse the selected place and nearby streets.</p><a href={osmUrl} target="_blank" rel="noreferrer"><ExternalLink size={16}/> Open OpenStreetMap</a></div>}
+        <div className="rg-maps-actions">
+          <a href={googleUrl} target="_blank" rel="noreferrer"><Map size={17}/> Open Google Maps <ExternalLink size={14}/></a>
+          <a href={appleUrl} target="_blank" rel="noreferrer"><Navigation size={17}/> Open Apple Maps <ExternalLink size={14}/></a>
+          <a href={osmUrl} target="_blank" rel="noreferrer"><Compass size={17}/> OpenStreetMap <ExternalLink size={14}/></a>
+        </div>
+      </section>
+
+      <div className="rg-maps-info-grid">
+        <article><MapPin/><b>Find places</b><p>Search addresses, landmarks, shops, restaurants and meetup locations.</p></article>
+        <article><Navigation/><b>Get directions</b><p>Open your chosen destination in a map provider that supports your device.</p></article>
+        <article><Shield/><b>Location privacy</b><p>Your location is requested only when you press “Use my current location”. ReelsGo does not save it in this page.</p></article>
+      </div>
+      <p className="rg-maps-disclaimer">Map data, turn-by-turn navigation and traffic are provided by the selected map service. Apple Maps availability depends on your device and browser. Google Maps preview requires an internet connection.</p>
+    </div>
+  );
+}
+
+
 function ReelsGoAdvancedHub({ user }) {
   const tabs = [
-    { id: "control", label: "1. My Feed, My Rules", icon: SlidersHorizontal },
-    { id: "ai", label: "2. ReelsGo AI Assistant", icon: Languages },
-    { id: "creator", label: "3. Creator Super Studio", icon: Film },
-    { id: "privacy", label: "4. Privacy per post", icon: Lock },
-    { id: "community", label: "5. Communities", icon: Users },
-    { id: "wellbeing", label: "6. Smart Scroll & Focus", icon: Clock3 },
-    { id: "editor", label: "7. Advanced Reels Editor", icon: Camera },
-    { id: "earn", label: "8. Creator Earnings", icon: Handshake },
-    { id: "trust", label: "9. Trust & Scam Protection", icon: Shield },
-    { id: "collab", label: "10. Collaborative Content", icon: UserPlus },
-    { id: "library", label: "11. Smart Save Library", icon: Bookmark },
-    { id: "local", label: "12. Local Discovery & Events", icon: Compass }
+    { id: "control", label: "My Feed, My Rules", icon: SlidersHorizontal },
+    { id: "creator", label: "Creator Super Studio", icon: Film },
+    { id: "privacy", label: "Privacy per post", icon: Lock },
+    { id: "community", label: "Communities", icon: Users },
+    { id: "wellbeing", label: "Smart Scroll & Focus", icon: Clock3 },
+    { id: "editor", label: "Advanced Reels Editor", icon: Camera },
+    { id: "earn", label: "Creator Earnings", icon: Handshake },
+    { id: "trust", label: "Trust & Scam Protection", icon: Shield },
+    { id: "collab", label: "Collaborative Content", icon: UserPlus },
+    { id: "library", label: "Smart Save Library", icon: Bookmark },
+    { id: "local", label: "Local Discovery & Events", icon: Compass }
   ];
   const [tab, setTab] = useState("control");
   const [prefs, setPrefs] = useState(() => {
@@ -602,14 +707,6 @@ function ReelsGoAdvancedHub({ user }) {
             <div className="rg-hub-callout"><Clock3 size={20}/><span><b>Take a break</b><small>Use a session target that feels helpful, not stressful.</small></span></div>
           </>}
 
-          {tab === "ai" && <>
-            <p className="rg-hub-intro">Generate summaries, captions and translations from text or a transcript. Connect a server-side AI provider to enable actual generation.</p>
-            <label className="rg-field-label">Paste text or a video transcript</label><textarea className="rg-ai-text" value={aiText} onChange={e=>setAiText(e.target.value)} placeholder="Paste a transcript, caption or content idea..."/>
-            <div className="rg-choice-grid"><button type="button" disabled={aiBusy} onClick={()=>runAI("summarize")}>Summarize</button><button type="button" disabled={aiBusy} onClick={()=>runAI("caption")}>Write caption</button><button type="button" disabled={aiBusy} onClick={()=>runAI("translate")}>Translate</button><button type="button" disabled={aiBusy} onClick={()=>runAI("hooks")}>Suggest hooks</button></div>
-            {aiBusy && <p className="rg-hub-muted">Working…</p>}{aiResult && <div className="rg-ai-result"><b>Result</b><p>{aiResult}</p><button className="secondary" type="button" onClick={()=>{navigator.clipboard?.writeText(aiResult);flash("Result copied when clipboard access is available.")}}>Copy result</button></div>}
-            <div className="rg-hub-callout"><Shield size={20}/><span><b>Keep API keys private</b><small>AI credentials belong on the backend, never in frontend source code.</small></span></div>
-          </>}
-
           {tab === "trust" && <>
             <p className="rg-hub-intro">A central place to review safety practices. These are quick links and recommendations; automated detection needs backend services.</p>
             <div className="rg-trust-grid"><article><Shield/><b>Account security</b><p>Use strong passwords, protect tokens, and review active sessions.</p></article><article><Flag/><b>Report harmful content</b><p>Use the report option on posts and profiles; add status tracking server-side.</p></article><article><Ban/><b>Block and restrict</b><p>Keep blocked users from messaging or interacting through server-enforced rules.</p></article><article><BadgeCheck/><b>Clear verification labels</b><p>A custom badge without ownership checks is not identity verification.</p></article></div>
@@ -633,7 +730,7 @@ function ReelsGoAdvancedHub({ user }) {
             <div className="rg-hub-list">{localEvents.length?localEvents.map(ev=><article className="rg-hub-list-item" key={ev.id}><div><b>{ev.title}</b><small>{ev.area} · Draft event</small></div><button className="rg-danger-text" type="button" onClick={()=>setLocalEvents(items=>items.filter(x=>x.id!==ev.id))}>Remove</button></article>):<div className="rg-hub-empty"><Compass/><b>No local event drafts</b><span>Create an event idea to start.</span></div>}</div>
             <button className="secondary" type="button" onClick={()=>flash("Connect a backend location/events API to load real nearby results.")}>Find local creators and events</button>
           </>}
-          <div className="rg-hub-footnote">All 12 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
+          <div className="rg-hub-footnote">All 11 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
         </section>
       </div>
     </div>
@@ -731,6 +828,7 @@ function App() {
           <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
           <Nav icon={<Compass />} label="Explore" active={page === "explore"} onClick={() => navigate("explore")} />
+          <Nav icon={<MapPin />} label="Maps" active={page === "maps"} onClick={() => navigate("maps")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
           <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
           <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
@@ -763,6 +861,7 @@ function App() {
               <button onClick={() => setMenuOpen(false)}><X /></button>
             </div>
             <button onClick={() => navigate("profile")}><User /> Profile</button>
+            <button onClick={() => navigate("maps")}><MapPin /> Maps</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
             <button onClick={() => navigate("advanced")}><SlidersHorizontal /> ReelsGo Lab</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
@@ -782,6 +881,7 @@ function App() {
           } catch (e) { alert(e.message); }
         }} />}
         {page === "explore" && <ExplorePage />}
+        {page === "maps" && <ReelsGoMapsPage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
@@ -860,12 +960,9 @@ function NavMobile({ icon, label, active, onClick }) {
 
 function AuthLogo({ className = "" }) {
   return (
-    <img
-      src={reelsGoLogo}
-      alt="ReelsGo"
-      className={`auth-logo-image ${className}`}
-      draggable="false"
-    />
+    <div className={`auth-logo-image ${className}`} role="img" aria-label="ReelsGo">
+      <ReelsGoLogo />
+    </div>
   );
 }
 
@@ -5127,4 +5224,36 @@ function Modal({ title, onClose, children }) {
   return <div className="overlay" onClick={onClose}><div className="modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button onClick={onClose}><X /></button></div><div className="modal-body">{children}</div></div></div>;
 }
 
-export default App;
+class ReelsGoAppErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, message: "" };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, message: error?.message || "An unexpected rendering error occurred." };
+  }
+  componentDidCatch(error) {
+    console.error("ReelsGo render error:", error);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <main style={{minHeight:"100vh",display:"grid",placeItems:"center",padding:"24px",background:"#f7f7f9",fontFamily:"system-ui,sans-serif",color:"#111827"}}>
+          <section style={{width:"min(100%,560px)",background:"white",border:"1px solid #e5e7eb",borderRadius:"18px",padding:"26px",boxShadow:"0 18px 50px #11182712"}}>
+            <h1 style={{fontSize:"24px",marginBottom:"10px"}}>ReelsGo could not load this screen</h1>
+            <p style={{fontSize:"14px",lineHeight:1.6,color:"#4b5563",marginBottom:"14px"}}>A frontend runtime error occurred. Open your browser DevTools Console and check the first red error. The message below can help identify it.</p>
+            <pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere",padding:"12px",background:"#f3f4f6",borderRadius:"10px",fontSize:"12px"}}>{this.state.message}</pre>
+            <button onClick={() => window.location.reload()} style={{marginTop:"16px",padding:"11px 16px",borderRadius:"10px",background:"#4f46e5",color:"white",fontWeight:700}}>Reload ReelsGo</button>
+          </section>
+        </main>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function ReelsGoAppWithErrorBoundary() {
+  return <ReelsGoAppErrorBoundary><App /></ReelsGoAppErrorBoundary>;
+}
+
+export default ReelsGoAppWithErrorBoundary;
