@@ -493,17 +493,18 @@ function ReelsGoMapsPage() {
 
 function ReelsGoAdvancedHub({ user }) {
   const tabs = [
-    { id: "control", label: "My Feed, My Rules", icon: SlidersHorizontal },
-    { id: "creator", label: "Creator Super Studio", icon: Film },
-    { id: "privacy", label: "Privacy per post", icon: Lock },
-    { id: "community", label: "Communities", icon: Users },
-    { id: "wellbeing", label: "Smart Scroll & Focus", icon: Clock3 },
-    { id: "editor", label: "Advanced Reels Editor", icon: Camera },
-    { id: "earn", label: "Creator Earnings", icon: Handshake },
-    { id: "trust", label: "Trust & Scam Protection", icon: Shield },
-    { id: "collab", label: "Collaborative Content", icon: UserPlus },
-    { id: "library", label: "Smart Save Library", icon: Bookmark },
-    { id: "local", label: "Local Discovery & Events", icon: Compass }
+    { id: "control", label: "1. My Feed, My Rules", icon: SlidersHorizontal },
+    { id: "ai", label: "2. ReelsGo AI Assistant", icon: Languages },
+    { id: "creator", label: "3. Creator Super Studio", icon: Film },
+    { id: "privacy", label: "4. Privacy per post", icon: Lock },
+    { id: "community", label: "5. Communities", icon: Users },
+    { id: "wellbeing", label: "6. Smart Scroll & Focus", icon: Clock3 },
+    { id: "editor", label: "7. Advanced Reels Editor", icon: Camera },
+    { id: "earn", label: "8. Creator Earnings", icon: Handshake },
+    { id: "trust", label: "9. Trust & Scam Protection", icon: Shield },
+    { id: "collab", label: "10. Collaborative Content", icon: UserPlus },
+    { id: "library", label: "11. Smart Save Library", icon: Bookmark },
+    { id: "local", label: "12. Local Discovery & Events", icon: Compass }
   ];
   const [tab, setTab] = useState("control");
   const [prefs, setPrefs] = useState(() => {
@@ -708,6 +709,13 @@ function ReelsGoAdvancedHub({ user }) {
             <div className="rg-hub-callout"><Clock3 size={20}/><span><b>Take a break</b><small>Use a session target that feels helpful, not stressful.</small></span></div>
           </>}
 
+          {tab === "ai" && <>
+            <p className="rg-hub-intro">Generate summaries, captions and translations from text or a transcript. Connect a server-side AI provider to enable actual generation.</p>
+            <label className="rg-field-label">Paste text or a video transcript</label><textarea className="rg-ai-text" value={aiText} onChange={e=>setAiText(e.target.value)} placeholder="Paste a transcript, caption or content idea..."/>
+            <div className="rg-choice-grid"><button type="button" disabled={aiBusy} onClick={()=>runAI("summarize")}>Summarize</button><button type="button" disabled={aiBusy} onClick={()=>runAI("caption")}>Write caption</button><button type="button" disabled={aiBusy} onClick={()=>runAI("translate")}>Translate</button><button type="button" disabled={aiBusy} onClick={()=>runAI("hooks")}>Suggest hooks</button></div>
+            {aiBusy && <p className="rg-hub-muted">Working…</p>}{aiResult && <div className="rg-ai-result"><b>Result</b><p>{aiResult}</p><button className="secondary" type="button" onClick={()=>{navigator.clipboard?.writeText(aiResult);flash("Result copied when clipboard access is available.")}}>Copy result</button></div>}
+            <div className="rg-hub-callout"><Shield size={20}/><span><b>Keep API keys private</b><small>AI credentials belong on the backend, never in frontend source code.</small></span></div>
+          </>}
 
           {tab === "trust" && <>
             <p className="rg-hub-intro">A central place to review safety practices. These are quick links and recommendations; automated detection needs backend services.</p>
@@ -732,7 +740,7 @@ function ReelsGoAdvancedHub({ user }) {
             <div className="rg-hub-list">{localEvents.length?localEvents.map(ev=><article className="rg-hub-list-item" key={ev.id}><div><b>{ev.title}</b><small>{ev.area} · Draft event</small></div><button className="rg-danger-text" type="button" onClick={()=>setLocalEvents(items=>items.filter(x=>x.id!==ev.id))}>Remove</button></article>):<div className="rg-hub-empty"><Compass/><b>No local event drafts</b><span>Create an event idea to start.</span></div>}</div>
             <button className="secondary" type="button" onClick={()=>flash("Connect a backend location/events API to load real nearby results.")}>Find local creators and events</button>
           </>}
-          <div className="rg-hub-footnote">All 11 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
+          <div className="rg-hub-footnote">All 12 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
         </section>
       </div>
     </div>
