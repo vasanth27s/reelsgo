@@ -4594,7 +4594,7 @@ function SavedPage({ user, embedded = false }) {
 
 const settingsSections = [
   { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account", "Profile discovery", "Account suggestions"] },
-  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close Friends", "Close friends visibility"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Close Friends", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close friends visibility"] },
   { id: "security", title: "Security", icon: Shield, items: ["Login alerts", "New device alerts", "Security email notifications", "Sensitive action confirmations", "Remember trusted devices", "Password change alerts", "Email change alerts", "Phone change alerts", "Active session reminders"] },
   { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Likes", "Comments", "Followers and follow requests", "Messages", "Message requests", "Story replies", "Mentions", "Live notifications", "Reels interactions", "Product announcements", "Email notifications"] },
   { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing", "Allow message previews", "Allow voice messages", "Call notifications"] },
@@ -4606,43 +4606,64 @@ const settingsSections = [
 ];
 
 
-
 function CloseFriendsSettings() {
   const [query, setQuery] = useState("");
   const [people, setPeople] = useState([]);
   const [closeFriends, setCloseFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
-  const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   async function loadCloseFriends() {
+    setLoading(true);
     try {
       const data = await api("/users/me/close-friends");
-      setCloseFriends(data.closeFriends || data.users || []);
+      setCloseFriends(data.closeFriends || []);
+      setError("");
     } catch (e) {
-      setError(e.message || "Unable to load Close Friends. Check that the backend route is installed.");
+      setError(e.message || "Could not load your Close Friends list.");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { loadCloseFriends(); }, []);
+  useEffect(() => {
+    loadCloseFriends();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     const timer = setTimeout(async () => {
-      if (!query.trim()) { setPeople([]); return; }
+      const term = query.trim();
+      if (!term) {
+        setPeople([]);
+        setSearching(false);
+        return;
+      }
+
       setSearching(true);
       try {
-        const data = await api(`/users/search?q=${encodeURIComponent(query.trim())}`);
+        const data = await api(`/users/search?q=${encodeURIComponent(term)}`);
         const results = data.users || data.results || [];
+        const currentId = String(getUser()?._id || "");
+        const existing = new Set(
+          closeFriends.map(person => String(person?._id || person?.user?._id || person))
+        );
+        const unique = [];
+        const seen = new Set();
+
+        for (const item of results) {
+          const person = item?.user || item;
+          const id = String(person?._id || "");
+          if (!id || id === currentId || existing.has(id) || seen.has(id)) continue;
+          seen.add(id);
+          unique.push(person);
+        }
         if (!cancelled) {
-          const currentId = String(getUser()?._id || "");
-          const existing = new Set(closeFriends.map(p => String(p._id || p)));
-          setPeople(results.map(x => x.user || x).filter(p =>
-            p?._id && String(p._id) !== currentId && !existing.has(String(p._id))
-          ));
+          setPeople(unique);
+          setError("");
         }
       } catch (e) {
         if (!cancelled) setError(e.message || "Unable to search users.");
@@ -4650,83 +4671,150 @@ function CloseFriendsSettings() {
         if (!cancelled) setSearching(false);
       }
     }, 250);
-    return () => { cancelled = true; clearTimeout(timer); };
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [query, closeFriends]);
 
   async function addPerson(person) {
-    setBusyId(String(person._id));
+    const id = String(person._id);
+    setBusyId(id);
     setError("");
+    setNotice("");
+
     try {
       const data = await api("/users/me/close-friends", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: person._id })
+        body: JSON.stringify({ userId: id }),
       });
       setCloseFriends(data.closeFriends || [...closeFriends, person]);
-      setPeople(current => current.filter(p => String(p._id) !== String(person._id)));
+      setPeople(current => current.filter(p => String(p._id) !== id));
+      setNotice(`@${person.username || person.name || "User"} added to Close Friends.`);
     } catch (e) {
-      setError(e.message || "Could not add this person. Check backend support.");
-    } finally { setBusyId(""); }
+      setError(e.message || "Unable to add this person.");
+    } finally {
+      setBusyId("");
+    }
   }
 
   async function removePerson(person) {
-    const id = String(person._id || person);
+    const id = String(person?._id || person?.user?._id || person);
     setBusyId(id);
     setError("");
+    setNotice("");
+
     try {
-      const data = await api(`/users/me/close-friends/${id}`, { method: "DELETE" });
-      setCloseFriends(data.closeFriends || closeFriends.filter(p => String(p._id || p) !== id));
+      const data = await api(`/users/me/close-friends/${id}`, {
+        method: "DELETE",
+      });
+      setCloseFriends(data.closeFriends || closeFriends.filter(
+        p => String(p?._id || p?.user?._id || p) !== id
+      ));
+      setNotice("Person removed from Close Friends.");
     } catch (e) {
-      setError(e.message || "Could not remove this person. Check backend support.");
-    } finally { setBusyId(""); }
+      setError(e.message || "Unable to remove this person.");
+    } finally {
+      setBusyId("");
+    }
   }
 
   return (
-    <div className="settings-panel close-friends-settings">
-      <div className="close-friends-intro">
-        <div className="close-friends-icon"><Users /></div>
+    <div className="rg-close-friends">
+      <div className="rg-cf-intro">
+        <div className="rg-cf-icon"><Users /></div>
         <div>
           <h2>Close Friends</h2>
-          <p>Share stories with a smaller group of people you choose.</p>
+          <p>Choose who can see stories shared with your Close Friends audience.</p>
         </div>
       </div>
-      <label className="close-friends-search">
-        <Search />
-        <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by username or name" />
+
+      <label className="rg-cf-search">
+        <Search aria-hidden="true" />
+        <input
+          type="search"
+          value={query}
+          onChange={event => setQuery(event.target.value)}
+          placeholder="Search by username or name"
+          aria-label="Search users to add to Close Friends"
+        />
+        {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search"><X /></button>}
       </label>
-      {error && <div className="close-friends-error" role="alert">{error}</div>}
+
+      {error && <div className="rg-cf-message error" role="alert">{error}</div>}
+      {notice && <div className="rg-cf-message success" role="status">{notice}</div>}
+
       {query.trim() && (
-        <div className="close-friends-results">
-          {searching ? <p className="close-friends-muted">Searching users…</p> :
-            people.length ? people.map(person => (
-              <div className="close-friends-row" key={person._id}>
+        <div className="rg-cf-search-results">
+          {searching ? (
+            <p className="rg-cf-muted">Searching…</p>
+          ) : people.length ? (
+            people.map(person => (
+              <div className="rg-cf-person" key={person._id}>
                 <Avatar user={person} size={44} />
-                <div className="close-friends-person-copy"><b>@{person.username}</b><span>{person.name || "ReelsGo user"}</span></div>
-                <button type="button" className="close-friends-add" disabled={!!busyId} onClick={() => addPerson(person)}>
-                  <UserPlus /> {busyId === String(person._id) ? "Adding…" : "Add"}
+                <div className="rg-cf-person-info">
+                  <b>@{person.username || "user"}</b>
+                  <span>{person.name || "ReelsGo user"}</span>
+                </div>
+                <button
+                  className="rg-cf-add"
+                  type="button"
+                  disabled={!!busyId}
+                  onClick={() => addPerson(person)}
+                >
+                  <UserPlus size={16} />
+                  {busyId === String(person._id) ? "Adding…" : "Add"}
                 </button>
               </div>
-            )) : <p className="close-friends-muted">No users found. Try another username.</p>}
+            ))
+          ) : (
+            <p className="rg-cf-muted">No users found to add.</p>
+          )}
         </div>
       )}
-      <div className="close-friends-list-heading">
-        <h3>Your list</h3><span>{closeFriends.length} people</span>
+
+      <div className="rg-cf-list-heading">
+        <h3>Your list</h3>
+        <span>{closeFriends.length} {closeFriends.length === 1 ? "person" : "people"}</span>
       </div>
-      {loading ? <p className="close-friends-muted">Loading your list…</p> :
-        closeFriends.length ? closeFriends.map(person => {
-          const p = person.user || person;
-          const id = String(p._id || p);
+
+      {loading ? (
+        <p className="rg-cf-muted">Loading your Close Friends…</p>
+      ) : closeFriends.length ? (
+        closeFriends.map(item => {
+          const person = item?.user || item;
+          const id = String(person?._id || person);
           return (
-            <div className="close-friends-row" key={id}>
-              <Avatar user={p} size={44} />
-              <div className="close-friends-person-copy"><b>{p.username ? `@${p.username}` : "ReelsGo user"}</b><span>{p.name || ""}</span></div>
-              <button type="button" className="close-friends-remove" disabled={!!busyId} onClick={() => removePerson(p)}>
+            <div className="rg-cf-person" key={id}>
+              <Avatar user={person} size={44} />
+              <div className="rg-cf-person-info">
+                <b>{person?.username ? `@${person.username}` : "ReelsGo user"}</b>
+                <span>{person?.name || ""}</span>
+              </div>
+              <button
+                className="rg-cf-remove"
+                type="button"
+                disabled={!!busyId}
+                onClick={() => removePerson(person)}
+              >
                 {busyId === id ? "Removing…" : "Remove"}
               </button>
             </div>
           );
-        }) : <div className="close-friends-empty"><Users /><b>Your Close Friends list is empty</b><span>Search for people above and press Add.</span></div>}
-      <p className="close-friends-note">This list is private. People are not notified when you add or remove them.</p>
+        })
+      ) : (
+        <div className="rg-cf-empty">
+          <Users />
+          <b>Your Close Friends list is empty</b>
+          <span>Search for people above and select Add.</span>
+        </div>
+      )}
+
+      <p className="rg-cf-footnote">
+        Your list is private. People are not notified when you add or remove them.
+      </p>
     </div>
   );
 }
@@ -4895,6 +4983,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                 onSelect={setSelectedItem}
               />
             )}
+            {section === "privacy" && <CloseFriendsSettings />}
             {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
             {section === "security" && (
               <SecuritySettings onSelect={setSelectedItem} />
@@ -5014,7 +5103,6 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   onSelect={setSelectedItem}
                 />
               )}
-              {section === "privacy" && <CloseFriendsSettings />}
               {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
