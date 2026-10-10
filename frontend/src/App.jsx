@@ -4593,16 +4593,16 @@ function SavedPage({ user, embedded = false }) {
 }
 
 const settingsSections = [
-  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account"] },
-  { id: "privacy", title: "Privacy", icon: Lock, items: ["Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
-  { id: "security", title: "Security", icon: Shield, items: ["Password", "Two-factor authentication", "Login activity", "Saved login information", "Emails from ReelsGo"] },
-  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Posts, stories and comments", "Following and followers", "Messages", "Calls", "Live and Reels"] },
-  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Messages", "Story replies", "Read receipts", "Typing indicator", "Group messages"] },
-  { id: "content", title: "What you see", icon: Compass, items: ["Content preferences", "Sensitive content", "Suggested content", "Favorites", "Muted accounts"] },
-  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage", "Upload at highest quality", "Autoplay videos", "Accessibility"] },
-  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Text size", "Sound"] },
-  { id: "language", title: "Language", icon: Languages, items: ["App language", "Translations"] },
-  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Terms"] }
+  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account", "Profile discovery", "Account suggestions"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close friends visibility"] },
+  { id: "security", title: "Security", icon: Shield, items: ["Login alerts", "New device alerts", "Security email notifications", "Sensitive action confirmations", "Remember trusted devices", "Password change alerts", "Email change alerts", "Phone change alerts", "Active session reminders"] },
+  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Likes", "Comments", "Followers and follow requests", "Messages", "Message requests", "Story replies", "Mentions", "Live notifications", "Reels interactions", "Product announcements", "Email notifications"] },
+  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing", "Allow message previews", "Allow voice messages", "Call notifications"] },
+  { id: "content", title: "What you see", icon: Compass, items: ["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites feed", "Show liked posts", "Personalized recommendations", "Hide previously seen posts", "Show content in original language"] },
+  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage saver", "Upload at highest quality", "Autoplay videos on Wi-Fi", "Autoplay videos on mobile data", "Save original photos", "Save original videos", "Allow media downloads", "Preload videos"] },
+  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Auto-generated captions", "Text size", "Sound effects", "Text-to-speech", "Screen reader labels", "High contrast", "Keyboard navigation"] },
+  { id: "language", title: "Language", icon: Languages, items: ["App language", "Automatic translations", "Translate captions", "Translate comments", "Translate messages", "Preferred content language"] },
+  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Community guidelines", "Terms and policies"] }
 ];
 
 function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification }) {
@@ -4758,6 +4758,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
 
             {section === "account" && (
               <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+              {section === "account" && <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />}
             )}
             {section === "privacy" && (
               <PrivacySettings
@@ -4768,85 +4769,29 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                 onSelect={setSelectedItem}
               />
             )}
+            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
             {section === "security" && (
               <SecuritySettings onSelect={setSelectedItem} />
             )}
+            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
             {section === "notifications" && (
-              <ToggleSettings
-                title="Notifications"
-                items={[
-                  "Likes",
-                  "Comments",
-                  "Followers and follow requests",
-                  "Messages",
-                  "Story replies",
-                  "Reels interactions",
-                  "Live notifications",
-                  "Email notifications"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
+              )}
             {section === "messages" && (
-              <ToggleSettings
-                title="Messages and replies"
-                items={[
-                  "Message requests",
-                  "Read receipts",
-                  "Typing indicator",
-                  "Group message requests",
-                  "Story replies",
-                  "Allow sharing"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
+              )}
             {section === "content" && (
-              <ToggleSettings
-                title="What you see"
-                items={[
-                  "Sensitive content",
-                  "Autoplay videos",
-                  "Suggested posts",
-                  "Show political content",
-                  "Use less mobile data",
-                  "Favorites"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
+              )}
             {section === "media" && (
-              <ToggleSettings
-                title="Media quality"
-                items={[
-                  "Upload at highest quality",
-                  "Use less mobile data",
-                  "Autoplay videos",
-                  "Save original photos",
-                  "Save original videos"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
+              )}
             {section === "accessibility" && (
-              <ToggleSettings
-                title="Accessibility"
-                items={[
-                  "Reduce motion",
-                  "Captions",
-                  "Text-to-speech",
-                  "Sound effects",
-                  "Large text"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
+              )}
             {section === "language" && (
-              <ToggleSettings
-                title="Language"
-                items={[
-                  "English",
-                  "Automatic translations",
-                  "Translate captions",
-                  "Translate comments"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
+              )}
             {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
             {selectedItem && (
@@ -4932,6 +4877,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
 
               {section === "account" && (
                 <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+              {section === "account" && <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />}
               )}
               {section === "privacy" && (
                 <PrivacySettings
@@ -4942,84 +4888,28 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   onSelect={setSelectedItem}
                 />
               )}
+              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
               )}
+              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
               {section === "notifications" && (
-                <ToggleSettings
-                  title="Notifications"
-                  items={[
-                    "Likes",
-                    "Comments",
-                    "Followers and follow requests",
-                    "Messages",
-                    "Story replies",
-                    "Reels interactions",
-                    "Live notifications",
-                    "Email notifications"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
               )}
               {section === "messages" && (
-                <ToggleSettings
-                  title="Messages and replies"
-                  items={[
-                    "Message requests",
-                    "Read receipts",
-                    "Typing indicator",
-                    "Group message requests",
-                    "Story replies",
-                    "Allow sharing"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
               )}
               {section === "content" && (
-                <ToggleSettings
-                  title="What you see"
-                  items={[
-                    "Sensitive content",
-                    "Autoplay videos",
-                    "Suggested posts",
-                    "Show political content",
-                    "Use less mobile data",
-                    "Favorites"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
               )}
               {section === "media" && (
-                <ToggleSettings
-                  title="Media quality"
-                  items={[
-                    "Upload at highest quality",
-                    "Use less mobile data",
-                    "Autoplay videos",
-                    "Save original photos",
-                    "Save original videos"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
               )}
               {section === "accessibility" && (
-                <ToggleSettings
-                  title="Accessibility"
-                  items={[
-                    "Reduce motion",
-                    "Captions",
-                    "Text-to-speech",
-                    "Sound effects",
-                    "Large text"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
               )}
               {section === "language" && (
-                <ToggleSettings
-                  title="Language"
-                  items={[
-                    "English",
-                    "Automatic translations",
-                    "Translate captions",
-                    "Translate comments"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
               )}
               {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
@@ -5035,9 +4925,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   </button>
                   <b>{selectedItem}</b>
                   <p>
-                    This option is currently represented in the ReelsGo
-                    interface. Account changes are saved only where a backend
-                    endpoint is connected.
+                    This setting needs its dedicated account action to be implemented. Preference switches in this section are saved through the authenticated settings API.
                   </p>
                 </div>
               )}
@@ -5110,17 +4998,63 @@ function SecuritySettings({ onSelect }) {
   </div>;
 }
 
-function ToggleSettings({ title, items }) {
-  const [values, setValues] = useState(() => Object.fromEntries(items.map(x => [x, localStorage.getItem(`vk_setting_${x}`) !== "false"])));
-  function flip(item) {
-    setValues(v => { const next = !v[item]; localStorage.setItem(`vk_setting_${item}`, String(next)); return { ...v, [item]: next }; });
+function ToggleSettings({ title, items, sectionId = "general" }) {
+  const [values, setValues] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [savingKey, setSavingKey] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    api("/users/me/settings")
+      .then(data => {
+        if (!active) return;
+        setValues(data?.settings || {});
+        setError("");
+      })
+      .catch(err => {
+        if (active) setError(err?.message || "Unable to load settings from the server. Please sign in and check your backend.");
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  async function flip(item) {
+    const key = `${sectionId}.${item}`;
+    const previous = Object.prototype.hasOwnProperty.call(values, key) ? values[key] : true;
+    const next = !Boolean(previous);
+    setValues(current => ({ ...current, [key]: next }));
+    setSavingKey(key);
+    setError("");
+    try {
+      const data = await api("/users/me/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value: next })
+      });
+      setValues(current => ({ ...current, ...(data?.settings || {}), [key]: next }));
+    } catch (err) {
+      setValues(current => ({ ...current, [key]: previous }));
+      setError(err?.message || `Could not save “${item}”.`);
+    } finally {
+      setSavingKey("");
+    }
   }
-  return <div className="settings-panel"><h2 className="panel-heading">{title}</h2>{items.map(item =>
-    <div className="setting-switch" key={item}>
-      <span><b>{item}</b><small>Manage this preference for your account.</small></span>
-      <Toggle checked={!!values[item]} onChange={() => flip(item)} />
-    </div>
-  )}</div>;
+
+  return <div className="settings-panel">
+    <h2 className="panel-heading">{title}</h2>
+    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
+    {error && <p className="settings-save-error" role="alert">{error}</p>}
+    {items.map(item => {
+      const key = `${sectionId}.${item}`;
+      const checked = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
+      return <div className="setting-switch" key={key}>
+        <span><b>{item}</b><small>{savingKey === key ? "Saving to your account…" : "This preference is saved to your ReelsGo account."}</small></span>
+        <Toggle checked={checked} disabled={loading || savingKey === key} onChange={() => flip(item)} />
+      </div>;
+    })}
+  </div>;
 }
 
 function HelpSettings({ onSelect }) {
