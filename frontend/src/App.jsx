@@ -4971,8 +4971,10 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
             </div>
 
             {section === "account" && (
-              <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-              {section === "account" && <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />}
+              <>
+                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+              </>
             )}
             {section === "privacy" && (
               <PrivacySettings
@@ -5091,8 +5093,10 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               </div>
 
               {section === "account" && (
-                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-              {section === "account" && <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />}
+                <>
+                  <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+                </>
               )}
               {section === "privacy" && (
                 <PrivacySettings
@@ -5103,6 +5107,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   onSelect={setSelectedItem}
                 />
               )}
+              {section === "privacy" && <CloseFriendsSettings />}
               {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
