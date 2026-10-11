@@ -11975,8 +11975,10 @@ div[style*="min-width: 170px"]{
 .conversation-options-wrap {
   position: absolute;
   right: 7px;
-  top: 50%;
-  transform: translateY(-50%);
+  /* Keep the three-dot button aligned with the username row, not the
+     vertical center of the entire conversation preview. */
+  top: 12px;
+  transform: none;
   z-index: 30;
 }
 .conversation-options-button,
