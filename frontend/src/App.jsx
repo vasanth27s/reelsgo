@@ -746,7 +746,7 @@ function App() {
 
       <main className="main">
         {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
-        {page === "search" && <SearchPage onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
+        {page === "search" && <SearchPage onBack={() => navigate("home")} onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
         {page === "user-profile" && profileUserId && <UserProfilePage userId={profileUserId} currentUser={user} onBack={() => navigate("search")} onMessage={async (id) => {
           try {
             if (!id) throw new Error("Could not find this user's profile ID. Please refresh the profile and try again.");
@@ -774,6 +774,7 @@ function App() {
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
+      {page === "search" && <button type="button" className="rg-search-floating-messages" onClick={() => navigate("messages")}><Send size={21}/><b>Messages</b><span className="rg-search-message-avatars"><i>●</i><i>●</i><i>●</i></span></button>}
       <nav className="bottom-nav glass-bottom-nav">
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
@@ -3538,7 +3539,7 @@ function readRecentProfiles() {
   } catch { return []; }
 }
 
-function SearchPage({ onOpenProfile }) {
+function SearchPage({ onOpenProfile, onBack }) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -3583,12 +3584,14 @@ function SearchPage({ onOpenProfile }) {
   }
 
   return (
-    <div className="page">
-      <div className="page-heading"><div><h1>Search</h1><p>Find people on ReelsGo</p></div></div>
-      <div className="search-box">
-        <Search />
-        <input value={q} onChange={e => search(e.target.value)} placeholder="Search username or name" autoFocus />
-        {q && <button className="icon-button" onClick={() => { setQ(""); setUsers([]); }} aria-label="Clear search"><X /></button>}
+    <div className="page rg-instagram-search-page">
+      <div className="rg-search-topbar">
+        <button type="button" className="rg-search-back" onClick={() => onBack ? onBack() : setQ("")} aria-label="Go back"><ChevronRight /></button>
+        <div className="search-box rg-search-pill">
+          <Search />
+          <input value={q} onChange={e => search(e.target.value)} placeholder="Search" autoFocus />
+          {q && <button className="rg-search-clear" onClick={() => { setQ(""); setUsers([]); }} aria-label="Clear search"><X /></button>}
+        </div>
       </div>
 
       {loading && <div className="empty small-empty"><p>Searching...</p></div>}
@@ -3603,7 +3606,7 @@ function SearchPage({ onOpenProfile }) {
       {!loading && q.trim() && !users.length && <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>}
 
       {!q.trim() && <section className="recent-searches-section" aria-label="Recent profiles">
-        <div className="recent-searches-heading"><h2>Recent</h2>{recent.length > 0 && <button type="button" className="recent-see-all-button" onClick={() => setRecentExpanded(v => !v)}>{recentExpanded ? "See less" : "See all"}</button>}</div>
+        <div className="recent-searches-heading"><h2>Recent</h2>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
         {recent.length > 0 ? <div className="user-list recent-searches-list">
           {(recentExpanded ? recent : recent.slice(0, 5)).map(person => <div className="recent-profile-wrap" key={person._id}>
             <button className="user-row recent-profile-row" onClick={() => openSearchedProfile(person)} type="button">
