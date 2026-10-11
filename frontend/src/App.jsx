@@ -1017,134 +1017,80 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
 function SuggestionsRail({ user, posts }) {
   const [people, setPeople] = useState([]);
   const [following, setFollowing] = useState(new Set());
-  const [busyId, setBusyId] = useState("");
-  const [showAll, setShowAll] = useState(false);
-  const [followError, setFollowError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadSuggestions() {
       const map = new Map();
-      const currentFollowing = new Set();
       const add = (person) => {
-        if (!person?._id || String(person._id) === String(user?._id)) return;
+        if (!person?._id) return;
+        if (String(person._id) === String(user?._id)) return;
         const id = String(person._id);
         if (!map.has(id)) map.set(id, person);
       };
 
-      // Reuse people already present in the feed, then supplement with
-      // the signed-in user's existing followers/following from the API.
       for (const post of posts || []) add(post?.author);
 
-      if (user?._id) {
-        try {
-          const d = await api(`/follows/${user._id}/following`);
-          for (const item of (d.following || d.users || [])) {
-            const person = item?.user || item;
-            add(person);
-            if (person?._id) currentFollowing.add(String(person._id));
-          }
-        } catch {}
+      try {
+        const d = await api(`/follows/${user._id}/following`);
+        for (const item of (d.following || d.users || [])) add(item?.user || item);
+      } catch {}
 
-        try {
-          const d = await api(`/follows/${user._id}/followers`);
-          for (const item of (d.followers || d.users || [])) add(item?.user || item);
-        } catch {}
-      }
+      try {
+        const d = await api(`/follows/${user._id}/followers`);
+        for (const item of (d.followers || d.users || [])) add(item?.user || item);
+      } catch {}
 
-      if (!cancelled) {
-        setPeople(Array.from(map.values()));
-        setFollowing(currentFollowing);
-      }
+      if (!cancelled) setPeople(Array.from(map.values()).slice(0, 6));
     }
 
     loadSuggestions();
     return () => { cancelled = true; };
   }, [posts, user?._id]);
 
-  async function toggleFollow(person) {
-    const id = String(person?._id || "");
-    if (!id || busyId) return;
-    const isFollowing = following.has(id);
-    setBusyId(id);
-    setFollowError("");
-
-    // Update immediately for responsive UI, then roll back if the API fails.
-    setFollowing(prev => {
-      const next = new Set(prev);
-      if (isFollowing) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
+  async function follow(person) {
+    const id = String(person._id);
     try {
-      await api(`/follows/${id}`, { method: isFollowing ? "DELETE" : "POST" });
+      await api(`/follows/${person._id}`, { method: "POST" });
+      setFollowing(prev => new Set([...prev, id]));
     } catch (e) {
-      setFollowing(prev => {
-        const next = new Set(prev);
-        if (isFollowing) next.add(id);
-        else next.delete(id);
-        return next;
-      });
-      setFollowError(e?.message || "Could not update follow status. Please try again.");
-    } finally {
-      setBusyId("");
+      alert(e.message);
     }
   }
-
-  const visiblePeople = showAll ? people : people.slice(0, 6);
 
   return (
     <aside className="suggestions-rail">
       <div className="rail-account">
-        <button type="button" className="rail-avatar-button" onClick={() => openUserProfile(user?._id)} aria-label="Open your profile">
-          <Avatar user={user} size={56} />
-        </button>
+        <Avatar user={user} size={56} />
         <div className="rail-account-info">
           <UserLink user={user} className="rail-username" />
           <span>{user?.name || "ReelsGo user"}</span>
         </div>
-        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-switch-account"))}>Switch</button>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Switch</button>
       </div>
 
       <div className="suggestions-title">
         <b>Suggested for you</b>
-        <button type="button" onClick={() => setShowAll(value => !value)}>
-          {showAll ? "Show less" : "See all"}
-        </button>
+        <button>See all</button>
       </div>
 
-      {followError && <div className="suggestion-error" role="status">{followError}</div>}
-
       <div className="suggestion-list">
-        {visiblePeople.map(person => {
-          const id = String(person._id);
-          const isFollowing = following.has(id);
-          const busy = busyId === id;
+        {people.map(person => {
+          const isFollowing = following.has(String(person._id));
           return (
-            <div className="suggestion-row" key={id}>
-              <button type="button" className="suggestion-avatar-button" onClick={() => openUserProfile(id)} aria-label={`Open ${person.username || person.name || "user"} profile`}>
-                <Avatar user={person} size={42} />
-              </button>
+            <div className="suggestion-row" key={person._id}>
+              <Avatar user={person} size={42} />
               <div className="suggestion-copy">
                 <UserLink user={person} />
-                <span>{isFollowing ? "Following" : "Suggested for you"}</span>
+                <span>Suggested for you</span>
               </div>
-              <button
-                type="button"
-                className={isFollowing ? "following" : "follow"}
-                disabled={busy}
-                onClick={() => toggleFollow(person)}
-              >
-                {busy ? "…" : isFollowing ? "Following" : "Follow"}
+              <button className={isFollowing ? "following" : "follow"} onClick={() => !isFollowing && follow(person)}>
+                {isFollowing ? "Following" : "Follow"}
               </button>
             </div>
           );
         })}
-        {!people.length && (
-          <div className="suggestion-empty">More people will appear here as ReelsGo discovers accounts.</div>
-        )}
       </div>
 
       <div className="rail-footer">
@@ -1153,11 +1099,11 @@ function SuggestionsRail({ user, posts }) {
         © 2026 REELSGO
       </div>
 
-      <button type="button" className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
+      <button className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
         <Send />
         <b>Messages</b>
         <span className="floating-avatars">
-          {people.slice(0, 3).map(person => <span key={person._id} className="floating-avatar-item"><Avatar user={person} size={25} /></span>)}
+          {people.slice(0, 3).map(person => <Avatar key={person._id} user={person} size={25} />)}
         </span>
       </button>
     </aside>
@@ -1732,7 +1678,7 @@ function MediaViewer({ media, post, onClose }) {
 
 function ShareSheet({ post, onClose }) {
   const [people, setPeople] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -1752,7 +1698,9 @@ function ShareSheet({ post, onClose }) {
       if (!users.length) {
         try {
           const d = await api("/messages/conversations");
-          users = (d.conversations || []).map(c => (c.members || []).find(m => String(m?._id) !== String(getUser()?._id))).filter(Boolean);
+          users = (d.conversations || [])
+            .map(c => (c.members || []).find(m => String(m?._id) !== String(getUser()?._id)))
+            .filter(Boolean);
         } catch {}
       }
 
@@ -1762,7 +1710,7 @@ function ShareSheet({ post, onClose }) {
         const person = item?.user || item;
         if (!person?._id) continue;
         const id = String(person._id);
-        if (seen.has(id)) continue;
+        if (id === String(getUser()?._id) || seen.has(id)) continue;
         seen.add(id);
         unique.push(person);
       }
@@ -1770,65 +1718,99 @@ function ShareSheet({ post, onClose }) {
     } catch (e) {
       console.error(e);
       setPeople([]);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { loadPeople(); }, []);
 
+  function togglePerson(person) {
+    const id = String(person._id);
+    setSelected(current => current.some(item => String(item._id) === id)
+      ? current.filter(item => String(item._id) !== id)
+      : [...current, person]);
+  }
+
   async function sendPost() {
-    if (!selected || sending) return;
+    if (!selected.length || sending) return;
     setSending(true);
+    const succeeded = [];
+    const failed = [];
     try {
-      const d = await api("/messages/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ members: [selected._id] })
-      });
-      const conversation = d.conversation;
-      if (!conversation?._id) throw new Error("Unable to create conversation");
       const postLink = `${window.location.origin}/post/${post._id}`;
-      await api(`/messages/conversations/${conversation._id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
-      });
-      alert(`Post sent to @${selected.username}`);
-      onClose();
-    } catch (e) { alert(e.message); }
-    finally { setSending(false); }
+      for (const person of selected) {
+        try {
+          const d = await api("/messages/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ members: [person._id] })
+          });
+          const conversation = d.conversation || d.data?.conversation || d;
+          if (!conversation?._id) throw new Error("Unable to create conversation");
+          await api(`/messages/conversations/${conversation._id}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
+          });
+          succeeded.push(person);
+        } catch (error) {
+          failed.push({ person, error });
+        }
+      }
+
+      if (succeeded.length && !failed.length) {
+        alert(`Post shared with ${succeeded.length} ${succeeded.length === 1 ? "person" : "people"}.`);
+        onClose();
+      } else if (succeeded.length) {
+        alert(`Post sent to ${succeeded.length} people. Could not send to ${failed.map(x => `@${x.person.username || x.person.name || "user"}`).join(", ")}. Please try again for those people.`);
+        setSelected(failed.map(x => x.person));
+      } else {
+        alert(failed[0]?.error?.message || "Unable to share this post. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
   }
 
   const filtered = people.filter(person => `${person.username || ""} ${person.name || ""}`.toLowerCase().includes(query.toLowerCase()));
+  const selectedIds = new Set(selected.map(person => String(person._id)));
 
   return (
     <div className="share-sheet-overlay" onClick={onClose}>
       <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
         <div className="share-sheet-handle" />
         <div className="share-sheet-head">
-          <div><h2>Share</h2><p>Send this post to someone</p></div>
-          <button className="icon-button" type="button" onClick={onClose}><X /></button>
+          <div><h2>Share</h2><p>Select one or more people to send this post</p></div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Close share sheet"><X /></button>
         </div>
         <div className="share-search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search people" autoFocus /></div>
+        {selected.length > 0 && (
+          <div className="share-selection-summary" aria-live="polite">
+            <span>{selected.length} selected</span>
+            <button type="button" onClick={() => setSelected([])} disabled={sending}>Clear selection</button>
+          </div>
+        )}
         <div className="share-people">
           {loading ? <div className="share-loading">Loading people...</div> : filtered.length ? filtered.map(person => {
-            const active = String(selected?._id) === String(person._id);
+            const active = selectedIds.has(String(person._id));
             return (
-              <button key={person._id} type="button" className={`share-person ${active ? "selected" : ""}`} onClick={() => setSelected(person)}>
+              <button key={person._id} type="button" aria-pressed={active} className={`share-person ${active ? "selected" : ""}`} onClick={() => togglePerson(person)} disabled={sending}>
                 <div className="share-person-avatar">
                   <Avatar user={person} size={64} />
                   {active && <span className="share-selected-check"><Check /></span>}
                 </div>
-                <b>@{person.username}</b>
+                <b>@{person.username || person.name || "user"}</b>
                 <span>{person.name || "ReelsGo user"}</span>
               </button>
             );
           }) : (
-            <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>
+            <div className="share-empty"><Users /><b>No people found</b><span>Follow people or search for someone to share posts with them.</span></div>
           )}
         </div>
-        <button className="share-send-button" type="button" disabled={!selected || sending} onClick={sendPost}>
+        <button className="share-send-button" type="button" disabled={!selected.length || sending} onClick={sendPost}>
           <Send />
-          {sending ? "Sending..." : selected ? `Send to @${selected.username}` : "Select a person"}
+          {sending ? `Sending to ${selected.length} ${selected.length === 1 ? "person" : "people"}...` : selected.length ? `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}` : "Select people to share"}
         </button>
       </div>
     </div>
