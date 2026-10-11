@@ -10022,7 +10022,8 @@ div[style*="min-width: 170px"]{
   }
 
   .edit-profile-photo-row{
-    gap:34px;
+    justify-content:center;
+    gap:0;
   }
 
   .edit-profile-photo-button,
@@ -10145,7 +10146,8 @@ div[style*="min-width: 170px"]{
 
 @media(max-width:390px){
   .edit-profile-photo-row{
-    gap:22px;
+    justify-content:center;
+    gap:0;
   }
 
   .edit-profile-photo-button,

@@ -2882,14 +2882,6 @@ function EditProfilePage({
                 <Avatar user={user} size={168} />
               </button>
 
-              <button
-                type="button"
-                className="edit-profile-avatar-button"
-                onClick={() => alert("Avatar selection can be connected to your avatar system later.")}
-                aria-label="Choose avatar"
-              >
-                <CircleUser />
-              </button>
             </div>
 
             <button
@@ -2897,7 +2889,7 @@ function EditProfilePage({
               className="edit-profile-photo-link"
               onClick={onAvatarClick}
             >
-              Edit picture or avatar
+              Edit profile picture
             </button>
           </section>
 
