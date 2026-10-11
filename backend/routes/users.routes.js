@@ -1,11 +1,10 @@
 import express from "express";
+
 import bcrypt from "bcryptjs";
 
 import auth from "../middleware/auth.js";
 
 import { uploadImage } from "../middleware/upload.js";
-
-
 
 import User from "../models/User.js";
 
@@ -15,11 +14,7 @@ import Post from "../models/Post.js";
 
 import Reel from "../models/Reel.js";
 
-
-
 const router = express.Router();
-
-
 
 /*
 
@@ -39,8 +34,6 @@ function postView(post) {
 
     : post;
 
-
-
   obj.media = (obj.media || []).map((media) => ({
 
     ...media,
@@ -53,13 +46,9 @@ function postView(post) {
 
   }));
 
-
-
   return obj;
 
 }
-
-
 
 /*
 
@@ -79,21 +68,15 @@ function reelView(reel) {
 
     : reel;
 
-
-
   return {
 
     ...obj,
-
-
 
     mediaUrl: obj.mediaId
 
       ? `/api/media/${obj.mediaId}`
 
       : null,
-
-
 
     coverUrl: obj.coverMediaId
 
@@ -104,8 +87,6 @@ function reelView(reel) {
   };
 
 }
-
-
 
 /*
 
@@ -125,11 +106,7 @@ function safe(user) {
 
     : { ...user };
 
-
-
   delete obj.password;
-
-
 
   if (obj.avatar) {
 
@@ -137,13 +114,9 @@ function safe(user) {
 
   }
 
-
-
   return obj;
 
 }
-
-
 
 /*
 
@@ -163,8 +136,6 @@ router.get("/me", auth, async (req, res) => {
 
       .select("-password -avatar.data");
 
-
-
     if (!user) {
 
       return res.status(404).json({
@@ -175,8 +146,6 @@ router.get("/me", auth, async (req, res) => {
 
     }
 
-
-
     return res.json({
 
       user,
@@ -186,8 +155,6 @@ router.get("/me", auth, async (req, res) => {
   } catch (error) {
 
     console.error("Get me error:", error);
-
-
 
     return res.status(500).json({
 
@@ -201,107 +168,171 @@ router.get("/me", auth, async (req, res) => {
 
 });
 
-
-
 /*
+
 |--------------------------------------------------------------------------
+
 | CLOSE FRIENDS
+
 |--------------------------------------------------------------------------
+
 | Requires this field in models/User.js:
+
 | closeFriends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+
 |--------------------------------------------------------------------------
+
 */
 
 // GET /api/users/me/close-friends
+
 router.get("/me/close-friends", auth, async (req, res) => {
+
   try {
+
     const user = await User.findById(req.user.id)
+
       .populate("closeFriends", "name username avatar isPrivate")
+
       .select("-password -avatar.data");
 
     if (!user) {
+
       return res.status(404).json({ message: "User not found" });
+
     }
 
     return res.json({ closeFriends: user.closeFriends || [] });
+
   } catch (error) {
+
     console.error("Get Close Friends error:", error);
+
     return res.status(500).json({
+
       message: "Unable to load Close Friends",
+
       error: error.message,
+
     });
+
   }
+
 });
 
 // ADD a user to the current user's Close Friends list
+
 // POST /api/users/me/close-friends  body: { "userId": "..." }
+
 router.post("/me/close-friends", auth, async (req, res) => {
+
   try {
+
     const { userId } = req.body || {};
 
     if (!userId || !/^[a-f\d]{24}$/i.test(String(userId))) {
+
       return res.status(400).json({ message: "A valid userId is required" });
+
     }
 
     if (String(userId) === String(req.user.id)) {
+
       return res.status(400).json({ message: "You cannot add yourself" });
+
     }
 
     const person = await User.findById(userId).select("_id");
+
     if (!person) {
+
       return res.status(404).json({ message: "User not found" });
+
     }
 
     const user = await User.findByIdAndUpdate(
+
       req.user.id,
+
       { $addToSet: { closeFriends: person._id } },
+
       { new: true }
+
     ).populate("closeFriends", "name username avatar isPrivate");
 
     if (!user) {
+
       return res.status(404).json({ message: "User not found" });
+
     }
 
     return res.json({ closeFriends: user.closeFriends || [] });
+
   } catch (error) {
+
     console.error("Add Close Friend error:", error);
+
     return res.status(500).json({
+
       message: "Unable to add Close Friend",
+
       error: error.message,
+
     });
+
   }
+
 });
 
 // REMOVE a user from the current user's Close Friends list
+
 // DELETE /api/users/me/close-friends/:userId
+
 router.delete("/me/close-friends/:userId", auth, async (req, res) => {
+
   try {
+
     const { userId } = req.params;
 
     if (!/^[a-f\d]{24}$/i.test(String(userId))) {
+
       return res.status(400).json({ message: "Invalid user id" });
+
     }
 
     const user = await User.findByIdAndUpdate(
+
       req.user.id,
+
       { $pull: { closeFriends: userId } },
+
       { new: true }
+
     ).populate("closeFriends", "name username avatar isPrivate");
 
     if (!user) {
+
       return res.status(404).json({ message: "User not found" });
+
     }
 
     return res.json({ closeFriends: user.closeFriends || [] });
-  } catch (error) {
-    console.error("Remove Close Friend error:", error);
-    return res.status(500).json({
-      message: "Unable to remove Close Friend",
-      error: error.message,
-    });
-  }
-});
 
+  } catch (error) {
+
+    console.error("Remove Close Friend error:", error);
+
+    return res.status(500).json({
+
+      message: "Unable to remove Close Friend",
+
+      error: error.message,
+
+    });
+
+  }
+
+});
 
 /*
 
@@ -314,26 +345,43 @@ router.delete("/me/close-friends/:userId", auth, async (req, res) => {
 */
 
 // Change password for the authenticated account. Passwords are never returned to the client.
+
 router.patch("/me/password", auth, async (req, res) => {
+
   try {
+
     const { currentPassword, newPassword } = req.body || {};
+
     if (!currentPassword || !newPassword) return res.status(400).json({ message: "Current password and new password are required." });
+
     if (String(newPassword).length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
+
     if (String(newPassword).length > 128) return res.status(400).json({ message: "New password is too long." });
 
     const user = await User.findById(req.user.id).select("+password");
+
     if (!user) return res.status(404).json({ message: "User not found." });
+
     if (!user.password) return res.status(400).json({ message: "Password login is not enabled for this account." });
 
     const valid = await bcrypt.compare(String(currentPassword), String(user.password));
+
     if (!valid) return res.status(400).json({ message: "Current password is incorrect." });
+
     user.password = await bcrypt.hash(String(newPassword), 12);
+
     await user.save();
+
     return res.json({ message: "Password updated successfully." });
+
   } catch (error) {
+
     console.error("Change password error:", error);
+
     return res.status(500).json({ message: "Unable to update password." });
+
   }
+
 });
 
 router.put("/me", auth, async (req, res) => {
@@ -341,8 +389,6 @@ router.put("/me", auth, async (req, res) => {
   try {
 
     const user = await User.findById(req.user.id);
-
-
 
     if (!user) {
 
@@ -354,34 +400,47 @@ router.put("/me", auth, async (req, res) => {
 
     }
 
-
-
     const allowedFields = ["name", "username", "email", "bio", "website", "isPrivate"];
+
     for (const field of allowedFields) {
+
       if (req.body?.[field] !== undefined) {
+
         if (typeof req.body[field] === "string") user[field] = req.body[field].trim();
+
         else if (field === "isPrivate") user[field] = Boolean(req.body[field]);
+
       }
+
     }
 
     if (user.username) {
+
       user.username = user.username.replace(/^@/, "").toLowerCase();
+
       if (!/^[a-z0-9._]{3,30}$/.test(user.username)) {
+
         return res.status(400).json({ message: "Username must be 3–30 characters and use only letters, numbers, dots or underscores." });
+
       }
+
       const duplicateUsername = await User.findOne({ username: user.username, _id: { $ne: user._id } }).select("_id");
+
       if (duplicateUsername) return res.status(409).json({ message: "That username is already in use." });
+
     }
 
     if (user.email) {
+
       user.email = user.email.toLowerCase();
+
       const duplicateEmail = await User.findOne({ email: user.email, _id: { $ne: user._id } }).select("_id");
+
       if (duplicateEmail) return res.status(409).json({ message: "That email is already in use." });
+
     }
 
     await user.save();
-
-
 
     return res.json({
 
@@ -392,8 +451,6 @@ router.put("/me", auth, async (req, res) => {
   } catch (error) {
 
     console.error("Update user error:", error);
-
-
 
     return res.status(500).json({
 
@@ -406,8 +463,6 @@ router.put("/me", auth, async (req, res) => {
   }
 
 });
-
-
 
 /*
 
@@ -441,11 +496,7 @@ router.post(
 
       }
 
-
-
       const user = await User.findById(req.user.id);
-
-
 
       if (!user) {
 
@@ -457,8 +508,6 @@ router.post(
 
       }
 
-
-
       user.avatar = {
 
         data: req.file.buffer,
@@ -469,17 +518,11 @@ router.post(
 
       };
 
-
-
       await user.save();
-
-
 
       return res.json({
 
         user: safe(user),
-
-
 
         avatarUrl:
 
@@ -490,8 +533,6 @@ router.post(
     } catch (error) {
 
       console.error("Avatar upload error:", error);
-
-
 
       return res.status(500).json({
 
@@ -506,8 +547,6 @@ router.post(
   }
 
 );
-
-
 
 /*
 
@@ -529,8 +568,6 @@ router.get("/:id/avatar", async (req, res) => {
 
     ).select("avatar");
 
-
-
     if (!user?.avatar?.data) {
 
       return res.status(404).send(
@@ -540,8 +577,6 @@ router.get("/:id/avatar", async (req, res) => {
       );
 
     }
-
-
 
     res.set(
 
@@ -553,8 +588,6 @@ router.get("/:id/avatar", async (req, res) => {
 
     );
 
-
-
     res.set(
 
       "Cache-Control",
@@ -563,15 +596,11 @@ router.get("/:id/avatar", async (req, res) => {
 
     );
 
-
-
     return res.send(user.avatar.data);
 
   } catch (error) {
 
     console.error("Get avatar error:", error);
-
-
 
     return res.status(500).send(
 
@@ -582,8 +611,6 @@ router.get("/:id/avatar", async (req, res) => {
   }
 
 });
-
-
 
 /*
 
@@ -611,8 +638,6 @@ router.delete(
 
       );
 
-
-
       if (!user) {
 
         return res.status(404).json({
@@ -623,15 +648,9 @@ router.delete(
 
       }
 
-
-
       user.avatar = undefined;
 
-
-
       await user.save();
-
-
 
       return res.json({
 
@@ -649,8 +668,6 @@ router.delete(
 
       );
 
-
-
       return res.status(500).json({
 
         message: "Unable to delete avatar",
@@ -664,8 +681,6 @@ router.delete(
   }
 
 );
-
-
 
 /*
 
@@ -687,8 +702,6 @@ router.get("/search", auth, async (req, res) => {
 
     ).trim();
 
-
-
     if (!q) {
 
       return res.json({
@@ -698,8 +711,6 @@ router.get("/search", auth, async (req, res) => {
       });
 
     }
-
-
 
     const users = await User.find({
 
@@ -716,8 +727,6 @@ router.get("/search", auth, async (req, res) => {
           },
 
         },
-
-
 
         {
 
@@ -743,8 +752,6 @@ router.get("/search", auth, async (req, res) => {
 
       .limit(30);
 
-
-
     return res.json({
 
       users,
@@ -761,8 +768,6 @@ router.get("/search", auth, async (req, res) => {
 
     );
 
-
-
     return res.status(500).json({
 
       message: "Unable to search users",
@@ -774,8 +779,6 @@ router.get("/search", auth, async (req, res) => {
   }
 
 });
-
-
 
 /*
 
@@ -829,8 +832,6 @@ router.get(
 
         .lean();
 
-
-
       if (!user) {
 
         return res.status(404).json({
@@ -841,15 +842,11 @@ router.get(
 
       }
 
-
-
       const isSelf =
 
         String(user._id) ===
 
         String(req.user.id);
-
-
 
       /*
 
@@ -865,15 +862,13 @@ router.get(
 
         ? null
 
-        : await Follow\.findOne({
+        : await Follow.findOne({
 
             follower: req.user.id,
 
             following: user._id,
 
           }).lean();
-
-
 
       const followStatus = isSelf
 
@@ -882,8 +877,6 @@ router.get(
         : relationship?.status ||
 
           "none";
-
-
 
       /*
 
@@ -899,11 +892,7 @@ router.get(
 
         isSelf || !user.isPrivate;
 
-
-
       let mutualFollow = false;
-
-
 
       /*
 
@@ -937,8 +926,6 @@ router.get(
 
           followStatus === "accepted";
 
-
-
         /*
 
         |--------------------------------------------------------------------------
@@ -951,7 +938,7 @@ router.get(
 
         const ownerFollowsViewer =
 
-          await Follow\.exists({
+          await Follow.exists({
 
             follower: user._id,
 
@@ -960,8 +947,6 @@ router.get(
             status: "accepted",
 
           });
-
-
 
         /*
 
@@ -979,15 +964,11 @@ router.get(
 
           !!ownerFollowsViewer;
 
-
-
         canViewConnections =
 
           mutualFollow;
 
       }
-
-
 
       /*
 
@@ -1021,8 +1002,6 @@ router.get(
 
         followStatus === "accepted";
 
-
-
       /*
 
       |--------------------------------------------------------------------------
@@ -1039,39 +1018,23 @@ router.get(
 
           user,
 
-
-
           followStatus,
-
-
 
           canViewContent: false,
 
-
-
           canViewConnections,
-
-
 
           mutualFollow,
 
-
-
           posts: [],
 
-
-
           reels: [],
-
-
 
           tagged: [],
 
         });
 
       }
-
-
 
       /*
 
@@ -1089,11 +1052,7 @@ router.get(
 
           author: user._id,
 
-
-
           archived: false,
-
-
 
           deletedAt: null,
 
@@ -1118,8 +1077,6 @@ router.get(
           .limit(100)
 
           .lean();
-
-
 
       /*
 
@@ -1157,8 +1114,6 @@ router.get(
 
           .lean();
 
-
-
       /*
 
       |--------------------------------------------------------------------------
@@ -1175,11 +1130,7 @@ router.get(
 
           mentions: user._id,
 
-
-
           archived: false,
-
-
 
           deletedAt: null,
 
@@ -1203,8 +1154,6 @@ router.get(
 
           .lean();
 
-
-
       /*
 
       |--------------------------------------------------------------------------
@@ -1219,35 +1168,21 @@ router.get(
 
         user,
 
-
-
         followStatus,
-
-
 
         canViewContent: true,
 
-
-
         canViewConnections,
 
-
-
         mutualFollow,
-
-
 
         posts:
 
           posts.map(postView),
 
-
-
         reels:
 
           reels.map(reelView),
-
-
 
         tagged:
 
@@ -1265,8 +1200,6 @@ router.get(
 
       );
 
-
-
       return res.status(500).json({
 
         message: "Unable to load profile",
@@ -1280,8 +1213,6 @@ router.get(
   }
 
 );
-
-
 
 /*
 
@@ -1315,8 +1246,6 @@ router.get(
 
         );
 
-
-
       if (!user) {
 
         return res.status(404).json({
@@ -1327,11 +1256,9 @@ router.get(
 
       }
 
-
-
       const following =
 
-        await Follow\.findOne({
+        await Follow.findOne({
 
           follower: req.user.id,
 
@@ -1341,13 +1268,9 @@ router.get(
 
         });
 
-
-
       return res.json({
 
         user,
-
-
 
         following:
 
@@ -1365,8 +1288,6 @@ router.get(
 
       );
 
-
-
       return res.status(500).json({
 
         message: "Unable to load user",
@@ -1380,7 +1301,5 @@ router.get(
   }
 
 );
-
-
 
 export default router;

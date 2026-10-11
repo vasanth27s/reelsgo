@@ -47,7 +47,7 @@ import reportRoutes from "./routes/reports.routes.js";
 
 
 
-/\*
+/*
 
   NEW:
 
@@ -191,7 +191,7 @@ app.use(
 
     origin(origin, callback) {
 
-      /\*
+      /*
 
         Allow Postman/server-to-server
 
