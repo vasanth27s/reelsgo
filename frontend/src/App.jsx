@@ -1017,80 +1017,134 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
 function SuggestionsRail({ user, posts }) {
   const [people, setPeople] = useState([]);
   const [following, setFollowing] = useState(new Set());
+  const [busyId, setBusyId] = useState("");
+  const [showAll, setShowAll] = useState(false);
+  const [followError, setFollowError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadSuggestions() {
       const map = new Map();
+      const currentFollowing = new Set();
       const add = (person) => {
-        if (!person?._id) return;
-        if (String(person._id) === String(user?._id)) return;
+        if (!person?._id || String(person._id) === String(user?._id)) return;
         const id = String(person._id);
         if (!map.has(id)) map.set(id, person);
       };
 
+      // Reuse people already present in the feed, then supplement with
+      // the signed-in user's existing followers/following from the API.
       for (const post of posts || []) add(post?.author);
 
-      try {
-        const d = await api(`/follows/${user._id}/following`);
-        for (const item of (d.following || d.users || [])) add(item?.user || item);
-      } catch {}
+      if (user?._id) {
+        try {
+          const d = await api(`/follows/${user._id}/following`);
+          for (const item of (d.following || d.users || [])) {
+            const person = item?.user || item;
+            add(person);
+            if (person?._id) currentFollowing.add(String(person._id));
+          }
+        } catch {}
 
-      try {
-        const d = await api(`/follows/${user._id}/followers`);
-        for (const item of (d.followers || d.users || [])) add(item?.user || item);
-      } catch {}
+        try {
+          const d = await api(`/follows/${user._id}/followers`);
+          for (const item of (d.followers || d.users || [])) add(item?.user || item);
+        } catch {}
+      }
 
-      if (!cancelled) setPeople(Array.from(map.values()).slice(0, 6));
+      if (!cancelled) {
+        setPeople(Array.from(map.values()));
+        setFollowing(currentFollowing);
+      }
     }
 
     loadSuggestions();
     return () => { cancelled = true; };
   }, [posts, user?._id]);
 
-  async function follow(person) {
-    const id = String(person._id);
+  async function toggleFollow(person) {
+    const id = String(person?._id || "");
+    if (!id || busyId) return;
+    const isFollowing = following.has(id);
+    setBusyId(id);
+    setFollowError("");
+
+    // Update immediately for responsive UI, then roll back if the API fails.
+    setFollowing(prev => {
+      const next = new Set(prev);
+      if (isFollowing) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
     try {
-      await api(`/follows/${person._id}`, { method: "POST" });
-      setFollowing(prev => new Set([...prev, id]));
+      await api(`/follows/${id}`, { method: isFollowing ? "DELETE" : "POST" });
     } catch (e) {
-      alert(e.message);
+      setFollowing(prev => {
+        const next = new Set(prev);
+        if (isFollowing) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+      setFollowError(e?.message || "Could not update follow status. Please try again.");
+    } finally {
+      setBusyId("");
     }
   }
+
+  const visiblePeople = showAll ? people : people.slice(0, 6);
 
   return (
     <aside className="suggestions-rail">
       <div className="rail-account">
-        <Avatar user={user} size={56} />
+        <button type="button" className="rail-avatar-button" onClick={() => openUserProfile(user?._id)} aria-label="Open your profile">
+          <Avatar user={user} size={56} />
+        </button>
         <div className="rail-account-info">
           <UserLink user={user} className="rail-username" />
           <span>{user?.name || "ReelsGo user"}</span>
         </div>
-        <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Switch</button>
+        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-switch-account"))}>Switch</button>
       </div>
 
       <div className="suggestions-title">
         <b>Suggested for you</b>
-        <button>See all</button>
+        <button type="button" onClick={() => setShowAll(value => !value)}>
+          {showAll ? "Show less" : "See all"}
+        </button>
       </div>
 
+      {followError && <div className="suggestion-error" role="status">{followError}</div>}
+
       <div className="suggestion-list">
-        {people.map(person => {
-          const isFollowing = following.has(String(person._id));
+        {visiblePeople.map(person => {
+          const id = String(person._id);
+          const isFollowing = following.has(id);
+          const busy = busyId === id;
           return (
-            <div className="suggestion-row" key={person._id}>
-              <Avatar user={person} size={42} />
+            <div className="suggestion-row" key={id}>
+              <button type="button" className="suggestion-avatar-button" onClick={() => openUserProfile(id)} aria-label={`Open ${person.username || person.name || "user"} profile`}>
+                <Avatar user={person} size={42} />
+              </button>
               <div className="suggestion-copy">
                 <UserLink user={person} />
-                <span>Suggested for you</span>
+                <span>{isFollowing ? "Following" : "Suggested for you"}</span>
               </div>
-              <button className={isFollowing ? "following" : "follow"} onClick={() => !isFollowing && follow(person)}>
-                {isFollowing ? "Following" : "Follow"}
+              <button
+                type="button"
+                className={isFollowing ? "following" : "follow"}
+                disabled={busy}
+                onClick={() => toggleFollow(person)}
+              >
+                {busy ? "…" : isFollowing ? "Following" : "Follow"}
               </button>
             </div>
           );
         })}
+        {!people.length && (
+          <div className="suggestion-empty">More people will appear here as ReelsGo discovers accounts.</div>
+        )}
       </div>
 
       <div className="rail-footer">
@@ -1099,11 +1153,11 @@ function SuggestionsRail({ user, posts }) {
         © 2026 REELSGO
       </div>
 
-      <button className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
+      <button type="button" className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
         <Send />
         <b>Messages</b>
         <span className="floating-avatars">
-          {people.slice(0, 3).map(person => <Avatar key={person._id} user={person} size={25} />)}
+          {people.slice(0, 3).map(person => <span key={person._id} className="floating-avatar-item"><Avatar user={person} size={25} /></span>)}
         </span>
       </button>
     </aside>
