@@ -3521,7 +3521,7 @@ function ReelViewer({ reel, onClose }) {
 function SearchPage({ onOpenProfile }) {
   const SEARCH_QUERY_KEY = "reelsgo_search_query";
   const SEARCH_RESULTS_KEY = "reelsgo_search_results";
-  const RECENT_SEARCHES_KEY = "reelsgo_recent_people";
+  const RECENT_SEARCHES_KEY = "reelsgo_recent_opened_people";
   const readRecent = () => {
     try {
       const value = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
@@ -3561,22 +3561,8 @@ function SearchPage({ onOpenProfile }) {
         setUsers(results);
         try { sessionStorage.setItem(SEARCH_RESULTS_KEY, JSON.stringify(results)); } catch {}
 
-        // Save accounts returned by a search to Recent immediately. localStorage
-        // survives page reloads and browser restarts, unlike component state.
-        if (results.length) {
-          setRecentPeople((current) => {
-            const byId = new Map();
-            // Keep the newest search results at the front, preserving prior entries.
-            [...results, ...current].forEach((person) => {
-              if (person?._id && !byId.has(String(person._id))) {
-                byId.set(String(person._id), person);
-              }
-            });
-            const next = Array.from(byId.values()).slice(0, 30);
-            try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)); } catch {}
-            return next;
-          });
-        }
+        // Do not add search results to Recent automatically.
+        // Recent is updated only when the user opens a person's profile.
       } catch (error) {
         if (cancelled || id !== requestId.current) return;
         console.error("Search users error:", error);
