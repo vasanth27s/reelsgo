@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import reelsGoLogo from "../image.png";
+import "./styles.css";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
@@ -7,7 +8,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Database, MapPin, Radio, Video
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -714,7 +715,6 @@ function App() {
 
         <div className="nav-bottom">
           <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
-          <Nav icon={<SlidersHorizontal />} label="ReelsGo Lab" active={page === "advanced"} onClick={() => navigate("advanced")} />
           <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
           <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
         </div>
@@ -738,7 +738,6 @@ function App() {
             </div>
             <button onClick={() => navigate("profile")}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
-            <button onClick={() => navigate("advanced")}><SlidersHorizontal /> ReelsGo Lab</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
           </div>
@@ -760,18 +759,28 @@ function App() {
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "advanced" && <ReelsGoAdvancedHub user={user} />}
+        {page === "videos" && <ReelsPage onCreate={() => setReelOpen(true)} />}
+        {page === "lab-privacy" && <LabFeaturePage kind="privacy" user={user} setUser={setUser} />}
+        {page === "lab-community" && <LabFeaturePage kind="community" user={user} />}
+        {page === "lab-live" && <LabFeaturePage kind="live" user={user} />}
+        {page === "lab-data" && <LabFeaturePage kind="collection" user={user} />}
+        {page === "lab-safety" && <LabFeaturePage kind="safety" user={user} />}
+        {page === "lab-map" && <LabFeaturePage kind="map" user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
-      <nav className="bottom-nav glass-bottom-nav">
-        <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
-        <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
-        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
-        <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={() => navigate("profile")} aria-label="Profile">
-          <Avatar user={user} size={34} />
-          <span>Profile</span>
-        </button>
+      <nav className="bottom-nav glass-bottom-nav rg-lab-dock" aria-label="ReelsGo Lab navigation">
+        <LabNav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+        <LabNav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+        <LabNav icon={<Lock />} label="Private" active={page === "lab-privacy"} onClick={() => navigate("lab-privacy")} />
+        <LabNav icon={<Users />} label="Community" active={page === "lab-community"} onClick={() => navigate("lab-community")} />
+        <LabNav icon={<Radio />} label="Live" active={page === "lab-live"} onClick={() => navigate("lab-live")} />
+        <LabNav icon={<Video />} label="Videos" active={page === "videos"} onClick={() => navigate("videos")} />
+        <LabNav icon={<Database />} label="Data" active={page === "lab-data"} onClick={() => navigate("lab-data")} />
+        <LabNav icon={<Shield />} label="Safety" active={page === "lab-safety"} onClick={() => navigate("lab-safety")} />
+        <LabNav icon={<UserPlus />} label="People" active={page === "search"} onClick={() => navigate("search")} />
+        <LabNav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
+        <LabNav icon={<MapPin />} label="Map" active={page === "lab-map"} onClick={() => navigate("lab-map")} />
       </nav>
 
       {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
@@ -3521,7 +3530,7 @@ function ReelViewer({ reel, onClose }) {
 function SearchPage({ onOpenProfile }) {
   const SEARCH_QUERY_KEY = "reelsgo_search_query";
   const SEARCH_RESULTS_KEY = "reelsgo_search_results";
-  const RECENT_SEARCHES_KEY = "reelsgo_recent_people";
+  const RECENT_SEARCHES_KEY = "reelsgo_recent_opened_people";
   const readRecent = () => {
     try {
       const value = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
@@ -3561,22 +3570,8 @@ function SearchPage({ onOpenProfile }) {
         setUsers(results);
         try { sessionStorage.setItem(SEARCH_RESULTS_KEY, JSON.stringify(results)); } catch {}
 
-        // Save accounts returned by a search to Recent immediately. localStorage
-        // survives page reloads and browser restarts, unlike component state.
-        if (results.length) {
-          setRecentPeople((current) => {
-            const byId = new Map();
-            // Keep the newest search results at the front, preserving prior entries.
-            [...results, ...current].forEach((person) => {
-              if (person?._id && !byId.has(String(person._id))) {
-                byId.set(String(person._id), person);
-              }
-            });
-            const next = Array.from(byId.values()).slice(0, 30);
-            try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)); } catch {}
-            return next;
-          });
-        }
+        // Do not add search results to Recent automatically.
+        // Recent is updated only when the user opens a person's profile.
       } catch (error) {
         if (cancelled || id !== requestId.current) return;
         console.error("Search users error:", error);
@@ -5418,7 +5413,8 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
     const person = people.find(p => String(p?._id || p?.id) === String(personId));
     if (action === "remove") {
       const label = person?.username ? `@${String(person.username).replace(/^@/, "")}` : (person?.name || "this account");
-      if (!window.confirm(`Delete ${label} from your ${peopleType} list?`)) return;
+      const actionLabel = peopleType === "blocked" ? "Unblock" : "Remove restriction for";
+      if (!window.confirm(`${actionLabel} ${label}?`)) return;
     }
     setPeopleBusyId(personId); setError(""); setNotice("");
     try {
@@ -5429,13 +5425,13 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
         ...(action === "add" ? { body: JSON.stringify({}) } : {})
       });
       if (action === "add") {
-        // Keep the searched account in place and change its action to Delete.
+        // Keep the searched account in place and change its action to Unblock or Remove restriction.
         setPeople(current => current.map(p => String(p?._id || p?.id) === String(personId) ? { ...p, isOnList: true } : p));
         setNotice(`${item === "Blocked accounts" ? "Account blocked" : "Account restricted"} successfully.`);
       } else {
         // Only remove the row after the user explicitly clicks Delete and confirms.
         setPeople(current => current.filter(p => String(p?._id || p?.id) !== String(personId)));
-        setNotice("Account removed from this list.");
+        setNotice(peopleType === "blocked" ? "Account unblocked successfully." : "Restriction removed successfully.");
       }
     } catch (err) { setError(err?.message || "Could not update this account."); }
     finally { setPeopleBusyId(""); }
@@ -5460,7 +5456,7 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
     {notice && <div className="rg-detail-message success" role="status">{notice}</div>}
     {isPeopleList ? <div className="rg-detail-form rg-people-manager">
       <label>Search ReelsGo accounts<input value={peopleSearch} onChange={e => setPeopleSearch(e.target.value)} placeholder="Search by name or username" autoComplete="off" /></label>
-      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results stay visible. Use Delete to remove an account from this list." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
+      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results stay visible. Block an account or unblock an account you previously blocked." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
       {peopleLoading ? <p className="settings-save-status">Loading accounts…</p> : null}
       {!peopleLoading && people.length === 0 && <p className="settings-save-status">{peopleSearch.trim() ? "No matching accounts found." : `No ${peopleType} accounts yet.`}</p>}
       <div className="rg-people-results">
@@ -5472,7 +5468,7 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
           return <div className="rg-people-row" key={personId}>
             <div className="rg-people-avatar">{String(displayName).slice(0, 1).toUpperCase()}</div>
             <div className="rg-people-copy"><b>{displayName}</b><small>@{String(person?.username || "user").replace(/^@/, "")}</small></div>
-            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? "Delete" : peopleType === "blocked" ? "Block" : "Restrict"}</button>
+            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? (peopleType === "blocked" ? "Unblock" : "Remove restriction") : peopleType === "blocked" ? "Block" : "Restrict"}</button>
           </div>;
         })}
       </div>
@@ -5503,6 +5499,137 @@ function SettingRow({ icon, title, description, action, danger, onClick }) {
 
 function Modal({ title, onClose, children }) {
   return <div className="overlay" onClick={onClose}><div className="modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button onClick={onClose}><X /></button></div><div className="modal-body">{children}</div></div></div>;
+}
+
+function LabNav({ icon, label, active, onClick }) {
+  return <button type="button" className={`rg-lab-nav-item ${active ? "active" : ""}`} onClick={onClick} aria-current={active ? "page" : undefined}>
+    <span className="rg-lab-nav-icon">{icon}</span><span className="rg-lab-nav-label">{label}</span>
+  </button>;
+}
+
+const LAB_CONFIG = {
+  community: { title: "Communities", subtitle: "Find your people and build something together.", endpoint: "community", createLabel: "Create community", placeholder: "Community name", descriptionPlaceholder: "What is this community about?", empty: "No communities yet. Create the first one." },
+  live: { title: "Live rooms", subtitle: "Create a room and invite people to join the conversation.", endpoint: "live", createLabel: "Start a live room", placeholder: "Live room title", descriptionPlaceholder: "What will you talk about?", empty: "No live rooms yet. Start one." },
+  collection: { title: "Creator data", subtitle: "Keep your ReelsGo ideas and resources organized.", endpoint: "collection", createLabel: "Add collection", placeholder: "Collection title", descriptionPlaceholder: "Add a note or description", empty: "No collections yet. Add your first one." },
+  map: { title: "ReelsGo Map", subtitle: "Share places and discover locations from the community.", endpoint: "map", createLabel: "Add a place", placeholder: "Place name", descriptionPlaceholder: "Location details or address", empty: "No places shared yet. Add a place." }
+};
+
+function LabFeaturePage({ kind, user, setUser }) {
+  const config = LAB_CONFIG[kind];
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [busyId, setBusyId] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [isPrivate, setIsPrivate] = useState(Boolean(user?.isPrivate));
+  const [reportType, setReportType] = useState("bug");
+  const [reportText, setReportText] = useState("");
+
+  async function loadItems() {
+    if (!config) return;
+    setLoading(true); setError("");
+    try {
+      const result = await api(`/lab/${config.endpoint}`);
+      setItems(Array.isArray(result.items) ? result.items : []);
+    } catch (e) {
+      setError(e.message || "Could not load this section.");
+    } finally { setLoading(false); }
+  }
+
+  useEffect(() => { if (config) loadItems(); }, [kind]);
+  useEffect(() => { setIsPrivate(Boolean(user?.isPrivate)); }, [user?.isPrivate]);
+
+  async function createItem(e) {
+    e.preventDefault(); setError(""); setNotice("");
+    if (!title.trim()) { setError("Please enter a title."); return; }
+    const body = { title: title.trim(), description: description.trim(), location: location.trim() };
+    if (kind === "map") {
+      if (latitude !== "" && !Number.isFinite(Number(latitude))) { setError("Latitude must be a number."); return; }
+      if (longitude !== "" && !Number.isFinite(Number(longitude))) { setError("Longitude must be a number."); return; }
+      if (latitude !== "") body.latitude = Number(latitude);
+      if (longitude !== "") body.longitude = Number(longitude);
+    }
+    setBusyId("create");
+    try {
+      const result = await api(`/lab/${config.endpoint}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (result.item) setItems(old => [result.item, ...old.filter(x => String(x._id) !== String(result.item._id))]);
+      setTitle(""); setDescription(""); setLocation(""); setLatitude(""); setLongitude(""); setCreating(false);
+      setNotice("Saved successfully.");
+    } catch (e) { setError(e.message || "Could not save this item."); }
+    finally { setBusyId(""); }
+  }
+
+  async function itemAction(id, action) {
+    setBusyId(String(id)); setError(""); setNotice("");
+    try {
+      const result = await api(`/lab/${config.endpoint}/${id}/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
+      if (result.item) setItems(old => old.map(item => String(item._id) === String(id) ? result.item : item));
+      else await loadItems();
+      setNotice(action === "join" ? "You joined successfully." : "Updated successfully.");
+    } catch (e) { setError(e.message || "Action failed."); }
+    finally { setBusyId(""); }
+  }
+
+  async function deleteItem(item) {
+    if (!window.confirm(`Delete “${item.title}”?`)) return;
+    setBusyId(String(item._id)); setError("");
+    try {
+      await api(`/lab/${config.endpoint}/${item._id}`, { method: "DELETE" });
+      setItems(old => old.filter(x => String(x._id) !== String(item._id)));
+      setNotice("Deleted.");
+    } catch (e) { setError(e.message || "Could not delete this item."); }
+    finally { setBusyId(""); }
+  }
+
+  async function savePrivacy(next) {
+    setError(""); setNotice("");
+    try {
+      const result = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) });
+      const updated = result.user || { ...user, isPrivate: next };
+      setUser?.(updated); localStorage.setItem("vk_user", JSON.stringify(updated)); setIsPrivate(next); setNotice("Privacy setting saved.");
+    } catch (e) { setError(e.message || "Could not save privacy setting."); }
+  }
+
+  async function submitReport(e) {
+    e.preventDefault(); setError(""); setNotice("");
+    if (reportText.trim().length < 8) { setError("Please describe the issue in at least 8 characters."); return; }
+    setBusyId("report");
+    try {
+      await api("/reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: reportType, description: reportText.trim(), source: "ReelsGo Lab" }) });
+      setReportText(""); setNotice("Report submitted. Thank you for helping keep ReelsGo safe.");
+    } catch (e) { setError(e.message || "Could not submit report. Check the reports API route."); }
+    finally { setBusyId(""); }
+  }
+
+  if (kind === "privacy") return <section className="rg-lab-page">
+    <div className="rg-lab-heading"><span className="rg-lab-eyebrow">YOUR ACCOUNT</span><h1>Privacy controls</h1><p>Choose who can see your posts and profile content.</p></div>
+    {error && <div className="rg-lab-alert error">{error}</div>}{notice && <div className="rg-lab-alert success">{notice}</div>}
+    <div className="rg-lab-panel rg-lab-privacy-card"><div className="rg-lab-feature-icon"><Lock /></div><div className="rg-lab-panel-copy"><h2>Private account</h2><p>When enabled, only approved followers should be able to view private content. Backend content routes must enforce this setting.</p><span className="rg-lab-status">Currently {isPrivate ? "private" : "public"}</span></div><button className={`rg-lab-toggle ${isPrivate ? "on" : ""}`} onClick={() => savePrivacy(!isPrivate)} aria-pressed={isPrivate}><span /></button></div>
+    <div className="rg-lab-panel"><h3>Account overview</h3><div className="rg-lab-stat-grid"><div><b>{user?.followersCount ?? 0}</b><span>Followers</span></div><div><b>{user?.followingCount ?? 0}</b><span>Following</span></div><div><b>{user?.postsCount ?? 0}</b><span>Posts</span></div></div></div>
+  </section>;
+
+  if (kind === "safety") return <section className="rg-lab-page">
+    <div className="rg-lab-heading"><span className="rg-lab-eyebrow">TRUST & SAFETY</span><h1>Safety center</h1><p>Report a problem or send feedback to the ReelsGo team.</p></div>
+    {error && <div className="rg-lab-alert error">{error}</div>}{notice && <div className="rg-lab-alert success">{notice}</div>}
+    <form className="rg-lab-panel rg-lab-create-form" onSubmit={submitReport}><label>Report category<select value={reportType} onChange={e => setReportType(e.target.value)}><option value="bug">Something is not working</option><option value="abuse">Harassment or abuse</option><option value="spam">Spam or fake account</option><option value="safety">Safety concern</option><option value="feedback">Product feedback</option></select></label><label>Describe the issue<textarea value={reportText} onChange={e => setReportText(e.target.value)} minLength={8} maxLength={3000} rows={5} placeholder="Tell us what happened…" required /></label><button className="rg-lab-primary" disabled={busyId === "report"}>{busyId === "report" ? "Submitting…" : "Submit report"}</button></form>
+  </section>;
+
+  if (!config) return null;
+  return <section className="rg-lab-page">
+    <div className="rg-lab-heading"><span className="rg-lab-eyebrow">REELSGO LAB</span><h1>{config.title}</h1><p>{config.subtitle}</p><button className="rg-lab-primary" onClick={() => setCreating(v => !v)}>{creating ? "Cancel" : `＋ ${config.createLabel}`}</button></div>
+    {error && <div className="rg-lab-alert error">{error}</div>}{notice && <div className="rg-lab-alert success">{notice}</div>}
+    {creating && <form className="rg-lab-panel rg-lab-create-form" onSubmit={createItem}><label>{kind === "map" ? "Place name" : "Title"}<input value={title} onChange={e => setTitle(e.target.value)} maxLength={100} required placeholder={config.placeholder} /></label><label>Description<textarea value={description} onChange={e => setDescription(e.target.value)} maxLength={1200} rows={3} placeholder={config.descriptionPlaceholder} /></label>{kind === "map" && <><label>Address / location<input value={location} onChange={e => setLocation(e.target.value)} maxLength={200} placeholder="City, venue, or address" /></label><div className="rg-lab-coordinate-row"><label>Latitude<input value={latitude} onChange={e => setLatitude(e.target.value)} placeholder="Optional" inputMode="decimal" /></label><label>Longitude<input value={longitude} onChange={e => setLongitude(e.target.value)} placeholder="Optional" inputMode="decimal" /></label></div></>}<button className="rg-lab-primary" disabled={busyId === "create"}>{busyId === "create" ? "Saving…" : "Save"}</button></form>}
+    <div className="rg-lab-results-head"><h2>{kind === "map" ? "Community places" : kind === "live" ? "Live now" : kind === "community" ? "Discover communities" : "Your collections"}</h2><button className="rg-lab-refresh" onClick={loadItems} disabled={loading}>{loading ? "Loading…" : "Refresh"}</button></div>
+    {loading && <div className="rg-lab-empty">Loading from ReelsGo…</div>}
+    {!loading && items.length === 0 && <div className="rg-lab-empty"><span>{kind === "map" ? "⌖" : kind === "live" ? "◉" : kind === "community" ? "♧" : "▤"}</span><h3>{config.empty}</h3><p>Create an item to see it saved to your ReelsGo account.</p></div>}
+    <div className="rg-lab-entry-grid">{items.map(item => { const ownerId = String(item.owner?._id || item.owner || ""); const mine = ownerId && ownerId === String(user?._id || ""); const joined = (item.members || []).some(m => String(m?._id || m) === String(user?._id || "")); const liked = (item.likes || []).some(m => String(m?._id || m) === String(user?._id || "")); return <article className="rg-lab-entry" key={item._id}><div className={`rg-lab-entry-banner ${kind}`}><span>{kind === "map" ? <MapPin /> : kind === "live" ? <Radio /> : kind === "community" ? <Users /> : <Database />}</span>{kind === "live" && <em>LIVE ROOM</em>}</div><div className="rg-lab-entry-body"><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}{item.location && <small className="rg-lab-location"><MapPin size={14} /> {item.location}</small>}<div className="rg-lab-entry-meta"><span>{item.members?.length || 0} members</span><span>{item.likes?.length || 0} likes</span></div><div className="rg-lab-entry-actions">{kind === "community" && <button className="rg-lab-secondary" disabled={busyId === String(item._id)} onClick={() => itemAction(item._id, "join")}>{joined ? "Joined" : "Join"}</button>}<button className="rg-lab-secondary" disabled={busyId === String(item._id)} onClick={() => itemAction(item._id, "like")}>{liked ? "♥ Liked" : "♡ Like"}</button>{mine && <button className="rg-lab-danger" disabled={busyId === String(item._id)} onClick={() => deleteItem(item)}>Delete</button>}{kind === "map" && (item.latitude != null && item.longitude != null) && <a className="rg-lab-secondary" href={`https://www.google.com/maps?q=${item.latitude},${item.longitude}`} target="_blank" rel="noreferrer">Open map</a>}</div></div></article>; })}</div>
+  </section>;
 }
 
 export default App;
