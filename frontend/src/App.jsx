@@ -645,6 +645,13 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
+    const openStoryComposer = () => setStoryOpen(true);
+    window.addEventListener("reelsgo-open-story-composer", openStoryComposer);
+    return () => window.removeEventListener("reelsgo-open-story-composer", openStoryComposer);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
     const openProfile = (event) => {
       const id = event?.detail?.id;
       if (!id) return;
@@ -1736,6 +1743,10 @@ function ShareSheet({ post, onClose }) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [notice, setNotice] = useState("");
+
+  const postLink = `${window.location.origin}/post/${post?._id || ""}`;
+  const shareText = `Check out this post on ReelsGo: ${postLink}`;
 
   async function loadPeople() {
     setLoading(true);
@@ -1748,7 +1759,6 @@ function ShareSheet({ post, onClose }) {
           users = d.following || d.users || d.followers || [];
         }
       } catch {}
-
       if (!users.length) {
         try {
           const d = await api("/messages/conversations");
@@ -1757,14 +1767,13 @@ function ShareSheet({ post, onClose }) {
           ).filter(Boolean);
         } catch {}
       }
-
       const unique = [];
       const seen = new Set();
       for (const item of users) {
         const person = item?.user || item;
         if (!person?._id) continue;
         const id = String(person._id);
-        if (seen.has(id)) continue;
+        if (id === String(getUser()?._id || "") || seen.has(id)) continue;
         seen.add(id);
         unique.push(person);
       }
@@ -1788,15 +1797,57 @@ function ShareSheet({ post, onClose }) {
     );
   }
 
+  async function copyPostLink() {
+    try {
+      await navigator.clipboard.writeText(postLink);
+      setNotice("Post link copied.");
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = postLink;
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      setNotice(copied ? "Post link copied." : "Copy failed. Please copy the link from your browser.");
+    }
+  }
+
+  function openWhatsApp(status = false) {
+    const message = encodeURIComponent(shareText);
+    // WhatsApp Web/app opens with the link. For Status, choose "My status"
+    // in WhatsApp's own share UI; browsers cannot publish a Status silently.
+    window.open(`https://wa.me/?text=${message}`, "_blank", "noopener,noreferrer");
+    if (status) setNotice("WhatsApp opened. Choose Status in WhatsApp to post it there.");
+  }
+
+  async function shareExternally() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "ReelsGo post", text: "Check out this post on ReelsGo", url: postLink });
+      } else {
+        await copyPostLink();
+        setNotice("Sharing is not supported here, so the link was copied.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") setNotice("Unable to open the share menu. Try Copy link.");
+    }
+  }
+
+  function addToStory() {
+    onClose();
+    window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", {
+      detail: { postId: post?._id || null, postLink }
+    }));
+  }
+
   async function sendPost() {
     if (!selected.length || sending) return;
     setSending(true);
-    const postLink = `${window.location.origin}/post/${post._id}`;
     let sent = 0;
     const failed = [];
-
     try {
-      // Send separately to each selected user, preserving individual DM conversations.
       for (const person of selected) {
         try {
           const d = await api("/messages/conversations", {
@@ -1806,11 +1857,10 @@ function ShareSheet({ post, onClose }) {
           });
           const conversation = d.conversation;
           if (!conversation?._id) throw new Error("Unable to create conversation");
-
           await api(`/messages/conversations/${conversation._id}/messages`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
+            body: JSON.stringify({ text: shareText })
           });
           sent += 1;
         } catch (error) {
@@ -1818,7 +1868,6 @@ function ShareSheet({ post, onClose }) {
           console.error("Failed to share post with user", person, error);
         }
       }
-
       if (sent && !failed.length) {
         alert(`Post sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
         onClose();
@@ -1842,41 +1891,61 @@ function ShareSheet({ post, onClose }) {
       <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
         <div className="share-sheet-handle" />
         <div className="share-sheet-head">
-          <div><h2>Share</h2><p>Select multiple people to share this post</p></div>
+          <div><h2>Share</h2><p>Select multiple people, or choose a sharing option</p></div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close share"><X /></button>
         </div>
+
         <div className="share-search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search people" autoFocus /></div>
+
         <div className="share-people">
           {loading ? <div className="share-loading">Loading people...</div> : filtered.length ? filtered.map(person => {
             const active = selected.some(item => String(item._id) === String(person._id));
             return (
-              <button
-                key={person._id}
-                type="button"
-                className={`share-person ${active ? "selected" : ""}`}
-                onClick={() => togglePerson(person)}
-                aria-pressed={active}
-                title={active ? `Remove @${person.username} from selection` : `Select @${person.username}`}
-              >
+              <button key={person._id} type="button" className={`share-person ${active ? "selected" : ""}`}
+                onClick={() => togglePerson(person)} aria-pressed={active}
+                title={active ? `Remove @${person.username} from selection` : `Select @${person.username}`}>
                 <div className="share-person-avatar">
                   <Avatar user={person} size={64} />
                   {active && <span className="share-selected-check"><Check /></span>}
                 </div>
-                <b>@{person.username}</b>
+                <b>@{person.username || person.name || "user"}</b>
                 <span>{person.name || "ReelsGo user"}</span>
               </button>
             );
-          }) : (
-            <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>
-          )}
+          }) : <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>}
         </div>
-        <button className="share-send-button" type="button" disabled={!selected.length || sending} onClick={sendPost}>
-          <Send />
-          {sending ? "Sending..." : selected.length ? `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}` : "Select people"}
-        </button>
+
+        {selected.length > 0 && (
+          <button className="share-send-button" type="button" disabled={sending} onClick={sendPost}>
+            <Send />{sending ? "Sending..." : `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}`}
+          </button>
+        )}
+
+        <div className="share-shortcuts" aria-label="More sharing options">
+          <button type="button" onClick={addToStory}>
+            <span className="share-shortcut-icon"><CirclePlusFallback /></span><b>Add to story</b>
+          </button>
+          <button type="button" onClick={() => openWhatsApp(false)}>
+            <span className="share-shortcut-icon whatsapp"><MessageCircle /></span><b>WhatsApp</b>
+          </button>
+          <button type="button" onClick={() => openWhatsApp(true)}>
+            <span className="share-shortcut-icon whatsapp"><CirclePlusFallback /></span><b>WhatsApp Status</b>
+          </button>
+          <button type="button" onClick={shareExternally}>
+            <span className="share-shortcut-icon"><Upload /></span><b>Share to…</b>
+          </button>
+          <button type="button" onClick={copyPostLink}>
+            <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
+          </button>
+        </div>
+        {notice && <div className="share-notice" role="status">{notice}</div>}
       </div>
     </div>
   );
+}
+
+function CirclePlusFallback() {
+  return <span className="share-circle-plus">＋</span>;
 }
 
 function TagPeoplePicker({ selected = [], setSelected, onClose }) {
