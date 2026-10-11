@@ -1732,7 +1732,7 @@ function MediaViewer({ media, post, onClose }) {
 
 function ShareSheet({ post, onClose }) {
   const [people, setPeople] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -1752,7 +1752,9 @@ function ShareSheet({ post, onClose }) {
       if (!users.length) {
         try {
           const d = await api("/messages/conversations");
-          users = (d.conversations || []).map(c => (c.members || []).find(m => String(m?._id) !== String(getUser()?._id))).filter(Boolean);
+          users = (d.conversations || []).map(c =>
+            (c.members || []).find(m => String(m?._id) !== String(getUser()?._id))
+          ).filter(Boolean);
         } catch {}
       }
 
@@ -1770,50 +1772,92 @@ function ShareSheet({ post, onClose }) {
     } catch (e) {
       console.error(e);
       setPeople([]);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => { loadPeople(); }, []);
 
-  async function sendPost() {
-    if (!selected || sending) return;
-    setSending(true);
-    try {
-      const d = await api("/messages/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ members: [selected._id] })
-      });
-      const conversation = d.conversation;
-      if (!conversation?._id) throw new Error("Unable to create conversation");
-      const postLink = `${window.location.origin}/post/${post._id}`;
-      await api(`/messages/conversations/${conversation._id}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
-      });
-      alert(`Post sent to @${selected.username}`);
-      onClose();
-    } catch (e) { alert(e.message); }
-    finally { setSending(false); }
+  function togglePerson(person) {
+    const id = String(person._id);
+    setSelected(current =>
+      current.some(item => String(item._id) === id)
+        ? current.filter(item => String(item._id) !== id)
+        : [...current, person]
+    );
   }
 
-  const filtered = people.filter(person => `${person.username || ""} ${person.name || ""}`.toLowerCase().includes(query.toLowerCase()));
+  async function sendPost() {
+    if (!selected.length || sending) return;
+    setSending(true);
+    const postLink = `${window.location.origin}/post/${post._id}`;
+    let sent = 0;
+    const failed = [];
+
+    try {
+      // Send separately to each selected user, preserving individual DM conversations.
+      for (const person of selected) {
+        try {
+          const d = await api("/messages/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ members: [person._id] })
+          });
+          const conversation = d.conversation;
+          if (!conversation?._id) throw new Error("Unable to create conversation");
+
+          await api(`/messages/conversations/${conversation._id}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: `Shared a post with you: ${postLink}` })
+          });
+          sent += 1;
+        } catch (error) {
+          failed.push(person.username || person.name || "user");
+          console.error("Failed to share post with user", person, error);
+        }
+      }
+
+      if (sent && !failed.length) {
+        alert(`Post sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
+        onClose();
+      } else if (sent) {
+        alert(`Post sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
+        onClose();
+      } else {
+        alert("Could not send the post. Please try again.");
+      }
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const filtered = people.filter(person =>
+    `${person.username || ""} ${person.name || ""}`.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <div className="share-sheet-overlay" onClick={onClose}>
       <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
         <div className="share-sheet-handle" />
         <div className="share-sheet-head">
-          <div><h2>Share</h2><p>Send this post to someone</p></div>
-          <button className="icon-button" type="button" onClick={onClose}><X /></button>
+          <div><h2>Share</h2><p>Select multiple people to share this post</p></div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Close share"><X /></button>
         </div>
         <div className="share-search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search people" autoFocus /></div>
         <div className="share-people">
           {loading ? <div className="share-loading">Loading people...</div> : filtered.length ? filtered.map(person => {
-            const active = String(selected?._id) === String(person._id);
+            const active = selected.some(item => String(item._id) === String(person._id));
             return (
-              <button key={person._id} type="button" className={`share-person ${active ? "selected" : ""}`} onClick={() => setSelected(person)}>
+              <button
+                key={person._id}
+                type="button"
+                className={`share-person ${active ? "selected" : ""}`}
+                onClick={() => togglePerson(person)}
+                aria-pressed={active}
+                title={active ? `Remove @${person.username} from selection` : `Select @${person.username}`}
+              >
                 <div className="share-person-avatar">
                   <Avatar user={person} size={64} />
                   {active && <span className="share-selected-check"><Check /></span>}
@@ -1826,9 +1870,9 @@ function ShareSheet({ post, onClose }) {
             <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>
           )}
         </div>
-        <button className="share-send-button" type="button" disabled={!selected || sending} onClick={sendPost}>
+        <button className="share-send-button" type="button" disabled={!selected.length || sending} onClick={sendPost}>
           <Send />
-          {sending ? "Sending..." : selected ? `Send to @${selected.username}` : "Select a person"}
+          {sending ? "Sending..." : selected.length ? `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}` : "Select people"}
         </button>
       </div>
     </div>
