@@ -12241,3 +12241,48 @@ div[style*="min-width: 170px"]{
  .page:has(.recent-searches-section) .recent-searches-section{margin-top:0;}
  .rg-search-floating-messages{right:12px;bottom:78px;padding:10px 13px;}
 }
+
+/* Final Search Recent list: Instagram-like rows without inner/outer cards */
+.page:has(.recent-searches-section) .recent-searches-list,
+.page:has(.recent-searches-section) .recent-profile-wrap,
+.page:has(.recent-searches-section) .recent-profile-row.user-row {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.page:has(.recent-searches-section) .recent-profile-wrap {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 8px 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+.page:has(.recent-searches-section) .recent-profile-wrap:hover,
+.page:has(.recent-searches-section) .recent-profile-row.user-row:hover {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.page:has(.recent-searches-section) .recent-profile-row.user-row {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+.page:has(.recent-searches-section) .recent-profile-options {
+  flex: 0 0 38px !important;
+  margin-left: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.page:has(.recent-searches-section) .recent-remove-button {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.page:has(.recent-searches-section) .recent-remove-button:hover {
+  background: #202328 !important;
+}
