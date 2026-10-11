@@ -20,6 +20,9 @@ import messageRoutes from "./routes/messages.routes.js";
 import notificationRoutes from "./routes/notifications.routes.js";
 import noteRoutes from "./routes/notes.routes.js";
 import reportRoutes from "./routes/reports.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
+
+
 
 /*
   NEW:
@@ -40,6 +43,7 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+app.use("/api/users", settingsRoutes);
 
 // ===============================
 // ENVIRONMENT
