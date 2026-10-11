@@ -11805,7 +11805,240 @@ div[style*="min-width: 170px"]{
 @media(max-width:700px){.settings-mobile-detail:has(> .setting-detail-screen) > :not(.setting-detail-screen){display:none!important}.setting-detail-screen{padding:16px 14px 28px;border-radius:0;overflow-y:auto}.rg-detail-heading h2{font-size:22px}.rg-detail-control-card{padding:15px;gap:12px}.rg-detail-form{gap:14px}}
 
 
+/* ===== ReelsGo dark, polished Search and Messages UI ===== */
+.page:has(.recent-searches-section),
+.page:has(.instagram-chat-layout) {
+  color: #f5f5f7;
+}
+.page:has(.recent-searches-section) .page-heading p,
+.page:has(.recent-searches-section) .recent-searches-heading p {
+  color: #9ca3af;
+}
+.page:has(.recent-searches-section) .search-box {
+  background: #202328;
+  border: 1px solid #30343b;
+  border-radius: 999px;
+  min-height: 52px;
+  padding: 0 17px;
+  color: #f5f5f7;
+}
+.page:has(.recent-searches-section) .search-box svg { color: #a8adb7; flex-shrink: 0; }
+.page:has(.recent-searches-section) .search-box input {
+  color: #f5f5f7;
+  background: transparent;
+  border: 0;
+  width: 100%;
+}
+.page:has(.recent-searches-section) .search-box input::placeholder { color: #9298a3; }
+.recent-searches-section {
+  margin-top: 26px;
+  max-width: 720px;
+}
+.recent-searches-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.recent-searches-heading h2 { color: #f7f7f8; font-size: 19px; font-weight: 750; }
+.recent-searches-heading p { font-size: 12px; margin-top: 4px; }
+.recent-clear-button {
+  background: transparent;
+  color: #a78bfa;
+  font-weight: 700;
+  padding: 9px 11px;
+  border-radius: 9px;
+}
+.recent-clear-button:hover { background: #292432; }
+.recent-searches-list { display: grid; gap: 7px; margin-top: 0; }
+.recent-profile-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  background: #15181d;
+  border: 1px solid #282c33;
+  border-radius: 15px;
+  padding: 5px 8px 5px 5px;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.recent-profile-wrap:hover { background: #1b1f25; border-color: #3a3f49; }
+.recent-profile-row.user-row {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  color: #f5f5f7;
+  text-align: left;
+  border-radius: 10px;
+}
+.recent-profile-row .avatar { width: 48px; height: 48px; }
+.recent-profile-row>div { min-width: 0; gap: 4px; }
+.recent-profile-row b { color: #f5f5f7; font-size: 14px; }
+.recent-profile-row span { color: #9ca3af; font-size: 12px; }
+.recent-profile-options { position: relative; flex: 0 0 auto; }
+.recent-more-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: transparent;
+  color: #c5c9d1;
+}
+.recent-more-button:hover { background: #30343b; color: white; }
+.recent-more-button svg { width: 20px; height: 20px; }
+.recent-profile-menu,
+.conversation-options-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  z-index: 80;
+  min-width: 190px;
+  padding: 6px;
+  border-radius: 13px;
+  border: 1px solid #383d46;
+  background: #24272d;
+  box-shadow: 0 16px 45px #0008;
+}
+.recent-profile-menu button,
+.conversation-options-menu button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: #f3f4f6;
+  text-align: left;
+  font-size: 13px;
+}
+.recent-profile-menu button:hover,
+.conversation-options-menu button:hover { background: #343841; }
+.recent-profile-menu button svg,
+.conversation-options-menu button svg { color: #fb7185; }
+.recent-searches-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 48px 20px;
+  color: #9ca3af;
+  background: #15181d;
+  border: 1px dashed #363b44;
+  border-radius: 18px;
+}
+.recent-searches-empty>svg { width: 34px; height: 34px; margin-bottom: 12px; color: #a78bfa; }
+.recent-searches-empty h3 { color: #f5f5f7; margin-bottom: 6px; }
+.recent-searches-empty p { max-width: 340px; line-height: 1.5; font-size: 13px; }
 
-
-
-
+.page:has(.instagram-chat-layout) { width: min(100%, 1250px); padding-top: 22px; }
+.page:has(.instagram-chat-layout) .page-heading h1 { color: #f5f5f7; }
+.chat-layout.instagram-chat-layout {
+  display: grid;
+  grid-template-columns: minmax(290px, 360px) minmax(0, 1fr);
+  min-height: min(76vh, 760px);
+  background: #0f1115;
+  border: 1px solid #292d34;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px #0002;
+}
+.instagram-conversation-list { min-width: 0; background: #111318; border-right: 1px solid #292d34; }
+.conversation-list-title {
+  height: 66px;
+  padding: 0 17px;
+  border-bottom: 1px solid #272b32;
+  color: #f5f5f7;
+}
+.conversation-list-title b { font-size: 18px; }
+.conversation-list-title span { color: #a0a6b1; }
+.conversation-scroll { max-height: 660px; overflow-y: auto; }
+.conversation-item {
+  position: relative;
+  min-height: 78px;
+  gap: 10px;
+  padding: 12px 46px 12px 13px;
+  border-bottom: 1px solid #20242b;
+  color: #f5f5f7;
+  transition: background .15s ease;
+}
+.conversation-item:hover { background: #1a1d23; }
+.conversation-item.active { background: #25212f; box-shadow: inset 3px 0 #a855f7; }
+.conversation-copy b { color: #f5f5f7; font-size: 13px; }
+.conversation-copy span { color: #a1a6b0; font-size: 12px; }
+.conversation-copy small { color: #777f8b; font-size: 10px; }
+.conversation-options-wrap {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+}
+.conversation-options-button,
+.chat-header-options-button {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: transparent;
+  color: #b6bbc5;
+}
+.conversation-options-button:hover,
+.chat-header-options-button:hover { background: #30343b; color: #fff; }
+.conversation-options-menu { min-width: 200px; }
+.conversation-options-menu button { color: #f3f4f6; }
+.conversation-options-menu button:disabled { opacity: .6; }
+.instagram-chat { min-width: 0; background: #0e1014; color: #f5f5f7; }
+.instagram-chat-placeholder {
+  min-height: 100%;
+  color: #a7adb8;
+  background: radial-gradient(ellipse at center, #191620 0%, #0e1014 64%);
+}
+.instagram-chat-placeholder h2 { color: #f5f5f7; font-size: 23px; margin: 17px 0 7px; }
+.instagram-chat-placeholder p { color: #c2c6ce; }
+.instagram-chat-placeholder span { font-size: 12px; margin-top: 7px; }
+.message-placeholder-icon {
+  width: 82px; height: 82px; border: 1.5px solid #a78bfa; color: #c4b5fd;
+  background: #201a2c; border-radius: 50%; display: grid; place-items: center;
+}
+.message-placeholder-icon svg { width: 36px; height: 36px; }
+.instagram-chat-head {
+  min-height: 72px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: #111318;
+  border-bottom: 1px solid #292d34;
+}
+.chat-profile-open { background: transparent; border-radius: 50%; flex: 0 0 auto; }
+.chat-profile-title { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; color: #f5f5f7; }
+.chat-profile-title span { color: #9ca3af; font-size: 11px; }
+.chat-header-options-wrap { position: relative; }
+.chat-messages.instagram-chat-messages { background: #0e1014; padding: 20px; }
+.message-bubble-wrap .bubble,
+.message-bubble-wrap .message-bubble { border-radius: 18px; }
+.bubble:not(.mine) { background: #262a32; color: #f5f5f7; }
+.bubble.mine { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
+.chat-input { background: #111318; border-top: 1px solid #292d34; padding: 12px; }
+.chat-input input { background: #202329; border: 1px solid #383d46; color: #f5f5f7; border-radius: 999px; padding: 12px 16px; }
+.chat-input input::placeholder { color: #8f96a2; }
+.chat-input button { color: #c4b5fd; }
+.chat-empty-list { color: #9ca3af; padding: 30px; text-align: center; }
+.chat-empty-list b { color: #f5f5f7; }
+.page:has(.instagram-chat-layout) .search-box { background: #202329; border-color: #383d46; }
+@media (max-width: 760px) {
+  .page:has(.instagram-chat-layout) { padding: 12px 0 20px; }
+  .chat-layout.instagram-chat-layout { grid-template-columns: 1fr; min-height: calc(100dvh - 130px); border-radius: 0; border-left: 0; border-right: 0; }
+  .chat-layout.instagram-chat-layout.has-active .instagram-conversation-list { display: none; }
+  .chat-layout.instagram-chat-layout:not(.has-active) .instagram-chat { display: none; }
+  .conversation-scroll { max-height: calc(100dvh - 250px); }
+  .recent-searches-section { margin-top: 20px; }
+  .recent-profile-wrap { border-radius: 13px; }
+}
