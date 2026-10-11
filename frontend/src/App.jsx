@@ -4593,17 +4593,231 @@ function SavedPage({ user, embedded = false }) {
 }
 
 const settingsSections = [
-  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account"] },
-  { id: "privacy", title: "Privacy", icon: Lock, items: ["Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
-  { id: "security", title: "Security", icon: Shield, items: ["Password", "Two-factor authentication", "Login activity", "Saved login information", "Emails from ReelsGo"] },
-  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Posts, stories and comments", "Following and followers", "Messages", "Calls", "Live and Reels"] },
-  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Messages", "Story replies", "Read receipts", "Typing indicator", "Group messages"] },
-  { id: "content", title: "What you see", icon: Compass, items: ["Content preferences", "Sensitive content", "Suggested content", "Favorites", "Muted accounts"] },
-  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage", "Upload at highest quality", "Autoplay videos", "Accessibility"] },
-  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Text size", "Sound"] },
-  { id: "language", title: "Language", icon: Languages, items: ["App language", "Translations"] },
-  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Terms"] }
+  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account", "Profile discovery", "Account suggestions"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Close Friends", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close friends visibility"] },
+  { id: "security", title: "Security", icon: Shield, items: ["Login alerts", "New device alerts", "Security email notifications", "Sensitive action confirmations", "Remember trusted devices", "Password change alerts", "Email change alerts", "Phone change alerts", "Active session reminders"] },
+  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Likes", "Comments", "Followers and follow requests", "Messages", "Message requests", "Story replies", "Mentions", "Live notifications", "Reels interactions", "Product announcements", "Email notifications"] },
+  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing", "Allow message previews", "Allow voice messages", "Call notifications"] },
+  { id: "content", title: "What you see", icon: Compass, items: ["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites feed", "Show liked posts", "Personalized recommendations", "Hide previously seen posts", "Show content in original language"] },
+  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage saver", "Upload at highest quality", "Autoplay videos on Wi-Fi", "Autoplay videos on mobile data", "Save original photos", "Save original videos", "Allow media downloads", "Preload videos"] },
+  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Auto-generated captions", "Text size", "Sound effects", "Text-to-speech", "Screen reader labels", "High contrast", "Keyboard navigation"] },
+  { id: "language", title: "Language", icon: Languages, items: ["App language", "Automatic translations", "Translate captions", "Translate comments", "Translate messages", "Preferred content language"] },
+  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Community guidelines", "Terms and policies"] }
 ];
+
+
+function CloseFriendsSettings() {
+  const [query, setQuery] = useState("");
+  const [people, setPeople] = useState([]);
+  const [closeFriends, setCloseFriends] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
+  const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  async function loadCloseFriends() {
+    setLoading(true);
+    try {
+      const data = await api("/users/me/close-friends");
+      setCloseFriends(data.closeFriends || []);
+      setError("");
+    } catch (e) {
+      setError(e.message || "Could not load your Close Friends list.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadCloseFriends();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const term = query.trim();
+      if (!term) {
+        setPeople([]);
+        setSearching(false);
+        return;
+      }
+
+      setSearching(true);
+      try {
+        const data = await api(`/users/search?q=${encodeURIComponent(term)}`);
+        const results = data.users || data.results || [];
+        const currentId = String(getUser()?._id || "");
+        const existing = new Set(
+          closeFriends.map(person => String(person?._id || person?.user?._id || person))
+        );
+        const unique = [];
+        const seen = new Set();
+
+        for (const item of results) {
+          const person = item?.user || item;
+          const id = String(person?._id || "");
+          if (!id || id === currentId || existing.has(id) || seen.has(id)) continue;
+          seen.add(id);
+          unique.push(person);
+        }
+        if (!cancelled) {
+          setPeople(unique);
+          setError("");
+        }
+      } catch (e) {
+        if (!cancelled) setError(e.message || "Unable to search users.");
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query, closeFriends]);
+
+  async function addPerson(person) {
+    const id = String(person._id);
+    setBusyId(id);
+    setError("");
+    setNotice("");
+
+    try {
+      const data = await api("/users/me/close-friends", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id }),
+      });
+      setCloseFriends(data.closeFriends || [...closeFriends, person]);
+      setPeople(current => current.filter(p => String(p._id) !== id));
+      setNotice(`@${person.username || person.name || "User"} added to Close Friends.`);
+    } catch (e) {
+      setError(e.message || "Unable to add this person.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function removePerson(person) {
+    const id = String(person?._id || person?.user?._id || person);
+    setBusyId(id);
+    setError("");
+    setNotice("");
+
+    try {
+      const data = await api(`/users/me/close-friends/${id}`, {
+        method: "DELETE",
+      });
+      setCloseFriends(data.closeFriends || closeFriends.filter(
+        p => String(p?._id || p?.user?._id || p) !== id
+      ));
+      setNotice("Person removed from Close Friends.");
+    } catch (e) {
+      setError(e.message || "Unable to remove this person.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  return (
+    <div className="rg-close-friends">
+      <div className="rg-cf-intro">
+        <div className="rg-cf-icon"><Users /></div>
+        <div>
+          <h2>Close Friends</h2>
+          <p>Choose who can see stories shared with your Close Friends audience.</p>
+        </div>
+      </div>
+
+      <label className="rg-cf-search">
+        <Search aria-hidden="true" />
+        <input
+          type="search"
+          value={query}
+          onChange={event => setQuery(event.target.value)}
+          placeholder="Search by username or name"
+          aria-label="Search users to add to Close Friends"
+        />
+        {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search"><X /></button>}
+      </label>
+
+      {error && <div className="rg-cf-message error" role="alert">{error}</div>}
+      {notice && <div className="rg-cf-message success" role="status">{notice}</div>}
+
+      {query.trim() && (
+        <div className="rg-cf-search-results">
+          {searching ? (
+            <p className="rg-cf-muted">Searching…</p>
+          ) : people.length ? (
+            people.map(person => (
+              <div className="rg-cf-person" key={person._id}>
+                <Avatar user={person} size={44} />
+                <div className="rg-cf-person-info">
+                  <b>@{person.username || "user"}</b>
+                  <span>{person.name || "ReelsGo user"}</span>
+                </div>
+                <button
+                  className="rg-cf-add"
+                  type="button"
+                  disabled={!!busyId}
+                  onClick={() => addPerson(person)}
+                >
+                  <UserPlus size={16} />
+                  {busyId === String(person._id) ? "Adding…" : "Add"}
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="rg-cf-muted">No users found to add.</p>
+          )}
+        </div>
+      )}
+
+      <div className="rg-cf-list-heading">
+        <h3>Your list</h3>
+        <span>{closeFriends.length} {closeFriends.length === 1 ? "person" : "people"}</span>
+      </div>
+
+      {loading ? (
+        <p className="rg-cf-muted">Loading your Close Friends…</p>
+      ) : closeFriends.length ? (
+        closeFriends.map(item => {
+          const person = item?.user || item;
+          const id = String(person?._id || person);
+          return (
+            <div className="rg-cf-person" key={id}>
+              <Avatar user={person} size={44} />
+              <div className="rg-cf-person-info">
+                <b>{person?.username ? `@${person.username}` : "ReelsGo user"}</b>
+                <span>{person?.name || ""}</span>
+              </div>
+              <button
+                className="rg-cf-remove"
+                type="button"
+                disabled={!!busyId}
+                onClick={() => removePerson(person)}
+              >
+                {busyId === id ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          );
+        })
+      ) : (
+        <div className="rg-cf-empty">
+          <Users />
+          <b>Your Close Friends list is empty</b>
+          <span>Search for people above and select Add.</span>
+        </div>
+      )}
+
+      <p className="rg-cf-footnote">
+        Your list is private. People are not notified when you add or remove them.
+      </p>
+    </div>
+  );
+}
 
 function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification }) {
   const [section, setSection] = useState("account");
@@ -4757,7 +4971,10 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
             </div>
 
             {section === "account" && (
-              <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+              <>
+                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+              </>
             )}
             {section === "privacy" && (
               <PrivacySettings
@@ -4768,85 +4985,30 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                 onSelect={setSelectedItem}
               />
             )}
+            {section === "privacy" && <CloseFriendsSettings />}
+            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
             {section === "security" && (
               <SecuritySettings onSelect={setSelectedItem} />
             )}
+            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
             {section === "notifications" && (
-              <ToggleSettings
-                title="Notifications"
-                items={[
-                  "Likes",
-                  "Comments",
-                  "Followers and follow requests",
-                  "Messages",
-                  "Story replies",
-                  "Reels interactions",
-                  "Live notifications",
-                  "Email notifications"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
+              )}
             {section === "messages" && (
-              <ToggleSettings
-                title="Messages and replies"
-                items={[
-                  "Message requests",
-                  "Read receipts",
-                  "Typing indicator",
-                  "Group message requests",
-                  "Story replies",
-                  "Allow sharing"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
+              )}
             {section === "content" && (
-              <ToggleSettings
-                title="What you see"
-                items={[
-                  "Sensitive content",
-                  "Autoplay videos",
-                  "Suggested posts",
-                  "Show political content",
-                  "Use less mobile data",
-                  "Favorites"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
+              )}
             {section === "media" && (
-              <ToggleSettings
-                title="Media quality"
-                items={[
-                  "Upload at highest quality",
-                  "Use less mobile data",
-                  "Autoplay videos",
-                  "Save original photos",
-                  "Save original videos"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
+              )}
             {section === "accessibility" && (
-              <ToggleSettings
-                title="Accessibility"
-                items={[
-                  "Reduce motion",
-                  "Captions",
-                  "Text-to-speech",
-                  "Sound effects",
-                  "Large text"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
+              )}
             {section === "language" && (
-              <ToggleSettings
-                title="Language"
-                items={[
-                  "English",
-                  "Automatic translations",
-                  "Translate captions",
-                  "Translate comments"
-                ]}
-              />
-            )}
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
+              )}
             {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
             {selectedItem && (
@@ -4931,7 +5093,10 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               </div>
 
               {section === "account" && (
-                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                <>
+                  <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+                </>
               )}
               {section === "privacy" && (
                 <PrivacySettings
@@ -4942,84 +5107,29 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   onSelect={setSelectedItem}
                 />
               )}
+              {section === "privacy" && <CloseFriendsSettings />}
+              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
               )}
+              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
               {section === "notifications" && (
-                <ToggleSettings
-                  title="Notifications"
-                  items={[
-                    "Likes",
-                    "Comments",
-                    "Followers and follow requests",
-                    "Messages",
-                    "Story replies",
-                    "Reels interactions",
-                    "Live notifications",
-                    "Email notifications"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
               )}
               {section === "messages" && (
-                <ToggleSettings
-                  title="Messages and replies"
-                  items={[
-                    "Message requests",
-                    "Read receipts",
-                    "Typing indicator",
-                    "Group message requests",
-                    "Story replies",
-                    "Allow sharing"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
               )}
               {section === "content" && (
-                <ToggleSettings
-                  title="What you see"
-                  items={[
-                    "Sensitive content",
-                    "Autoplay videos",
-                    "Suggested posts",
-                    "Show political content",
-                    "Use less mobile data",
-                    "Favorites"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
               )}
               {section === "media" && (
-                <ToggleSettings
-                  title="Media quality"
-                  items={[
-                    "Upload at highest quality",
-                    "Use less mobile data",
-                    "Autoplay videos",
-                    "Save original photos",
-                    "Save original videos"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
               )}
               {section === "accessibility" && (
-                <ToggleSettings
-                  title="Accessibility"
-                  items={[
-                    "Reduce motion",
-                    "Captions",
-                    "Text-to-speech",
-                    "Sound effects",
-                    "Large text"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
               )}
               {section === "language" && (
-                <ToggleSettings
-                  title="Language"
-                  items={[
-                    "English",
-                    "Automatic translations",
-                    "Translate captions",
-                    "Translate comments"
-                  ]}
-                />
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
               )}
               {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
@@ -5035,9 +5145,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   </button>
                   <b>{selectedItem}</b>
                   <p>
-                    This option is currently represented in the ReelsGo
-                    interface. Account changes are saved only where a backend
-                    endpoint is connected.
+                    This setting needs its dedicated account action to be implemented. Preference switches in this section are saved through the authenticated settings API.
                   </p>
                 </div>
               )}
@@ -5110,39 +5218,63 @@ function SecuritySettings({ onSelect }) {
   </div>;
 }
 
-function ToggleSettings({ title, items }) {
-  const [values, setValues] = useState(() => Object.fromEntries(items.map(x => [x, true])));
+function ToggleSettings({ title, items, sectionId = "general" }) {
+  const [values, setValues] = useState({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState("");
-  const [message, setMessage] = useState("");
+  const [savingKey, setSavingKey] = useState("");
+  const [error, setError] = useState("");
+
   useEffect(() => {
     let active = true;
-    api("/users/me/settings").then(({ settings = {} }) => {
-      if (!active) return;
-      setValues(Object.fromEntries(items.map(item => [item, typeof settings[item] === "boolean" ? settings[item] : true])));
-    }).catch(error => { if (active) setMessage(error.message || "Unable to load saved settings"); })
+    setLoading(true);
+    api("/users/me/settings")
+      .then(data => {
+        if (!active) return;
+        setValues(data?.settings || {});
+        setError("");
+      })
+      .catch(err => {
+        if (active) setError(err?.message || "Unable to load settings from the server. Please sign in and check your backend.");
+      })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [title, items.join("|")]);
+  }, []);
+
   async function flip(item) {
-    const previous = !!values[item];
-    const next = !previous;
-    setValues(v => ({ ...v, [item]: next }));
-    setSaving(item); setMessage("");
+    const key = `${sectionId}.${item}`;
+    const previous = Object.prototype.hasOwnProperty.call(values, key) ? values[key] : true;
+    const next = !Boolean(previous);
+    setValues(current => ({ ...current, [key]: next }));
+    setSavingKey(key);
+    setError("");
     try {
-      await api("/users/me/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: item, value: next }) });
-      setMessage(`${item} saved.`);
-    } catch (error) {
-      setValues(v => ({ ...v, [item]: previous }));
-      setMessage(error.message || `Could not save ${item}.`);
-    } finally { setSaving(""); }
+      const data = await api("/users/me/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value: next })
+      });
+      setValues(current => ({ ...current, ...(data?.settings || {}), [key]: next }));
+    } catch (err) {
+      setValues(current => ({ ...current, [key]: previous }));
+      setError(err?.message || `Could not save “${item}”.`);
+    } finally {
+      setSavingKey("");
+    }
   }
-  return <div className="settings-panel"><h2 className="panel-heading">{title}</h2>{loading && <p className="settings-status">Loading saved preferences…</p>}{items.map(item =>
-    <div className="setting-switch" key={item}>
-      <span><b>{item}</b><small>{saving === item ? "Saving…" : "Manage this preference for your account."}</small></span>
-      <Toggle checked={!!values[item]} disabled={loading || !!saving} onChange={() => flip(item)} />
-    </div>
-  )}{message && <p className="settings-status" role="status">{message}</p>}</div>;
+
+  return <div className="settings-panel">
+    <h2 className="panel-heading">{title}</h2>
+    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
+    {error && <p className="settings-save-error" role="alert">{error}</p>}
+    {items.map(item => {
+      const key = `${sectionId}.${item}`;
+      const checked = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
+      return <div className="setting-switch" key={key}>
+        <span><b>{item}</b><small>{savingKey === key ? "Saving to your account…" : "This preference is saved to your ReelsGo account."}</small></span>
+        <Toggle checked={checked} disabled={loading || savingKey === key} onChange={() => flip(item)} />
+      </div>;
+    })}
+  </div>;
 }
 
 function HelpSettings({ onSelect }) {
