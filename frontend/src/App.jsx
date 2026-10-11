@@ -705,7 +705,6 @@ function App() {
         <div className="sidebar-main-nav">
           <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-          <Nav icon={<Compass />} label="Explore" active={page === "explore"} onClick={() => navigate("explore")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
           <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
           <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
@@ -756,7 +755,6 @@ function App() {
             navigate("messages");
           } catch (e) { alert(e.message); }
         }} />}
-        {page === "explore" && <ExplorePage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
@@ -3784,9 +3782,6 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   );
 }
 
-function ExplorePage() {
-  return <div className="page"><div className="page-heading"><div><h1>Explore</h1><p>Discover photos, videos and creators</p></div></div><div className="explore-feature"><Compass /><h2>Explore</h2><p>Recommended content will appear here as your community grows.</p></div></div>;
-}
 
 function MessagesPage({ openConversationId = null }) {
   const me = getUser();
@@ -5297,10 +5292,16 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, username, email, bio, website })
       });
-      const updated = data.user || data;
+      const serverUser = data?.user || data || {};
+      const updated = { ...(user || {}), ...serverUser, name, username, email, bio, website };
       setUser?.(updated);
       localStorage.setItem("vk_user", JSON.stringify(updated));
-      setNotice("Profile information saved.");
+      setName(updated.name || "");
+      setUsername(updated.username || "");
+      setEmail(updated.email || "");
+      setBio(updated.bio || "");
+      setWebsite(updated.website || "");
+      setNotice("Profile information saved and updated.");
     } catch (err) { setError(err?.message || "Could not save profile information."); }
     finally { setSaving(false); }
   }
@@ -5329,36 +5330,66 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
     if (!isPeopleList) return;
     let active = true;
     setPeopleLoading(true);
-    const timer = setTimeout(() => {
-      const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
-      api(`/users/me/settings/people?${query}`)
-        .then(data => { if (active) { setPeople(Array.isArray(data?.people) ? data.people : Array.isArray(data?.users) ? data.users : []); setError(""); } })
-        .catch(err => { if (active) setError(err?.message || `Unable to load ${item.toLowerCase()}.`); })
-        .finally(() => { if (active) setPeopleLoading(false); });
+    const timer = setTimeout(async () => {
+      const term = peopleSearch.trim();
+      const query = new URLSearchParams({ type: peopleType, search: term }).toString();
+      try {
+        // Load the selected blocked/restricted list and, when searching, search all users too.
+        // Merge them instead of replacing the results so a searched user does not disappear.
+        const listPromise = api(`/users/me/settings/people?${query}`);
+        const searchPromise = term
+          ? api(`/users/search?q=${encodeURIComponent(term)}`).catch(() => ({ users: [] }))
+          : Promise.resolve({ users: [] });
+        const [listData, searchData] = await Promise.all([listPromise, searchPromise]);
+        const listed = Array.isArray(listData?.people) ? listData.people : Array.isArray(listData?.users) ? listData.users : [];
+        const found = Array.isArray(searchData?.users) ? searchData.users : Array.isArray(searchData?.results) ? searchData.results : [];
+        const byId = new Map();
+        for (const person of listed) {
+          const id = String(person?._id || person?.id || "");
+          if (id) byId.set(id, { ...person, isOnList: person?.isOnList !== false });
+        }
+        for (const raw of found) {
+          const person = raw?.user || raw;
+          const id = String(person?._id || person?.id || "");
+          if (!id) continue;
+          const previous = byId.get(id);
+          byId.set(id, { ...(previous || {}), ...person, isOnList: Boolean(previous?.isOnList || person?.isOnList) });
+        }
+        if (active) {
+          setPeople([...byId.values()]);
+          setError("");
+        }
+      } catch (err) {
+        if (active) setError(err?.message || `Unable to load ${item.toLowerCase()}.`);
+      } finally {
+        if (active) setPeopleLoading(false);
+      }
     }, 250);
     return () => { active = false; clearTimeout(timer); };
   }, [isPeopleList, peopleType, peopleSearch, item]);
 
   async function updatePerson(personId, action) {
+    const person = people.find(p => String(p?._id || p?.id) === String(personId));
+    if (action === "remove") {
+      const label = person?.username ? `@${String(person.username).replace(/^@/, "")}` : (person?.name || "this account");
+      if (!window.confirm(`Delete ${label} from your ${peopleType} list?`)) return;
+    }
     setPeopleBusyId(personId); setError(""); setNotice("");
     try {
       const url = `/users/me/settings/people/${peopleType}/${personId}`;
-      const data = await api(url, {
+      await api(url, {
         method: action === "add" ? "POST" : "DELETE",
         headers: { "Content-Type": "application/json" },
         ...(action === "add" ? { body: JSON.stringify({}) } : {})
       });
       if (action === "add") {
-        setPeople(current => [...current.filter(p => String(p._id) !== String(personId)), data?.person].filter(Boolean));
+        // Keep the searched account in place and change its action to Delete.
+        setPeople(current => current.map(p => String(p?._id || p?.id) === String(personId) ? { ...p, isOnList: true } : p));
         setNotice(`${item === "Blocked accounts" ? "Account blocked" : "Account restricted"} successfully.`);
       } else {
-        setPeople(current => current.filter(p => String(p._id) !== String(personId)));
+        // Only remove the row after the user explicitly clicks Delete and confirms.
+        setPeople(current => current.filter(p => String(p?._id || p?.id) !== String(personId)));
         setNotice("Account removed from this list.");
-      }
-      if (peopleSearch) {
-        const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
-        const refreshed = await api(`/users/me/settings/people?${query}`);
-        setPeople(Array.isArray(refreshed?.people) ? refreshed.people : Array.isArray(refreshed?.users) ? refreshed.users : []);
       }
     } catch (err) { setError(err?.message || "Could not update this account."); }
     finally { setPeopleBusyId(""); }
@@ -5383,19 +5414,19 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
     {notice && <div className="rg-detail-message success" role="status">{notice}</div>}
     {isPeopleList ? <div className="rg-detail-form rg-people-manager">
       <label>Search ReelsGo accounts<input value={peopleSearch} onChange={e => setPeopleSearch(e.target.value)} placeholder="Search by name or username" autoComplete="off" /></label>
-      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results show accounts you can add to this list." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
+      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results stay visible. Use Delete to remove an account from this list." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
       {peopleLoading ? <p className="settings-save-status">Loading accounts…</p> : null}
       {!peopleLoading && people.length === 0 && <p className="settings-save-status">{peopleSearch.trim() ? "No matching accounts found." : `No ${peopleType} accounts yet.`}</p>}
       <div className="rg-people-results">
         {people.map(person => {
           const personId = String(person?._id || person?.id || "");
           if (!personId) return null;
-          const isOnList = !peopleSearch.trim();
+          const isOnList = Boolean(person?.isOnList);
           const displayName = person?.name || person?.fullName || person?.username || "ReelsGo user";
           return <div className="rg-people-row" key={personId}>
             <div className="rg-people-avatar">{String(displayName).slice(0, 1).toUpperCase()}</div>
             <div className="rg-people-copy"><b>{displayName}</b><small>@{String(person?.username || "user").replace(/^@/, "")}</small></div>
-            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? "Remove" : peopleType === "blocked" ? "Block" : "Restrict"}</button>
+            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? "Delete" : peopleType === "blocked" ? "Block" : "Restrict"}</button>
           </div>;
         })}
       </div>

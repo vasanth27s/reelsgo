@@ -5,91 +5,149 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      trim: true
+      required: [true, "Name is required"],
+      trim: true,
+      maxlength: 100,
     },
+
     username: {
       type: String,
-      required: true,
+      required: [true, "Username is required"],
       unique: true,
       lowercase: true,
       trim: true,
-      index: true
+      minlength: 3,
+      maxlength: 30,
+      match: [
+        /^[a-z0-9._]+$/,
+        "Username can contain only lowercase letters, numbers, dots, and underscores",
+      ],
+      index: true,
     },
+
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       trim: true,
-      index: true
+      match: [
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        "Please provide a valid email address",
+      ],
+      index: true,
     },
+
     password: {
       type: String,
-      required: true
+      required: [true, "Password is required"],
+      select: false,
     },
+
     bio: {
       type: String,
       default: "",
-      maxlength: 150
+      trim: true,
+      maxlength: 150,
     },
+
     website: {
       type: String,
-      default: ""
+      default: "",
+      trim: true,
+      maxlength: 2048,
     },
+
     avatar: {
       data: Buffer,
       contentType: String,
-      fileName: String
+      fileName: String,
     },
+
     isPrivate: {
       type: Boolean,
-      default: false
+      default: false,
     },
+
     emailVerified: {
       type: Boolean,
-      default: false
+      default: false,
     },
+
     phoneVerified: {
       type: Boolean,
-      default: false
+      default: false,
     },
+
     twoFactorEnabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
+
     followersCount: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0,
     },
+
     followingCount: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0,
     },
+
     postsCount: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0,
     },
+
     settings: {
       type: mongoose.Schema.Types.Mixed,
-      default: {}
+      default: () => ({}),
     },
-    blockedUsers: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    }],
-    restrictedUsers: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    }],
-    closeFriends: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    }]
+
+    blockedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    restrictedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    closeFriends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
-    timestamps: true
+    timestamps: true,
+    versionKey: false,
   }
 );
 
-export default mongoose.model("User", userSchema);
+// Keep usernames normalized when documents are saved.
+userSchema.pre("save", function (next) {
+  if (this.username) {
+    this.username = this.username.replace(/^@/, "").toLowerCase();
+  }
+
+  if (this.email) {
+    this.email = this.email.trim().toLowerCase();
+  }
+
+  next();
+});
+
+const User =
+  mongoose.models.User || mongoose.model("User", userSchema);
+
+export default User;
