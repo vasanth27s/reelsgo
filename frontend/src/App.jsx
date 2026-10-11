@@ -3529,8 +3529,6 @@ function SearchPage({ onOpenProfile }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState(readRecentProfiles);
-  const [recentMenuId, setRecentMenuId] = useState(null);
-  const [recentMenuId, setRecentMenuId] = useState(null);
 
   async function search(v) {
     setQ(v);
@@ -3558,14 +3556,6 @@ function SearchPage({ onOpenProfile }) {
   function clearRecent() {
     try { localStorage.removeItem(RECENT_PROFILE_SEARCHES_KEY); } catch {}
     setRecent([]);
-    setRecentMenuId(null);
-  }
-
-  function deleteRecentProfile(profileId) {
-    const updated = readRecentProfiles().filter(item => String(item._id) !== String(profileId));
-    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not update recent profiles", e); }
-    setRecent(updated);
-    setRecentMenuId(null);
   }
 
   return (
@@ -3591,15 +3581,9 @@ function SearchPage({ onOpenProfile }) {
       {!q.trim() && <section className="recent-searches-section" aria-label="Recent profiles">
         <div className="recent-searches-heading"><div><h2>Recent</h2><p>Profiles you opened recently</p></div>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
         {recent.length > 0 ? <div className="user-list recent-searches-list">
-          {recent.map(person => <div className="recent-profile-wrap" key={person._id}>
-            <button className="user-row recent-profile-row" onClick={() => onOpenProfile(person._id)} type="button">
-              <Avatar user={person} size={48} /><div><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div>
-            </button>
-            <div className="recent-profile-options">
-              <button type="button" className="recent-more-button" aria-label={`Options for ${person.username || "profile"}`} aria-expanded={recentMenuId === String(person._id)} onClick={() => setRecentMenuId(id => id === String(person._id) ? null : String(person._id))}><MoreHorizontal /></button>
-              {recentMenuId === String(person._id) && <div className="recent-profile-menu"><button type="button" onClick={() => deleteRecentProfile(person._id)}><Trash2 size={15} />Remove from recent</button></div>}
-            </div>
-          </div>)}
+          {recent.map(person => <button className="user-row recent-profile-row" key={person._id} onClick={() => onOpenProfile(person._id)} type="button">
+            <Avatar user={person} size={48} /><div><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div><Clock3 aria-label="Recently opened" />
+          </button>)}
         </div> : <div className="recent-searches-empty"><Clock3 /><h3>No recent profiles yet</h3><p>Search for someone and open their profile. It will appear here even after you close ReelsGo.</p></div>}
       </section>}
     </div>
@@ -3793,9 +3777,6 @@ function MessagesPage({ openConversationId = null }) {
   const [sending, setSending] = useState(false);
   const [mobileChat, setMobileChat] = useState(false);
   const [conversationQuery, setConversationQuery] = useState('');
-  const [conversationMenuId, setConversationMenuId] = useState(null);
-  const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
-  const [deletingConversationId, setDeletingConversationId] = useState(null);
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -3813,25 +3794,6 @@ function MessagesPage({ openConversationId = null }) {
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }
-
-  async function deleteConversation(conversation) {
-    if (!conversation?._id || deletingConversationId) return;
-    const id = String(conversation._id);
-    const person = other(conversation);
-    const confirmed = window.confirm(`Delete conversation with ${person?.username ? `@${person.username}` : person?.name || "this person"}? It will be removed from your inbox.`);
-    if (!confirmed) { setConversationMenuId(null); setConversationMenuOpen(false); return; }
-    setDeletingConversationId(id);
-    try {
-      await api(`/messages/conversations/${id}`, { method: 'DELETE' });
-      setConversations(prev => prev.filter(c => String(c._id) !== id));
-      if (String(active?._id) === id) {
-        setActive(null); setMessages([]); setMobileChat(false);
-      }
-      setConversationMenuId(null); setConversationMenuOpen(false);
-    } catch (e) {
-      window.alert(e?.message || "Could not delete this conversation. Please try again.");
-    } finally { setDeletingConversationId(null); }
   }
 
   async function loadNotes() {
@@ -4244,23 +4206,17 @@ function MessagesPage({ openConversationId = null }) {
             {filteredConversations.map(c => {
               const u = other(c); const selected = String(active?._id) === String(c._id);
               const unread = Number(c.unreadCount || 0) > 0;
-              return <div className={`conversation-item-shell ${selected ? 'active' : ''}`} key={c._id}>
-                <button className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''}`} onClick={() => openConversation(c)} type="button">
-                  <div className="conversation-avatar-wrap">
-                    <Avatar user={u} size={58} />
-                    {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
-                  </div>
-                  <div className="conversation-copy">
-                    <UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />
-                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
-                    {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
-                  </div>
-                </button>
-                <div className="conversation-options-wrap">
-                  <button type="button" className="conversation-options-button" aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`} onClick={() => { setConversationMenuId(v => v === String(c._id) ? null : String(c._id)); setConversationMenuOpen(false); }}><MoreHorizontal size={19} /></button>
-                  {conversationMenuId === String(c._id) && <div className="conversation-options-menu"><button type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={15}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
+              return <button className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''}`} key={c._id} onClick={() => openConversation(c)}>
+                <div className="conversation-avatar-wrap">
+                  <Avatar user={u} size={58} />
+                  {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
                 </div>
-              </div>;
+                <div className="conversation-copy">
+                  <UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />
+                  <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
+                  {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
+                </div>
+              </button>;
             })}
           </div> : <div className="chat-empty-list"><MessageCircle /><b>Start a conversation</b><span>Send a message to someone you follow.</span><small>Open a profile and tap Message.</small></div>}
         </div>
@@ -4269,12 +4225,7 @@ function MessagesPage({ openConversationId = null }) {
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
               <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
-              <button type="button" className="chat-profile-open" onClick={() => openUserProfile(other(active)?._id)} aria-label="Open user profile"><Avatar user={other(active)} size={44} /></button>
-              <div className="chat-profile-title"><UserLink user={other(active)} /><span>Active now</span></div>
-              <div className="chat-header-options-wrap">
-                <button type="button" className="chat-header-options-button" aria-label="Conversation options" onClick={() => setConversationMenuOpen(v => !v)}><MoreHorizontal /></button>
-                {conversationMenuOpen && <div className="conversation-options-menu chat-header-options-menu"><button type="button" disabled={deletingConversationId === String(active._id)} onClick={() => deleteConversation(active)}><Trash2 size={15}/>{deletingConversationId === String(active._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
-              </div>
+              <Avatar user={other(active)} size={44} /><div><UserLink user={other(active)} /><span>Active now</span></div>
             </div>
             <div className="chat-messages instagram-chat-messages">
               {messages.length ? messages.map(m => {
