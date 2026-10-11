@@ -41,7 +41,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      select: false,
+      // Keep password selected by default to preserve existing login routes.
+      // Never return this field in API responses.
     },
 
     bio: {
@@ -134,7 +135,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Keep usernames normalized when documents are saved.
+// Normalize usernames and emails before saving.
 userSchema.pre("save", function (next) {
   if (this.username) {
     this.username = this.username.replace(/^@/, "").toLowerCase();
