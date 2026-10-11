@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcryptjs";
 
 import auth from "../middleware/auth.js";
 
@@ -312,6 +313,29 @@ router.delete("/me/close-friends/:userId", auth, async (req, res) => {
 
 */
 
+// Change password for the authenticated account. Passwords are never returned to the client.
+router.patch("/me/password", auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) return res.status(400).json({ message: "Current password and new password are required." });
+    if (String(newPassword).length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
+    if (String(newPassword).length > 128) return res.status(400).json({ message: "New password is too long." });
+
+    const user = await User.findById(req.user.id).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found." });
+    if (!user.password) return res.status(400).json({ message: "Password login is not enabled for this account." });
+
+    const valid = await bcrypt.compare(String(currentPassword), String(user.password));
+    if (!valid) return res.status(400).json({ message: "Current password is incorrect." });
+    user.password = await bcrypt.hash(String(newPassword), 12);
+    await user.save();
+    return res.json({ message: "Password updated successfully." });
+  } catch (error) {
+    console.error("Change password error:", error);
+    return res.status(500).json({ message: "Unable to update password." });
+  }
+});
+
 router.put("/me", auth, async (req, res) => {
 
   try {
@@ -332,27 +356,28 @@ router.put("/me", auth, async (req, res) => {
 
 
 
-    for (const field of [
-
-      "name",
-
-      "bio",
-
-      "website",
-
-      "isPrivate",
-
-    ]) {
-
-      if (req.body[field] !== undefined) {
-
-        user[field] = req.body[field];
-
+    const allowedFields = ["name", "username", "email", "bio", "website", "isPrivate"];
+    for (const field of allowedFields) {
+      if (req.body?.[field] !== undefined) {
+        if (typeof req.body[field] === "string") user[field] = req.body[field].trim();
+        else if (field === "isPrivate") user[field] = Boolean(req.body[field]);
       }
-
     }
 
+    if (user.username) {
+      user.username = user.username.replace(/^@/, "").toLowerCase();
+      if (!/^[a-z0-9._]{3,30}$/.test(user.username)) {
+        return res.status(400).json({ message: "Username must be 3–30 characters and use only letters, numbers, dots or underscores." });
+      }
+      const duplicateUsername = await User.findOne({ username: user.username, _id: { $ne: user._id } }).select("_id");
+      if (duplicateUsername) return res.status(409).json({ message: "That username is already in use." });
+    }
 
+    if (user.email) {
+      user.email = user.email.toLowerCase();
+      const duplicateEmail = await User.findOne({ email: user.email, _id: { $ne: user._id } }).select("_id");
+      if (duplicateEmail) return res.status(409).json({ message: "That email is already in use." });
+    }
 
     await user.save();
 
@@ -840,7 +865,7 @@ router.get(
 
         ? null
 
-        : await Follow.findOne({
+        : await Follow\.findOne({
 
             follower: req.user.id,
 
@@ -926,7 +951,7 @@ router.get(
 
         const ownerFollowsViewer =
 
-          await Follow.exists({
+          await Follow\.exists({
 
             follower: user._id,
 
@@ -1306,7 +1331,7 @@ router.get(
 
       const following =
 
-        await Follow.findOne({
+        await Follow\.findOne({
 
           follower: req.user.id,
 
@@ -1357,51 +1382,5 @@ router.get(
 );
 
 
-
-
-/* ================================================================
-   REELSGO SETTINGS API
-   GET   /api/users/me/settings
-   PATCH /api/users/me/settings
-   These endpoints persist the boolean preferences displayed by the
-   current frontend's ToggleSettings component.
-   User schema must contain: settings: { type: mongoose.Schema.Types.Mixed, default: {} }
-================================================================ */
-router.get("/me/settings", auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("settings");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    return res.status(200).json({ settings: user.settings || {} });
-  } catch (error) {
-    console.error("GET /me/settings error:", error);
-    return res.status(500).json({ message: "Unable to load settings" });
-  }
-});
-
-router.patch("/me/settings", auth, async (req, res) => {
-  try {
-    const { key, value } = req.body || {};
-    if (typeof key !== "string" || key.length > 150 ||
-        !/^[a-zA-Z][a-zA-Z0-9_-]*\.[a-zA-Z0-9 _-]+$/.test(key)) {
-      return res.status(400).json({ message: "Invalid setting key" });
-    }
-    if (typeof value !== "boolean") {
-      return res.status(400).json({ message: "Setting value must be true or false" });
-    }
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const current = user.settings && typeof user.settings === "object"
-      ? (typeof user.settings.toObject === "function" ? user.settings.toObject() : { ...user.settings })
-      : {};
-    current[key] = value;
-    user.settings = current;
-    if (typeof user.markModified === "function") user.markModified("settings");
-    await user.save();
-    return res.status(200).json({ message: "Setting saved", settings: user.settings || {} });
-  } catch (error) {
-    console.error("PATCH /me/settings error:", error);
-    return res.status(500).json({ message: "Unable to save setting" });
-  }
-});
 
 export default router;
