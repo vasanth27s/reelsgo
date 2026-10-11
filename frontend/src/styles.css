@@ -12293,30 +12293,50 @@ div[style*="min-width: 170px"]{
 .share-person.selected{background:rgba(22,140,255,.09) !important}
 .share-send-button:disabled{cursor:not-allowed !important}
 
-/* ReelsGo: remove the outer suggestion panel and account-card boxes.
-   Keep the dark page background and preserve profile/follow interactions. */
-.suggestions-rail,
-.rail-account,
-.suggestions-title,
-.suggestion-list,
-.suggestion-row,
-.rail-footer {
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
+/* Share recipients: show exactly three profiles per row, then wrap to next row */
+.share-people{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  grid-auto-rows:minmax(112px,auto) !important;
+  align-items:start !important;
+  justify-items:center !important;
+  gap:14px 8px !important;
+  width:100% !important;
+  min-height:0 !important;
+  max-height: min(42vh, 360px) !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  padding:12px 4px 16px !important;
+  scrollbar-width:thin !important;
 }
-.suggestions-rail {
-  padding: 18px 0 0 !important;
-  border-radius: 0 !important;
+.share-person{
+  box-sizing:border-box !important;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  flex:none !important;
+  min-height:108px !important;
+  padding:5px 2px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:6px !important;
 }
-.rail-account {
-  padding: 0 !important;
-  margin-bottom: 29px !important;
-  border-radius: 0 !important;
+.share-person-avatar{width:70px !important;height:70px !important;flex:0 0 70px !important}
+.share-person b,.share-person>span{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  text-align:center !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
 }
-.suggestion-row {
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
+.share-person b{font-size:11px !important}
+.share-person>span{font-size:10px !important}
+@media(max-width:380px){
+  .share-people{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:12px 4px !important;padding-left:0 !important;padding-right:0 !important}
+  .share-person-avatar{width:60px !important;height:60px !important;flex-basis:60px !important}
+  .share-person-avatar .avatar{width:54px !important;height:54px !important;min-width:54px !important;min-height:54px !important}
 }
