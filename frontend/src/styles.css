@@ -12292,3 +12292,31 @@ div[style*="min-width: 170px"]{
 .share-person:disabled{opacity:.75 !important;cursor:wait !important}
 .share-person.selected{background:rgba(22,140,255,.09) !important}
 .share-send-button:disabled{cursor:not-allowed !important}
+
+/* ReelsGo: remove the outer suggestion panel and account-card boxes.
+   Keep the dark page background and preserve profile/follow interactions. */
+.suggestions-rail,
+.rail-account,
+.suggestions-title,
+.suggestion-list,
+.suggestion-row,
+.rail-footer {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.suggestions-rail {
+  padding: 18px 0 0 !important;
+  border-radius: 0 !important;
+}
+.rail-account {
+  padding: 0 !important;
+  margin-bottom: 29px !important;
+  border-radius: 0 !important;
+}
+.suggestion-row {
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
