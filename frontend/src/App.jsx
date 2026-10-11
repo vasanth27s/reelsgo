@@ -774,7 +774,6 @@ function App() {
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
-      {page === "search" && <button type="button" className="rg-search-floating-messages" onClick={() => navigate("messages")}><Send size={21}/><b>Messages</b><span className="rg-search-message-avatars"><i>●</i><i>●</i><i>●</i></span></button>}
       <nav className="bottom-nav glass-bottom-nav">
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />

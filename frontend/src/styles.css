@@ -12228,19 +12228,6 @@ div[style*="min-width: 170px"]{
 .page:has(.recent-searches-section) .recent-profile-row span{font-size:13px;color:#a3a8b0;}
 .page:has(.recent-searches-section) .recent-profile-options{margin-left:auto;}
 .page:has(.recent-searches-section) .recent-remove-button{width:34px;height:34px;}
-.rg-search-floating-messages{position:fixed;right:26px;bottom:24px;z-index:85;display:flex;align-items:center;gap:10px;padding:12px 17px;border:1px solid #30343b;border-radius:999px;background:#202328;color:#f5f5f7;box-shadow:0 8px 30px #0003;}
-.rg-search-floating-messages>svg{color:#f5f5f7;}
-.rg-search-message-avatars{display:flex;align-items:center;padding-left:5px;}
-.rg-search-message-avatars i{display:grid;place-items:center;width:20px;height:20px;margin-left:-5px;border:2px solid #202328;border-radius:50%;background:#59616e;color:#cbd5e1;font-size:9px;font-style:normal;}
-.rg-search-message-avatars i:nth-child(2){background:#657a6d;}.rg-search-message-avatars i:nth-child(3){background:#625b84;}
-@media(max-width:700px){
- .page.rg-instagram-search-page:has(.recent-searches-section){width:100%;padding:12px 14px 100px;min-height:calc(100vh - 57px);}
- .rg-search-topbar{gap:10px;margin-bottom:34px;}
- .rg-search-back{width:32px;flex-basis:32px;height:40px;}
- .page:has(.recent-searches-section) .search-box.rg-search-pill{min-height:44px;height:44px;}
- .page:has(.recent-searches-section) .recent-searches-section{margin-top:0;}
- .rg-search-floating-messages{right:12px;bottom:78px;padding:10px 13px;}
-}
 
 /* Final Search Recent list: Instagram-like rows without inner/outer cards */
 .page:has(.recent-searches-section) .recent-searches-list,
