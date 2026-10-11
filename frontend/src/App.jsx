@@ -4973,7 +4973,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
             {section === "account" && (
               <>
                 <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} onSelect={setSelectedItem} />
               </>
             )}
             {section === "privacy" && (
@@ -4986,48 +4986,39 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               />
             )}
             {section === "privacy" && <CloseFriendsSettings />}
-            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
+            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} onSelect={setSelectedItem} />}
             {section === "security" && (
               <SecuritySettings onSelect={setSelectedItem} />
             )}
-            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
+            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} onSelect={setSelectedItem} />}
             {section === "notifications" && (
-                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "messages" && (
-                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "content" && (
-                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "media" && (
-                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "accessibility" && (
-                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "language" && (
-                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} onSelect={setSelectedItem} />
               )}
             {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
             {selectedItem && (
-              <div className="setting-detail">
-                <button
-                  type="button"
-                  className="setting-detail-back"
-                  onClick={() => setSelectedItem("")}
-                >
-                  <ChevronRight style={{ transform: "rotate(180deg)" }} />
-                  Back to {activeSection?.title}
-                </button>
-                <b>{selectedItem}</b>
-                <p>
-                  This option is currently represented in the ReelsGo
-                  interface. Account changes are saved only where a backend
-                  endpoint is connected.
-                </p>
-              </div>
+              <SettingDetailScreen
+                item={selectedItem}
+                sectionId={section}
+                user={user}
+                setUser={setUser}
+                onBack={() => setSelectedItem("")}
+              />
             )}
           </section>
         </div>
@@ -5095,7 +5086,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               {section === "account" && (
                 <>
                   <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
+                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} onSelect={setSelectedItem} />
                 </>
               )}
               {section === "privacy" && (
@@ -5108,46 +5099,39 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                 />
               )}
               {section === "privacy" && <CloseFriendsSettings />}
-              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
+              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} onSelect={setSelectedItem} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
               )}
-              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
+              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} onSelect={setSelectedItem} />}
               {section === "notifications" && (
-                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "messages" && (
-                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "content" && (
-                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "media" && (
-                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "accessibility" && (
-                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "language" && (
-                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} onSelect={setSelectedItem} />
               )}
               {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
               {selectedItem && (
-                <div className="setting-detail">
-                  <button
-                    type="button"
-                    className="setting-detail-back"
-                    onClick={() => setSelectedItem("")}
-                  >
-                    <ChevronRight style={{ transform: "rotate(180deg)" }} />
-                    Back to {activeSection?.title}
-                  </button>
-                  <b>{selectedItem}</b>
-                  <p>
-                    This setting needs its dedicated account action to be implemented. Preference switches in this section are saved through the authenticated settings API.
-                  </p>
-                </div>
+                <SettingDetailScreen
+                  item={selectedItem}
+                  sectionId={section}
+                  user={user}
+                  setUser={setUser}
+                  onBack={() => setSelectedItem("")}
+                />
               )}
             </section>
           )}
@@ -5218,63 +5202,154 @@ function SecuritySettings({ onSelect }) {
   </div>;
 }
 
-function ToggleSettings({ title, items, sectionId = "general" }) {
+function ToggleSettings({ title, items, sectionId = "general", onSelect }) {
   const [values, setValues] = useState({});
   const [loading, setLoading] = useState(true);
-  const [savingKey, setSavingKey] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
     api("/users/me/settings")
       .then(data => {
-        if (!active) return;
-        setValues(data?.settings || {});
-        setError("");
+        if (active) { setValues(data?.settings || {}); setError(""); }
       })
-      .catch(err => {
-        if (active) setError(err?.message || "Unable to load settings from the server. Please sign in and check your backend.");
-      })
+      .catch(err => { if (active) setError(err?.message || "Unable to load saved preferences."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
 
-  async function flip(item) {
-    const key = `${sectionId}.${item}`;
-    const previous = Object.prototype.hasOwnProperty.call(values, key) ? values[key] : true;
-    const next = !Boolean(previous);
-    setValues(current => ({ ...current, [key]: next }));
-    setSavingKey(key);
-    setError("");
+  return <div className="settings-panel rg-settings-options">
+    <h2 className="panel-heading">{title}</h2>
+    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
+    {error && <p className="settings-save-error" role="alert">{error}</p>}
+    {items.map(item => {
+      const key = `${sectionId}.${item}`;
+      const enabled = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
+      return <SettingRow
+        key={key}
+        title={item}
+        description={loading ? "Loading preference…" : `Currently ${enabled ? "on" : "off"}. Click to open and change this setting.`}
+        icon={<SlidersHorizontal />}
+        action={enabled ? "On" : "Off"}
+        onClick={() => onSelect?.(item)}
+      />;
+    })}
+  </div>;
+}
+
+function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
+  const [settings, setSettings] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [name, setName] = useState(user?.name || "");
+  const [username, setUsername] = useState(user?.username || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [website, setWebsite] = useState(user?.website || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const key = `${sectionId}.${item}`;
+  const value = Object.prototype.hasOwnProperty.call(settings, key) ? Boolean(settings[key]) : true;
+
+  useEffect(() => {
+    let active = true;
+    api("/users/me/settings")
+      .then(data => { if (active) setSettings(data?.settings || {}); })
+      .catch(err => { if (active) setError(err?.message || "Unable to load this setting."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  async function saveBoolean(next) {
+    const previous = value;
+    setSettings(current => ({ ...current, [key]: next }));
+    setSaving(true); setError(""); setNotice("");
     try {
       const data = await api("/users/me/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, value: next })
       });
-      setValues(current => ({ ...current, ...(data?.settings || {}), [key]: next }));
+      setSettings(data?.settings || { ...settings, [key]: next });
+      setNotice("Your change has been saved to your ReelsGo account.");
     } catch (err) {
-      setValues(current => ({ ...current, [key]: previous }));
-      setError(err?.message || `Could not save “${item}”.`);
-    } finally {
-      setSavingKey("");
-    }
+      setSettings(current => ({ ...current, [key]: previous }));
+      setError(err?.message || "Could not save this setting. Check that the backend settings route is deployed.");
+    } finally { setSaving(false); }
   }
 
-  return <div className="settings-panel">
-    <h2 className="panel-heading">{title}</h2>
-    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
-    {error && <p className="settings-save-error" role="alert">{error}</p>}
-    {items.map(item => {
-      const key = `${sectionId}.${item}`;
-      const checked = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
-      return <div className="setting-switch" key={key}>
-        <span><b>{item}</b><small>{savingKey === key ? "Saving to your account…" : "This preference is saved to your ReelsGo account."}</small></span>
-        <Toggle checked={checked} disabled={loading || savingKey === key} onChange={() => flip(item)} />
-      </div>;
-    })}
-  </div>;
+  async function saveProfile(event) {
+    event.preventDefault(); setSaving(true); setError(""); setNotice("");
+    try {
+      const data = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, bio, website })
+      });
+      const updated = data.user || data;
+      setUser?.(updated);
+      localStorage.setItem("vk_user", JSON.stringify(updated));
+      setNotice("Profile information saved.");
+    } catch (err) { setError(err?.message || "Could not save profile information."); }
+    finally { setSaving(false); }
+  }
+
+  async function changePassword(event) {
+    event.preventDefault(); setError(""); setNotice("");
+    if (newPassword.length < 8) { setError("Use at least 8 characters for your new password."); return; }
+    if (newPassword !== confirmPassword) { setError("The new passwords do not match."); return; }
+    setSaving(true);
+    try {
+      const data = await api("/users/me/password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      setNotice(data.message || "Password updated successfully.");
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (err) { setError(err?.message || "Password update endpoint is not available on the backend yet."); }
+    finally { setSaving(false); }
+  }
+
+  const isProfile = ["Personal information", "Edit profile"].includes(item);
+  const isPassword = item === "Password";
+  const isPrivateAccount = item === "Account privacy" || item === "Private account";
+  const descriptions = {
+    "Profile discovery": "Choose whether your account can be suggested or discovered by other ReelsGo users.",
+    "Account suggestions": "Control whether ReelsGo may suggest your account to other people.",
+    "Activity status": "Control whether people can see when you are active.",
+    "Read receipts": "Control whether people can see when you have read their messages.",
+    "Typing indicator": "Control whether people can see when you are typing.",
+    "Autoplay videos": "Choose whether videos play automatically when you browse.",
+    "Allow downloads": "Set your preference for allowing content downloads. Server-side download routes must enforce this choice.",
+    "Close friends visibility": "Set the default preference for Close Friends story visibility. Story routes must enforce this on every request.",
+    "Hidden words": "Enable or disable the hidden words preference. Filtering must also be applied to incoming comments and messages.",
+  };
+
+  return <section className="setting-detail-screen">
+    <button type="button" className="setting-detail-back" onClick={onBack}><ChevronRight style={{ transform: "rotate(180deg)" }} /> Back to {settingsSections.find(s => s.id === sectionId)?.title || "Settings"}</button>
+    <div className="rg-detail-heading"><span className="rg-detail-kicker">REELSGO SETTINGS</span><h2>{item}</h2><p>{descriptions[item] || `Manage ${item.toLowerCase()} for your ReelsGo account.`}</p></div>
+    {error && <div className="rg-detail-message error" role="alert">{error}</div>}
+    {notice && <div className="rg-detail-message success" role="status">{notice}</div>}
+    {isProfile ? <form className="rg-detail-form" onSubmit={saveProfile}>
+      <label>Full name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} /></label>
+      <label>Username<input value={username} onChange={e => setUsername(e.target.value)} maxLength={30} /></label>
+      <label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <label>Bio<textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3} /></label>
+      <label>Website<input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://example.com" /></label>
+      <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Saving…" : "Save changes"}</button>
+    </form> : isPassword ? <form className="rg-detail-form" onSubmit={changePassword}>
+      <label>Current password<input type="password" autoComplete="current-password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required /></label>
+      <label>New password<input type="password" autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={8} required /></label>
+      <label>Confirm new password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} minLength={8} required /></label>
+      <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Updating…" : "Update password"}</button>
+    </form> : isPrivateAccount ? <div className="rg-detail-control-card"><div><b>Private account</b><p>When enabled, only approved followers should be able to see your private content. Your backend content routes must enforce this.</p></div><Toggle checked={Boolean(user?.isPrivate)} onChange={async next => { setSaving(true); setError(""); try { const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) }); setUser?.(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user)); setNotice("Account privacy updated."); } catch (e) { setError(e.message); } finally { setSaving(false); } }} disabled={saving} /></div> : item === "Deactivate or delete account" ? <div className="rg-detail-control-card danger"><div><b>Account deactivation and deletion</b><p>These actions require a dedicated server endpoint and confirmation flow. No destructive action will be taken from this screen.</p></div></div> : <div className="rg-detail-control-card"><div><b>{item}</b><p>{descriptions[item] || "Turn this preference on or off. This choice is saved to your ReelsGo account."}</p><small>{loading ? "Loading saved value…" : `Currently ${value ? "on" : "off"}`}</small></div><Toggle checked={value} disabled={loading || saving} onChange={saveBoolean} /></div>}
+    {!isProfile && !isPassword && !isPrivateAccount && item !== "Deactivate or delete account" && <p className="rg-detail-footnote">Changes are saved to your account. Some preferences also require the corresponding ReelsGo feature to enforce them in the backend.</p>}
+  </section>;
 }
 
 function HelpSettings({ onSelect }) {
