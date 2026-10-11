@@ -693,91 +693,31 @@ router.delete(
 */
 
 router.get("/search", auth, async (req, res) => {
-
   try {
-
-    const q = String(
-
-      req.query.q || ""
-
-    ).trim();
+    const q = String(req.query.q || "").trim().slice(0, 50);
 
     if (!q) {
-
-      return res.json({
-
-        users: [],
-
-      });
-
+      return res.status(200).json({ users: [] });
     }
 
+    // Treat user input as literal text, not as a raw regular expression.
+    const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const users = await User.find({
-
       $or: [
-
-        {
-
-          username: {
-
-            $regex: q,
-
-            $options: "i",
-
-          },
-
-        },
-
-        {
-
-          name: {
-
-            $regex: q,
-
-            $options: "i",
-
-          },
-
-        },
-
+        { username: { $regex: escapedQuery, $options: "i" } },
+        { name: { $regex: escapedQuery, $options: "i" } },
       ],
-
     })
+      .select("_id name username bio avatar.contentType isPrivate")
+      .limit(30)
+      .lean();
 
-      .select(
-
-        "-password -avatar.data"
-
-      )
-
-      .limit(30);
-
-    return res.json({
-
-      users,
-
-    });
-
+    return res.status(200).json({ users });
   } catch (error) {
-
-    console.error(
-
-      "Search users error:",
-
-      error
-
-    );
-
-    return res.status(500).json({
-
-      message: "Unable to search users",
-
-      error: error.message,
-
-    });
-
+    console.error("Search users error:", error);
+    return res.status(500).json({ message: "Unable to search users" });
   }
-
 });
 
 /*
