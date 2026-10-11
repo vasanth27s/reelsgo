@@ -3560,6 +3560,23 @@ function SearchPage({ onOpenProfile }) {
         const results = Array.isArray(data?.users) ? data.users : [];
         setUsers(results);
         try { sessionStorage.setItem(SEARCH_RESULTS_KEY, JSON.stringify(results)); } catch {}
+
+        // Save accounts returned by a search to Recent immediately. localStorage
+        // survives page reloads and browser restarts, unlike component state.
+        if (results.length) {
+          setRecentPeople((current) => {
+            const byId = new Map();
+            // Keep the newest search results at the front, preserving prior entries.
+            [...results, ...current].forEach((person) => {
+              if (person?._id && !byId.has(String(person._id))) {
+                byId.set(String(person._id), person);
+              }
+            });
+            const next = Array.from(byId.values()).slice(0, 30);
+            try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)); } catch {}
+            return next;
+          });
+        }
       } catch (error) {
         if (cancelled || id !== requestId.current) return;
         console.error("Search users error:", error);
