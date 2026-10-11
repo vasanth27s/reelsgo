@@ -12401,3 +12401,74 @@ div[style*="min-width: 170px"]{
  .share-shortcuts button b{font-size:9px}
  .share-people{max-height:38vh!important}
 }
+
+/* Final requested layout: exactly three profile choices per row. */
+.share-sheet .share-people {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  align-items: start !important;
+  justify-items: center !important;
+  column-gap: 8px !important;
+  row-gap: 16px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(42vh, 390px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 12px 4px 18px !important;
+  scrollbar-width: thin !important;
+}
+.share-sheet .share-people > .share-loading,
+.share-sheet .share-people > .share-empty {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+}
+.share-sheet .share-person {
+  display: flex !important;
+  flex: initial !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  padding: 4px 2px !important;
+  margin: 0 !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+}
+.share-sheet .share-person-avatar {
+  flex: 0 0 auto !important;
+}
+.share-sheet .share-person-avatar .avatar {
+  width: 64px !important;
+  height: 64px !important;
+  min-width: 64px !important;
+  min-height: 64px !important;
+}
+.share-sheet .share-person b,
+.share-sheet .share-person > span {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+@media (max-width: 420px) {
+  .share-sheet .share-people {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    column-gap: 4px !important;
+    row-gap: 14px !important;
+    max-height: min(42vh, 390px) !important;
+  }
+  .share-sheet .share-person-avatar .avatar {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    min-height: 58px !important;
+  }
+}
