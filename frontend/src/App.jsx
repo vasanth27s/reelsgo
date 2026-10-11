@@ -3519,141 +3519,126 @@ function ReelViewer({ reel, onClose }) {
 }
 
 function SearchPage({ onOpenProfile }) {
-  // Keep the search query and results when the user opens a profile and returns.
   const SEARCH_QUERY_KEY = "reelsgo_search_query";
   const SEARCH_RESULTS_KEY = "reelsgo_search_results";
-
+  const RECENT_SEARCHES_KEY = "reelsgo_recent_people";
+  const readRecent = () => {
+    try {
+      const value = JSON.parse(localStorage.getItem(RECENT_SEARCHES_KEY) || "[]");
+      return Array.isArray(value) ? value : [];
+    } catch { return []; }
+  };
   const [q, setQ] = useState(() => {
-    try { return sessionStorage.getItem(SEARCH_QUERY_KEY) || ""; }
-    catch { return ""; }
+    try { return sessionStorage.getItem(SEARCH_QUERY_KEY) || ""; } catch { return ""; }
   });
   const [users, setUsers] = useState(() => {
-    try {
-      const cached = sessionStorage.getItem(SEARCH_RESULTS_KEY);
-      return cached ? JSON.parse(cached) : [];
-    } catch { return []; }
+    try { return JSON.parse(sessionStorage.getItem(SEARCH_RESULTS_KEY) || "[]"); } catch { return []; }
   });
+  const [recentPeople, setRecentPeople] = useState(readRecent);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const requestId = useRef(0);
 
   useEffect(() => {
     const query = q.trim();
     try { sessionStorage.setItem(SEARCH_QUERY_KEY, q); } catch {}
-
     if (!query) {
       setUsers([]);
+      setSearchError("");
       try { sessionStorage.removeItem(SEARCH_RESULTS_KEY); } catch {}
       setLoading(false);
       return;
     }
-
     let cancelled = false;
-    const thisRequest = ++requestId.current;
+    const id = ++requestId.current;
     const timer = setTimeout(async () => {
       setLoading(true);
+      setSearchError("");
       try {
         const data = await api(`/users/search?q=${encodeURIComponent(query)}`);
-        if (cancelled || thisRequest !== requestId.current) return;
+        if (cancelled || id !== requestId.current) return;
         const results = Array.isArray(data?.users) ? data.users : [];
         setUsers(results);
         try { sessionStorage.setItem(SEARCH_RESULTS_KEY, JSON.stringify(results)); } catch {}
       } catch (error) {
-        if (cancelled || thisRequest !== requestId.current) return;
+        if (cancelled || id !== requestId.current) return;
         console.error("Search users error:", error);
-        // Keep cached results visible if a temporary network error occurs.
-        setUsers((current) => current.length ? current : []);
+        setSearchError(error.message || "Unable to search users. Please try again.");
+        setUsers(current => {
+          if (current.length) return current;
+          try { return JSON.parse(sessionStorage.getItem(SEARCH_RESULTS_KEY) || "[]"); } catch { return []; }
+        });
       } finally {
-        if (!cancelled && thisRequest === requestId.current) setLoading(false);
+        if (!cancelled && id === requestId.current) setLoading(false);
       }
     }, 250);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
+    return () => { cancelled = true; clearTimeout(timer); };
   }, [q]);
 
+  function saveRecent(person) {
+    if (!person?._id) return;
+    setRecentPeople(current => {
+      const next = [person, ...current.filter(item => String(item?._id) !== String(person._id))].slice(0, 30);
+      try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  function removeRecent(id) {
+    setRecentPeople(current => {
+      const next = current.filter(person => String(person?._id) !== String(id));
+      try { localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  function clearRecent() {
+    setRecentPeople([]);
+    try { localStorage.removeItem(RECENT_SEARCHES_KEY); } catch {}
+  }
   function clearSearch() {
     setQ("");
     setUsers([]);
-    try {
-      sessionStorage.removeItem(SEARCH_QUERY_KEY);
-      sessionStorage.removeItem(SEARCH_RESULTS_KEY);
-    } catch {}
+    setSearchError("");
+    try { sessionStorage.removeItem(SEARCH_QUERY_KEY); sessionStorage.removeItem(SEARCH_RESULTS_KEY); } catch {}
   }
 
+  const searching = Boolean(q.trim());
+  const visiblePeople = searching ? users : recentPeople;
   return (
     <div className="page">
-      <div className="page-heading">
-        <div>
-          <h1>Search</h1>
-          <p>Find people on ReelsGo</p>
-        </div>
-      </div>
-
+      <div className="page-heading"><div><h1>Search</h1><p>Find people on ReelsGo</p></div></div>
       <div className="search-box">
         <Search />
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search username or name"
-          autoFocus
-        />
-        {q && (
-          <button
-            type="button"
-            className="icon-button"
-            onClick={clearSearch}
-            aria-label="Clear search"
-          >
-            <X />
-          </button>
-        )}
+        <input value={q} onChange={event => setQ(event.target.value)} placeholder="Search username or name" autoFocus aria-label="Search username or name" />
+        {q && <button type="button" className="icon-button" onClick={clearSearch} aria-label="Clear search"><X /></button>}
       </div>
 
-      {loading && users.length === 0 && (
-        <div className="empty small-empty"><p>Searching...</p></div>
+      {!searching && recentPeople.length > 0 && (
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",margin:"18px 0 8px"}}>
+          <h2 style={{margin:0,fontSize:18}}>Recent</h2>
+          <button type="button" className="text-button" onClick={clearRecent}>Clear all</button>
+        </div>
       )}
-
-      {users.length > 0 && (
+      {loading && users.length === 0 && searching && <div className="empty small-empty"><p>Searching...</p></div>}
+      {searchError && <div className="empty small-empty"><p>{searchError}</p></div>}
+      {visiblePeople.length > 0 && (
         <div className="user-list">
-          {users.map((user) => (
-            <button
-              className="user-row"
-              key={user._id}
-              onClick={() => onOpenProfile(user._id)}
-              type="button"
-            >
-              <Avatar user={user} size={48} />
-              <div>
-                <b>@{user.username}</b>
-                <span>{user.name}</span>
-              </div>
-              <ChevronRight />
-            </button>
+          {visiblePeople.map(person => (
+            <div className="user-row" key={person._id} style={{display:"flex",alignItems:"center",width:"100%"}}>
+              <button type="button" onClick={() => { saveRecent(person); onOpenProfile(person._id); }} style={{display:"flex",alignItems:"center",gap:12,flex:1,minWidth:0,textAlign:"left",background:"transparent",border:0,color:"inherit",cursor:"pointer",padding:0}}>
+                <Avatar user={person} size={48} />
+                <span style={{display:"flex",flexDirection:"column",minWidth:0,flex:1}}><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo user"}</span></span>
+                <ChevronRight />
+              </button>
+              {!searching && <button type="button" className="icon-button" aria-label={`Remove ${person.username || "user"} from recent searches`} title="Remove from recent searches" onClick={() => removeRecent(person._id)}><X /></button>}
+            </div>
           ))}
         </div>
       )}
-
-      {!loading && q.trim() && users.length === 0 && (
-        <div className="empty small-empty">
-          <Search />
-          <h2>No users found</h2>
-          <p>Try the exact username or another name.</p>
-        </div>
-      )}
-
-      {!q.trim() && (
-        <div className="empty small-empty">
-          <User />
-          <h2>Search for people</h2>
-          <p>Tap a person from the results to open their profile.</p>
-        </div>
-      )}
+      {!loading && searching && !searchError && users.length === 0 && <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>}
+      {!searching && recentPeople.length === 0 && <div className="empty small-empty"><User /><h2>Search for people</h2><p>Your recent searches will appear here until you remove them.</p></div>}
     </div>
   );
 }
-
 function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [profile, setProfile] = useState(null);
   const [tab, setTab] = useState("posts");
