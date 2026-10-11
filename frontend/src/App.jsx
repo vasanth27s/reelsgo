@@ -632,6 +632,7 @@ function App() {
   const [feedRefresh, setFeedRefresh] = useState(0);
   const [profileUserId, setProfileUserId] = useState(null);
   const [openConversationId, setOpenConversationId] = useState(null);
+  const [openConversationData, setOpenConversationData] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [verificationAlert, setVerificationAlert] = useState(false);
 
@@ -748,13 +749,26 @@ function App() {
         {page === "search" && <SearchPage onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
         {page === "user-profile" && profileUserId && <UserProfilePage userId={profileUserId} currentUser={user} onBack={() => navigate("search")} onMessage={async (id) => {
           try {
-            const d = await api("/messages/conversations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: [id] }) });
-            setOpenConversationId(d.conversation?._id || null);
-            navigate("messages");
-          } catch (e) { alert(e.message); }
+            if (!id) throw new Error("Could not find this user's profile ID. Please refresh the profile and try again.");
+            const d = await api("/messages/conversations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ members: [String(id)] })
+            });
+            const conversation = d?.conversation;
+            if (!conversation?._id) throw new Error("The server did not return a conversation. Please check the messages API and try again.");
+            // Keep the returned conversation so MessagesPage can open it immediately,
+            // even if the inbox list has not refreshed yet.
+            setOpenConversationData(conversation);
+            setOpenConversationId(String(conversation._id));
+            setPage("messages");
+            setProfileUserId(null);
+            setMenuOpen(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } catch (e) { alert(e?.message || "Unable to start this conversation."); }
         }} />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
-        {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
+        {page === "messages" && <MessagesPage openConversationId={openConversationId} openConversationData={openConversationData} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
@@ -3778,7 +3792,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 }
 
 
-function MessagesPage({ openConversationId = null }) {
+function MessagesPage({ openConversationId = null, openConversationData = null }) {
   const me = getUser();
   const [conversations, setConversations] = useState([]);
   const [active, setActive] = useState(null);
@@ -4017,17 +4031,21 @@ function MessagesPage({ openConversationId = null }) {
     if (!openConversationId) return;
     (async () => {
       try {
-        const [cd, md] = await Promise.all([
-          api('/messages/conversations'),
-          api(`/messages/conversations/${openConversationId}/messages`)
-        ]);
+        // Load the inbox first, but open the conversation returned by POST even
+        // if the inbox response is briefly stale or omits the new conversation.
+        const cd = await api('/messages/conversations');
         const rows = cd.conversations || [];
         setConversations(rows);
-        const c = rows.find(x => String(x._id) === String(openConversationId));
-        if (c) {
-          setActive({ ...c, unreadCount: 0 });
+        const listed = rows.find(x => String(x._id) === String(openConversationId));
+        const returned = openConversationData && String(openConversationData._id) === String(openConversationId)
+          ? openConversationData
+          : null;
+        const conversationToOpen = listed || returned;
+        if (conversationToOpen) {
+          setActive({ ...conversationToOpen, unreadCount: 0 });
           setMobileChat(true);
         }
+        const md = await api(`/messages/conversations/${openConversationId}/messages`);
         const openedMessages = md.messages || [];
         setMessages(openedMessages);
         const unseen = openedMessages
@@ -4068,7 +4086,7 @@ function MessagesPage({ openConversationId = null }) {
         );
       } catch (e) { console.error(e); }
     })();
-  }, [openConversationId]);
+  }, [openConversationId, openConversationData]);
 
   async function openConversation(c) {
     setActive({ ...c, unreadCount: 0 });
