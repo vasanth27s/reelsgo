@@ -12107,3 +12107,90 @@ div[style*="min-width: 170px"]{
   .recent-profile-wrap { padding-right: 2px; }
   .recent-profile-row .avatar { width: 58px; height: 58px; }
 }
+
+
+/* =========================================================
+   REELSGO CLOSE FRIENDS — DARK THEME CONTRAST UPDATE
+   Scoped to Close Friends so other screens are unchanged.
+   ========================================================= */
+.rg-close-friends{
+  --cf-bg:#15191f;
+  --cf-panel:#1c2128;
+  --cf-input:#252b34;
+  --cf-border:#343b46;
+  --cf-text:#f5f7fb;
+  --cf-muted:#a7b0bd;
+  color:var(--cf-text)!important;
+  background:var(--cf-bg)!important;
+  border-color:var(--cf-border)!important;
+}
+.rg-close-friends h1,
+.rg-close-friends h2,
+.rg-close-friends h3,
+.rg-close-friends b,
+.rg-close-friends strong,
+.rg-close-friends label,
+.rg-close-friends .rg-cf-person-info b{
+  color:var(--cf-text)!important;
+}
+.rg-close-friends .rg-cf-intro p,
+.rg-close-friends .rg-cf-person-info span,
+.rg-close-friends .rg-cf-list-heading span,
+.rg-close-friends .rg-cf-muted,
+.rg-close-friends .rg-cf-empty,
+.rg-close-friends .rg-cf-empty span,
+.rg-close-friends .rg-cf-footnote{
+  color:var(--cf-muted)!important;
+}
+.rg-close-friends .rg-cf-search{
+  background:var(--cf-input)!important;
+  border:1px solid var(--cf-border)!important;
+  color:var(--cf-text)!important;
+}
+.rg-close-friends .rg-cf-search>svg{color:#b7c0cc!important}
+.rg-close-friends .rg-cf-search input{
+  color:var(--cf-text)!important;
+  caret-color:#a78bfa!important;
+  -webkit-text-fill-color:var(--cf-text)!important;
+}
+.rg-close-friends .rg-cf-search input::placeholder{
+  color:#929cab!important;
+  opacity:1!important;
+  -webkit-text-fill-color:#929cab!important;
+}
+.rg-close-friends .rg-cf-search input::-webkit-search-cancel-button{
+  filter:invert(1);
+}
+.rg-close-friends .rg-cf-search button{color:#e4e8ef!important}
+.rg-close-friends .rg-cf-search-results,
+.rg-close-friends .rg-cf-footnote{
+  border-color:var(--cf-border)!important;
+}
+.rg-close-friends .rg-cf-add{
+  background:#7c3aed!important;
+  color:#fff!important;
+}
+.rg-close-friends .rg-cf-remove{
+  background:#e9edf3!important;
+  color:#171b22!important;
+}
+.rg-close-friends .rg-cf-message.error{
+  color:#ffb4b4!important;
+  background:rgba(239,68,68,.14)!important;
+  border:1px solid rgba(248,113,113,.25)!important;
+}
+.rg-close-friends .rg-cf-message.success{
+  color:#9be8b0!important;
+  background:rgba(34,197,94,.12)!important;
+  border:1px solid rgba(74,222,128,.2)!important;
+}
+.rg-close-friends .rg-cf-icon{
+  background:rgba(124,58,237,.18)!important;
+  color:#a78bfa!important;
+}
+.rg-close-friends .rg-cf-empty b{color:var(--cf-text)!important}
+@media(max-width:600px){
+  .rg-close-friends{padding:14px!important}
+  .rg-close-friends .rg-cf-search{min-height:48px}
+  .rg-close-friends .rg-cf-search input{min-height:46px;font-size:16px}
+}
