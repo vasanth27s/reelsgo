@@ -47,23 +47,6 @@ import reportRoutes from "./routes/reports.routes.js";
 
 
 
-/*
-
-  NEW:
-
-  ReelsGo custom phone verification.
-
-
-
-  IMPORTANT:
-
-  This does NOT use OTP.
-
-  This does NOT use Firebase.
-
-  This does NOT use Twilio.
-
-*/
 
 import verificationRoutes from "./routes/verification.routes.js";
 
@@ -191,13 +174,7 @@ app.use(
 
     origin(origin, callback) {
 
-      /*
-
-        Allow Postman/server-to-server
-
-        requests.
-
-      */
+   
 
 
 
