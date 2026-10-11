@@ -3519,26 +3519,67 @@ function ReelViewer({ reel, onClose }) {
 }
 
 function SearchPage({ onOpenProfile }) {
-  const [q, setQ] = useState("");
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // Keep the search query and results when the user opens a profile and returns.
+  const SEARCH_QUERY_KEY = "reelsgo_search_query";
+  const SEARCH_RESULTS_KEY = "reelsgo_search_results";
 
-  async function search(v) {
-    setQ(v);
-    if (!v.trim()) {
+  const [q, setQ] = useState(() => {
+    try { return sessionStorage.getItem(SEARCH_QUERY_KEY) || ""; }
+    catch { return ""; }
+  });
+  const [users, setUsers] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem(SEARCH_RESULTS_KEY);
+      return cached ? JSON.parse(cached) : [];
+    } catch { return []; }
+  });
+  const [loading, setLoading] = useState(false);
+  const requestId = useRef(0);
+
+  useEffect(() => {
+    const query = q.trim();
+    try { sessionStorage.setItem(SEARCH_QUERY_KEY, q); } catch {}
+
+    if (!query) {
       setUsers([]);
+      try { sessionStorage.removeItem(SEARCH_RESULTS_KEY); } catch {}
+      setLoading(false);
       return;
     }
-    setLoading(true);
+
+    let cancelled = false;
+    const thisRequest = ++requestId.current;
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const data = await api(`/users/search?q=${encodeURIComponent(query)}`);
+        if (cancelled || thisRequest !== requestId.current) return;
+        const results = Array.isArray(data?.users) ? data.users : [];
+        setUsers(results);
+        try { sessionStorage.setItem(SEARCH_RESULTS_KEY, JSON.stringify(results)); } catch {}
+      } catch (error) {
+        if (cancelled || thisRequest !== requestId.current) return;
+        console.error("Search users error:", error);
+        // Keep cached results visible if a temporary network error occurs.
+        setUsers((current) => current.length ? current : []);
+      } finally {
+        if (!cancelled && thisRequest === requestId.current) setLoading(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [q]);
+
+  function clearSearch() {
+    setQ("");
+    setUsers([]);
     try {
-      const d = await api(`/users/search?q=${encodeURIComponent(v.trim())}`);
-      setUsers(d.users || []);
-    } catch (e) {
-      console.error(e);
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
+      sessionStorage.removeItem(SEARCH_QUERY_KEY);
+      sessionStorage.removeItem(SEARCH_RESULTS_KEY);
+    } catch {}
   }
 
   return (
@@ -3554,14 +3595,15 @@ function SearchPage({ onOpenProfile }) {
         <Search />
         <input
           value={q}
-          onChange={e => search(e.target.value)}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Search username or name"
           autoFocus
         />
         {q && (
           <button
+            type="button"
             className="icon-button"
-            onClick={() => { setQ(""); setUsers([]); }}
+            onClick={clearSearch}
             aria-label="Clear search"
           >
             <X />
@@ -3569,21 +3611,23 @@ function SearchPage({ onOpenProfile }) {
         )}
       </div>
 
-      {loading && <div className="empty small-empty"><p>Searching...</p></div>}
+      {loading && users.length === 0 && (
+        <div className="empty small-empty"><p>Searching...</p></div>
+      )}
 
-      {!loading && users.length > 0 && (
+      {users.length > 0 && (
         <div className="user-list">
-          {users.map(u => (
+          {users.map((user) => (
             <button
               className="user-row"
-              key={u._id}
-              onClick={() => onOpenProfile(u._id)}
+              key={user._id}
+              onClick={() => onOpenProfile(user._id)}
               type="button"
             >
-              <Avatar user={u} size={48} />
+              <Avatar user={user} size={48} />
               <div>
-                <b>@{u.username}</b>
-                <span>{u.name}</span>
+                <b>@{user.username}</b>
+                <span>{user.name}</span>
               </div>
               <ChevronRight />
             </button>
@@ -3591,7 +3635,7 @@ function SearchPage({ onOpenProfile }) {
         </div>
       )}
 
-      {!loading && q && !users.length && (
+      {!loading && q.trim() && users.length === 0 && (
         <div className="empty small-empty">
           <Search />
           <h2>No users found</h2>
@@ -3599,7 +3643,7 @@ function SearchPage({ onOpenProfile }) {
         </div>
       )}
 
-      {!q && (
+      {!q.trim() && (
         <div className="empty small-empty">
           <User />
           <h2>Search for people</h2>
