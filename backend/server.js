@@ -24,6 +24,7 @@ import authRoutes from "./routes/auth.routes.js";
 
 import userRoutes from "./routes/users.routes.js";
 import settingsRoutes from "./routes/settings.routes.js";
+import labRoutes from "./routes/lab.routes.js";
 
 import mediaRoutes from "./routes/media.routes.js";
 
@@ -175,11 +176,11 @@ const allowedOrigins = [
 
   CLIENT_URL,
 
-  "http\://localhost:5173",
+  "http://localhost:5173",
 
-  "http\://127.0.0.1:5173",
+  "http://127.0.0.1:5173",
 
-  "http\://localhost:3000"
+  "http://localhost:3000"
 
 ].filter(Boolean);
 
@@ -482,6 +483,9 @@ app.use(
   "/api/users",
   settingsRoutes
 );
+
+// ReelsGo Lab: communities, live rooms, collections, and map places.
+app.use("/api/lab", labRoutes);
 
 
 
