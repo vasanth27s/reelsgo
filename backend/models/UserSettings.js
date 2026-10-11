@@ -1,5 +1,3 @@
-// backend/models/UserSettings.js
-
 import mongoose from "mongoose";
 
 const userSettingsSchema = new mongoose.Schema(
@@ -9,17 +7,29 @@ const userSettingsSchema = new mongoose.Schema(
       ref: "User",
       required: true,
       unique: true,
-      index: true,
+      index: true
     },
-    preferences: {
+
+    settings: {
       type: mongoose.Schema.Types.Mixed,
-      default: {},
+      default: {}
     },
+
+    blockedUsers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+
+    restrictedUsers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }]
   },
   {
     timestamps: true,
-    minimize: false,
+    minimize: false
   }
 );
 
-export default mongoose.model("UserSettings", userSettingsSchema);
+export default mongoose.models.UserSettings ||
+  mongoose.model("UserSettings", userSettingsSchema);

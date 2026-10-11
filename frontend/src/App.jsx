@@ -5251,6 +5251,13 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [people, setPeople] = useState([]);
+  const [peopleSearch, setPeopleSearch] = useState("");
+  const [peopleLoading, setPeopleLoading] = useState(false);
+  const [peopleBusyId, setPeopleBusyId] = useState("");
+
+  const peopleType = item === "Blocked accounts" ? "blocked" : item === "Restricted accounts" ? "restricted" : "";
+  const isPeopleList = Boolean(peopleType);
 
   const key = `${sectionId}.${item}`;
   const value = Object.prototype.hasOwnProperty.call(settings, key) ? Boolean(settings[key]) : true;
@@ -5317,6 +5324,45 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
 
   const isProfile = ["Personal information", "Edit profile"].includes(item);
   const isPassword = item === "Password";
+
+  useEffect(() => {
+    if (!isPeopleList) return;
+    let active = true;
+    setPeopleLoading(true);
+    const timer = setTimeout(() => {
+      const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
+      api(`/users/me/settings/people?${query}`)
+        .then(data => { if (active) { setPeople(Array.isArray(data?.people) ? data.people : Array.isArray(data?.users) ? data.users : []); setError(""); } })
+        .catch(err => { if (active) setError(err?.message || `Unable to load ${item.toLowerCase()}.`); })
+        .finally(() => { if (active) setPeopleLoading(false); });
+    }, 250);
+    return () => { active = false; clearTimeout(timer); };
+  }, [isPeopleList, peopleType, peopleSearch, item]);
+
+  async function updatePerson(personId, action) {
+    setPeopleBusyId(personId); setError(""); setNotice("");
+    try {
+      const url = `/users/me/settings/people/${peopleType}/${personId}`;
+      const data = await api(url, {
+        method: action === "add" ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        ...(action === "add" ? { body: JSON.stringify({}) } : {})
+      });
+      if (action === "add") {
+        setPeople(current => [...current.filter(p => String(p._id) !== String(personId)), data?.person].filter(Boolean));
+        setNotice(`${item === "Blocked accounts" ? "Account blocked" : "Account restricted"} successfully.`);
+      } else {
+        setPeople(current => current.filter(p => String(p._id) !== String(personId)));
+        setNotice("Account removed from this list.");
+      }
+      if (peopleSearch) {
+        const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
+        const refreshed = await api(`/users/me/settings/people?${query}`);
+        setPeople(Array.isArray(refreshed?.people) ? refreshed.people : Array.isArray(refreshed?.users) ? refreshed.users : []);
+      }
+    } catch (err) { setError(err?.message || "Could not update this account."); }
+    finally { setPeopleBusyId(""); }
+  }
   const isPrivateAccount = item === "Account privacy" || item === "Private account";
   const descriptions = {
     "Profile discovery": "Choose whether your account can be suggested or discovered by other ReelsGo users.",
@@ -5335,7 +5381,25 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
     <div className="rg-detail-heading"><span className="rg-detail-kicker">REELSGO SETTINGS</span><h2>{item}</h2><p>{descriptions[item] || `Manage ${item.toLowerCase()} for your ReelsGo account.`}</p></div>
     {error && <div className="rg-detail-message error" role="alert">{error}</div>}
     {notice && <div className="rg-detail-message success" role="status">{notice}</div>}
-    {isProfile ? <form className="rg-detail-form" onSubmit={saveProfile}>
+    {isPeopleList ? <div className="rg-detail-form rg-people-manager">
+      <label>Search ReelsGo accounts<input value={peopleSearch} onChange={e => setPeopleSearch(e.target.value)} placeholder="Search by name or username" autoComplete="off" /></label>
+      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results show accounts you can add to this list." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
+      {peopleLoading ? <p className="settings-save-status">Loading accounts…</p> : null}
+      {!peopleLoading && people.length === 0 && <p className="settings-save-status">{peopleSearch.trim() ? "No matching accounts found." : `No ${peopleType} accounts yet.`}</p>}
+      <div className="rg-people-results">
+        {people.map(person => {
+          const personId = String(person?._id || person?.id || "");
+          if (!personId) return null;
+          const isOnList = !peopleSearch.trim();
+          const displayName = person?.name || person?.fullName || person?.username || "ReelsGo user";
+          return <div className="rg-people-row" key={personId}>
+            <div className="rg-people-avatar">{String(displayName).slice(0, 1).toUpperCase()}</div>
+            <div className="rg-people-copy"><b>{displayName}</b><small>@{String(person?.username || "user").replace(/^@/, "")}</small></div>
+            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? "Remove" : peopleType === "blocked" ? "Block" : "Restrict"}</button>
+          </div>;
+        })}
+      </div>
+    </div> : isProfile ? <form className="rg-detail-form" onSubmit={saveProfile}>
       <label>Full name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} /></label>
       <label>Username<input value={username} onChange={e => setUsername(e.target.value)} maxLength={30} /></label>
       <label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
@@ -5348,7 +5412,7 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
       <label>Confirm new password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} minLength={8} required /></label>
       <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Updating…" : "Update password"}</button>
     </form> : isPrivateAccount ? <div className="rg-detail-control-card"><div><b>Private account</b><p>When enabled, only approved followers should be able to see your private content. Your backend content routes must enforce this.</p></div><Toggle checked={Boolean(user?.isPrivate)} onChange={async next => { setSaving(true); setError(""); try { const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) }); setUser?.(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user)); setNotice("Account privacy updated."); } catch (e) { setError(e.message); } finally { setSaving(false); } }} disabled={saving} /></div> : item === "Deactivate or delete account" ? <div className="rg-detail-control-card danger"><div><b>Account deactivation and deletion</b><p>These actions require a dedicated server endpoint and confirmation flow. No destructive action will be taken from this screen.</p></div></div> : <div className="rg-detail-control-card"><div><b>{item}</b><p>{descriptions[item] || "Turn this preference on or off. This choice is saved to your ReelsGo account."}</p><small>{loading ? "Loading saved value…" : `Currently ${value ? "on" : "off"}`}</small></div><Toggle checked={value} disabled={loading || saving} onChange={saveBoolean} /></div>}
-    {!isProfile && !isPassword && !isPrivateAccount && item !== "Deactivate or delete account" && <p className="rg-detail-footnote">Changes are saved to your account. Some preferences also require the corresponding ReelsGo feature to enforce them in the backend.</p>}
+    {!isProfile && !isPassword && !isPrivateAccount && !isPeopleList && item !== "Deactivate or delete account" && <p className="rg-detail-footnote">Changes are saved to your account. Some preferences also require the corresponding ReelsGo feature to enforce them in the backend.</p>}
   </section>;
 }
 

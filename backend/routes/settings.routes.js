@@ -1,4 +1,3 @@
-// backend/routes/settings.routes.js
 
 import express from "express";
 import mongoose from "mongoose";
@@ -110,24 +109,37 @@ const DEFAULT_SETTINGS = {
   },
 };
 
+const PEOPLE_TYPES = {
+  blocked: "blockedUsers",
+  restricted: "restrictedUsers",
+};
+
+const ALLOWED_SETTING_TYPES = ["boolean", "string", "number"];
+
+function isPlainObject(value) {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value)
+  );
+}
+
 function deepMerge(base, override) {
   const result = { ...base };
 
-  if (!override || typeof override !== "object" || Array.isArray(override)) {
+  if (!isPlainObject(override)) {
     return result;
   }
 
   for (const [key, value] of Object.entries(override)) {
     if (
-      value &&
-      typeof value === "object" &&
-      !Array.isArray(value) &&
-      result[key] &&
-      typeof result[key] === "object" &&
-      !Array.isArray(result[key])
+      isPlainObject(value) &&
+      isPlainObject(result[key])
     ) {
       result[key] = deepMerge(result[key], value);
-    } else {
+    } else if (
+      Object.prototype.hasOwnProperty.call(result, key)
+    ) {
       result[key] = value;
     }
   }
@@ -135,135 +147,271 @@ function deepMerge(base, override) {
   return result;
 }
 
+function validSection(section) {
+  return Object.prototype.hasOwnProperty.call(
+    DEFAULT_SETTINGS,
+    section
+  );
+}
+
+function validSettingValue(value) {
+  return ALLOWED_SETTING_TYPES.includes(typeof value);
+}
+
+function normalizeType(type) {
+  return String(type || "").trim().toLowerCase();
+}
+
+function getPeopleField(type) {
+  return PEOPLE_TYPES[normalizeType(type)];
+}
+
+function safePerson(user) {
+  return {
+    _id: user._id,
+    name: user.name || "",
+    username: user.username || "",
+  };
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 async function getSettingsDocument(userId) {
   let doc = await UserSettings.findOne({ user: userId });
 
   if (!doc) {
-    doc = await UserSettings.create({
-      user: userId,
-      preferences: DEFAULT_SETTINGS,
-    });
+    try {
+      doc = await UserSettings.create({
+        user: userId,
+        preferences: DEFAULT_SETTINGS,
+        blockedUsers: [],
+        restrictedUsers: [],
+      });
+    } catch (error) {
+      // Handle concurrent first requests creating the same document.
+      if (error.code !== 11000) {
+        throw error;
+      }
+
+      doc = await UserSettings.findOne({ user: userId });
+    }
+  }
+
+  if (!doc) {
+    throw new Error("Unable to initialize user settings.");
   }
 
   return doc;
 }
 
-function validSection(section) {
-  return Object.prototype.hasOwnProperty.call(DEFAULT_SETTINGS, section);
+function readPreferences(doc) {
+  const raw = doc.preferences?.toObject
+    ? doc.preferences.toObject()
+    : doc.preferences;
+
+  return deepMerge(DEFAULT_SETTINGS, raw);
+}
+
+function validateSetting(section, key, value, current) {
+  if (!validSection(section)) {
+    return `Unknown settings section: ${section}`;
+  }
+
+  if (
+    typeof key !== "string" ||
+    !Object.prototype.hasOwnProperty.call(current[section], key)
+  ) {
+    return `Unknown setting: ${section}.${key}`;
+  }
+
+  if (!validSettingValue(value)) {
+    return `Unsupported value for ${section}.${key}`;
+  }
+
+  const defaultValue = DEFAULT_SETTINGS[section][key];
+
+  if (typeof value !== typeof defaultValue) {
+    return `Invalid value type for ${section}.${key}`;
+  }
+
+  return null;
+}
+
+function applyFlatSetting(current, flatKey, value) {
+  if (typeof flatKey !== "string") {
+    return "Setting key must be a string.";
+  }
+
+  // Supports frontend keys such as "privacy.Activity status".
+  // Also accepts canonical keys such as "privacy.activityStatus".
+  const dot = flatKey.indexOf(".");
+
+  if (dot < 1) {
+    return `Use section.key format for setting "${flatKey}".`;
+  }
+
+  const section = flatKey.slice(0, dot).trim();
+  const suppliedKey = flatKey.slice(dot + 1).trim();
+
+  if (!validSection(section)) {
+    return `Unknown settings section: ${section}`;
+  }
+
+  const sectionDefaults = DEFAULT_SETTINGS[section];
+
+  let key = suppliedKey;
+
+  // Map display labels to the camelCase setting names.
+  if (!Object.prototype.hasOwnProperty.call(sectionDefaults, key)) {
+    const normalize = text =>
+      String(text).toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    const wanted = normalize(suppliedKey);
+
+    key = Object.keys(sectionDefaults).find(
+      candidate => normalize(candidate) === wanted
+    );
+  }
+
+  if (!key) {
+    return `Unknown setting: ${section}.${suppliedKey}`;
+  }
+
+  const error = validateSetting(section, key, value, current);
+
+  if (error) {
+    return error;
+  }
+
+  current[section][key] = value;
+  return null;
+}
+
+async function populatedPeople(doc, field) {
+  const populated = await UserSettings.findById(doc._id)
+    .populate({
+      path: field,
+      select: "name username",
+    });
+
+  return (populated?.[field] || [])
+    .filter(Boolean)
+    .map(safePerson);
 }
 
 /*
   GET /api/users/me/settings
 
-  Returns all settings for the logged-in user.
+  Returns merged defaults and the logged-in user's saved preferences.
 */
 router.get("/me/settings", async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.user.id)) {
-      return res.status(401).json({ message: "Invalid authenticated user" });
+      return res.status(401).json({
+        message: "Invalid authenticated user.",
+      });
     }
 
     const doc = await getSettingsDocument(req.user.id);
 
-    const preferences = deepMerge(
-      DEFAULT_SETTINGS,
-      doc.preferences?.toObject
-        ? doc.preferences.toObject()
-        : doc.preferences
-    );
-
-    return res.json({ settings: preferences });
+    return res.json({
+      settings: readPreferences(doc),
+    });
   } catch (error) {
     console.error("GET settings error:", error);
-    return res.status(500).json({ message: "Unable to load settings" });
+
+    return res.status(500).json({
+      message: "Unable to load settings.",
+    });
   }
 });
 
 /*
   PATCH /api/users/me/settings
 
-  Accepts either:
+  Supported formats:
+
   { "section": "privacy", "key": "activityStatus", "value": false }
 
-  or:
   { "settings": { "privacy": { "activityStatus": false } } }
+
+  { "key": "privacy.Activity status", "value": false }
 */
 router.patch("/me/settings", async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.user.id)) {
-      return res.status(401).json({ message: "Invalid authenticated user" });
+      return res.status(401).json({
+        message: "Invalid authenticated user.",
+      });
     }
 
     const doc = await getSettingsDocument(req.user.id);
+    const current = readPreferences(doc);
+    const body = req.body || {};
 
-    const current = deepMerge(
-      DEFAULT_SETTINGS,
-      doc.preferences?.toObject
-        ? doc.preferences.toObject()
-        : doc.preferences
-    );
-
-    const { section, key, value, settings } = req.body || {};
-
-    if (settings !== undefined) {
-      if (!settings || typeof settings !== "object" || Array.isArray(settings)) {
-        return res.status(400).json({ message: "settings must be an object" });
+    if (body.settings !== undefined) {
+      if (!isPlainObject(body.settings)) {
+        return res.status(400).json({
+          message: "settings must be an object.",
+        });
       }
 
-      for (const [sectionName, values] of Object.entries(settings)) {
-        if (!validSection(sectionName)) {
+      for (const [section, values] of Object.entries(body.settings)) {
+        if (!validSection(section)) {
           return res.status(400).json({
-            message: `Unknown settings section: ${sectionName}`,
+            message: `Unknown settings section: ${section}`,
           });
         }
 
-        if (!values || typeof values !== "object" || Array.isArray(values)) {
+        if (!isPlainObject(values)) {
           return res.status(400).json({
-            message: `Settings for ${sectionName} must be an object`,
+            message: `Settings for ${section} must be an object.`,
           });
         }
 
-        for (const [settingName, settingValue] of Object.entries(values)) {
-          if (!Object.prototype.hasOwnProperty.call(current[sectionName], settingName)) {
-            return res.status(400).json({
-              message: `Unknown setting: ${sectionName}.${settingName}`,
-            });
+        for (const [key, value] of Object.entries(values)) {
+          const error = validateSetting(
+            section,
+            key,
+            value,
+            current
+          );
+
+          if (error) {
+            return res.status(400).json({ message: error });
           }
 
-          if (
-            typeof settingValue !== "boolean" &&
-            typeof settingValue !== "string" &&
-            typeof settingValue !== "number"
-          ) {
-            return res.status(400).json({
-              message: `Unsupported value for ${sectionName}.${settingName}`,
-            });
-          }
-
-          current[sectionName][settingName] = settingValue;
+          current[section][key] = value;
         }
+      }
+    } else if (
+      typeof body.key === "string" &&
+      body.section === undefined
+    ) {
+      // Compatibility with the frontend's flat key format.
+      const error = applyFlatSetting(
+        current,
+        body.key,
+        body.value
+      );
+
+      if (error) {
+        return res.status(400).json({ message: error });
       }
     } else {
-      if (!validSection(section) || typeof key !== "string") {
-        return res.status(400).json({
-          message: "Provide a valid section, key and value",
-        });
-      }
+      const { section, key, value } = body;
 
-      if (!Object.prototype.hasOwnProperty.call(current[section], key)) {
-        return res.status(400).json({
-          message: `Unknown setting: ${section}.${key}`,
-        });
-      }
+      const error = validateSetting(
+        section,
+        key,
+        value,
+        current
+      );
 
-      if (
-        typeof value !== "boolean" &&
-        typeof value !== "string" &&
-        typeof value !== "number"
-      ) {
-        return res.status(400).json({
-          message: "Unsupported setting value",
-        });
+      if (error) {
+        return res.status(400).json({ message: error });
       }
 
       current[section][key] = value;
@@ -274,36 +422,35 @@ router.patch("/me/settings", async (req, res) => {
     await doc.save();
 
     return res.json({
-      message: "Settings saved",
+      message: "Settings saved successfully.",
       settings: current,
     });
   } catch (error) {
     console.error("PATCH settings error:", error);
-    return res.status(500).json({ message: "Unable to save settings" });
+
+    return res.status(500).json({
+      message: "Unable to save settings.",
+    });
   }
 });
 
 /*
   GET /api/users/me/settings/:section
 
-  Loads one settings category for a detail screen.
+  Returns one category of settings.
 */
 router.get("/me/settings/:section", async (req, res) => {
   try {
     const { section } = req.params;
 
     if (!validSection(section)) {
-      return res.status(404).json({ message: "Settings section not found" });
+      return res.status(404).json({
+        message: "Settings section not found.",
+      });
     }
 
     const doc = await getSettingsDocument(req.user.id);
-
-    const preferences = deepMerge(
-      DEFAULT_SETTINGS,
-      doc.preferences?.toObject
-        ? doc.preferences.toObject()
-        : doc.preferences
-    );
+    const preferences = readPreferences(doc);
 
     return res.json({
       section,
@@ -311,8 +458,193 @@ router.get("/me/settings/:section", async (req, res) => {
     });
   } catch (error) {
     console.error("GET settings section error:", error);
-    return res.status(500).json({ message: "Unable to load settings section" });
+
+    return res.status(500).json({
+      message: "Unable to load settings section.",
+    });
   }
 });
+
+/*
+  GET /api/users/me/settings/people?type=blocked
+  GET /api/users/me/settings/people?type=restricted
+
+  Without search: returns the selected list.
+  With search: returns other users that can be added to that list.
+*/
+router.get("/me/settings/people", async (req, res) => {
+  try {
+    const type = normalizeType(req.query.type);
+    const field = getPeopleField(type);
+
+    if (!field) {
+      return res.status(400).json({
+        message: "Type must be blocked or restricted.",
+      });
+    }
+
+    const doc = await getSettingsDocument(req.user.id);
+    const search = String(req.query.search || "").trim();
+
+    if (!search) {
+      return res.json({
+        type,
+        people: await populatedPeople(doc, field),
+      });
+    }
+
+    const escaped = escapeRegex(search);
+    const regex = new RegExp(escaped, "i");
+
+    const alreadyListed = (doc[field] || []).map(
+      id => new mongoose.Types.ObjectId(String(id))
+    );
+
+    const users = await User.find({
+      _id: {
+        $ne: req.user.id,
+        $nin: alreadyListed,
+      },
+      $or: [
+        { username: regex },
+        { name: regex },
+      ],
+    })
+      .select("_id name username")
+      .limit(25)
+      .lean();
+
+    return res.json({
+      type,
+      people: users.map(safePerson),
+    });
+  } catch (error) {
+    console.error("Search settings people error:", error);
+
+    return res.status(500).json({
+      message: "Unable to search accounts.",
+    });
+  }
+});
+
+/*
+  POST /api/users/me/settings/people/blocked/:userId
+  POST /api/users/me/settings/people/restricted/:userId
+
+  Adds an account to the selected list.
+*/
+router.post(
+  "/me/settings/people/:type/:userId",
+  async (req, res) => {
+    try {
+      const type = normalizeType(req.params.type);
+      const field = getPeopleField(type);
+      const { userId } = req.params;
+
+      if (!field) {
+        return res.status(400).json({
+          message: "Type must be blocked or restricted.",
+        });
+      }
+
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({
+          message: "Invalid user ID.",
+        });
+      }
+
+      if (String(userId) === String(req.user.id)) {
+        return res.status(400).json({
+          message: "You cannot add your own account.",
+        });
+      }
+
+      const target = await User.findById(userId).select("_id");
+
+      if (!target) {
+        return res.status(404).json({
+          message: "User not found.",
+        });
+      }
+
+      const doc = await getSettingsDocument(req.user.id);
+
+      await UserSettings.updateOne(
+        { _id: doc._id },
+        { $addToSet: { [field]: target._id } }
+      );
+
+      const updated = await UserSettings.findById(doc._id);
+
+      return res.json({
+        message:
+          type === "blocked"
+            ? "Account added to blocked accounts."
+            : "Account added to restricted accounts.",
+        type,
+        people: await populatedPeople(updated, field),
+      });
+    } catch (error) {
+      console.error("Add settings person error:", error);
+
+      return res.status(500).json({
+        message: "Unable to update account list.",
+      });
+    }
+  }
+);
+
+/*
+  DELETE /api/users/me/settings/people/blocked/:userId
+  DELETE /api/users/me/settings/people/restricted/:userId
+
+  Removes an account from the selected list.
+*/
+router.delete(
+  "/me/settings/people/:type/:userId",
+  async (req, res) => {
+    try {
+      const type = normalizeType(req.params.type);
+      const field = getPeopleField(type);
+      const { userId } = req.params;
+
+      if (!field) {
+        return res.status(400).json({
+          message: "Type must be blocked or restricted.",
+        });
+      }
+
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).json({
+          message: "Invalid user ID.",
+        });
+      }
+
+      const doc = await getSettingsDocument(req.user.id);
+
+      await UserSettings.updateOne(
+        { _id: doc._id },
+        { $pull: { [field]: new mongoose.Types.ObjectId(userId) } }
+      );
+
+      const updated = await UserSettings.findById(doc._id);
+
+      return res.json({
+        message:
+          type === "blocked"
+            ? "Account unblocked successfully."
+            : "Restriction removed successfully.",
+        type,
+        people: await populatedPeople(updated, field),
+      });
+    } catch (error) {
+      console.error("Remove settings person error:", error);
+
+      return res.status(500).json({
+        message: "Unable to update account list.",
+      });
+    }
+  }
+);
 
 export default router;
