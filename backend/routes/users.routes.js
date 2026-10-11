@@ -1,2466 +1,1305 @@
 import express from "express";
 
-
-
 import bcrypt from "bcryptjs";
-
-
 
 import auth from "../middleware/auth.js";
 
-
-
 import { uploadImage } from "../middleware/upload.js";
-
-
 
 import User from "../models/User.js";
 
-
-
 import Follow from "../models/Follow.js";
-
-
 
 import Post from "../models/Post.js";
 
-
-
 import Reel from "../models/Reel.js";
-
-
 
 const router = express.Router();
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | POST VIEW
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 function postView(post) {
 
+  const obj = post.toObject
 
+    ? post.toObject()
 
-  const obj = post.toObject
+    : post;
 
+  obj.media = (obj.media || []).map((media) => ({
 
+    ...media,
 
-    ? post.toObject()
+    url: media.mediaId
 
+      ? `/api/media/${media.mediaId}`
 
+      : null,
 
-    : post;
+  }));
 
-
-
-  obj.media = (obj.media || []).map((media) => ({
-
-
-
-    ...media,
-
-
-
-    url: media.mediaId
-
-
-
-      ? `/api/media/${media.mediaId}`
-
-
-
-      : null,
-
-
-
-  }));
-
-
-
-  return obj;
-
-
+  return obj;
 
 }
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | REEL VIEW
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 function reelView(reel) {
 
+  const obj = reel.toObject
 
+    ? reel.toObject()
 
-  const obj = reel.toObject
+    : reel;
 
+  return {
 
+    ...obj,
 
-    ? reel.toObject()
+    mediaUrl: obj.mediaId
 
+      ? `/api/media/${obj.mediaId}`
 
+      : null,
 
-    : reel;
+    coverUrl: obj.coverMediaId
 
+      ? `/api/media/${obj.coverMediaId}`
 
+      : null,
 
-  return {
-
-
-
-    ...obj,
-
-
-
-    mediaUrl: obj.mediaId
-
-
-
-      ? `/api/media/${obj.mediaId}`
-
-
-
-      : null,
-
-
-
-    coverUrl: obj.coverMediaId
-
-
-
-      ? `/api/media/${obj.coverMediaId}`
-
-
-
-      : null,
-
-
-
-  };
-
-
+  };
 
 }
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | SAFE USER
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 function safe(user) {
 
+  const obj = user.toObject
 
+    ? user.toObject()
 
-  const obj = user.toObject
+    : { ...user };
 
+  delete obj.password;
 
+  if (obj.avatar) {
 
-    ? user.toObject()
+    delete obj.avatar.data;
 
+  }
 
-
-    : { ...user };
-
-
-
-  delete obj.password;
-
-
-
-  if (obj.avatar) {
-
-
-
-    delete obj.avatar.data;
-
-
-
-  }
-
-
-
-  return obj;
-
-
+  return obj;
 
 }
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | GET CURRENT USER
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 router.get("/me", auth, async (req, res) => {
 
+  try {
 
+    const user = await User.findById(req.user.id)
 
-  try {
+      .select("-password -avatar.data");
 
+    if (!user) {
 
+      return res.status(404).json({
 
-    const user = await User.findById(req.user.id)
+        message: "User not found",
 
+      });
 
+    }
 
-      .select("-password -avatar.data");
+    return res.json({
 
+      user,
 
+    });
 
-    if (!user) {
+  } catch (error) {
 
+    console.error("Get me error:", error);
 
+    return res.status(500).json({
 
-      return res.status(404).json({
+      message: "Unable to load user",
 
+      error: error.message,
 
+    });
 
-        message: "User not found",
-
-
-
-      });
-
-
-
-    }
-
-
-
-    return res.json({
-
-
-
-      user,
-
-
-
-    });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Get me error:", error);
-
-
-
-    return res.status(500).json({
-
-
-
-      message: "Unable to load user",
-
-
-
-      error: error.message,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | CLOSE FRIENDS
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | Requires this field in models/User.js:
 
-
-
 | closeFriends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
-
-
 
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 // GET /api/users/me/close-friends
 
-
-
 router.get("/me/close-friends", auth, async (req, res) => {
 
+  try {
 
+    const user = await User.findById(req.user.id)
 
-  try {
+      .populate("closeFriends", "name username avatar isPrivate")
 
+      .select("-password -avatar.data");
 
+    if (!user) {
 
-    const user = await User.findById(req.user.id)
+      return res.status(404).json({ message: "User not found" });
 
+    }
 
+    return res.json({ closeFriends: user.closeFriends || [] });
 
-      .populate("closeFriends", "name username avatar isPrivate")
+  } catch (error) {
 
+    console.error("Get Close Friends error:", error);
 
+    return res.status(500).json({
 
-      .select("-password -avatar.data");
+      message: "Unable to load Close Friends",
 
+      error: error.message,
 
+    });
 
-    if (!user) {
-
-
-
-      return res.status(404).json({ message: "User not found" });
-
-
-
-    }
-
-
-
-    return res.json({ closeFriends: user.closeFriends || [] });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Get Close Friends error:", error);
-
-
-
-    return res.status(500).json({
-
-
-
-      message: "Unable to load Close Friends",
-
-
-
-      error: error.message,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
-
-
 
 // ADD a user to the current user's Close Friends list
 
-
-
-// POST /api/users/me/close-friends  body: { "userId": "..." }
-
-
+// POST /api/users/me/close-friends  body: { "userId": "..." }
 
 router.post("/me/close-friends", auth, async (req, res) => {
 
+  try {
 
+    const { userId } = req.body || {};
 
-  try {
+    if (!userId || !/^[a-f\d]{24}$/i.test(String(userId))) {
 
+      return res.status(400).json({ message: "A valid userId is required" });
 
+    }
 
-    const { userId } = req.body || {};
+    if (String(userId) === String(req.user.id)) {
 
+      return res.status(400).json({ message: "You cannot add yourself" });
 
+    }
 
-    if (!userId || !/^[a-f\d]{24}$/i.test(String(userId))) {
+    const person = await User.findById(userId).select("_id");
 
+    if (!person) {
 
+      return res.status(404).json({ message: "User not found" });
 
-      return res.status(400).json({ message: "A valid userId is required" });
+    }
 
+    const user = await User.findByIdAndUpdate(
 
+      req.user.id,
 
-    }
+      { $addToSet: { closeFriends: person._id } },
 
+      { new: true }
 
+    ).populate("closeFriends", "name username avatar isPrivate");
 
-    if (String(userId) === String(req.user.id)) {
+    if (!user) {
 
+      return res.status(404).json({ message: "User not found" });
 
+    }
 
-      return res.status(400).json({ message: "You cannot add yourself" });
+    return res.json({ closeFriends: user.closeFriends || [] });
 
+  } catch (error) {
 
+    console.error("Add Close Friend error:", error);
 
-    }
+    return res.status(500).json({
 
+      message: "Unable to add Close Friend",
 
+      error: error.message,
 
-    const person = await User.findById(userId).select("_id");
+    });
 
-
-
-    if (!person) {
-
-
-
-      return res.status(404).json({ message: "User not found" });
-
-
-
-    }
-
-
-
-    const user = await User.findByIdAndUpdate(
-
-
-
-      req.user.id,
-
-
-
-      { $addToSet: { closeFriends: person._id } },
-
-
-
-      { new: true }
-
-
-
-    ).populate("closeFriends", "name username avatar isPrivate");
-
-
-
-    if (!user) {
-
-
-
-      return res.status(404).json({ message: "User not found" });
-
-
-
-    }
-
-
-
-    return res.json({ closeFriends: user.closeFriends || [] });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Add Close Friend error:", error);
-
-
-
-    return res.status(500).json({
-
-
-
-      message: "Unable to add Close Friend",
-
-
-
-      error: error.message,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
-
-
 
 // REMOVE a user from the current user's Close Friends list
 
-
-
 // DELETE /api/users/me/close-friends/:userId
-
-
 
 router.delete("/me/close-friends/:userId", auth, async (req, res) => {
 
+  try {
 
+    const { userId } = req.params;
 
-  try {
+    if (!/^[a-f\d]{24}$/i.test(String(userId))) {
 
+      return res.status(400).json({ message: "Invalid user id" });
 
+    }
 
-    const { userId } = req.params;
+    const user = await User.findByIdAndUpdate(
 
+      req.user.id,
 
+      { $pull: { closeFriends: userId } },
 
-    if (!/^[a-f\d]{24}$/i.test(String(userId))) {
+      { new: true }
 
+    ).populate("closeFriends", "name username avatar isPrivate");
 
+    if (!user) {
 
-      return res.status(400).json({ message: "Invalid user id" });
+      return res.status(404).json({ message: "User not found" });
 
+    }
 
+    return res.json({ closeFriends: user.closeFriends || [] });
 
-    }
+  } catch (error) {
 
+    console.error("Remove Close Friend error:", error);
 
+    return res.status(500).json({
 
-    const user = await User.findByIdAndUpdate(
+      message: "Unable to remove Close Friend",
 
+      error: error.message,
 
+    });
 
-      req.user.id,
-
-
-
-      { $pull: { closeFriends: userId } },
-
-
-
-      { new: true }
-
-
-
-    ).populate("closeFriends", "name username avatar isPrivate");
-
-
-
-    if (!user) {
-
-
-
-      return res.status(404).json({ message: "User not found" });
-
-
-
-    }
-
-
-
-    return res.json({ closeFriends: user.closeFriends || [] });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Remove Close Friend error:", error);
-
-
-
-    return res.status(500).json({
-
-
-
-      message: "Unable to remove Close Friend",
-
-
-
-      error: error.message,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | UPDATE CURRENT USER
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 // Change password for the authenticated account. Passwords are never returned to the client.
 
-
-
 router.patch("/me/password", auth, async (req, res) => {
 
+  try {
 
+    const { currentPassword, newPassword } = req.body || {};
 
-  try {
+    if (!currentPassword || !newPassword) return res.status(400).json({ message: "Current password and new password are required." });
 
+    if (String(newPassword).length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
 
+    if (String(newPassword).length > 128) return res.status(400).json({ message: "New password is too long." });
 
-    const { currentPassword, newPassword } = req.body || {};
+    const user = await User.findById(req.user.id).select("+password");
 
+    if (!user) return res.status(404).json({ message: "User not found." });
 
+    if (!user.password) return res.status(400).json({ message: "Password login is not enabled for this account." });
 
-    if (!currentPassword || !newPassword) return res.status(400).json({ message: "Current password and new password are required." });
+    const valid = await bcrypt.compare(String(currentPassword), String(user.password));
 
+    if (!valid) return res.status(400).json({ message: "Current password is incorrect." });
 
+    user.password = await bcrypt.hash(String(newPassword), 12);
 
-    if (String(newPassword).length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
+    await user.save();
 
+    return res.json({ message: "Password updated successfully." });
 
+  } catch (error) {
 
-    if (String(newPassword).length > 128) return res.status(400).json({ message: "New password is too long." });
+    console.error("Change password error:", error);
 
+    return res.status(500).json({ message: "Unable to update password." });
 
-
-    const user = await User.findById(req.user.id).select("+password");
-
-
-
-    if (!user) return res.status(404).json({ message: "User not found." });
-
-
-
-    if (!user.password) return res.status(400).json({ message: "Password login is not enabled for this account." });
-
-
-
-    const valid = await bcrypt.compare(String(currentPassword), String(user.password));
-
-
-
-    if (!valid) return res.status(400).json({ message: "Current password is incorrect." });
-
-
-
-    user.password = await bcrypt.hash(String(newPassword), 12);
-
-
-
-    await user.save();
-
-
-
-    return res.json({ message: "Password updated successfully." });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Change password error:", error);
-
-
-
-    return res.status(500).json({ message: "Unable to update password." });
-
-
-
-  }
-
-
+  }
 
 });
-
-
 
 router.put("/me", auth, async (req, res) => {
 
+  try {
 
+    const user = await User.findById(req.user.id);
 
-  try {
+    if (!user) {
 
+      return res.status(404).json({
 
+        message: "User not found",
 
-    const user = await User.findById(req.user.id);
+      });
 
+    }
 
+    const allowedFields = ["name", "username", "email", "bio", "website", "isPrivate"];
 
-    if (!user) {
+    for (const field of allowedFields) {
 
+      if (req.body?.[field] !== undefined) {
 
+        if (typeof req.body[field] === "string") user[field] = req.body[field].trim();
 
-      return res.status(404).json({
+        else if (field === "isPrivate") user[field] = Boolean(req.body[field]);
 
+      }
 
+    }
 
-        message: "User not found",
+    if (user.username) {
 
+      user.username = user.username.replace(/^@/, "").toLowerCase();
 
+      if (!/^[a-z0-9._]{3,30}$/.test(user.username)) {
 
-      });
+        return res.status(400).json({ message: "Username must be 3–30 characters and use only letters, numbers, dots or underscores." });
 
+      }
 
+      const duplicateUsername = await User.findOne({ username: user.username, _id: { $ne: user._id } }).select("_id");
 
-    }
+      if (duplicateUsername) return res.status(409).json({ message: "That username is already in use." });
 
+    }
 
+    if (user.email) {
 
-    const allowedFields = ["name", "username", "email", "bio", "website", "isPrivate"];
+      user.email = user.email.toLowerCase();
 
+      const duplicateEmail = await User.findOne({ email: user.email, _id: { $ne: user._id } }).select("_id");
 
+      if (duplicateEmail) return res.status(409).json({ message: "That email is already in use." });
 
-    for (const field of allowedFields) {
+    }
 
+    await user.save();
 
+    return res.json({
 
-      if (req.body?.[field] !== undefined) {
+      user: safe(user),
 
+    });
 
+  } catch (error) {
 
-        if (typeof req.body[field] === "string") user[field] = req.body[field].trim();
+    console.error("Update user error:", error);
 
+    return res.status(500).json({
 
+      message: "Unable to update profile",
 
-        else if (field === "isPrivate") user[field] = Boolean(req.body[field]);
+      error: error.message,
 
+    });
 
-
-      }
-
-
-
-    }
-
-
-
-    if (user.username) {
-
-
-
-      user.username = user.username.replace(/^@/, "").toLowerCase();
-
-
-
-      if (!/^[a-z0-9._]{3,30}$/.test(user.username)) {
-
-
-
-        return res.status(400).json({ message: "Username must be 3–30 characters and use only letters, numbers, dots or underscores." });
-
-
-
-      }
-
-
-
-      const duplicateUsername = await User.findOne({ username: user.username, _id: { $ne: user._id } }).select("_id");
-
-
-
-      if (duplicateUsername) return res.status(409).json({ message: "That username is already in use." });
-
-
-
-    }
-
-
-
-    if (user.email) {
-
-
-
-      user.email = user.email.toLowerCase();
-
-
-
-      const duplicateEmail = await User.findOne({ email: user.email, _id: { $ne: user._id } }).select("_id");
-
-
-
-      if (duplicateEmail) return res.status(409).json({ message: "That email is already in use." });
-
-
-
-    }
-
-
-
-    await user.save();
-
-
-
-    return res.json({
-
-
-
-      user: safe(user),
-
-
-
-    });
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Update user error:", error);
-
-
-
-    return res.status(500).json({
-
-
-
-      message: "Unable to update profile",
-
-
-
-      error: error.message,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | UPLOAD AVATAR
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 router.post(
 
+  "/me/avatar",
 
+  auth,
 
-  "/me/avatar",
+  uploadImage.single("avatar"),
 
+  async (req, res) => {
 
+    try {
 
-  auth,
+      if (!req.file) {
 
+        return res.status(400).json({
 
+          message: "Please select an image",
 
-  uploadImage.single("avatar"),
+        });
 
+      }
 
+      const user = await User.findById(req.user.id);
 
-  async (req, res) => {
+      if (!user) {
 
+        return res.status(404).json({
 
+          message: "User not found",
 
-    try {
+        });
 
+      }
 
+      user.avatar = {
 
-      if (!req.file) {
+        data: req.file.buffer,
 
+        contentType: req.file.mimetype,
 
+        fileName: req.file.originalname,
 
-        return res.status(400).json({
+      };
 
+      await user.save();
 
+      return res.json({
 
-          message: "Please select an image",
+        user: safe(user),
 
+        avatarUrl:
 
+          `/api/users/${user._id}/avatar`,
 
-        });
+      });
 
+    } catch (error) {
 
+      console.error("Avatar upload error:", error);
 
-      }
+      return res.status(500).json({
 
+        message: "Unable to upload avatar",
 
+        error: error.message,
 
-      const user = await User.findById(req.user.id);
+      });
 
+    }
 
-
-      if (!user) {
-
-
-
-        return res.status(404).json({
-
-
-
-          message: "User not found",
-
-
-
-        });
-
-
-
-      }
-
-
-
-      user.avatar = {
-
-
-
-        data: req.file.buffer,
-
-
-
-        contentType: req.file.mimetype,
-
-
-
-        fileName: req.file.originalname,
-
-
-
-      };
-
-
-
-      await user.save();
-
-
-
-      return res.json({
-
-
-
-        user: safe(user),
-
-
-
-        avatarUrl:
-
-
-
-          `/api/users/${user._id}/avatar`,
-
-
-
-      });
-
-
-
-    } catch (error) {
-
-
-
-      console.error("Avatar upload error:", error);
-
-
-
-      return res.status(500).json({
-
-
-
-        message: "Unable to upload avatar",
-
-
-
-        error: error.message,
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | GET AVATAR
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 router.get("/:id/avatar", async (req, res) => {
 
+  try {
 
+    const user = await User.findById(
 
-  try {
+      req.params.id
 
+    ).select("avatar");
 
+    if (!user?.avatar?.data) {
 
-    const user = await User.findById(
+      return res.status(404).send(
 
+        "Avatar not found"
 
+      );
 
-      req.params.id
+    }
 
+    res.set(
 
+      "Content-Type",
 
-    ).select("avatar");
+      user.avatar.contentType ||
 
+        "image/jpeg"
 
+    );
 
-    if (!user?.avatar?.data) {
+    res.set(
 
+      "Cache-Control",
 
+      "public, max-age=3600"
 
-      return res.status(404).send(
+    );
 
+    return res.send(user.avatar.data);
 
+  } catch (error) {
 
-        "Avatar not found"
+    console.error("Get avatar error:", error);
 
+    return res.status(500).send(
 
+      "Unable to load avatar"
 
-      );
+    );
 
-
-
-    }
-
-
-
-    res.set(
-
-
-
-      "Content-Type",
-
-
-
-      user.avatar.contentType ||
-
-
-
-        "image/jpeg"
-
-
-
-    );
-
-
-
-    res.set(
-
-
-
-      "Cache-Control",
-
-
-
-      "public, max-age=3600"
-
-
-
-    );
-
-
-
-    return res.send(user.avatar.data);
-
-
-
-  } catch (error) {
-
-
-
-    console.error("Get avatar error:", error);
-
-
-
-    return res.status(500).send(
-
-
-
-      "Unable to load avatar"
-
-
-
-    );
-
-
-
-  }
-
-
+  }
 
 });
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | DELETE AVATAR
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 */
-
-
 
 router.delete(
 
+  "/me/avatar",
 
+  auth,
 
-  "/me/avatar",
+  async (req, res) => {
 
+    try {
 
+      const user = await User.findById(
 
-  auth,
+        req.user.id
 
+      );
 
+      if (!user) {
 
-  async (req, res) => {
+        return res.status(404).json({
 
+          message: "User not found",
 
+        });
 
-    try {
+      }
 
+      user.avatar = undefined;
 
+      await user.save();
 
-      const user = await User.findById(
+      return res.json({
 
+        user: safe(user),
 
+      });
 
-        req.user.id
+    } catch (error) {
 
+      console.error(
 
+        "Delete avatar error:",
 
-      );
+        error
 
+      );
 
+      return res.status(500).json({
 
-      if (!user) {
+        message: "Unable to delete avatar",
 
+        error: error.message,
 
+      });
 
-        return res.status(404).json({
+    }
 
-
-
-          message: "User not found",
-
-
-
-        });
-
-
-
-      }
-
-
-
-      user.avatar = undefined;
-
-
-
-      await user.save();
-
-
-
-      return res.json({
-
-
-
-        user: safe(user),
-
-
-
-      });
-
-
-
-    } catch (error) {
-
-
-
-      console.error(
-
-
-
-        "Delete avatar error:",
-
-
-
-        error
-
-
-
-      );
-
-
-
-      return res.status(500).json({
-
-
-
-        message: "Unable to delete avatar",
-
-
-
-        error: error.message,
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
 
-
-
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | SEARCH USERS
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 */
 
-
-
 router.get("/search", auth, async (req, res) => {
+
   try {
-    const q = String(req.query.q || "").trim().slice(0, 50);
+
+    const q = String(
+
+      req.query.q || ""
+
+    ).trim();
 
     if (!q) {
-      return res.status(200).json({ users: [] });
+
+      return res.json({
+
+        users: [],
+
+      });
+
     }
 
-    // Escape regex syntax so searches are treated as plain text.
-    const escapedQuery = q.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&");
-
     const users = await User.find({
-      _id: { $ne: req.user.id },
+
       $or: [
-        { username: { $regex: escapedQuery, $options: "i" } },
-        { name: { $regex: escapedQuery, $options: "i" } },
+
+        {
+
+          username: {
+
+            $regex: q,
+
+            $options: "i",
+
+          },
+
+        },
+
+        {
+
+          name: {
+
+            $regex: q,
+
+            $options: "i",
+
+          },
+
+        },
+
       ],
+
     })
-      .select("_id name username bio avatar.contentType isPrivate")
-      .limit(30)
-      .lean();
 
-    return res.status(200).json({ users });
-  } catch (error) {
-    console.error("Search users error:", error);
-    return res.status(500).json({
-      message: "Unable to search users",
+      .select(
+
+        "-password -avatar.data"
+
+      )
+
+      .limit(30);
+
+    return res.json({
+
+      users,
+
     });
+
+  } catch (error) {
+
+    console.error(
+
+      "Search users error:",
+
+      error
+
+    );
+
+    return res.status(500).json({
+
+      message: "Unable to search users",
+
+      error: error.message,
+
+    });
+
   }
+
 });
-
-
 
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | GET USER PROFILE
 
-
-
 |--------------------------------------------------------------------------
 
-
-
 |
-
-
 
 | Important fields returned:
 
-
-
 |
-
-
 
 | followStatus
 
-
-
 | canViewContent
-
-
 
 | canViewConnections
 
-
-
 | mutualFollow
-
-
 
 |
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 */
 
-
-
 router.get(
 
+  "/:id/profile",
 
+  auth,
 
-  "/:id/profile",
+  async (req, res) => {
 
+    try {
 
+      const user = await User.findById(
 
-  auth,
+        req.params.id
 
+      )
 
+        .select(
 
-  async (req, res) => {
+          "-password -avatar.data"
 
+        )
 
+        .lean();
 
-    try {
+      if (!user) {
 
+        return res.status(404).json({
 
+          message: "User not found",
 
-      const user = await User.findById(
+        });
 
+      }
 
+      const isSelf =
 
-        req.params.id
+        String(user._id) ===
 
+        String(req.user.id);
 
+      /*
 
-      )
+      |--------------------------------------------------------------------------
 
+      | Current user's relationship to profile owner
 
+      |--------------------------------------------------------------------------
 
-        .select(
+      */
 
+      const relationship = isSelf
 
+        ? null
 
-          "-password -avatar.data"
+        : await Follow.findOne({
 
+            follower: req.user.id,
 
+            following: user._id,
 
-        )
+          }).lean();
 
+      const followStatus = isSelf
 
+        ? "self"
 
-        .lean();
+        : relationship?.status ||
 
+          "none";
 
+      /*
 
-      if (!user) {
+      |--------------------------------------------------------------------------
 
+      | CONNECTION PRIVACY
 
+      |--------------------------------------------------------------------------
 
-        return res.status(404).json({
+      */
 
+      let canViewConnections =
 
+        isSelf || !user.isPrivate;
 
-          message: "User not found",
+      let mutualFollow = false;
 
+      /*
 
+      |--------------------------------------------------------------------------
 
-        });
+      | Private profile
 
+      |--------------------------------------------------------------------------
 
+      */
 
-      }
+      if (
 
+        !isSelf &&
 
+        user.isPrivate
 
-      const isSelf =
+      ) {
 
+        /*
 
+        |--------------------------------------------------------------------------
 
-        String(user._id) ===
+        | Viewer -> profile owner
 
+        |--------------------------------------------------------------------------
 
+        */
 
-        String(req.user.id);
+        const viewerFollowsOwner =
 
+          followStatus === "accepted";
 
+        /*
 
-      /*
+        |--------------------------------------------------------------------------
 
+        | Profile owner -> viewer
 
+        |--------------------------------------------------------------------------
 
-      |--------------------------------------------------------------------------
+        */
 
+        const ownerFollowsViewer =
 
+          await Follow.exists({
 
-      | Current user's relationship to profile owner
+            follower: user._id,
 
+            following: req.user.id,
 
+            status: "accepted",
 
-      |--------------------------------------------------------------------------
+          });
 
+        /*
 
+        |--------------------------------------------------------------------------
 
-      */
+        | Mutual accepted relationship
 
+        |--------------------------------------------------------------------------
 
+        */
 
-      const relationship = isSelf
+        mutualFollow =
 
+          viewerFollowsOwner &&
 
+          !!ownerFollowsViewer;
 
-        ? null
+        canViewConnections =
 
+          mutualFollow;
 
+      }
 
-        : await Follow.findOne({
+      /*
 
+      |--------------------------------------------------------------------------
 
+      | CONTENT PRIVACY
 
-            follower: req.user.id,
+      |--------------------------------------------------------------------------
 
+      |
 
+      | Private account content is available to:
 
-            following: user._id,
+      |
 
+      | - owner
 
+      | - accepted follower
 
-          }).lean();
+      |
 
+      |--------------------------------------------------------------------------
 
+      */
 
-      const followStatus = isSelf
+      const canViewContent =
 
+        isSelf ||
 
+        !user.isPrivate ||
 
-        ? "self"
+        followStatus === "accepted";
 
+      /*
 
+      |--------------------------------------------------------------------------
 
-        : relationship?.status ||
+      | Private account not accessible
 
+      |--------------------------------------------------------------------------
 
+      */
 
-          "none";
+      if (!canViewContent) {
 
+        return res.json({
 
+          user,
 
-      /*
+          followStatus,
 
+          canViewContent: false,
 
+          canViewConnections,
 
-      |--------------------------------------------------------------------------
+          mutualFollow,
 
+          posts: [],
 
+          reels: [],
 
-      | CONNECTION PRIVACY
+          tagged: [],
 
+        });
 
+      }
 
-      |--------------------------------------------------------------------------
+      /*
 
+      |--------------------------------------------------------------------------
 
+      | POSTS
 
-      */
+      |--------------------------------------------------------------------------
 
+      */
 
+      const posts =
 
-      let canViewConnections =
+        await Post.find({
 
+          author: user._id,
 
+          archived: false,
 
-        isSelf || !user.isPrivate;
+          deletedAt: null,
 
+        })
 
+          .populate(
 
-      let mutualFollow = false;
+            "author",
 
+            "name username isPrivate"
 
+          )
 
-      /*
+          .sort({
 
+            pinned: -1,
 
+            createdAt: -1,
 
-      |--------------------------------------------------------------------------
+          })
 
+          .limit(100)
 
+          .lean();
 
-      | Private profile
+      /*
 
+      |--------------------------------------------------------------------------
 
+      | REELS
 
-      |--------------------------------------------------------------------------
+      |--------------------------------------------------------------------------
 
+      */
 
+      const reels =
 
-      */
+        await Reel.find({
 
+          author: user._id,
 
+        })
 
-      if (
+          .populate(
 
+            "author",
 
+            "name username isPrivate"
 
-        !isSelf &&
+          )
 
+          .sort({
 
+            createdAt: -1,
 
-        user.isPrivate
+          })
 
+          .limit(100)
 
+          .lean();
 
-      ) {
+      /*
 
+      |--------------------------------------------------------------------------
 
+      | TAGGED POSTS
 
-        /*
+      |--------------------------------------------------------------------------
 
+      */
 
+      const tagged =
 
-        |--------------------------------------------------------------------------
+        await Post.find({
 
+          mentions: user._id,
 
+          archived: false,
 
-        | Viewer -> profile owner
+          deletedAt: null,
 
+        })
 
+          .populate(
 
-        |--------------------------------------------------------------------------
+            "author",
 
+            "name username isPrivate"
 
+          )
 
-        */
+          .sort({
 
+            createdAt: -1,
 
+          })
 
-        const viewerFollowsOwner =
+          .limit(100)
 
+          .lean();
 
+      /*
 
-          followStatus === "accepted";
+      |--------------------------------------------------------------------------
 
+      | RESPONSE
 
+      |--------------------------------------------------------------------------
 
-        /*
+      */
 
+      return res.json({
 
+        user,
 
-        |--------------------------------------------------------------------------
+        followStatus,
 
+        canViewContent: true,
 
+        canViewConnections,
 
-        | Profile owner -> viewer
+        mutualFollow,
 
+        posts:
 
+          posts.map(postView),
 
-        |--------------------------------------------------------------------------
+        reels:
 
+          reels.map(reelView),
 
+        tagged:
 
-        */
+          tagged.map(postView),
 
+      });
 
+    } catch (error) {
 
-        const ownerFollowsViewer =
+      console.error(
 
+        "Profile error:",
 
+        error
 
-          await Follow.exists({
+      );
 
+      return res.status(500).json({
 
+        message: "Unable to load profile",
 
-            follower: user._id,
+        error: error.message,
 
+      });
 
+    }
 
-            following: req.user.id,
-
-
-
-            status: "accepted",
-
-
-
-          });
-
-
-
-        /*
-
-
-
-        |--------------------------------------------------------------------------
-
-
-
-        | Mutual accepted relationship
-
-
-
-        |--------------------------------------------------------------------------
-
-
-
-        */
-
-
-
-        mutualFollow =
-
-
-
-          viewerFollowsOwner &&
-
-
-
-          !!ownerFollowsViewer;
-
-
-
-        canViewConnections =
-
-
-
-          mutualFollow;
-
-
-
-      }
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | CONTENT PRIVACY
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      |
-
-
-
-      | Private account content is available to:
-
-
-
-      |
-
-
-
-      | - owner
-
-
-
-      | - accepted follower
-
-
-
-      |
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      const canViewContent =
-
-
-
-        isSelf ||
-
-
-
-        !user.isPrivate ||
-
-
-
-        followStatus === "accepted";
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | Private account not accessible
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      if (!canViewContent) {
-
-
-
-        return res.json({
-
-
-
-          user,
-
-
-
-          followStatus,
-
-
-
-          canViewContent: false,
-
-
-
-          canViewConnections,
-
-
-
-          mutualFollow,
-
-
-
-          posts: [],
-
-
-
-          reels: [],
-
-
-
-          tagged: [],
-
-
-
-        });
-
-
-
-      }
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | POSTS
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      const posts =
-
-
-
-        await Post.find({
-
-
-
-          author: user._id,
-
-
-
-          archived: false,
-
-
-
-          deletedAt: null,
-
-
-
-        })
-
-
-
-          .populate(
-
-
-
-            "author",
-
-
-
-            "name username isPrivate"
-
-
-
-          )
-
-
-
-          .sort({
-
-
-
-            pinned: -1,
-
-
-
-            createdAt: -1,
-
-
-
-          })
-
-
-
-          .limit(100)
-
-
-
-          .lean();
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | REELS
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      const reels =
-
-
-
-        await Reel.find({
-
-
-
-          author: user._id,
-
-
-
-        })
-
-
-
-          .populate(
-
-
-
-            "author",
-
-
-
-            "name username isPrivate"
-
-
-
-          )
-
-
-
-          .sort({
-
-
-
-            createdAt: -1,
-
-
-
-          })
-
-
-
-          .limit(100)
-
-
-
-          .lean();
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | TAGGED POSTS
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      const tagged =
-
-
-
-        await Post.find({
-
-
-
-          mentions: user._id,
-
-
-
-          archived: false,
-
-
-
-          deletedAt: null,
-
-
-
-        })
-
-
-
-          .populate(
-
-
-
-            "author",
-
-
-
-            "name username isPrivate"
-
-
-
-          )
-
-
-
-          .sort({
-
-
-
-            createdAt: -1,
-
-
-
-          })
-
-
-
-          .limit(100)
-
-
-
-          .lean();
-
-
-
-      /*
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      | RESPONSE
-
-
-
-      |--------------------------------------------------------------------------
-
-
-
-      */
-
-
-
-      return res.json({
-
-
-
-        user,
-
-
-
-        followStatus,
-
-
-
-        canViewContent: true,
-
-
-
-        canViewConnections,
-
-
-
-        mutualFollow,
-
-
-
-        posts:
-
-
-
-          posts.map(postView),
-
-
-
-        reels:
-
-
-
-          reels.map(reelView),
-
-
-
-        tagged:
-
-
-
-          tagged.map(postView),
-
-
-
-      });
-
-
-
-    } catch (error) {
-
-
-
-      console.error(
-
-
-
-        "Profile error:",
-
-
-
-        error
-
-
-
-      );
-
-
-
-      return res.status(500).json({
-
-
-
-        message: "Unable to load profile",
-
-
-
-        error: error.message,
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
-
-
 
 /*
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 | GET USER BY ID
 
-
-
 |--------------------------------------------------------------------------
-
-
 
 */
 
-
-
 router.get(
 
+  "/:id",
 
+  auth,
 
-  "/:id",
+  async (req, res) => {
 
+    try {
 
+      const user =
 
-  auth,
+        await User.findById(
 
+          req.params.id
 
+        ).select(
 
-  async (req, res) => {
+          "-password -avatar.data"
 
+        );
 
+      if (!user) {
 
-    try {
+        return res.status(404).json({
 
+          message: "User not found",
 
+        });
 
-      const user =
+      }
 
+      const following =
 
+        await Follow.findOne({
 
-        await User.findById(
+          follower: req.user.id,
 
+          following: user._id,
 
+          status: "accepted",
 
-          req.params.id
+        });
 
+      return res.json({
 
+        user,
 
-        ).select(
+        following:
 
+          !!following,
 
+      });
 
-          "-password -avatar.data"
+    } catch (error) {
 
+      console.error(
 
+        "Get user error:",
 
-        );
+        error
 
+      );
 
+      return res.status(500).json({
 
-      if (!user) {
+        message: "Unable to load user",
 
+        error: error.message,
 
+      });
 
-        return res.status(404).json({
+    }
 
-
-
-          message: "User not found",
-
-
-
-        });
-
-
-
-      }
-
-
-
-      const following =
-
-
-
-        await Follow.findOne({
-
-
-
-          follower: req.user.id,
-
-
-
-          following: user._id,
-
-
-
-          status: "accepted",
-
-
-
-        });
-
-
-
-      return res.json({
-
-
-
-        user,
-
-
-
-        following:
-
-
-
-          !!following,
-
-
-
-      });
-
-
-
-    } catch (error) {
-
-
-
-      console.error(
-
-
-
-        "Get user error:",
-
-
-
-        error
-
-
-
-      );
-
-
-
-      return res.status(500).json({
-
-
-
-        message: "Unable to load user",
-
-
-
-        error: error.message,
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
-
-
 
 export default router;
