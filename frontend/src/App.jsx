@@ -705,7 +705,6 @@ function App() {
         <div className="sidebar-main-nav">
           <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-          <Nav icon={<Compass />} label="Explore" active={page === "explore"} onClick={() => navigate("explore")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
           <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
           <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
@@ -754,7 +753,6 @@ function App() {
             navigate("messages");
           } catch (e) { alert(e.message); }
         }} />}
-        {page === "explore" && <ExplorePage />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
@@ -3517,31 +3515,24 @@ function ReelViewer({ reel, onClose }) {
   );
 }
 
+const RECENT_PROFILE_SEARCHES_KEY = "reelsgo_recent_opened_profiles_v1";
+
+function readRecentProfiles() {
+  try {
+    const value = JSON.parse(localStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) || "[]");
+    return Array.isArray(value) ? value.filter(item => item && item._id) : [];
+  } catch { return []; }
+}
+
 function SearchPage({ onOpenProfile }) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [recentUsers, setRecentUsers] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_recent_search_profiles") || "[]"); }
-    catch { return []; }
-  });
-
-  function openSearchedProfile(user) {
-    if (!user?._id) return;
-    setRecentUsers(previous => {
-      const next = [user, ...previous.filter(item => String(item?._id) !== String(user._id))].slice(0, 12);
-      try { localStorage.setItem("reelsgo_recent_search_profiles", JSON.stringify(next)); } catch {}
-      return next;
-    });
-    onOpenProfile(user._id);
-  }
+  const [recent, setRecent] = useState(readRecentProfiles);
 
   async function search(v) {
     setQ(v);
-    if (!v.trim()) {
-      setUsers([]);
-      return;
-    }
+    if (!v.trim()) { setUsers([]); return; }
     setLoading(true);
     try {
       const d = await api(`/users/search?q=${encodeURIComponent(v.trim())}`);
@@ -3549,54 +3540,52 @@ function SearchPage({ onOpenProfile }) {
     } catch (e) {
       console.error(e);
       setUsers([]);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }
 
-  const visibleUsers = q.trim() ? users : recentUsers;
+  function openSearchedProfile(person) {
+    if (!person?._id) return;
+    // Only add a person after the user actually opens their profile, not just from search results.
+    const previous = readRecentProfiles();
+    const updated = [person, ...previous.filter(item => String(item._id) !== String(person._id))].slice(0, 20);
+    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not save recent profiles", e); }
+    setRecent(updated);
+    onOpenProfile(person._id);
+  }
+
+  function clearRecent() {
+    try { localStorage.removeItem(RECENT_PROFILE_SEARCHES_KEY); } catch {}
+    setRecent([]);
+  }
 
   return (
     <div className="page">
-      <div className="page-heading">
-        <div>
-          <h1>Search</h1>
-          <p>Find people on ReelsGo</p>
-        </div>
-      </div>
+      <div className="page-heading"><div><h1>Search</h1><p>Find people on ReelsGo</p></div></div>
       <div className="search-box">
         <Search />
         <input value={q} onChange={e => search(e.target.value)} placeholder="Search username or name" autoFocus />
         {q && <button className="icon-button" onClick={() => { setQ(""); setUsers([]); }} aria-label="Clear search"><X /></button>}
       </div>
 
-      {!q.trim() && recentUsers.length > 0 && (
-        <div className="recent-search-heading">
-          <h2>Recent searches</h2>
-          <button type="button" onClick={() => {
-            setRecentUsers([]);
-            try { localStorage.removeItem("reelsgo_recent_search_profiles"); } catch {}
-          }}>Clear all</button>
-        </div>
-      )}
       {loading && <div className="empty small-empty"><p>Searching...</p></div>}
-      {!loading && visibleUsers.length > 0 && (
-        <div className="user-list">
-          {visibleUsers.map(u => (
-            <button className="user-row" key={u._id} onClick={() => openSearchedProfile(u)} type="button">
-              <Avatar user={u} size={48} />
-              <div><b>@{u.username}</b><span>{u.name}</span></div>
-              <ChevronRight />
-            </button>
-          ))}
+      {!loading && q.trim() && users.length > 0 && (
+        <div className="user-list" aria-label="Search results">
+          {users.map(u => <button className="user-row" key={u._id} onClick={() => openSearchedProfile(u)} type="button">
+            <Avatar user={u} size={48} />
+            <div><b>@{u.username}</b><span>{u.name}</span></div><ChevronRight />
+          </button>)}
         </div>
       )}
-      {!loading && q.trim() && !users.length && (
-        <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>
-      )}
-      {!q.trim() && !recentUsers.length && (
-        <div className="empty small-empty"><User /><h2>Search for people</h2><p>Profiles you open from search will appear here next time, even after you close ReelsGo.</p></div>
-      )}
+      {!loading && q.trim() && !users.length && <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>}
+
+      {!q.trim() && <section className="recent-searches-section" aria-label="Recent profiles">
+        <div className="recent-searches-heading"><div><h2>Recent</h2><p>Profiles you opened recently</p></div>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
+        {recent.length > 0 ? <div className="user-list recent-searches-list">
+          {recent.map(person => <button className="user-row recent-profile-row" key={person._id} onClick={() => onOpenProfile(person._id)} type="button">
+            <Avatar user={person} size={48} /><div><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div><Clock3 aria-label="Recently opened" />
+          </button>)}
+        </div> : <div className="recent-searches-empty"><Clock3 /><h3>No recent profiles yet</h3><p>Search for someone and open their profile. It will appear here even after you close ReelsGo.</p></div>}
+      </section>}
     </div>
   );
 }
@@ -3773,9 +3762,6 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   );
 }
 
-function ExplorePage() {
-  return <div className="page"><div className="page-heading"><div><h1>Explore</h1><p>Discover photos, videos and creators</p></div></div><div className="explore-feature"><Compass /><h2>Explore</h2><p>Recommended content will appear here as your community grows.</p></div></div>;
-}
 
 function MessagesPage({ openConversationId = null }) {
   const me = getUser();

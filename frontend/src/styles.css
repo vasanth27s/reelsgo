@@ -11811,25 +11811,18 @@ div[style*="min-width: 170px"]{
 
 
 
-/* Search history: persistent in this browser after closing/reopening ReelsGo. */
-.recent-search-heading{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  margin:22px 2px 8px;color:var(--text)
-}
-.recent-search-heading h2{font-size:16px;font-weight:750}
-.recent-search-heading button{
-  background:transparent;color:var(--accent);font-size:13px;font-weight:700;padding:7px
-}
-
-/* Close Friends usernames stay readable on dark surfaces. */
-.rg-close-friends .rg-cf-person-info b,
-.rg-close-friends .close-friends-username{
-  color:#f8fafc !important;
-  font-weight:750;
-}
-.rg-close-friends .rg-cf-person-info span{
-  color:#aab2c0 !important;
-}
-.rg-close-friends .rg-cf-list-heading h3{color:#f8fafc !important}
-.rg-close-friends .rg-cf-list-heading span,
-.rg-close-friends .rg-cf-muted{color:#aab2c0 !important}
+/* Recent profile search history */
+.recent-searches-section{margin-top:25px;color:var(--text)}
+.recent-searches-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.recent-searches-heading h2{font-size:18px;font-weight:750;color:var(--text)}
+.recent-searches-heading p{font-size:12px;color:var(--muted);margin-top:4px}
+.recent-clear-button{background:transparent;color:var(--accent);font-size:13px;font-weight:700;padding:8px 10px;border-radius:9px}
+.recent-clear-button:hover{background:var(--soft)}
+.recent-searches-list .user-row{color:var(--text);text-align:left;cursor:pointer}
+.recent-searches-list .user-row b{color:var(--text);font-size:14px;font-weight:750}
+.recent-searches-list .user-row span{color:var(--muted);font-size:12px;margin-top:3px}
+.recent-searches-list .user-row>svg{width:17px;height:17px;color:var(--muted);flex:none}
+.recent-searches-empty{margin-top:12px;padding:25px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);text-align:center;color:var(--muted)}
+.recent-searches-empty>svg{width:25px;height:25px;margin:0 auto 9px}
+.recent-searches-empty h3{font-size:14px;color:var(--text);margin-bottom:5px}
+.recent-searches-empty p{font-size:12px;line-height:1.6;max-width:370px;margin:0 auto}
