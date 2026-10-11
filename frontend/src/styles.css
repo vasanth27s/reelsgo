@@ -11809,3 +11809,27 @@ div[style*="min-width: 170px"]{
 
 
 
+
+
+/* Search history: persistent in this browser after closing/reopening ReelsGo. */
+.recent-search-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin:22px 2px 8px;color:var(--text)
+}
+.recent-search-heading h2{font-size:16px;font-weight:750}
+.recent-search-heading button{
+  background:transparent;color:var(--accent);font-size:13px;font-weight:700;padding:7px
+}
+
+/* Close Friends usernames stay readable on dark surfaces. */
+.rg-close-friends .rg-cf-person-info b,
+.rg-close-friends .close-friends-username{
+  color:#f8fafc !important;
+  font-weight:750;
+}
+.rg-close-friends .rg-cf-person-info span{
+  color:#aab2c0 !important;
+}
+.rg-close-friends .rg-cf-list-heading h3{color:#f8fafc !important}
+.rg-close-friends .rg-cf-list-heading span,
+.rg-close-friends .rg-cf-muted{color:#aab2c0 !important}

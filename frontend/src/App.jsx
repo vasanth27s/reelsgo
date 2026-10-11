@@ -715,7 +715,6 @@ function App() {
 
         <div className="nav-bottom">
           <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
-          <Nav icon={<SlidersHorizontal />} label="ReelsGo Lab" active={page === "advanced"} onClick={() => navigate("advanced")} />
           <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
           <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
         </div>
@@ -739,7 +738,6 @@ function App() {
             </div>
             <button onClick={() => navigate("profile")}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
-            <button onClick={() => navigate("advanced")}><SlidersHorizontal /> ReelsGo Lab</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
           </div>
@@ -761,7 +759,6 @@ function App() {
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
-        {page === "advanced" && <ReelsGoAdvancedHub user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
@@ -3524,6 +3521,20 @@ function SearchPage({ onOpenProfile }) {
   const [q, setQ] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [recentUsers, setRecentUsers] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_recent_search_profiles") || "[]"); }
+    catch { return []; }
+  });
+
+  function openSearchedProfile(user) {
+    if (!user?._id) return;
+    setRecentUsers(previous => {
+      const next = [user, ...previous.filter(item => String(item?._id) !== String(user._id))].slice(0, 12);
+      try { localStorage.setItem("reelsgo_recent_search_profiles", JSON.stringify(next)); } catch {}
+      return next;
+    });
+    onOpenProfile(user._id);
+  }
 
   async function search(v) {
     setQ(v);
@@ -3543,6 +3554,8 @@ function SearchPage({ onOpenProfile }) {
     }
   }
 
+  const visibleUsers = q.trim() ? users : recentUsers;
+
   return (
     <div className="page">
       <div className="page-heading">
@@ -3551,62 +3564,38 @@ function SearchPage({ onOpenProfile }) {
           <p>Find people on ReelsGo</p>
         </div>
       </div>
-
       <div className="search-box">
         <Search />
-        <input
-          value={q}
-          onChange={e => search(e.target.value)}
-          placeholder="Search username or name"
-          autoFocus
-        />
-        {q && (
-          <button
-            className="icon-button"
-            onClick={() => { setQ(""); setUsers([]); }}
-            aria-label="Clear search"
-          >
-            <X />
-          </button>
-        )}
+        <input value={q} onChange={e => search(e.target.value)} placeholder="Search username or name" autoFocus />
+        {q && <button className="icon-button" onClick={() => { setQ(""); setUsers([]); }} aria-label="Clear search"><X /></button>}
       </div>
 
+      {!q.trim() && recentUsers.length > 0 && (
+        <div className="recent-search-heading">
+          <h2>Recent searches</h2>
+          <button type="button" onClick={() => {
+            setRecentUsers([]);
+            try { localStorage.removeItem("reelsgo_recent_search_profiles"); } catch {}
+          }}>Clear all</button>
+        </div>
+      )}
       {loading && <div className="empty small-empty"><p>Searching...</p></div>}
-
-      {!loading && users.length > 0 && (
+      {!loading && visibleUsers.length > 0 && (
         <div className="user-list">
-          {users.map(u => (
-            <button
-              className="user-row"
-              key={u._id}
-              onClick={() => onOpenProfile(u._id)}
-              type="button"
-            >
+          {visibleUsers.map(u => (
+            <button className="user-row" key={u._id} onClick={() => openSearchedProfile(u)} type="button">
               <Avatar user={u} size={48} />
-              <div>
-                <b>@{u.username}</b>
-                <span>{u.name}</span>
-              </div>
+              <div><b>@{u.username}</b><span>{u.name}</span></div>
               <ChevronRight />
             </button>
           ))}
         </div>
       )}
-
-      {!loading && q && !users.length && (
-        <div className="empty small-empty">
-          <Search />
-          <h2>No users found</h2>
-          <p>Try the exact username or another name.</p>
-        </div>
+      {!loading && q.trim() && !users.length && (
+        <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>
       )}
-
-      {!q && (
-        <div className="empty small-empty">
-          <User />
-          <h2>Search for people</h2>
-          <p>Tap a person from the results to open their profile.</p>
-        </div>
+      {!q.trim() && !recentUsers.length && (
+        <div className="empty small-empty"><User /><h2>Search for people</h2><p>Profiles you open from search will appear here next time, even after you close ReelsGo.</p></div>
       )}
     </div>
   );
