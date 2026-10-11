@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import reelsGoLogo from "../image.png";
-import "./ReelsGoLab.css";
+import "./styles.css";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
