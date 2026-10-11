@@ -12068,3 +12068,30 @@ div[style*="min-width: 170px"]{
   .mobile-conversation-action-sheet>button.mobile-action-delete svg{color:#ff5968}
 }
 @keyframes conversationSheetIn{from{transform:translateY(22px);opacity:.7}to{transform:translateY(0);opacity:1}}
+
+/* Instagram-inspired recent profiles in Search */
+.recent-searches-section { margin-top: 28px; max-width: 760px; }
+.recent-searches-heading { margin-bottom: 22px; }
+.recent-searches-heading h2 { font-size: 19px; font-weight: 750; }
+.recent-see-all-button { background: transparent; color: #7895ff; font-size: 14px; font-weight: 700; padding: 7px 0 7px 12px; }
+.recent-see-all-button:hover { color: #a5b6ff; }
+.recent-searches-list { gap: 4px; }
+.recent-profile-wrap { border: 0; background: transparent; border-radius: 12px; padding: 5px 2px 5px 0; gap: 10px; }
+.recent-profile-wrap:hover { background: #171a20; border-color: transparent; }
+.recent-profile-row.user-row { padding: 8px 0; gap: 13px; }
+.recent-profile-row .avatar { width: 58px; height: 58px; }
+.recent-profile-row b { font-size: 15px; font-weight: 700; }
+.recent-profile-row span { font-size: 13px; color: #9ca3af; }
+.recent-profile-text { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.recent-profile-options { display: flex; align-items: center; justify-content: center; }
+.recent-remove-button { display: grid; place-items: center; width: 38px; height: 38px; background: transparent; color: #a4aab4; border-radius: 50%; }
+.recent-remove-button:hover { background: #272b32; color: #f5f5f7; }
+.recent-remove-button svg { width: 22px; height: 22px; stroke-width: 1.8; }
+@media (max-width: 700px) {
+  .page:has(.recent-searches-section) .page-heading { display: none; }
+  .page:has(.recent-searches-section) .search-box { min-height: 52px; }
+  .recent-searches-section { margin-top: 26px; width: 100%; }
+  .recent-searches-heading { margin-bottom: 18px; }
+  .recent-profile-wrap { padding-right: 2px; }
+  .recent-profile-row .avatar { width: 58px; height: 58px; }
+}

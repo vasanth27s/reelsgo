@@ -3530,6 +3530,7 @@ function SearchPage({ onOpenProfile }) {
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState(readRecentProfiles);
   const [recentMenuId, setRecentMenuId] = useState(null);
+  const [recentExpanded, setRecentExpanded] = useState(false);
 
   async function search(v) {
     setQ(v);
@@ -3588,15 +3589,14 @@ function SearchPage({ onOpenProfile }) {
       {!loading && q.trim() && !users.length && <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>}
 
       {!q.trim() && <section className="recent-searches-section" aria-label="Recent profiles">
-        <div className="recent-searches-heading"><div><h2>Recent</h2><p>Profiles you opened recently</p></div>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
+        <div className="recent-searches-heading"><h2>Recent</h2>{recent.length > 0 && <button type="button" className="recent-see-all-button" onClick={() => setRecentExpanded(v => !v)}>{recentExpanded ? "See less" : "See all"}</button>}</div>
         {recent.length > 0 ? <div className="user-list recent-searches-list">
-          {recent.map(person => <div className="recent-profile-wrap" key={person._id}>
+          {(recentExpanded ? recent : recent.slice(0, 5)).map(person => <div className="recent-profile-wrap" key={person._id}>
             <button className="user-row recent-profile-row" onClick={() => openSearchedProfile(person)} type="button">
-              <Avatar user={person} size={48} /><div><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div>
+              <Avatar user={person} size={48} /><div className="recent-profile-text"><b>{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div>
             </button>
             <div className="recent-profile-options">
-              <button type="button" className="recent-more-button" aria-label={`Options for ${person.username || "profile"}`} aria-expanded={recentMenuId === String(person._id)} onClick={() => setRecentMenuId(id => id === String(person._id) ? null : String(person._id))}><MoreHorizontal /></button>
-              {recentMenuId === String(person._id) && <div className="recent-profile-menu"><button type="button" onClick={() => deleteRecentProfile(person._id)}><Trash2 size={15} />Remove from recent</button></div>}
+              <button type="button" className="recent-remove-button" aria-label={`Remove ${person.username || "profile"} from recent searches`} onClick={() => deleteRecentProfile(person._id)}><X /></button>
             </div>
           </div>)}
         </div> : <div className="recent-searches-empty"><Clock3 /><h3>No recent profiles yet</h3><p>Search for someone and open their profile. It will appear here even after you close ReelsGo.</p></div>}
