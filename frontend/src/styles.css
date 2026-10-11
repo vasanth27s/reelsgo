@@ -12042,3 +12042,27 @@ div[style*="min-width: 170px"]{
   .recent-searches-section { margin-top: 20px; }
   .recent-profile-wrap { border-radius: 13px; }
 }
+
+/* Mobile Instagram-style long-press conversation action sheet */
+.conversation-name-line{display:flex;align-items:center;gap:6px;min-width:0}
+.conversation-name-line .conversation-username{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conversation-pin-indicator,.conversation-mute-indicator{flex:0 0 auto;color:#9ca3af}
+.conversation-item.is-pinned{border-left:2px solid #a855f7}
+.mobile-conversation-action-overlay{display:none}
+@media(max-width:700px){
+  .conversation-item{-webkit-touch-callout:none;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+  .mobile-conversation-action-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.62);backdrop-filter:blur(2px)}
+  .mobile-conversation-action-sheet{width:100%;max-width:560px;padding:10px 14px calc(16px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;background:#242629;color:#f5f5f5;box-shadow:0 -12px 48px #0008;animation:conversationSheetIn .18s ease-out}
+  .mobile-action-sheet-handle{width:38px;height:4px;border-radius:99px;background:#666970;margin:0 auto 14px}
+  .mobile-action-sheet-user{display:flex;align-items:center;gap:11px;padding:5px 7px 15px;margin-bottom:5px;border-bottom:1px solid #3a3c40}
+  .mobile-action-sheet-user>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .mobile-action-sheet-user b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mobile-action-sheet-user span{font-size:12px;color:#a8abb2}
+  .mobile-conversation-action-sheet>button{width:100%;min-height:58px;padding:0 10px;display:flex;align-items:center;gap:18px;border-radius:10px;background:transparent;color:#f4f4f5;text-align:left;font-size:16px;font-weight:450}
+  .mobile-conversation-action-sheet>button:active{background:#36383d}
+  .mobile-conversation-action-sheet>button svg{width:25px;height:25px;stroke-width:1.8;flex:0 0 25px;color:#f4f4f5}
+  .mobile-conversation-action-sheet>button span{flex:1}
+  .mobile-conversation-action-sheet>button.mobile-action-delete{color:#ff5968}
+  .mobile-conversation-action-sheet>button.mobile-action-delete svg{color:#ff5968}
+}
+@keyframes conversationSheetIn{from{transform:translateY(22px);opacity:.7}to{transform:translateY(0);opacity:1}}

@@ -3591,7 +3591,7 @@ function SearchPage({ onOpenProfile }) {
         <div className="recent-searches-heading"><div><h2>Recent</h2><p>Profiles you opened recently</p></div>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
         {recent.length > 0 ? <div className="user-list recent-searches-list">
           {recent.map(person => <div className="recent-profile-wrap" key={person._id}>
-            <button className="user-row recent-profile-row" onClick={() => onOpenProfile(person._id)} type="button">
+            <button className="user-row recent-profile-row" onClick={() => openSearchedProfile(person)} type="button">
               <Avatar user={person} size={48} /><div><b>@{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div>
             </button>
             <div className="recent-profile-options">
@@ -3795,16 +3795,65 @@ function MessagesPage({ openConversationId = null }) {
   const [conversationMenuId, setConversationMenuId] = useState(null);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
   const [deletingConversationId, setDeletingConversationId] = useState(null);
+  const [mobileConversationActions, setMobileConversationActions] = useState(null);
+  const [pinnedConversationIds, setPinnedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_pinned_conversations") || "[]").map(String); } catch { return []; } });
+  const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
+  const longPressTimer = useRef(null);
+  const suppressConversationClick = useRef(false);
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState("Smileys");
   const emojiPickerRef = useRef(null);
 
+  useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
+
+  function cancelConversationLongPress() {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  }
+
+  function startConversationLongPress(conversation) {
+    cancelConversationLongPress();
+    suppressConversationClick.current = false;
+    longPressTimer.current = window.setTimeout(() => {
+      suppressConversationClick.current = true;
+      setConversationMenuId(String(conversation._id));
+      setMobileConversationActions(conversation);
+      if (navigator.vibrate) navigator.vibrate(25);
+    }, 500);
+  }
+
+  function runConversationAction(action, conversation) {
+    const id = String(conversation?._id || "");
+    if (!id) return;
+    if (action === "delete") {
+      setMobileConversationActions(null);
+      setConversationMenuId(id);
+      deleteConversation(conversation);
+      return;
+    }
+    if (action === "unread") {
+      setConversations(prev => prev.map(c => String(c._id) === id ? { ...c, unreadCount: Math.max(1, Number(c.unreadCount || 0)) } : c));
+      if (String(active?._id) === id) setActive(prev => prev ? { ...prev, unreadCount: 1 } : prev);
+    } else if (action === "pin") {
+      setPinnedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev]);
+    } else if (action === "mute") {
+      setMutedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    }
+    setMobileConversationActions(null);
+    setConversationMenuId(null);
+  }
+
   async function loadConversations(selectId = null) {
     try {
       const d = await api('/messages/conversations');
-      const rows = d.conversations || [];
+      const serverRows = d.conversations || [];
+      // Keep locally deleted conversations hidden when the backend has no DELETE route.
+      let hiddenIds = [];
+      try { hiddenIds = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]"); } catch {}
+      const rows = serverRows.filter(c => !hiddenIds.includes(String(c._id)));
       setConversations(rows);
       if (selectId) {
         const c = rows.find(x => String(x._id) === String(selectId));
@@ -3821,15 +3870,27 @@ function MessagesPage({ openConversationId = null }) {
     const confirmed = window.confirm(`Delete conversation with ${person?.username ? `@${person.username}` : person?.name || "this person"}? It will be removed from your inbox.`);
     if (!confirmed) { setConversationMenuId(null); setConversationMenuOpen(false); return; }
     setDeletingConversationId(id);
-    try {
-      await api(`/messages/conversations/${id}`, { method: 'DELETE' });
+    // Hide immediately so the interface works even if the deployed backend
+    // does not implement DELETE /messages/conversations/:id.
+    const hideLocally = () => {
+      try {
+        const existing = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]");
+        localStorage.setItem("reelsgo_hidden_conversations", JSON.stringify([...new Set([...existing.map(String), id])]));
+      } catch {}
       setConversations(prev => prev.filter(c => String(c._id) !== id));
       if (String(active?._id) === id) {
         setActive(null); setMessages([]); setMobileChat(false);
       }
       setConversationMenuId(null); setConversationMenuOpen(false);
+    };
+    try {
+      await api(`/messages/conversations/${id}`, { method: 'DELETE' });
+      hideLocally();
     } catch (e) {
-      window.alert(e?.message || "Could not delete this conversation. Please try again.");
+      // A missing backend endpoint should not break the UI or show "API not found".
+      // The conversation is hidden on this device; server-side deletion needs backend support.
+      hideLocally();
+      console.warn("Conversation hidden locally because server deletion is unavailable:", e?.message);
     } finally { setDeletingConversationId(null); }
   }
 
@@ -4143,7 +4204,7 @@ function MessagesPage({ openConversationId = null }) {
     if (!q) return true;
     const u = other(c);
     return String(u?.username || '').toLowerCase().includes(q) || String(u?.name || '').toLowerCase().includes(q);
-  });
+  }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))));
 
   return (
     <div className={`page messages-page ${mobileChat && active ? "is-mobile-chat" : ""}`}>
@@ -4244,20 +4305,30 @@ function MessagesPage({ openConversationId = null }) {
               const u = other(c); const selected = String(active?._id) === String(c._id);
               const unread = Number(c.unreadCount || 0) > 0;
               return <div className={`conversation-item-shell ${selected ? 'active' : ''}`} key={c._id}>
-                <button className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''}`} onClick={() => openConversation(c)} type="button">
+                <button
+                  className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''} ${pinnedConversationIds.includes(String(c._id)) ? 'is-pinned' : ''}`}
+                  onClick={() => { if (suppressConversationClick.current) { suppressConversationClick.current = false; return; } openConversation(c); }}
+                  onTouchStart={() => startConversationLongPress(c)}
+                  onTouchEnd={cancelConversationLongPress}
+                  onTouchMove={cancelConversationLongPress}
+                  onTouchCancel={cancelConversationLongPress}
+                  onContextMenu={e => { e.preventDefault(); setConversationMenuId(String(c._id)); setMobileConversationActions(c); }}
+                  onMouseDown={e => { if (e.pointerType !== 'touch') return; startConversationLongPress(c); }}
+                  onMouseUp={cancelConversationLongPress}
+                  type="button">
                   <div className="conversation-avatar-wrap">
                     <Avatar user={u} size={58} />
                     {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
                   </div>
                   <div className="conversation-copy">
-                    <UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />
+                    <div className="conversation-name-line"><UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
                     <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
                 </button>
                 <div className="conversation-options-wrap">
                   <button type="button" className="conversation-options-button" aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`} onClick={() => { setConversationMenuId(v => v === String(c._id) ? null : String(c._id)); setConversationMenuOpen(false); }}><MoreHorizontal size={19} /></button>
-                  {conversationMenuId === String(c._id) && <div className="conversation-options-menu"><button type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={15}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
+                  {conversationMenuId === String(c._id) && !mobileConversationActions && <div className="conversation-options-menu"><button type="button" onClick={() => runConversationAction('unread', c)}><Mail size={17}/>Mark as unread</button><button type="button" onClick={() => runConversationAction('pin', c)}><PinOff size={17}/>{pinnedConversationIds.includes(String(c._id)) ? 'Unpin' : 'Pin'}</button><button type="button" onClick={() => runConversationAction('mute', c)}><Bell size={17}/>{mutedConversationIds.includes(String(c._id)) ? 'Unmute' : 'Mute'}</button><button className="conversation-delete-action" type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={17}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete'}</button></div>}
                 </div>
               </div>;
             })}
@@ -4362,6 +4433,18 @@ function MessagesPage({ openConversationId = null }) {
           </>}
         </div>
       </div>
+      {mobileConversationActions && (
+        <div className="mobile-conversation-action-overlay" role="presentation" onClick={() => { setMobileConversationActions(null); setConversationMenuId(null); }}>
+          <section className="mobile-conversation-action-sheet" role="dialog" aria-modal="true" aria-label="Conversation actions" onClick={e => e.stopPropagation()}>
+            <div className="mobile-action-sheet-handle" />
+            <div className="mobile-action-sheet-user"><Avatar user={other(mobileConversationActions)} size={42} /><div><b>{other(mobileConversationActions)?.username ? `@${other(mobileConversationActions).username}` : other(mobileConversationActions)?.name || 'Conversation'}</b><span>Conversation options</span></div></div>
+            <button type="button" onClick={() => runConversationAction('unread', mobileConversationActions)}><Mail size={22}/><span>Mark as unread</span></button>
+            <button type="button" onClick={() => runConversationAction('pin', mobileConversationActions)}><PinOff size={22}/><span>{pinnedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unpin' : 'Pin'}</span></button>
+            <button type="button" onClick={() => runConversationAction('mute', mobileConversationActions)}><Bell size={22}/><span>{mutedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unmute' : 'Mute'}</span></button>
+            <button type="button" className="mobile-action-delete" onClick={() => runConversationAction('delete', mobileConversationActions)}><Trash2 size={22}/><span>Delete</span></button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
