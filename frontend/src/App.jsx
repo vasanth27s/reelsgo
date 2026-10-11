@@ -3530,7 +3530,6 @@ function SearchPage({ onOpenProfile }) {
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState(readRecentProfiles);
   const [recentMenuId, setRecentMenuId] = useState(null);
-  const [recentMenuId, setRecentMenuId] = useState(null);
 
   async function search(v) {
     setQ(v);
