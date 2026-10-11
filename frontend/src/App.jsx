@@ -378,6 +378,248 @@ function ReelsGoLogo({ className = "" }) {
 }
 
 
+/* =========================================================
+   REELSGO ADVANCED HUB
+   Working MVP controls stored locally in this browser.
+   Server-dependent AI, payments and analytics are clearly
+   presented as integrations to connect before production.
+   ========================================================= */
+function ReelsGoAdvancedHub({ user }) {
+  const tabs = [
+    { id: "control", label: "My Feed, My Rules", icon: SlidersHorizontal },
+    { id: "creator", label: "Creator Super Studio", icon: Film },
+    { id: "privacy", label: "Privacy per post", icon: Lock },
+    { id: "community", label: "Communities", icon: Users },
+    { id: "wellbeing", label: "Smart Scroll & Focus", icon: Clock3 },
+    { id: "editor", label: "Advanced Reels Editor", icon: Camera },
+    { id: "earn", label: "Creator Earnings", icon: Handshake },
+    { id: "trust", label: "Trust & Scam Protection", icon: Shield },
+    { id: "collab", label: "Collaborative Content", icon: UserPlus },
+    { id: "library", label: "Smart Save Library", icon: Bookmark },
+    { id: "local", label: "Local Discovery & Events", icon: Compass }
+  ];
+  const [tab, setTab] = useState("control");
+  const [prefs, setPrefs] = useState(() => {
+    try { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false, ...JSON.parse(localStorage.getItem("reelsgo_advanced_prefs") || "{}") }; }
+    catch { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false }; }
+  });
+  const [library, setLibrary] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_smart_library") || "[]"); } catch { return []; }
+  });
+  const [drafts, setDrafts] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_creator_drafts") || "[]"); } catch { return []; }
+  });
+  const [communities, setCommunities] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_communities") || "[]"); } catch { return []; }
+  });
+  const [joined, setJoined] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_joined_communities") || "[]"); } catch { return []; }
+  });
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftDate, setDraftDate] = useState("");
+  const [saveTitle, setSaveTitle] = useState("");
+  const [saveUrl, setSaveUrl] = useState("");
+  const [focusActive, setFocusActive] = useState(false);
+  const [focusSeconds, setFocusSeconds] = useState(0);
+  const [notice, setNotice] = useState("");
+  const [privacyAudience, setPrivacyAudience] = useState("Everyone");
+  const [privacyComments, setPrivacyComments] = useState("Everyone");
+  const [privacyDownloads, setPrivacyDownloads] = useState(false);
+  const [privacyRemix, setPrivacyRemix] = useState(true);
+  const [collabTitle, setCollabTitle] = useState("");
+  const [collabUsername, setCollabUsername] = useState("");
+  const [collabItems, setCollabItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_collaboration_invites") || "[]"); } catch { return []; }
+  });
+  const [editorFile, setEditorFile] = useState(null);
+  const [editorCaption, setEditorCaption] = useState("");
+  const [editorMuted, setEditorMuted] = useState(false);
+  const [editorAutoCaptions, setEditorAutoCaptions] = useState(true);
+  const [localArea, setLocalArea] = useState("");
+  const [localEventTitle, setLocalEventTitle] = useState("");
+  const [localEvents, setLocalEvents] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_local_event_drafts") || "[]"); } catch { return []; }
+  });
+
+  useEffect(() => { localStorage.setItem("reelsgo_advanced_prefs", JSON.stringify(prefs)); }, [prefs]);
+  useEffect(() => { localStorage.setItem("reelsgo_smart_library", JSON.stringify(library)); }, [library]);
+  useEffect(() => { localStorage.setItem("reelsgo_creator_drafts", JSON.stringify(drafts)); }, [drafts]);
+  useEffect(() => { localStorage.setItem("reelsgo_communities", JSON.stringify(communities)); }, [communities]);
+  useEffect(() => { localStorage.setItem("reelsgo_joined_communities", JSON.stringify(joined)); }, [joined]);
+  useEffect(() => {
+    if (!focusActive) return;
+    const id = window.setInterval(() => setFocusSeconds(v => v + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [focusActive]);
+
+  function flash(message) {
+    setNotice(message);
+    window.setTimeout(() => setNotice(""), 2800);
+  }
+  function addLibraryItem(e) {
+    e.preventDefault();
+    if (!saveTitle.trim()) return;
+    setLibrary(items => [{ id: `${Date.now()}`, title: saveTitle.trim(), url: saveUrl.trim(), note: "", createdAt: new Date().toISOString() }, ...items]);
+    setSaveTitle(""); setSaveUrl("");
+    flash("Added to your Smart Save Library.");
+  }
+  function addDraft(e) {
+    e.preventDefault();
+    if (!draftTitle.trim()) return;
+    setDrafts(items => [{ id: `${Date.now()}`, title: draftTitle.trim(), date: draftDate, status: draftDate ? "Scheduled locally" : "Draft", createdAt: new Date().toISOString() }, ...items]);
+    setDraftTitle(""); setDraftDate("");
+    flash("Creator item saved on this device.");
+  }
+  function createCommunity(name) {
+    const clean = name.trim();
+    if (!clean) return;
+    setCommunities(items => [...items, { id: `${Date.now()}`, name: clean, members: 1, description: "A new community started by you" }]);
+    flash("Community created locally.");
+  }
+
+
+  const Toggle = ({ label, detail, checked, onChange }) => (
+    <label className="rg-toggle-row">
+      <span><b>{label}</b><small>{detail}</small></span>
+      <input type="checkbox" checked={Boolean(checked)} onChange={e => onChange(e.target.checked)} />
+    </label>
+  );
+  const panelTitle = tabs.find(t => t.id === tab)?.label || "ReelsGo Lab";
+
+  return (
+    <div className="page rg-hub-page">
+      <div className="rg-hub-hero">
+        <div className="rg-hub-kicker"><Shield size={16} /> REELSGO LAB</div>
+        <h1>Make social media work for you.</h1>
+        <p>Personal controls, creator tools, communities and wellbeing in one place.</p>
+        <div className="rg-hub-chips"><span>Personalized</span><span>Creator-first</span><span>Privacy-aware</span></div>
+      </div>
+      {notice && <div className="rg-hub-notice" role="status">{notice}</div>}
+      <div className="rg-hub-layout">
+        <nav className="rg-hub-tabs" aria-label="ReelsGo advanced features">
+          {tabs.map(item => {
+            const Icon = item.icon;
+            return <button type="button" key={item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}><Icon size={18}/><span>{item.label}</span><ChevronRight size={16}/></button>;
+          })}
+        </nav>
+        <section className="rg-hub-panel">
+          <div className="rg-hub-panel-heading"><div><span>REELSGO TOOLS</span><h2>{panelTitle}</h2></div><span className="rg-hub-local-tag">MVP</span></div>
+
+          {tab === "control" && <>
+            <p className="rg-hub-intro">Choose the feed experience you want. These preferences are saved on this device; connect them to your backend feed query to apply them across devices.</p>
+            <label className="rg-field-label">Default feed</label>
+            <div className="rg-choice-grid">{["For you","Following","Close friends","Learning","Local","Reels only"].map(v => <button type="button" key={v} className={prefs.feed === v ? "selected" : ""} onClick={() => setPrefs(p => ({...p, feed:v}))}>{v}</button>)}</div>
+            <Toggle label="Chronological mode" detail="Prefer newest posts first when the backend supports it." checked={prefs.chronological} onChange={v => setPrefs(p=>({...p,chronological:v}))}/>
+            <Toggle label="Autoplay videos" detail="Turn automatic video playback on or off." checked={prefs.autoplay} onChange={v=>setPrefs(p=>({...p,autoplay:v}))}/>
+            <Toggle label="Suggested posts" detail="Choose whether to include recommendations." checked={prefs.suggestions} onChange={v=>setPrefs(p=>({...p,suggestions:v}))}/>
+            <Toggle label="Sponsored content" detail="Hide platform-controlled promotions where available." checked={prefs.sponsored} onChange={v=>setPrefs(p=>({...p,sponsored:v}))}/>
+            <div className="rg-hub-callout"><Shield size={20}/><span><b>Privacy by design</b><small>Audience controls should be enforced by the server, not just hidden in the interface.</small></span></div>
+          </>}
+
+          {tab === "library" && <>
+            <p className="rg-hub-intro">Keep links, tutorials and ideas together. These entries are stored in this browser, not synced to other devices yet.</p>
+            <form className="rg-hub-form" onSubmit={addLibraryItem}><label className="rg-field-label">Title</label><input value={saveTitle} onChange={e=>setSaveTitle(e.target.value)} placeholder="e.g. React interview preparation" required/><label className="rg-field-label">Link (optional)</label><input type="url" value={saveUrl} onChange={e=>setSaveUrl(e.target.value)} placeholder="https://..."/><button className="primary" type="submit"><Bookmark size={16}/> Save item</button></form>
+            <div className="rg-hub-list">{library.length ? library.map(item=><article className="rg-hub-list-item" key={item.id}><div><b>{item.title}</b>{item.url && <a href={item.url} target="_blank" rel="noreferrer">{item.url}</a>}<small>Saved {new Date(item.createdAt).toLocaleDateString()}</small></div><button type="button" className="rg-danger-text" onClick={()=>setLibrary(items=>items.filter(x=>x.id!==item.id))}>Remove</button></article>) : <div className="rg-hub-empty"><Bookmark/><b>Your library is ready</b><span>Add your first link or learning resource above.</span></div>}</div>
+          </>}
+
+          {tab === "creator" && <>
+            <p className="rg-hub-intro">Plan content, keep a publishing calendar and review the creator dashboard. The figures below are demo placeholders until real post/view events are recorded by your backend.</p>
+            <form className="rg-hub-form" onSubmit={addDraft}><label className="rg-field-label">Content title</label><input value={draftTitle} onChange={e=>setDraftTitle(e.target.value)} placeholder="e.g. 5 JavaScript interview tips" required/><label className="rg-field-label">Planned date (optional)</label><input type="datetime-local" value={draftDate} onChange={e=>setDraftDate(e.target.value)}/><button className="primary" type="submit"><PlusSquare size={16}/> Save draft plan</button></form>
+            <div className="rg-hub-stat-grid"><div><b>{drafts.length}</b><span>Planned items</span></div><div><b>{drafts.filter(d=>d.status==="Draft").length}</b><span>Unscheduled drafts</span></div><div><b>Not connected</b><span>Live analytics</span></div></div>
+            <div className="rg-trust-grid"><article><Film/><b>Watch time</b><p>Connect playback events to calculate average watch time and retention.</p></article><article><Users/><b>Audience growth</b><p>Track follower changes, reach and engagement from real data.</p></article><article><Clock3/><b>Best posting time</b><p>Recommend times only after enough historical engagement data exists.</p></article><article><CalendarDaysFallback/><b>Content calendar</b><p>Your planned items are listed below; automated publishing needs a scheduler.</p></article></div>
+            <div className="rg-hub-list">{drafts.length ? drafts.map(d=><article className="rg-hub-list-item" key={d.id}><div><b>{d.title}</b><small>{d.date ? new Date(d.date).toLocaleString() : "No date set"} · {d.status}</small></div><button type="button" className="rg-danger-text" onClick={()=>setDrafts(items=>items.filter(x=>x.id!==d.id))}>Delete</button></article>) : <div className="rg-hub-empty"><Film/><b>Your creator planner is empty</b><span>Add a draft idea to start planning.</span></div>}</div>
+            <div className="rg-hub-callout"><AlertTriangle size={20}/><span><b>Analytics integration needed</b><small>Watch time, retention and audience metrics must come from real post and view events in your backend.</small></span></div>
+          </>}
+
+          {tab === "privacy" && <>
+            <p className="rg-hub-intro">Choose defaults for the audience and interaction settings used when you create content. These are saved as local preferences; enforce each audience on the server before production.</p>
+            <label className="rg-field-label">Default audience for new posts</label>
+            <select value={privacyAudience} onChange={e=>setPrivacyAudience(e.target.value)}>
+              <option>Everyone</option><option>Followers</option><option>Close friends</option><option>Selected people</option><option>Only me</option>
+            </select>
+            <label className="rg-field-label">Who can comment?</label>
+            <select value={privacyComments} onChange={e=>setPrivacyComments(e.target.value)}>
+              <option>Everyone</option><option>People I follow</option><option>Followers</option><option>Off</option>
+            </select>
+            <Toggle label="Allow downloads" detail="Default preference for your own uploaded content." checked={privacyDownloads} onChange={setPrivacyDownloads}/>
+            <Toggle label="Allow remixes and collaborations" detail="Let others request to remix content when supported." checked={privacyRemix} onChange={setPrivacyRemix}/>
+            <div className="rg-hub-callout"><Lock size={20}/><span><b>Per-post audience controls</b><small>Choose the audience on every post too. The server must check audience permissions for feeds, direct links, downloads and APIs.</small></span></div>
+            <button className="primary" type="button" onClick={()=>{try{localStorage.setItem("reelsgo_privacy_defaults",JSON.stringify({privacyAudience,privacyComments,privacyDownloads,privacyRemix}));flash("Privacy defaults saved on this device.");}catch{flash("Could not save privacy settings.");}}}>Save privacy defaults</button>
+          </>}
+
+          {tab === "editor" && <>
+            <p className="rg-hub-intro">A starter editing workspace for selecting a local video, adding a caption and setting editing preferences. Multi-track editing, background removal, beat sync and rendered exports need a dedicated video-processing implementation.</p>
+            <label className="rg-field-label">Choose a video file</label>
+            <input type="file" accept="video/*" onChange={e=>{const f=e.target.files?.[0]; if(f) setEditorFile({name:f.name,size:f.size,url:URL.createObjectURL(f)});}}/>
+            {editorFile && <div className="rg-editor-preview"><video src={editorFile.url} controls playsInline/><div><b>{editorFile.name}</b><small>{(editorFile.size/1024/1024).toFixed(1)} MB · Preview on this device</small></div></div>}
+            <label className="rg-field-label">Caption / hook</label>
+            <textarea className="rg-ai-text" value={editorCaption} onChange={e=>setEditorCaption(e.target.value)} placeholder="Write a hook or caption for your reel..."/>
+            <Toggle label="Prepare auto-caption workflow" detail="Preference only; speech-to-text must be connected to generate subtitles." checked={editorAutoCaptions} onChange={setEditorAutoCaptions}/>
+            <Toggle label="Mute original audio" detail="Saved editing preference; an export pipeline is needed to apply it to a file." checked={editorMuted} onChange={setEditorMuted}/>
+            <div className="rg-choice-grid"><button type="button" onClick={()=>{navigator.clipboard?.writeText(editorCaption);flash("Caption copied when clipboard access is available.");}}>Copy caption</button><button type="button" onClick={()=>flash("Draft settings saved in this editing session.")}>Save edit settings</button></div>
+            <div className="rg-hub-callout"><Film size={20}/><span><b>Next editor integrations</b><small>Timeline tracks, trimming, transitions, audio mixing, subtitles, background removal and MP4 export.</small></span></div>
+          </>}
+
+          {tab === "collab" && <>
+            <p className="rg-hub-intro">Prepare collaboration invitations and ideas. Invitations created here are local drafts only; real invitations must be delivered and accepted through the backend.</p>
+            <form className="rg-hub-form" onSubmit={e=>{e.preventDefault();if(!collabTitle.trim()||!collabUsername.trim())return;setCollabItems(items=>[{id:String(Date.now()),title:collabTitle.trim(),username:collabUsername.trim().replace(/^@/,""),status:"Draft invitation",createdAt:new Date().toISOString()},...items]);setCollabTitle("");setCollabUsername("");flash("Collaboration invitation draft saved.");}}>
+              <label className="rg-field-label">Post or reel idea</label><input value={collabTitle} onChange={e=>setCollabTitle(e.target.value)} placeholder="e.g. React tips collaboration" required/>
+              <label className="rg-field-label">Creator username</label><input value={collabUsername} onChange={e=>setCollabUsername(e.target.value)} placeholder="@creatorname" required/>
+              <button className="primary" type="submit"><UserPlus size={16}/> Create collaboration draft</button>
+            </form>
+            <div className="rg-hub-list">{collabItems.length?collabItems.map(item=><article className="rg-hub-list-item" key={item.id}><div><b>{item.title}</b><small>Invite @{item.username} · {item.status}</small></div><button className="rg-danger-text" type="button" onClick={()=>setCollabItems(items=>items.filter(x=>x.id!==item.id))}>Remove</button></article>):<div className="rg-hub-empty"><UserPlus/><b>No collaboration drafts yet</b><span>Invite a co-author or plan a remix idea.</span></div>}</div>
+            <div className="rg-hub-callout"><Users size={20}/><span><b>Collaboration permissions</b><small>Production support needs accepted invites, co-author attribution, consent, removal rules and ownership checks.</small></span></div>
+          </>}
+
+          {tab === "community" && <>
+            <p className="rg-hub-intro">Start interest groups and join local demo communities. For a multi-user community, membership and permissions must be saved on the server.</p>
+            <form className="rg-hub-form rg-inline-form" onSubmit={e=>{e.preventDefault();createCommunity(e.currentTarget.elements.communityName.value);e.currentTarget.reset();}}><input name="communityName" placeholder="Community name, e.g. MERN Developers" required/><button className="primary" type="submit">Create</button></form>
+            <div className="rg-hub-community-grid">{[{id:"learn",name:"Learn & Build",description:"Share skills, projects and learning resources."},{id:"creators",name:"Creator Circle",description:"Feedback, collaboration and creator tips."},{id:"local",name:"Local Connect",description:"Meet people around shared interests."},...communities].map(c=><article className="rg-community-card" key={c.id}><div className="rg-community-avatar"><Users/></div><h3>{c.name}</h3><p>{c.description}</p><button className={joined.includes(c.id)?"secondary":"primary"} type="button" onClick={()=>setJoined(j=>j.includes(c.id)?j.filter(x=>x!==c.id):[...j,c.id])}>{joined.includes(c.id)?"Joined":"Join community"}</button></article>)}</div>
+          </>}
+
+          {tab === "wellbeing" && <>
+            <p className="rg-hub-intro">Set boundaries and use ReelsGo intentionally. The timer works while this page stays open.</p>
+            <div className="rg-focus-card"><span>YOUR FOCUS SESSION</span><strong>{String(Math.floor(focusSeconds/60)).padStart(2,"0")}:{String(focusSeconds%60).padStart(2,"0")}</strong><p>{focusActive?"Focus session is running.":"Ready when you are."}</p><div><button className="primary" onClick={()=>setFocusActive(v=>!v)}>{focusActive?"Pause session":"Start focus session"}</button><button className="secondary" onClick={()=>{setFocusActive(false);setFocusSeconds(0)}}>Reset</button></div></div>
+            <label className="rg-field-label">Daily reminder target</label><select value={prefs.sessionLimit} onChange={e=>setPrefs(p=>({...p,sessionLimit:Number(e.target.value)}))}><option value={10}>10 minutes</option><option value={20}>20 minutes</option><option value={30}>30 minutes</option><option value={45}>45 minutes</option><option value={60}>60 minutes</option></select>
+            <Toggle label="Bedtime quiet mode" detail="Preference saved locally; notification suppression must be connected separately." checked={prefs.bedtime} onChange={v=>setPrefs(p=>({...p,bedtime:v}))}/>
+            <div className="rg-hub-callout"><Clock3 size={20}/><span><b>Take a break</b><small>Use a session target that feels helpful, not stressful.</small></span></div>
+          </>}
+
+                    {tab === "trust" && <>
+            <p className="rg-hub-intro">A central place to review safety practices. These are quick links and recommendations; automated detection needs backend services.</p>
+            <div className="rg-trust-grid"><article><Shield/><b>Account security</b><p>Use strong passwords, protect tokens, and review active sessions.</p></article><article><Flag/><b>Report harmful content</b><p>Use the report option on posts and profiles; add status tracking server-side.</p></article><article><Ban/><b>Block and restrict</b><p>Keep blocked users from messaging or interacting through server-enforced rules.</p></article><article><BadgeCheck/><b>Clear verification labels</b><p>A custom badge without ownership checks is not identity verification.</p></article></div>
+            <button className="secondary" type="button" onClick={()=>flash("Safety checklist reviewed.")}>Mark checklist reviewed</button>
+          </>}
+
+          {tab === "earn" && <>
+            <p className="rg-hub-intro">Creator earnings dashboard preview. No payments are processed by this demo panel.</p>
+            <div className="rg-hub-stat-grid"><div><b>₹0</b><span>Available balance</span></div><div><b>0</b><span>Supporters</span></div><div><b>Not connected</b><span>Payments</span></div></div>
+            <div className="rg-trust-grid"><article><Heart/><b>Tips and gifts</b><p>Allow eligible viewers to support creators.</p></article><article><Users/><b>Memberships</b><p>Offer optional subscriber-only content.</p></article><article><LinkIcon/><b>Affiliate links</b><p>Disclose paid partnerships and track eligible referrals.</p></article><article><Handshake/><b>Brand collaborations</b><p>Let brands contact opted-in creators.</p></article></div>
+            <div className="rg-hub-callout"><AlertTriangle size={20}/><span><b>Before launch</b><small>Connect a compliant payment provider, creator eligibility checks, refunds, fraud monitoring and payout records.</small></span></div>
+          </>}
+
+          {tab === "local" && <>
+            <p className="rg-hub-intro">Discover public events and creators by a city or area you choose. ReelsGo does not request precise device location for this feature.</p>
+            <label className="rg-field-label">Choose a city or area</label><input value={localArea} onChange={e=>setLocalArea(e.target.value)} placeholder="e.g. Bengaluru, Tirupati, Hyderabad"/>
+            <div className="rg-trust-grid"><article><Compass/><b>Local creators</b><p>Directory of public profiles filtered by a selected area.</p></article><article><CalendarDaysFallback/><b>Events and meetups</b><p>Draft public events and later add RSVP and organizer tools.</p></article></div>
+            <form className="rg-hub-form" onSubmit={e=>{e.preventDefault();if(!localEventTitle.trim())return;setLocalEvents(items=>[{id:String(Date.now()),title:localEventTitle.trim(),area:localArea.trim()||"Area not set",createdAt:new Date().toISOString()},...items]);setLocalEventTitle("");flash("Local event draft saved on this device.");}}>
+              <label className="rg-field-label">Create an event draft</label><input value={localEventTitle} onChange={e=>setLocalEventTitle(e.target.value)} placeholder="e.g. Bengaluru developers meetup" required/><button className="primary" type="submit">Save event draft</button>
+            </form>
+            <div className="rg-hub-list">{localEvents.length?localEvents.map(ev=><article className="rg-hub-list-item" key={ev.id}><div><b>{ev.title}</b><small>{ev.area} · Draft event</small></div><button className="rg-danger-text" type="button" onClick={()=>setLocalEvents(items=>items.filter(x=>x.id!==ev.id))}>Remove</button></article>):<div className="rg-hub-empty"><Compass/><b>No local event drafts</b><span>Create an event idea to start.</span></div>}</div>
+            <button className="secondary" type="button" onClick={()=>flash("Connect a backend location/events API to load real nearby results.")}>Find local creators and events</button>
+          </>}
+          <div className="rg-hub-footnote">All 12 feature areas are listed here. Browser-based preferences and draft tools work locally; shared feeds, per-post permissions, AI, real analytics, video exports, collaboration invitations, community membership, payments and local listings need backend/API integration.</div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function CalendarDaysFallback() {
+  return <Clock3 />;
+}
+
+
 function App() {
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
@@ -473,6 +715,7 @@ function App() {
 
         <div className="nav-bottom">
           <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
+          <Nav icon={<SlidersHorizontal />} label="ReelsGo Lab" active={page === "advanced"} onClick={() => navigate("advanced")} />
           <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
           <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
         </div>
@@ -496,6 +739,7 @@ function App() {
             </div>
             <button onClick={() => navigate("profile")}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
+            <button onClick={() => navigate("advanced")}><SlidersHorizontal /> ReelsGo Lab</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
           </div>
@@ -517,6 +761,7 @@ function App() {
         {page === "messages" && <MessagesPage openConversationId={openConversationId} />}
         {page === "notifications" && <NotificationsPage />}
         {page === "saved" && <SavedPage user={user} />}
+        {page === "advanced" && <ReelsGoAdvancedHub user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
@@ -4348,231 +4593,17 @@ function SavedPage({ user, embedded = false }) {
 }
 
 const settingsSections = [
-  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account", "Profile discovery", "Account suggestions"] },
-  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Close Friends", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close friends visibility"] },
-  { id: "security", title: "Security", icon: Shield, items: ["Login alerts", "New device alerts", "Security email notifications", "Sensitive action confirmations", "Remember trusted devices", "Password change alerts", "Email change alerts", "Phone change alerts", "Active session reminders"] },
-  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Likes", "Comments", "Followers and follow requests", "Messages", "Message requests", "Story replies", "Mentions", "Live notifications", "Reels interactions", "Product announcements", "Email notifications"] },
-  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing", "Allow message previews", "Allow voice messages", "Call notifications"] },
-  { id: "content", title: "What you see", icon: Compass, items: ["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites feed", "Show liked posts", "Personalized recommendations", "Hide previously seen posts", "Show content in original language"] },
-  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage saver", "Upload at highest quality", "Autoplay videos on Wi-Fi", "Autoplay videos on mobile data", "Save original photos", "Save original videos", "Allow media downloads", "Preload videos"] },
-  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Auto-generated captions", "Text size", "Sound effects", "Text-to-speech", "Screen reader labels", "High contrast", "Keyboard navigation"] },
-  { id: "language", title: "Language", icon: Languages, items: ["App language", "Automatic translations", "Translate captions", "Translate comments", "Translate messages", "Preferred content language"] },
-  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Community guidelines", "Terms and policies"] }
+  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Account privacy", "Hidden words", "Tags and mentions", "Comments", "Sharing", "Restricted accounts", "Blocked accounts", "Muted accounts"] },
+  { id: "security", title: "Security", icon: Shield, items: ["Password", "Two-factor authentication", "Login activity", "Saved login information", "Emails from ReelsGo"] },
+  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Posts, stories and comments", "Following and followers", "Messages", "Calls", "Live and Reels"] },
+  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Messages", "Story replies", "Read receipts", "Typing indicator", "Group messages"] },
+  { id: "content", title: "What you see", icon: Compass, items: ["Content preferences", "Sensitive content", "Suggested content", "Favorites", "Muted accounts"] },
+  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage", "Upload at highest quality", "Autoplay videos", "Accessibility"] },
+  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Text size", "Sound"] },
+  { id: "language", title: "Language", icon: Languages, items: ["App language", "Translations"] },
+  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Terms"] }
 ];
-
-
-function CloseFriendsSettings() {
-  const [query, setQuery] = useState("");
-  const [people, setPeople] = useState([]);
-  const [closeFriends, setCloseFriends] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searching, setSearching] = useState(false);
-  const [busyId, setBusyId] = useState("");
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-
-  async function loadCloseFriends() {
-    setLoading(true);
-    try {
-      const data = await api("/users/me/close-friends");
-      setCloseFriends(data.closeFriends || []);
-      setError("");
-    } catch (e) {
-      setError(e.message || "Could not load your Close Friends list.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadCloseFriends();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const timer = setTimeout(async () => {
-      const term = query.trim();
-      if (!term) {
-        setPeople([]);
-        setSearching(false);
-        return;
-      }
-
-      setSearching(true);
-      try {
-        const data = await api(`/users/search?q=${encodeURIComponent(term)}`);
-        const results = data.users || data.results || [];
-        const currentId = String(getUser()?._id || "");
-        const existing = new Set(
-          closeFriends.map(person => String(person?._id || person?.user?._id || person))
-        );
-        const unique = [];
-        const seen = new Set();
-
-        for (const item of results) {
-          const person = item?.user || item;
-          const id = String(person?._id || "");
-          if (!id || id === currentId || existing.has(id) || seen.has(id)) continue;
-          seen.add(id);
-          unique.push(person);
-        }
-        if (!cancelled) {
-          setPeople(unique);
-          setError("");
-        }
-      } catch (e) {
-        if (!cancelled) setError(e.message || "Unable to search users.");
-      } finally {
-        if (!cancelled) setSearching(false);
-      }
-    }, 250);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [query, closeFriends]);
-
-  async function addPerson(person) {
-    const id = String(person._id);
-    setBusyId(id);
-    setError("");
-    setNotice("");
-
-    try {
-      const data = await api("/users/me/close-friends", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: id }),
-      });
-      setCloseFriends(data.closeFriends || [...closeFriends, person]);
-      setPeople(current => current.filter(p => String(p._id) !== id));
-      setNotice(`@${person.username || person.name || "User"} added to Close Friends.`);
-    } catch (e) {
-      setError(e.message || "Unable to add this person.");
-    } finally {
-      setBusyId("");
-    }
-  }
-
-  async function removePerson(person) {
-    const id = String(person?._id || person?.user?._id || person);
-    setBusyId(id);
-    setError("");
-    setNotice("");
-
-    try {
-      const data = await api(`/users/me/close-friends/${id}`, {
-        method: "DELETE",
-      });
-      setCloseFriends(data.closeFriends || closeFriends.filter(
-        p => String(p?._id || p?.user?._id || p) !== id
-      ));
-      setNotice("Person removed from Close Friends.");
-    } catch (e) {
-      setError(e.message || "Unable to remove this person.");
-    } finally {
-      setBusyId("");
-    }
-  }
-
-  return (
-    <div className="rg-close-friends">
-      <div className="rg-cf-intro">
-        <div className="rg-cf-icon"><Users /></div>
-        <div>
-          <h2>Close Friends</h2>
-          <p>Choose who can see stories shared with your Close Friends audience.</p>
-        </div>
-      </div>
-
-      <label className="rg-cf-search">
-        <Search aria-hidden="true" />
-        <input
-          type="search"
-          value={query}
-          onChange={event => setQuery(event.target.value)}
-          placeholder="Search by username or name"
-          aria-label="Search users to add to Close Friends"
-        />
-        {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search"><X /></button>}
-      </label>
-
-      {error && <div className="rg-cf-message error" role="alert">{error}</div>}
-      {notice && <div className="rg-cf-message success" role="status">{notice}</div>}
-
-      {query.trim() && (
-        <div className="rg-cf-search-results">
-          {searching ? (
-            <p className="rg-cf-muted">Searching…</p>
-          ) : people.length ? (
-            people.map(person => (
-              <div className="rg-cf-person" key={person._id}>
-                <Avatar user={person} size={44} />
-                <div className="rg-cf-person-info">
-                  <b>@{person.username || "user"}</b>
-                  <span>{person.name || "ReelsGo user"}</span>
-                </div>
-                <button
-                  className="rg-cf-add"
-                  type="button"
-                  disabled={!!busyId}
-                  onClick={() => addPerson(person)}
-                >
-                  <UserPlus size={16} />
-                  {busyId === String(person._id) ? "Adding…" : "Add"}
-                </button>
-              </div>
-            ))
-          ) : (
-            <p className="rg-cf-muted">No users found to add.</p>
-          )}
-        </div>
-      )}
-
-      <div className="rg-cf-list-heading">
-        <h3>Your list</h3>
-        <span>{closeFriends.length} {closeFriends.length === 1 ? "person" : "people"}</span>
-      </div>
-
-      {loading ? (
-        <p className="rg-cf-muted">Loading your Close Friends…</p>
-      ) : closeFriends.length ? (
-        closeFriends.map(item => {
-          const person = item?.user || item;
-          const id = String(person?._id || person);
-          return (
-            <div className="rg-cf-person" key={id}>
-              <Avatar user={person} size={44} />
-              <div className="rg-cf-person-info">
-                <b>{person?.username ? `@${person.username}` : "ReelsGo user"}</b>
-                <span>{person?.name || ""}</span>
-              </div>
-              <button
-                className="rg-cf-remove"
-                type="button"
-                disabled={!!busyId}
-                onClick={() => removePerson(person)}
-              >
-                {busyId === id ? "Removing…" : "Remove"}
-              </button>
-            </div>
-          );
-        })
-      ) : (
-        <div className="rg-cf-empty">
-          <Users />
-          <b>Your Close Friends list is empty</b>
-          <span>Search for people above and select Add.</span>
-        </div>
-      )}
-
-      <p className="rg-cf-footnote">
-        Your list is private. People are not notified when you add or remove them.
-      </p>
-    </div>
-  );
-}
 
 function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification }) {
   const [section, setSection] = useState("account");
@@ -4606,19 +4637,6 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
     onClose();
   }
 
-  function persistPrivateLocally(next) {
-    const current = getUser() || user || {};
-    const updated = { ...current, isPrivate: Boolean(next) };
-    setUser(updated);
-    setPrivateAccount(Boolean(next));
-    localStorage.setItem("vk_user", JSON.stringify(updated));
-    const localKey = `reelsgo_settings_${current._id || current.id || "guest"}`;
-    let saved = {};
-    try { saved = JSON.parse(localStorage.getItem(localKey) || "{}"); } catch { saved = {}; }
-    saved["privacy.Private account"] = Boolean(next);
-    localStorage.setItem(localKey, JSON.stringify(saved));
-  }
-
   async function savePrivacy() {
     try {
       const d = await api("/users/me", {
@@ -4626,31 +4644,28 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isPrivate: privateAccount })
       });
-      const updated = d?.user || { ...(getUser() || user || {}), isPrivate: privateAccount };
-      setUser(updated);
-      localStorage.setItem("vk_user", JSON.stringify(updated));
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
       alert("Privacy updated");
     } catch (e) {
-      // Keep the switch usable when the deployment has not added the profile update route yet.
-      persistPrivateLocally(privateAccount);
-      alert(`Saved on this device. Account sync is unavailable: ${e.message}`);
+      alert(e.message);
     }
   }
 
   async function togglePrivateAccount(next) {
-    persistPrivateLocally(next);
+    const previous = privateAccount;
+    setPrivateAccount(next);
     try {
       const d = await api("/users/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isPrivate: next })
       });
-      if (d?.user) {
-        setUser(d.user);
-        localStorage.setItem("vk_user", JSON.stringify(d.user));
-      }
-    } catch {
-      // Local preference remains saved; server sync becomes available when the endpoint exists.
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+    } catch (e) {
+      setPrivateAccount(previous);
+      alert(e.message);
     }
   }
 
@@ -4742,10 +4757,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
             </div>
 
             {section === "account" && (
-              <>
-                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
-              </>
+              <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
             )}
             {section === "privacy" && (
               <PrivacySettings
@@ -4756,30 +4768,85 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                 onSelect={setSelectedItem}
               />
             )}
-            {section === "privacy" && <CloseFriendsSettings />}
-            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
             {section === "security" && (
               <SecuritySettings onSelect={setSelectedItem} />
             )}
-            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
             {section === "notifications" && (
-                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
-              )}
+              <ToggleSettings
+                title="Notifications"
+                items={[
+                  "Likes",
+                  "Comments",
+                  "Followers and follow requests",
+                  "Messages",
+                  "Story replies",
+                  "Reels interactions",
+                  "Live notifications",
+                  "Email notifications"
+                ]}
+              />
+            )}
             {section === "messages" && (
-                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
-              )}
+              <ToggleSettings
+                title="Messages and replies"
+                items={[
+                  "Message requests",
+                  "Read receipts",
+                  "Typing indicator",
+                  "Group message requests",
+                  "Story replies",
+                  "Allow sharing"
+                ]}
+              />
+            )}
             {section === "content" && (
-                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
-              )}
+              <ToggleSettings
+                title="What you see"
+                items={[
+                  "Sensitive content",
+                  "Autoplay videos",
+                  "Suggested posts",
+                  "Show political content",
+                  "Use less mobile data",
+                  "Favorites"
+                ]}
+              />
+            )}
             {section === "media" && (
-                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
-              )}
+              <ToggleSettings
+                title="Media quality"
+                items={[
+                  "Upload at highest quality",
+                  "Use less mobile data",
+                  "Autoplay videos",
+                  "Save original photos",
+                  "Save original videos"
+                ]}
+              />
+            )}
             {section === "accessibility" && (
-                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
-              )}
+              <ToggleSettings
+                title="Accessibility"
+                items={[
+                  "Reduce motion",
+                  "Captions",
+                  "Text-to-speech",
+                  "Sound effects",
+                  "Large text"
+                ]}
+              />
+            )}
             {section === "language" && (
-                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
-              )}
+              <ToggleSettings
+                title="Language"
+                items={[
+                  "English",
+                  "Automatic translations",
+                  "Translate captions",
+                  "Translate comments"
+                ]}
+              />
+            )}
             {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
             {selectedItem && (
@@ -4864,10 +4931,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
               </div>
 
               {section === "account" && (
-                <>
-                  <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
-                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} />
-                </>
+                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
               )}
               {section === "privacy" && (
                 <PrivacySettings
@@ -4878,29 +4942,84 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   onSelect={setSelectedItem}
                 />
               )}
-              {section === "privacy" && <CloseFriendsSettings />}
-              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} />}
               {section === "security" && (
                 <SecuritySettings onSelect={setSelectedItem} />
               )}
-              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} />}
               {section === "notifications" && (
-                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} />
+                <ToggleSettings
+                  title="Notifications"
+                  items={[
+                    "Likes",
+                    "Comments",
+                    "Followers and follow requests",
+                    "Messages",
+                    "Story replies",
+                    "Reels interactions",
+                    "Live notifications",
+                    "Email notifications"
+                  ]}
+                />
               )}
               {section === "messages" && (
-                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} />
+                <ToggleSettings
+                  title="Messages and replies"
+                  items={[
+                    "Message requests",
+                    "Read receipts",
+                    "Typing indicator",
+                    "Group message requests",
+                    "Story replies",
+                    "Allow sharing"
+                  ]}
+                />
               )}
               {section === "content" && (
-                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} />
+                <ToggleSettings
+                  title="What you see"
+                  items={[
+                    "Sensitive content",
+                    "Autoplay videos",
+                    "Suggested posts",
+                    "Show political content",
+                    "Use less mobile data",
+                    "Favorites"
+                  ]}
+                />
               )}
               {section === "media" && (
-                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} />
+                <ToggleSettings
+                  title="Media quality"
+                  items={[
+                    "Upload at highest quality",
+                    "Use less mobile data",
+                    "Autoplay videos",
+                    "Save original photos",
+                    "Save original videos"
+                  ]}
+                />
               )}
               {section === "accessibility" && (
-                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} />
+                <ToggleSettings
+                  title="Accessibility"
+                  items={[
+                    "Reduce motion",
+                    "Captions",
+                    "Text-to-speech",
+                    "Sound effects",
+                    "Large text"
+                  ]}
+                />
               )}
               {section === "language" && (
-                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} />
+                <ToggleSettings
+                  title="Language"
+                  items={[
+                    "English",
+                    "Automatic translations",
+                    "Translate captions",
+                    "Translate comments"
+                  ]}
+                />
               )}
               {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
 
@@ -4916,7 +5035,9 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
                   </button>
                   <b>{selectedItem}</b>
                   <p>
-                    This setting needs its dedicated account action to be implemented. Preference switches in this section are saved through the authenticated settings API.
+                    This option is currently represented in the ReelsGo
+                    interface. Account changes are saved only where a backend
+                    endpoint is connected.
                   </p>
                 </div>
               )}
@@ -4989,100 +5110,39 @@ function SecuritySettings({ onSelect }) {
   </div>;
 }
 
-function ToggleSettings({ title, items, sectionId = "general" }) {
-  const user = getUser();
-  const localKey = `reelsgo_settings_${user?._id || user?.id || "guest"}`;
-  const [values, setValues] = useState({});
+function ToggleSettings({ title, items }) {
+  const [values, setValues] = useState(() => Object.fromEntries(items.map(x => [x, true])));
   const [loading, setLoading] = useState(true);
-  const [savingKey, setSavingKey] = useState("");
-  const [error, setError] = useState("");
-  const [localOnly, setLocalOnly] = useState(false);
-
+  const [saving, setSaving] = useState("");
+  const [message, setMessage] = useState("");
   useEffect(() => {
     let active = true;
-    let localValues = {};
-    try { localValues = JSON.parse(localStorage.getItem(localKey) || "{}"); } catch { localValues = {}; }
-    setValues(localValues);
-    setLoading(true);
-    api("/users/me/settings")
-      .then(data => {
-        if (!active) return;
-        const serverValues = data?.settings || {};
-        // Supports both flat keys ("privacy.Activity status") and grouped settings objects.
-        const normalized = { ...localValues };
-        Object.entries(serverValues).forEach(([key, value]) => {
-          if (value && typeof value === "object" && !Array.isArray(value)) {
-            Object.entries(value).forEach(([nestedKey, nestedValue]) => {
-              normalized[`${key}.${nestedKey}`] = nestedValue;
-            });
-          } else {
-            normalized[key] = value;
-          }
-        });
-        setValues(normalized);
-        setLocalOnly(false);
-        setError("");
-      })
-      .catch(() => {
-        if (!active) return;
-        // A missing endpoint must not break the settings screen; use persistent per-user browser storage.
-        setLocalOnly(true);
-        setError("");
-      })
+    api("/users/me/settings").then(({ settings = {} }) => {
+      if (!active) return;
+      setValues(Object.fromEntries(items.map(item => [item, typeof settings[item] === "boolean" ? settings[item] : true])));
+    }).catch(error => { if (active) setMessage(error.message || "Unable to load saved settings"); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [localKey]);
-
+  }, [title, items.join("|")]);
   async function flip(item) {
-    const key = `${sectionId}.${item}`;
-    const previous = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
+    const previous = !!values[item];
     const next = !previous;
-    const updated = { ...values, [key]: next };
-    setValues(updated);
-    localStorage.setItem(localKey, JSON.stringify(updated));
-    setSavingKey(key);
-    setError("");
-    setLocalOnly(false);
+    setValues(v => ({ ...v, [item]: next }));
+    setSaving(item); setMessage("");
     try {
-      const data = await api("/users/me/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section: sectionId, key, name: item, value: next })
-      });
-      if (data?.settings) {
-        const merged = { ...updated };
-        Object.entries(data.settings).forEach(([settingKey, value]) => {
-          if (value && typeof value === "object" && !Array.isArray(value)) {
-            Object.entries(value).forEach(([nestedKey, nestedValue]) => {
-              merged[`${settingKey}.${nestedKey}`] = nestedValue;
-            });
-          } else merged[settingKey] = value;
-        });
-        setValues(merged);
-        localStorage.setItem(localKey, JSON.stringify(merged));
-      }
-    } catch {
-      // Keep the option responsive and saved locally if the server route is not deployed.
-      setLocalOnly(true);
-    } finally {
-      setSavingKey("");
-    }
+      await api("/users/me/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: item, value: next }) });
+      setMessage(`${item} saved.`);
+    } catch (error) {
+      setValues(v => ({ ...v, [item]: previous }));
+      setMessage(error.message || `Could not save ${item}.`);
+    } finally { setSaving(""); }
   }
-
-  return <div className="settings-panel">
-    <h2 className="panel-heading">{title}</h2>
-    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
-    {localOnly && !loading && <p className="settings-local-note" role="status">Changes are saved on this device. Connect the settings API to sync them across devices.</p>}
-    {error && <p className="settings-save-error" role="alert">{error}</p>}
-    {items.map(item => {
-      const key = `${sectionId}.${item}`;
-      const checked = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
-      return <div className="setting-switch" key={key}>
-        <span><b>{item}</b><small>{savingKey === key ? "Saving…" : localOnly ? "Saved on this device" : "Saved preference"}</small></span>
-        <Toggle checked={checked} disabled={loading || savingKey === key} onChange={() => flip(item)} />
-      </div>;
-    })}
-  </div>;
+  return <div className="settings-panel"><h2 className="panel-heading">{title}</h2>{loading && <p className="settings-status">Loading saved preferences…</p>}{items.map(item =>
+    <div className="setting-switch" key={item}>
+      <span><b>{item}</b><small>{saving === item ? "Saving…" : "Manage this preference for your account."}</small></span>
+      <Toggle checked={!!values[item]} disabled={loading || !!saving} onChange={() => flip(item)} />
+    </div>
+  )}{message && <p className="settings-status" role="status">{message}</p>}</div>;
 }
 
 function HelpSettings({ onSelect }) {
