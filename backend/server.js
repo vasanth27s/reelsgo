@@ -8,9 +8,9 @@ import { Server } from "socket.io";
 // ===============================
 // ROUTES
 // ===============================
-
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/users.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
 import mediaRoutes from "./routes/media.routes.js";
 import postRoutes from "./routes/posts.routes.js";
 import followRoutes from "./routes/follows.routes.js";
@@ -20,14 +20,10 @@ import messageRoutes from "./routes/messages.routes.js";
 import notificationRoutes from "./routes/notifications.routes.js";
 import noteRoutes from "./routes/notes.routes.js";
 import reportRoutes from "./routes/reports.routes.js";
-import settingsRoutes from "./routes/settings.routes.js";
-
-
 
 /*
   NEW:
   ReelsGo custom phone verification.
-  
   IMPORTANT:
   This does NOT use OTP.
   This does NOT use Firebase.
@@ -38,54 +34,43 @@ import verificationRoutes from "./routes/verification.routes.js";
 // ===============================
 // LOAD ENVIRONMENT
 // ===============================
-
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-app.use("/api/users", settingsRoutes);
 
 // ===============================
 // ENVIRONMENT
 // ===============================
-
 const PORT =
   process.env.PORT || 5000;
-
 const CLIENT_URL =
   process.env.CLIENT_URL ||
   "https://reelsgo.vercel.app";
-
 const MONGO_URI =
   process.env.MONGO_URI;
-
 const JWT_SECRET =
   process.env.JWT_SECRET;
 
 // ===============================
 // ENVIRONMENT CHECK
 // ===============================
-
 if (!MONGO_URI) {
   console.error(
     "❌ MONGO_URI is missing"
   );
-
   process.exit(1);
 }
-
 if (!JWT_SECRET) {
   console.error(
     "❌ JWT_SECRET is missing"
   );
-
   process.exit(1);
 }
 
 // ===============================
 // CORS
 // ===============================
-
 const allowedOrigins = [
   "https://reelsgo.vercel.app",
   CLIENT_URL,
@@ -101,14 +86,12 @@ app.use(
         Allow Postman/server-to-server
         requests.
       */
-
       if (!origin) {
         return callback(
           null,
           true
         );
       }
-
       if (
         allowedOrigins.includes(origin)
       ) {
@@ -117,21 +100,17 @@ app.use(
           true
         );
       }
-
       console.warn(
         "⚠️ CORS blocked:",
         origin
       );
-
       return callback(
         new Error(
           "Not allowed by CORS"
         )
       );
     },
-
     credentials: true,
-
     methods: [
       "GET",
       "POST",
@@ -140,7 +119,6 @@ app.use(
       "DELETE",
       "OPTIONS"
     ],
-
     allowedHeaders: [
       "Content-Type",
       "Authorization"
@@ -151,13 +129,11 @@ app.use(
 // ===============================
 // BODY PARSING
 // ===============================
-
 app.use(
   express.json({
     limit: "20mb"
   })
 );
-
 app.use(
   express.urlencoded({
     extended: true,
@@ -168,13 +144,11 @@ app.use(
 // ===============================
 // REQUEST LOGGER
 // ===============================
-
 app.use(
   (req, res, next) => {
     console.log(
       `${new Date().toISOString()} ${req.method} ${req.originalUrl}`
     );
-
     next();
   }
 );
@@ -182,7 +156,6 @@ app.use(
 // ===============================
 // ROOT
 // ===============================
-
 app.get(
   "/",
   (req, res) => {
@@ -199,20 +172,17 @@ app.get(
 // ===============================
 // HEALTH CHECK
 // ===============================
-
 app.get(
   "/api/health",
   (req, res) => {
     res.json({
       ok: true,
       service: "ReelsGo",
-
       database:
         mongoose.connection
           .readyState === 1
           ? "MongoDB connected"
           : "MongoDB not connected",
-
       timestamp:
         new Date().toISOString()
     });
@@ -226,7 +196,6 @@ app.get(
 // ===============================
 // AUTHENTICATION
 // ===============================
-
 app.use(
   "/api/auth",
   authRoutes
@@ -235,16 +204,24 @@ app.use(
 // ===============================
 // USERS
 // ===============================
-
 app.use(
   "/api/users",
   userRoutes
 );
 
 // ===============================
+// USER SETTINGS
+// Settings are stored separately.
+// Existing User.js remains unchanged.
+// ===============================
+app.use(
+  "/api/users",
+  settingsRoutes
+);
+
+// ===============================
 // MEDIA
 // ===============================
-
 app.use(
   "/api/media",
   mediaRoutes
@@ -253,7 +230,6 @@ app.use(
 // ===============================
 // POSTS
 // ===============================
-
 app.use(
   "/api/posts",
   postRoutes
@@ -262,7 +238,6 @@ app.use(
 // ===============================
 // FOLLOWS
 // ===============================
-
 app.use(
   "/api/follows",
   followRoutes
@@ -271,7 +246,6 @@ app.use(
 // ===============================
 // STORIES
 // ===============================
-
 app.use(
   "/api/stories",
   storyRoutes
@@ -280,7 +254,6 @@ app.use(
 // ===============================
 // REELS
 // ===============================
-
 app.use(
   "/api/reels",
   reelRoutes
@@ -289,7 +262,6 @@ app.use(
 // ===============================
 // MESSAGES
 // ===============================
-
 app.use(
   "/api/messages",
   messageRoutes
@@ -298,7 +270,6 @@ app.use(
 // ===============================
 // NOTIFICATIONS
 // ===============================
-
 app.use(
   "/api/notifications",
   notificationRoutes
@@ -307,7 +278,6 @@ app.use(
 // ===============================
 // NOTES
 // ===============================
-
 app.use(
   "/api/notes",
   noteRoutes
@@ -316,7 +286,6 @@ app.use(
 // ===============================
 // REPORTS
 // ===============================
-
 app.use(
   "/api/reports",
   reportRoutes
@@ -338,7 +307,6 @@ app.use(
 // /api/verification/phone/confirm
 //
 // =====================================================
-
 app.use(
   "/api/verification",
   verificationRoutes
@@ -347,16 +315,13 @@ app.use(
 // ===============================
 // 404 HANDLER
 // ===============================
-
 app.use(
   (req, res) => {
     res.status(404).json({
       message:
         "API endpoint not found",
-
       method:
         req.method,
-
       path:
         req.originalUrl
     });
@@ -366,7 +331,6 @@ app.use(
 // ===============================
 // GLOBAL ERROR HANDLER
 // ===============================
-
 app.use(
   (
     err,
@@ -377,15 +341,12 @@ app.use(
     console.error(
       "================================="
     );
-
     console.error(
       "SERVER ERROR"
     );
-
     console.error(
       err
     );
-
     console.error(
       "================================="
     );
@@ -393,7 +354,6 @@ app.use(
     // ===============================
     // CORS ERROR
     // ===============================
-
     if (
       err.message ===
       "Not allowed by CORS"
@@ -407,7 +367,6 @@ app.use(
     // ===============================
     // MULTER FILE ERROR
     // ===============================
-
     if (
       err.code ===
       "LIMIT_FILE_SIZE"
@@ -421,7 +380,6 @@ app.use(
     // ===============================
     // GENERAL ERROR
     // ===============================
-
     res.status(
       err.status || 500
     ).json({
@@ -435,7 +393,6 @@ app.use(
 // ===============================
 // SOCKET.IO
 // ===============================
-
 const io =
   new Server(
     server,
@@ -443,16 +400,13 @@ const io =
       cors: {
         origin:
           allowedOrigins,
-
         credentials:
           true,
-
         methods: [
           "GET",
           "POST"
         ]
       },
-
       transports: [
         "websocket",
         "polling"
@@ -463,7 +417,6 @@ const io =
 // ===============================
 // SOCKET.IO CONNECTIONS
 // ===============================
-
 io.on(
   "connection",
   (socket) => {
@@ -475,7 +428,6 @@ io.on(
     // ===============================
     // JOIN USER ROOM
     // ===============================
-
     socket.on(
       "join_user",
       (userId) => {
@@ -497,7 +449,6 @@ io.on(
     // ===============================
     // JOIN CONVERSATION
     // ===============================
-
     socket.on(
       "join_conversation",
       (conversationId) => {
@@ -519,7 +470,6 @@ io.on(
     // ===============================
     // LEAVE CONVERSATION
     // ===============================
-
     socket.on(
       "leave_conversation",
       (conversationId) => {
@@ -541,7 +491,6 @@ io.on(
     // ===============================
     // TYPING
     // ===============================
-
     socket.on(
       "typing",
       (data) => {
@@ -567,7 +516,6 @@ io.on(
     // ===============================
     // STOP TYPING
     // ===============================
-
     socket.on(
       "stop_typing",
       (data) => {
@@ -593,7 +541,6 @@ io.on(
     // ===============================
     // MESSAGE SENT
     // ===============================
-
     socket.on(
       "message_sent",
       (data) => {
@@ -617,7 +564,6 @@ io.on(
     // ===============================
     // MESSAGE SEEN
     // ===============================
-
     socket.on(
       "message_seen",
       (data) => {
@@ -641,7 +587,6 @@ io.on(
     // ===============================
     // MESSAGE REACTION
     // ===============================
-
     socket.on(
       "message_reaction",
       (data) => {
@@ -665,7 +610,6 @@ io.on(
     // ===============================
     // STORY VIEWED
     // ===============================
-
     socket.on(
       "story_viewed",
       (data) => {
@@ -685,7 +629,6 @@ io.on(
     // ===============================
     // NOTIFICATION
     // ===============================
-
     socket.on(
       "notification",
       (data) => {
@@ -709,7 +652,6 @@ io.on(
     // ===============================
     // DISCONNECT
     // ===============================
-
     socket.on(
       "disconnect",
       (reason) => {
@@ -725,7 +667,6 @@ io.on(
 // ===============================
 // MONGODB
 // ===============================
-
 mongoose.set(
   "strictQuery",
   true
@@ -734,7 +675,6 @@ mongoose.set(
 // ===============================
 // MONGODB CONNECTED
 // ===============================
-
 mongoose.connection.on(
   "connected",
   () => {
@@ -752,7 +692,6 @@ mongoose.connection.on(
 // ===============================
 // MONGODB ERROR
 // ===============================
-
 mongoose.connection.on(
   "error",
   (error) => {
@@ -766,7 +705,6 @@ mongoose.connection.on(
 // ===============================
 // MONGODB DISCONNECTED
 // ===============================
-
 mongoose.connection.on(
   "disconnected",
   () => {
@@ -779,7 +717,6 @@ mongoose.connection.on(
 // ===============================
 // START SERVER
 // ===============================
-
 async function startServer() {
   try {
     console.log(
@@ -835,7 +772,6 @@ async function startServer() {
         );
       }
     );
-
   } catch (error) {
     console.error(
       "================================="
@@ -860,7 +796,6 @@ async function startServer() {
 // ===============================
 // GRACEFUL SHUTDOWN
 // ===============================
-
 async function shutdown(
   signal
 ) {
@@ -882,7 +817,6 @@ async function shutdown(
         );
 
         process.exit(0);
-
       } catch (error) {
         console.error(
           "Shutdown error:",
@@ -898,7 +832,6 @@ async function shutdown(
 // ===============================
 // PROCESS SIGNALS
 // ===============================
-
 process.on(
   "SIGINT",
   () => shutdown("SIGINT")
@@ -912,5 +845,4 @@ process.on(
 // ===============================
 // START
 // ===============================
-
 startServer();
