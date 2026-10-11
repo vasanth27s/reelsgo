@@ -11803,3 +11803,162 @@ div[style*="min-width: 170px"]{
 .rg-detail-footnote{font-size:12px;color:var(--muted,#a2aab6);line-height:1.6;margin-top:18px;max-width:720px;}
 .rg-settings-options .setting-row{width:100%;}
 @media(max-width:700px){.settings-mobile-detail:has(> .setting-detail-screen) > :not(.setting-detail-screen){display:none!important}.setting-detail-screen{padding:16px 14px 28px;border-radius:0;overflow-y:auto}.rg-detail-heading h2{font-size:22px}.rg-detail-control-card{padding:15px;gap:12px}.rg-detail-form{gap:14px}}
+
+/* =========================================================
+   REELSGO LAB MOBILE NAV FIX — must remain at the end
+   Prevent oversized icons, clipped labels and horizontal overflow.
+   ========================================================= */
+@media (max-width: 700px) {
+  .rg-hub-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 12px 10px 96px !important;
+    overflow-x: clip !important;
+  }
+
+  .rg-hub-page .rg-hub-hero {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 18px 16px !important;
+    margin-bottom: 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .rg-hub-page .rg-hub-hero h1 {
+    font-size: clamp(25px, 7vw, 32px) !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.7px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rg-hub-page .rg-hub-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs {
+    position: static !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 9px !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border-radius: 16px !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button {
+    display: grid !important;
+    grid-template-columns: 22px minmax(0, 1fr) !important;
+    align-items: center !important;
+    justify-content: start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    height: auto !important;
+    padding: 10px 9px !important;
+    margin: 0 !important;
+    border: 1px solid var(--line, rgba(150, 160, 180, .2)) !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    text-align: left !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button > svg:first-child {
+    display: block !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    max-width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    flex: 0 0 20px !important;
+    justify-self: center !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button span {
+    display: block !important;
+    width: auto !important;
+    min-width: 0 !important;
+    flex: initial !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button > svg:last-child {
+    display: none !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button.active {
+    border-color: #a78bfa !important;
+    background: rgba(139, 92, 246, .18) !important;
+    color: var(--text, #fff) !important;
+    box-shadow: inset 0 0 0 1px rgba(167, 139, 250, .16) !important;
+  }
+
+  .rg-hub-page .rg-hub-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+  }
+
+  .rg-hub-page .rg-hub-panel-heading {
+    align-items: flex-start !important;
+    min-width: 0 !important;
+    gap: 8px !important;
+  }
+
+  .rg-hub-page .rg-hub-panel-heading h2 {
+    font-size: 21px !important;
+    line-height: 1.25 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .rg-hub-page .rg-choice-grid,
+  .rg-hub-page .rg-hub-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .rg-hub-page .rg-hub-community-grid,
+  .rg-hub-page .rg-trust-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rg-hub-page input,
+  .rg-hub-page select,
+  .rg-hub-page textarea,
+  .rg-hub-page button {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .rg-hub-page .rg-hub-tabs {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .rg-hub-page .rg-hub-tabs button {
+    min-height: 48px !important;
+    grid-template-columns: 22px minmax(0, 1fr) !important;
+  }
+}
