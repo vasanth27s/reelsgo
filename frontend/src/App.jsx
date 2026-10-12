@@ -620,10 +620,155 @@ function CalendarDaysFallback() {
 }
 
 
+function getSharedPostIdFromPath(pathname = window.location.pathname) {
+  const match = pathname.match(/^\/post\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getSharedReelIdFromPath(pathname = window.location.pathname) {
+  const match = pathname.match(/^\/(?:reel|reels)\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getSharedRouteFromPath(pathname = window.location.pathname) {
+  const postId = getSharedPostIdFromPath(pathname);
+  if (postId) return { type: "post", id: postId };
+  const reelId = getSharedReelIdFromPath(pathname);
+  if (reelId) return { type: "reel", id: reelId };
+  return null;
+}
+
+function SharedPostPage({ postId, user, onBack }) {
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadPost() {
+      setLoading(true);
+      setError("");
+      try {
+        let foundPost = null;
+        try {
+          const data = await api(`/posts/${encodeURIComponent(postId)}`);
+          foundPost = data?.post || data?.data?.post || data;
+          if (String(foundPost?._id || "") !== String(postId)) foundPost = null;
+        } catch {
+          // Some backend versions expose the feed but not GET /posts/:id.
+        }
+        if (!foundPost) {
+          const feed = await api("/posts");
+          foundPost = (feed?.posts || feed?.data?.posts || []).find(
+            item => String(item?._id) === String(postId)
+          );
+        }
+        if (!foundPost || !foundPost._id) {
+          throw new Error("This post could not be found, or the backend does not allow public access.");
+        }
+        if (!cancelled) setPost(foundPost);
+      } catch (err) {
+        if (!cancelled) setError(err?.message || "Unable to load this post.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    if (postId) loadPost();
+    else { setError("This post link is invalid."); setLoading(false); }
+    return () => { cancelled = true; };
+  }, [postId]);
+
+  if (loading) return <div className="page"><div className="empty">Loading post…</div></div>;
+  if (error || !post) return <div className="page"><button type="button" className="secondary" onClick={onBack}>Back to ReelsGo</button><div className="empty"><h2>Post unavailable</h2><p>{error || "This post could not be found."}</p></div></div>;
+  return <div className="page"><button type="button" className="secondary" onClick={onBack}>← Back to ReelsGo</button><Post post={post} user={user} onDeleted={onBack} /></div>;
+}
+
+function SharedReelPage({ reelId, onBack }) {
+  const [reel, setReel] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadReel() {
+      setLoading(true);
+      setError("");
+      try {
+        let foundReel = null;
+        try {
+          const data = await api(`/reels/${encodeURIComponent(reelId)}`);
+          foundReel = data?.reel || data?.data?.reel || data;
+          if (String(foundReel?._id || "") !== String(reelId)) foundReel = null;
+        } catch {
+          // Fall back to the existing reels feed route.
+        }
+        if (!foundReel) {
+          const feed = await api("/reels");
+          foundReel = (feed?.reels || feed?.data?.reels || []).find(
+            item => String(item?._id) === String(reelId)
+          );
+        }
+        if (!foundReel?._id) {
+          throw new Error("This Reel could not be found, or the backend does not allow public access.");
+        }
+        if (!cancelled) setReel(foundReel);
+      } catch (err) {
+        if (!cancelled) setError(err?.message || "Unable to load this Reel.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    if (reelId) loadReel();
+    else { setError("This Reel link is invalid."); setLoading(false); }
+    return () => { cancelled = true; };
+  }, [reelId]);
+
+  if (loading) return <div className="page"><div className="empty">Loading Reel…</div></div>;
+  if (error || !reel) return <div className="page"><button type="button" className="secondary" onClick={onBack}>Back to ReelsGo</button><div className="empty"><h2>Reel unavailable</h2><p>{error || "This Reel could not be found."}</p></div></div>;
+
+  const author = reel.author || {};
+  const mediaUrl = reel.mediaUrl ? `${SERVER}${reel.mediaUrl}` : "";
+  return (
+    <div className="page shared-reel-page" style={{ maxWidth: 760, margin: "0 auto", padding: "20px 14px" }}>
+      <button type="button" className="secondary" onClick={onBack} style={{ marginBottom: 16 }}>← Back to ReelsGo</button>
+      <article style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 14, justifyItems: "center" }}>
+        <div style={{ width: "min(100%, 430px)", overflow: "hidden", borderRadius: 18, background: "#080808", border: "1px solid rgba(128,128,128,.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 12, color: "inherit" }}>
+            <Avatar user={author} size={40} />
+            <div style={{ minWidth: 0 }}>
+              <strong>{author.username ? `@${author.username}` : author.name || "ReelsGo user"}</strong>
+              <div style={{ opacity: .7, fontSize: 12 }}>Reel on ReelsGo</div>
+            </div>
+          </div>
+          {mediaUrl ? <video src={mediaUrl} controls playsInline autoPlay loop style={{ display: "block", width: "100%", maxHeight: "72vh", objectFit: "contain", background: "#000" }} /> : <div className="empty">Reel video is unavailable.</div>}
+          <div style={{ padding: 14, color: "inherit", overflowWrap: "anywhere" }}>
+            <div>{reel.caption || "Watch this Reel on ReelsGo."}</div>
+            {reel.hashtags && <div style={{ opacity: .8, marginTop: 6 }}>{Array.isArray(reel.hashtags) ? reel.hashtags.join(" ") : reel.hashtags}</div>}
+            <button type="button" className="secondary" style={{ marginTop: 14 }} onClick={async () => {
+              const link = window.location.href;
+              try {
+                if (navigator.share) await navigator.share({ title: "ReelsGo Reel", text: reel.caption || "Check out this Reel on ReelsGo", url: link });
+                else { await navigator.clipboard.writeText(link); alert("Reel link copied."); }
+              } catch (e) {
+                if (e?.name !== "AbortError") alert("Unable to share. Please copy the link from your browser.");
+              }
+            }}><Link2 size={16} /> Share Reel</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => {
+    const shared = getSharedRouteFromPath();
+    return shared ? `shared-${shared.type}` : "home";
+  });
+  const [sharedPostId, setSharedPostId] = useState(() => getSharedPostIdFromPath());
+  const [sharedReelId, setSharedReelId] = useState(() => getSharedReelIdFromPath());
   const [createOpen, setCreateOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [reelOpen, setReelOpen] = useState(false);
@@ -635,6 +780,18 @@ function App() {
   const [openConversationData, setOpenConversationData] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [verificationAlert, setVerificationAlert] = useState(false);
+
+  useEffect(() => {
+    const syncRoute = () => {
+      const postId = getSharedPostIdFromPath();
+      const reelId = getSharedReelIdFromPath();
+      setSharedPostId(postId);
+      setSharedReelId(reelId);
+      setPage(postId ? "shared-post" : reelId ? "shared-reel" : "home");
+    };
+    window.addEventListener("popstate", syncRoute);
+    return () => window.removeEventListener("popstate", syncRoute);
+  }, []);
 
   useEffect(() => {
     if (!token) return;
@@ -680,7 +837,11 @@ function App() {
     localStorage.setItem("vk_user", JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
-    setPage("home");
+    const postId = getSharedPostIdFromPath();
+    const reelId = getSharedReelIdFromPath();
+    setSharedPostId(postId);
+    setSharedReelId(reelId);
+    setPage(postId ? "shared-post" : reelId ? "shared-reel" : "home");
   }
 
   function logout() {
@@ -694,10 +855,23 @@ function App() {
   const navigate = p => {
     setPage(p);
     if (p !== "user-profile") setProfileUserId(null);
+    if (p !== "shared-post" && p !== "shared-reel" && getSharedRouteFromPath()) {
+      window.history.pushState({}, "", "/");
+      setSharedPostId(null);
+      setSharedReelId(null);
+    }
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Shared post/Reel links should open directly in a browser, even when the visitor
+  // is not logged in. Other sections still require authentication as before.
+  if (!token && sharedPostId) {
+    return <div className="shared-public-shell"><SharedPostPage postId={sharedPostId} user={user} onBack={() => { window.history.pushState({}, "", "/"); setSharedPostId(null); setPage("home"); }} /></div>;
+  }
+  if (!token && sharedReelId) {
+    return <div className="shared-public-shell"><SharedReelPage reelId={sharedReelId} onBack={() => { window.history.pushState({}, "", "/"); setSharedReelId(null); setPage("home"); }} /></div>;
+  }
   if (!token) return <Auth onLogin={login} />;
 
   return (
@@ -753,6 +927,8 @@ function App() {
 
       <main className="main">
         {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
+        {page === "shared-post" && <SharedPostPage postId={sharedPostId} user={user} onBack={() => navigate("home")} />}
+        {page === "shared-reel" && <SharedReelPage reelId={sharedReelId} onBack={() => navigate("home")} />}
         {page === "search" && <SearchPage onBack={() => navigate("home")} onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
         {page === "user-profile" && profileUserId && <UserProfilePage userId={profileUserId} currentUser={user} onBack={() => navigate("search")} onMessage={async (id) => {
           try {
@@ -3377,6 +3553,40 @@ function ReelsPage({ onCreate }) {
     }
   }
 
+  async function shareReel(reel) {
+    const reelLink = `${window.location.origin}/reel/${reel._id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "ReelsGo Reel",
+          text: reel.caption || "Check out this Reel on ReelsGo",
+          url: reelLink
+        });
+      } else {
+        await navigator.clipboard.writeText(reelLink);
+        alert("Reel link copied.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        try {
+          const field = document.createElement("textarea");
+          field.value = reelLink;
+          field.style.position = "fixed";
+          field.style.opacity = "0";
+          document.body.appendChild(field);
+          field.select();
+          const copied = document.execCommand("copy");
+          field.remove();
+          alert(copied ? "Reel link copied." : `Copy this Reel link: ${reelLink}`);
+        } catch {
+          alert(`Copy this Reel link: ${reelLink}`);
+        }
+      }
+    } finally {
+      setOpenMenuId(null);
+    }
+  }
+
   async function deleteReel(reel) {
     const isOwner =
       String(reel.author?._id || reel.author) === String(me?._id);
@@ -3533,7 +3743,27 @@ function ReelsPage({ onCreate }) {
                                 "0 18px 50px rgba(0,0,0,.5)"
                             }}
                           >
-                            {isOwner ? (
+                            <button
+                            type="button"
+                            onClick={() => shareReel(r)}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 9,
+                              padding: "11px 12px",
+                              borderRadius: 10,
+                              background: "transparent",
+                              color: "#fff",
+                              textAlign: "left",
+                              fontWeight: 700
+                            }}
+                          >
+                            <Link2 size={17} />
+                            Share Reel
+                          </button>
+
+                          {isOwner ? (
                               <>
                                 <button
                                   type="button"

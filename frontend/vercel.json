@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/post/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reel/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reels/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
