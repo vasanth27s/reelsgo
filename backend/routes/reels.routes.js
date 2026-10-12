@@ -5,6 +5,7 @@ import Media from "../models/Media.js";
 import Reel from "../models/Reel.js";
 import Interaction from "../models/Interaction.js";
 import Notification from "../models/Notification.js";
+import Comment from "../models/Comment.js";
 
 const router = express.Router();
 
@@ -131,6 +132,59 @@ router.post("/:id/save", auth, async (req, res) => {
   await reel.save();
 
   res.json({ saved: true, savesCount: reel.savesCount });
+});
+
+
+// =====================================================
+// REEL COMMENTS: GET, CREATE, DELETE OWN COMMENT
+// Comment.post stores the Reel ObjectId. Do not populate `post` because
+// the existing schema references Post; populate only the author.
+// =====================================================
+router.get("/:id/comments", auth, async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+
+    const comments = await Comment.find({ post: reel._id, hidden: false })
+      .populate("author", "name username")
+      .sort({ createdAt: 1 })
+      .limit(200);
+    return res.json({ comments });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to load Reel comments" });
+  }
+});
+
+router.post("/:id/comments", auth, async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+
+    const text = String(req.body?.text || "").trim();
+    if (!text) return res.status(400).json({ message: "Comment cannot be empty" });
+    if (text.length > 1000) return res.status(400).json({ message: "Comment cannot exceed 1000 characters" });
+
+    const comment = await Comment.create({ post: reel._id, author: req.user.id, text });
+    const populated = await Comment.findById(comment._id).populate("author", "name username");
+    return res.status(201).json({ comment: populated });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to create comment" });
+  }
+});
+
+router.delete("/:id/comments/:commentId", auth, async (req, res) => {
+  try {
+    const comment = await Comment.findOne({
+      _id: req.params.commentId,
+      post: req.params.id,
+      author: req.user.id
+    });
+    if (!comment) return res.status(404).json({ message: "Comment not found or you cannot delete it" });
+    await comment.deleteOne();
+    return res.json({ ok: true, message: "Comment deleted" });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete comment" });
+  }
 });
 
 export default router;

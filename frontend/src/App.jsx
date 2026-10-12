@@ -5207,17 +5207,34 @@ function NotificationsPage() {
             <div className="notification-center-state">Loading notifications...</div>
           ) : filteredItems.length ? (
             filteredItems.map(n => (
-              <button type="button" className="notification notification-card" key={n._id} onClick={() => {
-                const actorId = n?.actor?._id || n?.actorId;
-                if (actorId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: actorId } }));
-              }}>
+              <div role="button" tabIndex={0} className="notification notification-card" key={n._id}
+                onClick={() => {
+                  const actorId = n?.actor?._id || n?.actorId;
+                  if (actorId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: actorId } }));
+                }}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const actorId = n?.actor?._id || n?.actorId;
+                    if (actorId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: actorId } }));
+                  }
+                }}>
                 <Avatar user={n.actor} size={48} />
                 <span className="notification-copy">
                   <span><UserLink user={n.actor} /> {n.text || n.message || "New activity on your account"}</span>
                   <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
                 </span>
-                <ChevronRight className="notification-arrow" />
-              </button>
+                <button type="button" className="notification-delete" aria-label="Delete notification" title="Delete notification"
+                  onClick={async e => {
+                    e.stopPropagation();
+                    try {
+                      await api(`/notifications/${n._id}`, { method: "DELETE" });
+                      setItems(current => current.filter(item => String(item._id) !== String(n._id)));
+                    } catch (error) {
+                      alert(error.message || "Could not delete notification.");
+                    }
+                  }}><Trash2 size={18} /></button>
+              </div>
             ))
           ) : (
             <div className="notification-center-state notification-center-empty">

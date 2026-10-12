@@ -2,7 +2,15 @@ import express from "express";
 
 
 
+
+
+
+
 import http from "http";
+
+
+
+
 
 
 
@@ -10,11 +18,23 @@ import mongoose from "mongoose";
 
 
 
+
+
+
+
 import cors from "cors";
 
 
 
+
+
+
+
 import dotenv from "dotenv";
+
+
+
+
 
 
 
@@ -26,7 +46,19 @@ import { Server } from "socket.io";
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -34,7 +66,19 @@ import { Server } from "socket.io";
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -46,9 +90,19 @@ import authRoutes from "./routes/auth.routes.js";
 
 
 
+
+
+
+
 import userRoutes from "./routes/users.routes.js";
 
+
+
 import settingsRoutes from "./routes/settings.routes.js";
+
+
+
+
 
 
 
@@ -56,7 +110,15 @@ import mediaRoutes from "./routes/media.routes.js";
 
 
 
+
+
+
+
 import postRoutes from "./routes/posts.routes.js";
+
+
+
+
 
 
 
@@ -64,7 +126,15 @@ import followRoutes from "./routes/follows.routes.js";
 
 
 
+
+
+
+
 import storyRoutes from "./routes/stories.routes.js";
+
+
+
+
 
 
 
@@ -72,7 +142,15 @@ import reelRoutes from "./routes/reels.routes.js";
 
 
 
+
+
+
+
 import messageRoutes from "./routes/messages.routes.js";
+
+
+
+
 
 
 
@@ -80,11 +158,33 @@ import notificationRoutes from "./routes/notifications.routes.js";
 
 
 
+
+
+
+
 import noteRoutes from "./routes/notes.routes.js";
 
 
 
+
+
+
+
 import reportRoutes from "./routes/reports.routes.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -106,7 +206,19 @@ import verificationRoutes from "./routes/verification.routes.js";
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -114,7 +226,19 @@ import verificationRoutes from "./routes/verification.routes.js";
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -130,7 +254,19 @@ dotenv.config();
 
 
 
+
+
+
+
+
+
+
+
 const app = express();
+
+
+
+
 
 
 
@@ -142,7 +278,19 @@ const server = http.createServer(app);
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -150,7 +298,19 @@ const server = http.createServer(app);
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -162,7 +322,19 @@ const PORT =
 
 
 
-  process.env.PORT || 5000;
+
+
+
+
+  process.env.PORT || 5000;
+
+
+
+
+
+
+
+
 
 
 
@@ -174,11 +346,27 @@ const CLIENT_URL =
 
 
 
-  process.env.CLIENT_URL ||
 
 
 
-  "https://reelsgo.vercel.app";
+
+  process.env.CLIENT_URL ||
+
+
+
+
+
+
+
+  "https://reelsgo.vercel.app";
+
+
+
+
+
+
+
+
 
 
 
@@ -190,7 +378,19 @@ const MONGO_URI =
 
 
 
-  process.env.MONGO_URI;
+
+
+
+
+  process.env.MONGO_URI;
+
+
+
+
+
+
+
+
 
 
 
@@ -202,7 +402,19 @@ const JWT_SECRET =
 
 
 
-  process.env.JWT_SECRET;
+
+
+
+
+  process.env.JWT_SECRET;
+
+
+
+
+
+
+
+
 
 
 
@@ -211,6 +423,10 @@ const JWT_SECRET =
 
 
 // ===============================
+
+
+
+
 
 
 
@@ -218,7 +434,19 @@ const JWT_SECRET =
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -230,15 +458,11 @@ if (!MONGO_URI) {
 
 
 
-  console.error(
 
 
 
-    "❌ MONGO_URI is missing"
 
-
-
-  );
+  console.error(
 
 
 
@@ -246,11 +470,47 @@ if (!MONGO_URI) {
 
 
 
-  process.exit(1);
+    "❌ MONGO_URI is missing"
+
+
+
+
+
+
+
+  );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  process.exit(1);
+
+
+
+
 
 
 
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -262,15 +522,11 @@ if (!JWT_SECRET) {
 
 
 
-  console.error(
 
 
 
-    "❌ JWT_SECRET is missing"
 
-
-
-  );
+  console.error(
 
 
 
@@ -278,7 +534,35 @@ if (!JWT_SECRET) {
 
 
 
-  process.exit(1);
+    "❌ JWT_SECRET is missing"
+
+
+
+
+
+
+
+  );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  process.exit(1);
+
+
+
+
 
 
 
@@ -290,7 +574,19 @@ if (!JWT_SECRET) {
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -298,7 +594,19 @@ if (!JWT_SECRET) {
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -310,23 +618,47 @@ const allowedOrigins = [
 
 
 
-  "https://reelsgo.vercel.app",
 
 
 
-  CLIENT_URL,
+
+  "https://reelsgo.vercel.app",
 
 
 
-  "http://localhost:5173",
 
 
 
-  "http://127.0.0.1:5173",
+
+  CLIENT_URL,
 
 
 
-  "http://localhost:3000"
+
+
+
+
+  "http://localhost:5173",
+
+
+
+
+
+
+
+  "http://127.0.0.1:5173",
+
+
+
+
+
+
+
+  "http://localhost:3000"
+
+
+
+
 
 
 
@@ -338,16 +670,23 @@ const allowedOrigins = [
 
 
 
+
+
+
+
+
+
+
+
 app.use(
 
 
 
-  cors({
 
 
 
-    origin(origin, callback) {
 
+  cors({
 
 
 
@@ -355,86 +694,75 @@ app.use(
 
 
 
+    origin(origin, callback) {
 
 
 
-      if (!origin) {
 
 
 
-        return callback(
 
 
 
-          null,
 
 
 
-          true
 
 
 
-        );
 
 
 
-      }
 
 
 
 
 
+      if (!origin) {
 
 
-      if (
 
 
 
-        allowedOrigins.includes(origin)
 
 
+        return callback(
 
-      ) {
 
 
 
-        return callback(
 
 
 
-          null,
+          null,
 
 
 
-          true
 
 
 
-        );
 
+          true
 
 
-      }
 
 
 
 
 
+        );
 
 
-      console.warn(
 
 
 
-        "⚠️ CORS blocked:",
 
 
+      }
 
-        origin
 
 
 
-      );
 
 
 
@@ -442,95 +770,303 @@ app.use(
 
 
 
-      return callback(
 
 
 
-        new Error(
 
+      if (
 
 
-          "Not allowed by CORS"
 
 
 
-        )
 
 
+        allowedOrigins.includes(origin)
 
-      );
 
 
 
-    },
 
 
 
+      ) {
 
 
 
 
-    credentials: true,
 
 
 
+        return callback(
 
 
 
 
-    methods: [
 
 
 
-      "GET",
+          null,
 
 
 
-      "POST",
 
 
 
-      "PUT",
 
+          true
 
 
-      "PATCH",
 
 
 
-      "DELETE",
 
 
+        );
 
-      "OPTIONS"
 
 
 
-    ],
 
 
 
+      }
 
 
 
 
-    allowedHeaders: [
 
 
 
-      "Content-Type",
 
 
 
-      "Authorization"
 
 
 
-    ]
 
 
+      console.warn(
 
-  })
+
+
+
+
+
+
+        "⚠️ CORS blocked:",
+
+
+
+
+
+
+
+        origin
+
+
+
+
+
+
+
+      );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      return callback(
+
+
+
+
+
+
+
+        new Error(
+
+
+
+
+
+
+
+          "Not allowed by CORS"
+
+
+
+
+
+
+
+        )
+
+
+
+
+
+
+
+      );
+
+
+
+
+
+
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    credentials: true,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    methods: [
+
+
+
+
+
+
+
+      "GET",
+
+
+
+
+
+
+
+      "POST",
+
+
+
+
+
+
+
+      "PUT",
+
+
+
+
+
+
+
+      "PATCH",
+
+
+
+
+
+
+
+      "DELETE",
+
+
+
+
+
+
+
+      "OPTIONS"
+
+
+
+
+
+
+
+    ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    allowedHeaders: [
+
+
+
+
+
+
+
+      "Content-Type",
+
+
+
+
+
+
+
+      "Authorization"
+
+
+
+
+
+
+
+    ]
+
+
+
+
+
+
+
+  })
+
+
+
+
 
 
 
@@ -542,7 +1078,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -550,7 +1098,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -562,19 +1122,43 @@ app.use(
 
 
 
-  express.json({
 
 
 
-    limit: "20mb"
+
+  express.json({
 
 
 
-  })
+
+
+
+
+    limit: "20mb"
+
+
+
+
+
+
+
+  })
+
+
+
+
 
 
 
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -586,19 +1170,39 @@ app.use(
 
 
 
-  express.urlencoded({
 
 
 
-    extended: true,
+
+  express.urlencoded({
 
 
 
-    limit: "20mb"
 
 
 
-  })
+
+    extended: true,
+
+
+
+
+
+
+
+    limit: "20mb"
+
+
+
+
+
+
+
+  })
+
+
+
+
 
 
 
@@ -610,7 +1214,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -618,7 +1234,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -630,19 +1258,11 @@ app.use(
 
 
 
-  (req, res, next) => {
 
 
 
-    console.log(
 
-
-
-      `${new Date().toISOString()} ${req.method} ${req.originalUrl}`
-
-
-
-    );
+  (req, res, next) => {
 
 
 
@@ -650,11 +1270,51 @@ app.use(
 
 
 
-    next();
+    console.log(
 
 
 
-  }
+
+
+
+
+      `${new Date().toISOString()} ${req.method} ${req.originalUrl}`
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    next();
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -666,7 +1326,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -674,7 +1346,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -686,43 +1370,87 @@ app.get(
 
 
 
-  "/",
 
 
 
-  (req, res) => {
+
+  "/",
 
 
 
-    res.json({
 
 
 
-      ok: true,
+
+  (req, res) => {
 
 
 
-      name: "ReelsGo API",
 
 
 
-      message:
+
+    res.json({
 
 
 
-        "ReelsGo backend is running",
 
 
 
-      version: "1.0.0"
+
+      ok: true,
 
 
 
-    });
 
 
 
-  }
+
+      name: "ReelsGo API",
+
+
+
+
+
+
+
+      message:
+
+
+
+
+
+
+
+        "ReelsGo backend is running",
+
+
+
+
+
+
+
+      version: "1.0.0"
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -734,7 +1462,19 @@ app.get(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -742,7 +1482,19 @@ app.get(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -754,23 +1506,11 @@ app.get(
 
 
 
-  "/api/health",
 
 
 
-  (req, res) => {
 
-
-
-    res.json({
-
-
-
-      ok: true,
-
-
-
-      service: "ReelsGo",
+  "/api/health",
 
 
 
@@ -778,23 +1518,7 @@ app.get(
 
 
 
-      database:
-
-
-
-        mongoose.connection
-
-
-
-          .readyState === 1
-
-
-
-          ? "MongoDB connected"
-
-
-
-          : "MongoDB not connected",
+  (req, res) => {
 
 
 
@@ -802,19 +1526,115 @@ app.get(
 
 
 
-      timestamp:
+    res.json({
 
 
 
-        new Date().toISOString()
 
 
 
-    });
+
+      ok: true,
 
 
 
-  }
+
+
+
+
+      service: "ReelsGo",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      database:
+
+
+
+
+
+
+
+        mongoose.connection
+
+
+
+
+
+
+
+          .readyState === 1
+
+
+
+
+
+
+
+          ? "MongoDB connected"
+
+
+
+
+
+
+
+          : "MongoDB not connected",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      timestamp:
+
+
+
+
+
+
+
+        new Date().toISOString()
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -826,7 +1646,19 @@ app.get(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -834,6 +1666,10 @@ app.get(
 
 
 
+
+
+
+
 // ===============================
 
 
@@ -842,7 +1678,19 @@ app.get(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -850,7 +1698,19 @@ app.get(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -862,11 +1722,23 @@ app.use(
 
 
 
-  "/api/auth",
 
 
 
-  authRoutes
+
+  "/api/auth",
+
+
+
+
+
+
+
+  authRoutes
+
+
+
+
 
 
 
@@ -878,7 +1750,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -886,7 +1770,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -898,25 +1794,49 @@ app.use(
 
 
 
-  "/api/users",
 
 
 
-  userRoutes
+
+  "/api/users",
+
+
+
+
+
+
+
+  userRoutes
+
+
+
+
 
 
 
 );
+
+
+
+
 
 
 
 // Settings API; uses a separate collection and leaves User.js unchanged.
 
+
+
 app.use(
 
-  "/api/users",
 
-  settingsRoutes
+
+  "/api/users",
+
+
+
+  settingsRoutes
+
+
 
 );
 
@@ -926,7 +1846,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -934,7 +1866,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -946,11 +1890,23 @@ app.use(
 
 
 
-  "/api/media",
 
 
 
-  mediaRoutes
+
+  "/api/media",
+
+
+
+
+
+
+
+  mediaRoutes
+
+
+
+
 
 
 
@@ -962,7 +1918,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -970,7 +1938,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -982,11 +1962,23 @@ app.use(
 
 
 
-  "/api/posts",
 
 
 
-  postRoutes
+
+  "/api/posts",
+
+
+
+
+
+
+
+  postRoutes
+
+
+
+
 
 
 
@@ -998,7 +1990,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1006,7 +2010,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1018,11 +2034,23 @@ app.use(
 
 
 
-  "/api/follows",
 
 
 
-  followRoutes
+
+  "/api/follows",
+
+
+
+
+
+
+
+  followRoutes
+
+
+
+
 
 
 
@@ -1034,7 +2062,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1042,7 +2082,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1054,11 +2106,23 @@ app.use(
 
 
 
-  "/api/stories",
 
 
 
-  storyRoutes
+
+  "/api/stories",
+
+
+
+
+
+
+
+  storyRoutes
+
+
+
+
 
 
 
@@ -1070,7 +2134,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1078,7 +2154,20 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1090,11 +2179,23 @@ app.use(
 
 
 
-  "/api/reels",
 
 
 
-  reelRoutes
+
+  "/api/reels",
+
+
+
+
+
+
+
+  reelRoutes
+
+
+
+
 
 
 
@@ -1106,7 +2207,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1114,7 +2227,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1126,11 +2251,23 @@ app.use(
 
 
 
-  "/api/messages",
 
 
 
-  messageRoutes
+
+  "/api/messages",
+
+
+
+
+
+
+
+  messageRoutes
+
+
+
+
 
 
 
@@ -1142,7 +2279,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1150,7 +2299,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1162,11 +2323,23 @@ app.use(
 
 
 
-  "/api/notifications",
 
 
 
-  notificationRoutes
+
+  "/api/notifications",
+
+
+
+
+
+
+
+  notificationRoutes
+
+
+
+
 
 
 
@@ -1178,7 +2351,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1186,7 +2371,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1198,11 +2395,23 @@ app.use(
 
 
 
-  "/api/notes",
 
 
 
-  noteRoutes
+
+  "/api/notes",
+
+
+
+
+
+
+
+  noteRoutes
+
+
+
+
 
 
 
@@ -1214,7 +2423,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1222,7 +2443,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1234,11 +2467,23 @@ app.use(
 
 
 
-  "/api/reports",
 
 
 
-  reportRoutes
+
+  "/api/reports",
+
+
+
+
+
+
+
+  reportRoutes
+
+
+
+
 
 
 
@@ -1250,7 +2495,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // =====================================================
+
+
+
+
 
 
 
@@ -1258,11 +2515,23 @@ app.use(
 
 
 
+
+
+
+
 // =====================================================
 
 
 
+
+
+
+
 //
+
+
+
+
 
 
 
@@ -1270,11 +2539,23 @@ app.use(
 
 
 
+
+
+
+
 //
 
 
 
+
+
+
+
 // GET
+
+
+
+
 
 
 
@@ -1282,7 +2563,15 @@ app.use(
 
 
 
+
+
+
+
 //
+
+
+
+
 
 
 
@@ -1290,11 +2579,23 @@ app.use(
 
 
 
+
+
+
+
 // /api/verification/me
 
 
 
+
+
+
+
 //
+
+
+
+
 
 
 
@@ -1302,11 +2603,23 @@ app.use(
 
 
 
+
+
+
+
 // /api/verification/phone/confirm
 
 
 
+
+
+
+
 //
+
+
+
+
 
 
 
@@ -1318,15 +2631,35 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 app.use(
 
 
 
-  "/api/verification",
 
 
 
-  verificationRoutes
+
+  "/api/verification",
+
+
+
+
+
+
+
+  verificationRoutes
+
+
+
+
 
 
 
@@ -1338,7 +2671,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1346,7 +2691,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1358,19 +2715,11 @@ app.use(
 
 
 
-  (req, res) => {
 
 
 
-    res.status(404).json({
 
-
-
-      message:
-
-
-
-        "API endpoint not found",
+  (req, res) => {
 
 
 
@@ -1378,11 +2727,7 @@ app.use(
 
 
 
-      method:
-
-
-
-        req.method,
+    res.status(404).json({
 
 
 
@@ -1390,19 +2735,83 @@ app.use(
 
 
 
-      path:
+      message:
 
 
 
-        req.originalUrl
 
 
 
-    });
+
+        "API endpoint not found",
 
 
 
-  }
+
+
+
+
+
+
+
+
+
+
+
+
+      method:
+
+
+
+
+
+
+
+        req.method,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      path:
+
+
+
+
+
+
+
+        req.originalUrl
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -1414,7 +2823,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1422,7 +2843,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1434,87 +2867,78 @@ app.use(
 
 
 
-  (
 
 
 
-    err,
 
+  (
 
 
-    req,
 
 
 
-    res,
 
 
+    err,
 
-    next
 
 
 
-  ) => {
 
 
 
-    console.error(
+    req,
 
 
 
-      "================================="
 
 
 
-    );
 
+    res,
 
 
 
 
 
 
-    console.error(
 
+    next
 
 
-      "SERVER ERROR"
 
 
 
-    );
 
 
+  ) => {
 
 
 
 
 
-    console.error(
 
 
+    console.error(
 
-      err
 
 
 
-    );
 
 
 
+      "================================="
 
 
 
 
-    console.error(
 
 
 
-      "================================="
+    );
 
 
 
-    );
 
 
 
@@ -1522,71 +2946,62 @@ app.use(
 
 
 
-    // ===============================
 
 
 
-    // CORS ERROR
 
 
+    console.error(
 
-    // ===============================
 
 
 
 
 
 
+      "SERVER ERROR"
 
-    if (
 
 
 
-      err.message ===
 
 
 
-      "Not allowed by CORS"
+    );
 
 
 
-    ) {
 
 
 
-      return res.status(403).json({
 
 
 
-        message:
 
 
 
-          "CORS blocked this request"
 
 
 
-      });
+    console.error(
 
 
 
-    }
 
 
 
 
+      err
 
 
 
-    // ===============================
 
 
 
-    // MULTER FILE ERROR
 
+    );
 
 
-    // ===============================
 
 
 
@@ -1594,39 +3009,33 @@ app.use(
 
 
 
-    if (
 
 
 
-      err.code ===
 
 
 
-      "LIMIT_FILE_SIZE"
+    console.error(
 
 
 
-    ) {
 
 
 
-      return res.status(400).json({
 
+      "================================="
 
 
-        message:
 
 
 
-          "Uploaded file is too large"
 
 
+    );
 
-      });
 
 
 
-    }
 
 
 
@@ -1634,51 +3043,327 @@ app.use(
 
 
 
-    // ===============================
 
 
 
-    // GENERAL ERROR
 
+    // ===============================
 
 
-    // ===============================
 
 
 
 
 
+    // CORS ERROR
 
 
-    res.status(
 
 
 
-      err.status || 500
 
 
+    // ===============================
 
-    ).json({
 
 
 
-      message:
 
 
 
-        err.message ||
 
 
 
-        "Internal server error"
 
 
 
-    });
 
 
+    if (
 
-  }
+
+
+
+
+
+
+      err.message ===
+
+
+
+
+
+
+
+      "Not allowed by CORS"
+
+
+
+
+
+
+
+    ) {
+
+
+
+
+
+
+
+      return res.status(403).json({
+
+
+
+
+
+
+
+        message:
+
+
+
+
+
+
+
+          "CORS blocked this request"
+
+
+
+
+
+
+
+      });
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // MULTER FILE ERROR
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (
+
+
+
+
+
+
+
+      err.code ===
+
+
+
+
+
+
+
+      "LIMIT_FILE_SIZE"
+
+
+
+
+
+
+
+    ) {
+
+
+
+
+
+
+
+      return res.status(400).json({
+
+
+
+
+
+
+
+        message:
+
+
+
+
+
+
+
+          "Uploaded file is too large"
+
+
+
+
+
+
+
+      });
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // GENERAL ERROR
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    res.status(
+
+
+
+
+
+
+
+      err.status || 500
+
+
+
+
+
+
+
+    ).json({
+
+
+
+
+
+
+
+      message:
+
+
+
+
+
+
+
+        err.message ||
+
+
+
+
+
+
+
+        "Internal server error"
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -1690,7 +3375,19 @@ app.use(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -1698,7 +3395,19 @@ app.use(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1710,39 +3419,35 @@ const io =
 
 
 
-  new Server(
 
 
 
-    server,
 
+  new Server(
 
 
-    {
 
 
 
-      cors: {
 
 
+    server,
 
-        origin:
 
 
 
-          allowedOrigins,
 
 
 
+    {
 
 
 
 
-        credentials:
 
 
 
-          true,
+      cors: {
 
 
 
@@ -1750,23 +3455,20 @@ const io =
 
 
 
-        methods: [
+        origin:
 
 
 
-          "GET",
 
 
 
-          "POST"
 
+          allowedOrigins,
 
 
-        ]
 
 
 
-      },
 
 
 
@@ -1774,27 +3476,130 @@ const io =
 
 
 
-      transports: [
 
 
 
-        "websocket",
+        credentials:
 
 
 
-        "polling"
 
 
 
-      ]
 
+          true,
 
 
-    }
 
 
 
-  );
+
+
+
+
+
+
+
+
+
+
+        methods: [
+
+
+
+
+
+
+
+          "GET",
+
+
+
+
+
+
+
+          "POST"
+
+
+
+
+
+
+
+        ]
+
+
+
+
+
+
+
+      },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      transports: [
+
+
+
+
+
+
+
+        "websocket",
+
+
+
+
+
+
+
+        "polling"
+
+
+
+
+
+
+
+      ]
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+  );
+
+
+
+
+
+
+
+
 
 
 
@@ -1803,6 +3608,10 @@ const io =
 
 
 // ===============================
+
+
+
+
 
 
 
@@ -1810,7 +3619,19 @@ const io =
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -1822,159 +3643,142 @@ io.on(
 
 
 
-  "connection",
 
 
 
-  (socket) => {
 
+  "connection",
 
 
-    console.log(
 
 
 
-      "🟢 Socket connected:",
 
 
+  (socket) => {
 
-      socket.id
 
 
 
-    );
 
 
 
+    console.log(
 
 
 
 
-    // ===============================
 
 
 
-    // JOIN USER ROOM
+      "🟢 Socket connected:",
 
 
 
-    // ===============================
 
 
 
 
+      socket.id
 
 
 
-    socket.on(
 
 
 
-      "join_user",
 
+    );
 
 
-      (userId) => {
 
 
 
-        if (!userId) {
 
 
 
-          return;
 
 
 
-        }
 
 
 
 
+    // ===============================
 
 
 
-        const room =
 
 
 
-          `user:${userId}`;
 
+    // JOIN USER ROOM
 
 
 
 
 
 
-        socket.join(room);
 
+    // ===============================
 
 
 
 
 
 
-        console.log(
 
 
 
-          `👤 User ${userId} joined ${room}`
 
 
 
-        );
 
 
 
-      }
+    socket.on(
 
 
 
-    );
 
 
 
 
+      "join_user",
 
 
 
-    // ===============================
 
 
 
-    // JOIN CONVERSATION
 
+      (userId) => {
 
 
-    // ===============================
 
 
 
 
 
+        if (!userId) {
 
 
-    socket.on(
 
 
 
-      "join_conversation",
 
 
+          return;
 
-      (conversationId) => {
 
 
 
-        if (!conversationId) {
 
 
 
-          return;
+        }
 
 
 
-        }
 
 
 
@@ -1982,43 +3786,38 @@ io.on(
 
 
 
-        const room =
 
 
 
-          `conversation:${conversationId}`;
 
 
+        const room =
 
 
 
 
 
-        socket.join(room);
 
 
+          `user:${userId}`;
 
 
 
 
 
-        console.log(
 
 
 
-          `💬 Socket ${socket.id} joined ${room}`
 
 
 
-        );
 
 
 
-      }
 
+        socket.join(room);
 
 
-    );
 
 
 
@@ -2026,15 +3825,13 @@ io.on(
 
 
 
-    // ===============================
 
 
 
-    // LEAVE CONVERSATION
 
 
 
-    // ===============================
+        console.log(
 
 
 
@@ -2042,39 +3839,35 @@ io.on(
 
 
 
-    socket.on(
+          `👤 User ${userId} joined ${room}`
 
 
 
-      "leave_conversation",
 
 
 
-      (conversationId) => {
 
+        );
 
 
-        if (!conversationId) {
 
 
 
-          return;
 
 
+      }
 
-        }
 
 
 
 
 
 
+    );
 
-        const room =
 
 
 
-          `conversation:${conversationId}`;
 
 
 
@@ -2082,31 +3875,28 @@ io.on(
 
 
 
-        socket.leave(room);
 
 
 
 
+    // ===============================
 
 
 
-        console.log(
 
 
 
-          `🚪 Socket ${socket.id} left ${room}`
 
+    // JOIN CONVERSATION
 
 
-        );
 
 
 
-      }
 
 
+    // ===============================
 
-    );
 
 
 
@@ -2114,119 +3904,102 @@ io.on(
 
 
 
-    // ===============================
 
 
 
-    // TYPING
 
 
 
-    // ===============================
 
+    socket.on(
 
 
 
 
 
 
-    socket.on(
 
+      "join_conversation",
 
 
-      "typing",
 
 
 
-      (data) => {
 
 
+      (conversationId) => {
 
-        if (
 
 
 
-          !data?.conversationId
 
 
 
-        ) {
+        if (!conversationId) {
 
 
 
-          return;
 
 
 
-        }
 
+          return;
 
 
 
 
 
 
-        socket
 
+        }
 
 
-          .to(
 
 
 
-            `conversation:${data.conversationId}`
 
 
 
-          )
 
 
 
-          .emit(
 
 
 
-            "typing",
 
+        const room =
 
 
-            {
 
 
 
-              ...data
 
 
+          `conversation:${conversationId}`;
 
-            }
 
 
 
-          );
 
 
 
-      }
 
 
 
-    );
 
 
 
 
 
+        socket.join(room);
 
 
-    // ===============================
 
 
 
-    // STOP TYPING
 
 
 
-    // ===============================
 
 
 
@@ -2234,35 +4007,31 @@ io.on(
 
 
 
-    socket.on(
+        console.log(
 
 
 
-      "stop_typing",
 
 
 
-      (data) => {
 
+          `💬 Socket ${socket.id} joined ${room}`
 
 
-        if (
 
 
 
-          !data?.conversationId
 
 
+        );
 
-        ) {
 
 
 
-          return;
 
 
 
-        }
+      }
 
 
 
@@ -2270,51 +4039,43 @@ io.on(
 
 
 
-        socket
+    );
 
 
 
-          .to(
 
 
 
-            `conversation:${data.conversationId}`
 
 
 
-          )
 
 
 
-          .emit(
 
 
 
-            "stop_typing",
+    // ===============================
 
 
 
-            {
 
 
 
-              ...data
 
+    // LEAVE CONVERSATION
 
 
-            }
 
 
 
-          );
 
 
+    // ===============================
 
-      }
 
 
 
-    );
 
 
 
@@ -2322,95 +4083,82 @@ io.on(
 
 
 
-    // ===============================
 
 
 
-    // MESSAGE SENT
 
+    socket.on(
 
 
-    // ===============================
 
 
 
 
 
+      "leave_conversation",
 
 
-    socket.on(
 
 
 
-      "message_sent",
 
 
+      (conversationId) => {
 
-      (data) => {
 
 
 
-        if (
 
 
 
-          !data?.conversationId
+        if (!conversationId) {
 
 
 
-        ) {
 
 
 
-          return;
 
+          return;
 
 
-        }
 
 
 
 
 
+        }
 
 
-        socket
 
 
 
-          .to(
 
 
 
-            `conversation:${data.conversationId}`
 
 
 
-          )
 
 
 
-          .emit(
 
+        const room =
 
 
-            "message_received",
 
 
 
-            data
 
 
+          `conversation:${conversationId}`;
 
-          );
 
 
 
-      }
 
 
 
-    );
 
 
 
@@ -2418,15 +4166,13 @@ io.on(
 
 
 
-    // ===============================
 
+        socket.leave(room);
 
 
-    // MESSAGE SEEN
 
 
 
-    // ===============================
 
 
 
@@ -2434,95 +4180,82 @@ io.on(
 
 
 
-    socket.on(
 
 
 
-      "message_seen",
+        console.log(
 
 
 
-      (data) => {
 
 
 
-        if (
 
+          `🚪 Socket ${socket.id} left ${room}`
 
 
-          !data?.conversationId
 
 
 
-        ) {
 
 
+        );
 
-          return;
 
 
 
-        }
 
 
 
+      }
 
 
 
 
-        socket
 
 
 
-          .to(
+    );
 
 
 
-            `conversation:${data.conversationId}`
 
 
 
-          )
 
 
 
-          .emit(
 
 
 
-            "message_seen",
 
 
 
-            data
+    // ===============================
 
 
 
-          );
 
 
 
-      }
 
+    // TYPING
 
 
-    );
 
 
 
 
 
+    // ===============================
 
 
-    // ===============================
 
 
 
-    // MESSAGE REACTION
 
 
 
-    // ===============================
 
 
 
@@ -2530,35 +4263,31 @@ io.on(
 
 
 
-    socket.on(
+    socket.on(
 
 
 
-      "message_reaction",
 
 
 
-      (data) => {
 
+      "typing",
 
 
-        if (
 
 
 
-          !data?.conversationId
 
 
+      (data) => {
 
-        ) {
 
 
 
-          return;
 
 
 
-        }
+        if (
 
 
 
@@ -2566,43 +4295,37 @@ io.on(
 
 
 
-        socket
+          !data?.conversationId
 
 
 
-          .to(
 
 
 
-            `conversation:${data.conversationId}`
 
+        ) {
 
 
-          )
 
 
 
-          .emit(
 
 
+          return;
 
-            "message_reaction",
 
 
 
-            data
 
 
 
-          );
+        }
 
 
 
-      }
 
 
 
-    );
 
 
 
@@ -2610,191 +4333,169 @@ io.on(
 
 
 
-    // ===============================
 
 
+        socket
 
-    // STORY VIEWED
 
 
 
-    // ===============================
 
 
 
+          .to(
 
 
 
 
-    socket.on(
 
 
 
-      "story_viewed",
+            `conversation:${data.conversationId}`
 
 
 
-      (data) => {
 
 
 
-        if (
 
+          )
 
 
-          !data?.storyId
 
 
 
-        ) {
 
 
+          .emit(
 
-          return;
 
 
 
-        }
 
 
 
+            "typing",
 
 
 
 
-        socket.emit(
 
 
 
-          "story_viewed",
+            {
 
 
 
-          data
 
 
 
-        );
 
+              ...data
 
 
-      }
 
 
 
-    );
 
 
+            }
 
 
 
 
 
-    // ===============================
 
 
+          );
 
-    // NOTIFICATION
 
 
 
-    // ===============================
 
 
 
+      }
 
 
 
 
-    socket.on(
 
 
 
-      "notification",
+    );
 
 
 
-      (data) => {
 
 
 
-        if (
 
 
 
-          !data?.userId
 
 
 
-        ) {
 
 
 
-          return;
+    // ===============================
 
 
 
-        }
 
 
 
 
+    // STOP TYPING
 
 
 
-        io
 
 
 
-          .to(
 
+    // ===============================
 
 
-            `user:${data.userId}`
 
 
 
-          )
 
 
 
-          .emit(
 
 
 
-            "notification",
 
 
 
-            data
 
+    socket.on(
 
 
-          );
 
 
 
-      }
 
 
+      "stop_typing",
 
-    );
 
 
 
 
 
 
+      (data) => {
 
-    // ===============================
 
 
 
-    // DISCONNECT
 
 
 
-    // ===============================
+        if (
 
 
 
@@ -2802,43 +4503,1187 @@ io.on(
 
 
 
-    socket.on(
+          !data?.conversationId
 
 
 
-      "disconnect",
 
 
 
-      (reason) => {
 
+        ) {
 
 
-        console.log(
 
 
 
-          `🔴 Socket disconnected: ${socket.id}`,
 
 
+          return;
 
-          reason
 
 
 
-        );
 
 
 
-      }
+        }
 
 
 
-    );
 
 
 
-  }
+
+
+
+
+
+
+
+
+
+        socket
+
+
+
+
+
+
+
+          .to(
+
+
+
+
+
+
+
+            `conversation:${data.conversationId}`
+
+
+
+
+
+
+
+          )
+
+
+
+
+
+
+
+          .emit(
+
+
+
+
+
+
+
+            "stop_typing",
+
+
+
+
+
+
+
+            {
+
+
+
+
+
+
+
+              ...data
+
+
+
+
+
+
+
+            }
+
+
+
+
+
+
+
+          );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // MESSAGE SENT
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "message_sent",
+
+
+
+
+
+
+
+      (data) => {
+
+
+
+
+
+
+
+        if (
+
+
+
+
+
+
+
+          !data?.conversationId
+
+
+
+
+
+
+
+        ) {
+
+
+
+
+
+
+
+          return;
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket
+
+
+
+
+
+
+
+          .to(
+
+
+
+
+
+
+
+            `conversation:${data.conversationId}`
+
+
+
+
+
+
+
+          )
+
+
+
+
+
+
+
+          .emit(
+
+
+
+
+
+
+
+            "message_received",
+
+
+
+
+
+
+
+            data
+
+
+
+
+
+
+
+          );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // MESSAGE SEEN
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "message_seen",
+
+
+
+
+
+
+
+      (data) => {
+
+
+
+
+
+
+
+        if (
+
+
+
+
+
+
+
+          !data?.conversationId
+
+
+
+
+
+
+
+        ) {
+
+
+
+
+
+
+
+          return;
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket
+
+
+
+
+
+
+
+          .to(
+
+
+
+
+
+
+
+            `conversation:${data.conversationId}`
+
+
+
+
+
+
+
+          )
+
+
+
+
+
+
+
+          .emit(
+
+
+
+
+
+
+
+            "message_seen",
+
+
+
+
+
+
+
+            data
+
+
+
+
+
+
+
+          );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // MESSAGE REACTION
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "message_reaction",
+
+
+
+
+
+
+
+      (data) => {
+
+
+
+
+
+
+
+        if (
+
+
+
+
+
+
+
+          !data?.conversationId
+
+
+
+
+
+
+
+        ) {
+
+
+
+
+
+
+
+          return;
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket
+
+
+
+
+
+
+
+          .to(
+
+
+
+
+
+
+
+            `conversation:${data.conversationId}`
+
+
+
+
+
+
+
+          )
+
+
+
+
+
+
+
+          .emit(
+
+
+
+
+
+
+
+            "message_reaction",
+
+
+
+
+
+
+
+            data
+
+
+
+
+
+
+
+          );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // STORY VIEWED
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "story_viewed",
+
+
+
+
+
+
+
+      (data) => {
+
+
+
+
+
+
+
+        if (
+
+
+
+
+
+
+
+          !data?.storyId
+
+
+
+
+
+
+
+        ) {
+
+
+
+
+
+
+
+          return;
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        socket.emit(
+
+
+
+
+
+
+
+          "story_viewed",
+
+
+
+
+
+
+
+          data
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // NOTIFICATION
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "notification",
+
+
+
+
+
+
+
+      (data) => {
+
+
+
+
+
+
+
+        if (
+
+
+
+
+
+
+
+          !data?.userId
+
+
+
+
+
+
+
+        ) {
+
+
+
+
+
+
+
+          return;
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        io
+
+
+
+
+
+
+
+          .to(
+
+
+
+
+
+
+
+            `user:${data.userId}`
+
+
+
+
+
+
+
+          )
+
+
+
+
+
+
+
+          .emit(
+
+
+
+
+
+
+
+            "notification",
+
+
+
+
+
+
+
+            data
+
+
+
+
+
+
+
+          );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+    // DISCONNECT
+
+
+
+
+
+
+
+    // ===============================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    socket.on(
+
+
+
+
+
+
+
+      "disconnect",
+
+
+
+
+
+
+
+      (reason) => {
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          `🔴 Socket disconnected: ${socket.id}`,
+
+
+
+
+
+
+
+          reason
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -2850,7 +5695,19 @@ io.on(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -2858,7 +5715,19 @@ io.on(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -2870,11 +5739,23 @@ mongoose.set(
 
 
 
-  "strictQuery",
 
 
 
-  true
+
+  "strictQuery",
+
+
+
+
+
+
+
+  true
+
+
+
+
 
 
 
@@ -2886,7 +5767,19 @@ mongoose.set(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -2894,7 +5787,19 @@ mongoose.set(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -2906,23 +5811,11 @@ mongoose.connection.on(
 
 
 
-  "connected",
 
 
 
-  () => {
 
-
-
-    console.log(
-
-
-
-      "🟢 MongoDB connected"
-
-
-
-    );
+  "connected",
 
 
 
@@ -2930,23 +5823,83 @@ mongoose.connection.on(
 
 
 
-    console.log(
+  () => {
 
 
 
-      "Database:",
 
 
 
-      mongoose.connection.name
+
+    console.log(
 
 
 
-    );
 
 
 
-  }
+
+      "🟢 MongoDB connected"
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.log(
+
+
+
+
+
+
+
+      "Database:",
+
+
+
+
+
+
+
+      mongoose.connection.name
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -2958,7 +5911,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -2966,7 +5931,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -2978,31 +5955,63 @@ mongoose.connection.on(
 
 
 
-  "error",
 
 
 
-  (error) => {
+
+  "error",
 
 
 
-    console.error(
 
 
 
-      "❌ MongoDB error:",
+
+  (error) => {
 
 
 
-      error.message
 
 
 
-    );
+
+    console.error(
 
 
 
-  }
+
+
+
+
+      "❌ MongoDB error:",
+
+
+
+
+
+
+
+      error.message
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -3014,7 +6023,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -3022,7 +6043,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -3034,27 +6067,55 @@ mongoose.connection.on(
 
 
 
-  "disconnected",
 
 
 
-  () => {
+
+  "disconnected",
 
 
 
-    console.log(
 
 
 
-      "🟡 MongoDB disconnected"
+
+  () => {
 
 
 
-    );
 
 
 
-  }
+
+    console.log(
+
+
+
+
+
+
+
+      "🟡 MongoDB disconnected"
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -3066,7 +6127,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -3074,7 +6147,19 @@ mongoose.connection.on(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -3086,83 +6171,73 @@ async function startServer() {
 
 
 
-  try {
 
 
 
-    console.log(
 
+  try {
 
 
-      "---------------------------------"
 
 
 
-    );
 
 
+    console.log(
 
 
 
 
 
-    console.log(
 
 
+      "---------------------------------"
 
-      "🚀 Starting ReelsGo server..."
 
 
 
-    );
 
 
 
+    );
 
 
 
 
-    console.log(
 
 
 
-      "MongoDB connecting..."
 
 
 
-    );
 
 
 
 
 
+    console.log(
 
 
-    await mongoose.connect(
 
 
 
-      MONGO_URI,
 
 
+      "🚀 Starting ReelsGo server..."
 
-      {
 
 
 
-        serverSelectionTimeoutMS:
 
 
 
-          10000
+    );
 
 
 
-      }
 
 
 
-    );
 
 
 
@@ -3170,47 +6245,41 @@ async function startServer() {
 
 
 
-    console.log(
 
 
+    console.log(
 
-      "---------------------------------"
 
 
 
-    );
 
 
 
+      "MongoDB connecting..."
 
 
 
 
-    server.listen(
 
 
 
-      PORT,
+    );
 
 
 
-      "0.0.0.0",
 
 
 
-      () => {
 
 
 
-        console.log(
 
 
 
-          `🚀 ReelsGo API running on port ${PORT}`
 
 
 
-        );
+    await mongoose.connect(
 
 
 
@@ -3218,87 +6287,79 @@ async function startServer() {
 
 
 
-        console.log(
+      MONGO_URI,
 
 
 
-          `🌐 Frontend: ${CLIENT_URL}`
 
 
 
-        );
 
+      {
 
 
 
 
 
 
-        console.log(
 
+        serverSelectionTimeoutMS:
 
 
-          `❤️ Health: /api/health`
 
 
 
-        );
 
 
+          30000
 
 
 
 
 
-        console.log(
 
 
+      }
 
-          `📱 Verification: /api/verification`
 
 
 
-        );
 
 
 
+    );
 
 
 
 
-        console.log(
 
 
 
-          `💬 Socket.IO enabled`
 
 
 
-        );
 
 
 
 
 
+    console.log(
 
 
-        console.log(
 
 
 
-          "---------------------------------"
 
 
+      "---------------------------------"
 
-        );
 
 
 
-      }
 
 
 
-    );
+    );
 
 
 
@@ -3306,35 +6367,31 @@ async function startServer() {
 
 
 
-  } catch (error) {
 
 
 
-    console.error(
 
 
 
-      "================================="
 
 
+    server.listen(
 
-    );
 
 
 
 
 
 
+      PORT,
 
-    console.error(
 
 
 
-      "❌ SERVER STARTUP FAILED"
 
 
 
-    );
+      "0.0.0.0",
 
 
 
@@ -3342,43 +6399,371 @@ async function startServer() {
 
 
 
-    console.error(
+      () => {
 
 
 
-      error.message
 
 
 
-    );
 
+        console.log(
 
 
 
 
 
 
-    console.error(
 
+          `🚀 ReelsGo API running on port ${PORT}`
 
 
-      "================================="
 
 
 
-    );
 
 
+        );
 
 
 
 
 
-    process.exit(1);
 
 
 
-  }
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          `🌐 Frontend: ${CLIENT_URL}`
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          `❤️ Health: /api/health`
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          `📱 Verification: /api/verification`
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          `💬 Socket.IO enabled`
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          "---------------------------------"
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  } catch (error) {
+
+
+
+
+
+
+
+    console.error(
+
+
+
+
+
+
+
+      "================================="
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.error(
+
+
+
+
+
+
+
+      "❌ SERVER STARTUP FAILED"
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.error(
+
+
+
+
+
+
+
+      error.message
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    console.error(
+
+
+
+
+
+
+
+      "================================="
+
+
+
+
+
+
+
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    process.exit(1);
+
+
+
+
+
+
+
+  }
+
+
+
+
 
 
 
@@ -3390,7 +6775,19 @@ async function startServer() {
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -3398,7 +6795,19 @@ async function startServer() {
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -3410,7 +6819,15 @@ async function shutdown(
 
 
 
-  signal
+
+
+
+
+  signal
+
+
+
+
 
 
 
@@ -3418,35 +6835,31 @@ async function shutdown(
 
 
 
-  console.log(
 
 
 
-    `\n${signal} received. Shutting down...`
 
+  console.log(
 
 
-  );
 
 
 
 
 
+    `\n${signal} received. Shutting down...`
 
 
-  server.close(
 
 
 
-    async () => {
 
 
+  );
 
-      try {
 
 
 
-        await mongoose.connection.close();
 
 
 
@@ -3454,39 +6867,36 @@ async function shutdown(
 
 
 
-        console.log(
 
 
 
-          "MongoDB connection closed."
 
+  server.close(
 
 
-        );
 
 
 
 
 
+    async () => {
 
 
-        console.log(
 
 
 
-          "ReelsGo server stopped."
 
 
+      try {
 
-        );
 
 
 
 
 
 
+        await mongoose.connection.close();
 
-        process.exit(0);
 
 
 
@@ -3494,43 +6904,170 @@ async function shutdown(
 
 
 
-      } catch (error) {
 
 
 
-        console.error(
 
 
 
-          "Shutdown error:",
 
+        console.log(
 
 
-          error.message
 
 
 
-        );
 
 
+          "MongoDB connection closed."
 
 
 
 
 
-        process.exit(1);
 
 
+        );
 
-      }
 
 
 
-    }
 
 
 
-  );
+
+
+
+
+
+
+
+
+        console.log(
+
+
+
+
+
+
+
+          "ReelsGo server stopped."
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        process.exit(0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      } catch (error) {
+
+
+
+
+
+
+
+        console.error(
+
+
+
+
+
+
+
+          "Shutdown error:",
+
+
+
+
+
+
+
+          error.message
+
+
+
+
+
+
+
+        );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        process.exit(1);
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+  );
+
+
+
+
 
 
 
@@ -3542,7 +7079,19 @@ async function shutdown(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -3550,7 +7099,19 @@ async function shutdown(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
@@ -3562,15 +7123,35 @@ process.on(
 
 
 
-  "SIGINT",
 
 
 
-  () => shutdown("SIGINT")
+
+  "SIGINT",
+
+
+
+
+
+
+
+  () => shutdown("SIGINT")
+
+
+
+
 
 
 
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -3582,11 +7163,23 @@ process.on(
 
 
 
-  "SIGTERM",
 
 
 
-  () => shutdown("SIGTERM")
+
+  "SIGTERM",
+
+
+
+
+
+
+
+  () => shutdown("SIGTERM")
+
+
+
+
 
 
 
@@ -3598,7 +7191,19 @@ process.on(
 
 
 
+
+
+
+
+
+
+
+
 // ===============================
+
+
+
+
 
 
 
@@ -3606,7 +7211,19 @@ process.on(
 
 
 
+
+
+
+
 // ===============================
+
+
+
+
+
+
+
+
 
 
 
