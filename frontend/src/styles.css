@@ -12609,3 +12609,34 @@ body.reelsgo-reels-active .floating-messages { display:none !important; }
   color: #a1a1aa; background: transparent; margin-left: auto;
 }
 .notification-delete:hover { color: #ef4444; background: #ef44441a; }
+
+
+/* Reels UI refinement: visible desktop actions, Instagram-like comment sheet, and nav suppression while commenting. */
+@media (min-width:701px) {
+  .reels-page .reels-stage { display:flex !important; justify-content:center !important; width:100% !important; overflow:visible !important; }
+  .reels-page .reels-scroll { width:min(430px,42vw) !important; overflow-y:auto !important; overflow-x:visible !important; }
+  .reels-page .reel-feed-card { overflow:visible !important; }
+  .reels-page .reel-feed-media { overflow:visible !important; }
+  .reels-page .reels-desktop-actions { display:flex !important; left:calc(100% + 22px) !important; bottom:26px !important; gap:18px !important; z-index:30 !important; }
+  .reels-page .reels-desktop-actions button { min-width:52px !important; min-height:48px !important; text-shadow:0 2px 8px #000 !important; }
+  .reels-page .reels-desktop-actions svg { width:27px !important; height:27px !important; }
+}
+body.reelsgo-comments-open .bottom-nav { display:none !important; }
+body.reelsgo-comments-open .main { padding-bottom:0 !important; }
+.reel-comments-backdrop { z-index:2000 !important; }
+.reel-comments-panel { width:min(100%,560px) !important; height:min(82dvh,780px) !important; }
+.reel-comments-list { overscroll-behavior:contain; }
+.reel-comment-form { position:relative; flex:0 0 auto; }
+.reel-comment-form input { min-height:44px !important; }
+.reel-comment-form button { min-width:58px; min-height:40px; }
+@media(max-width:700px) {
+  body.reelsgo-comments-open .bottom-nav,
+  body.reelsgo-comments-open .glass-bottom-nav { display:none !important; }
+  body.reelsgo-comments-open .reels-mobile-actions { pointer-events:none; }
+  .reel-comments-panel { width:100% !important; height:calc(78dvh + env(safe-area-inset-bottom)) !important; max-height:calc(100dvh - env(safe-area-inset-top)) !important; border-radius:24px 24px 0 0 !important; }
+  .reel-comments-header { flex-basis:54px !important; height:54px !important; }
+  .reel-comment-form { padding:12px 14px calc(14px + env(safe-area-inset-bottom)) !important; }
+  .reel-comment-form input { flex:1 1 auto; }
+  .reels-mobile-actions { right:12px !important; bottom:calc(100px + env(safe-area-inset-bottom)) !important; gap:17px !important; }
+  .reels-mobile-actions button { min-width:44px !important; min-height:42px !important; }
+}

@@ -1920,7 +1920,7 @@ function MediaViewer({ media, post, onClose }) {
   );
 }
 
-function ShareSheet({ post, onClose }) {
+function ShareSheet({ post, onClose, kind = "post" }) {
   const [people, setPeople] = useState([]);
   const [selected, setSelected] = useState([]);
   const [query, setQuery] = useState("");
@@ -1928,8 +1928,9 @@ function ShareSheet({ post, onClose }) {
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const postLink = `${window.location.origin}/post/${post?._id || ""}`;
-  const shareText = `Check out this post on ReelsGo: ${postLink}`;
+  const postLink = `${window.location.origin}/${kind === "reel" ? "reel" : "post"}/${post?._id || ""}`;
+  const contentLabel = kind === "reel" ? "Reel" : "post";
+  const shareText = `Check out this ${contentLabel} on ReelsGo: ${postLink}`;
 
   async function loadPeople() {
     setLoading(true);
@@ -1983,7 +1984,7 @@ function ShareSheet({ post, onClose }) {
   async function copyPostLink() {
     try {
       await navigator.clipboard.writeText(postLink);
-      setNotice("Post link copied.");
+      setNotice(`${kind === "reel" ? "Reel" : "Post"} link copied.`);
     } catch {
       const field = document.createElement("textarea");
       field.value = postLink;
@@ -1993,7 +1994,7 @@ function ShareSheet({ post, onClose }) {
       field.select();
       const copied = document.execCommand("copy");
       field.remove();
-      setNotice(copied ? "Post link copied." : "Copy failed. Please copy the link from your browser.");
+      setNotice(copied ? `${kind === "reel" ? "Reel" : "Post"} link copied.` : "Copy failed. Please copy the link from your browser.");
     }
   }
 
@@ -2008,7 +2009,7 @@ function ShareSheet({ post, onClose }) {
   async function shareExternally() {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "ReelsGo post", text: "Check out this post on ReelsGo", url: postLink });
+        await navigator.share({ title: `ReelsGo ${contentLabel}`, text: `Check out this ${contentLabel} on ReelsGo`, url: postLink });
       } else {
         await copyPostLink();
         setNotice("Sharing is not supported here, so the link was copied.");
@@ -2021,7 +2022,7 @@ function ShareSheet({ post, onClose }) {
   function addToStory() {
     onClose();
     window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", {
-      detail: { postId: post?._id || null, postLink }
+      detail: { postId: kind === "post" ? (post?._id || null) : null, reelId: kind === "reel" ? (post?._id || null) : null, postLink }
     }));
   }
 
@@ -2052,13 +2053,13 @@ function ShareSheet({ post, onClose }) {
         }
       }
       if (sent && !failed.length) {
-        alert(`Post sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
+        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
         onClose();
       } else if (sent) {
-        alert(`Post sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
+        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
         onClose();
       } else {
-        alert("Could not send the post. Please try again.");
+        alert(`Could not send the ${contentLabel}. Please try again.`);
       }
     } finally {
       setSending(false);
@@ -2074,7 +2075,7 @@ function ShareSheet({ post, onClose }) {
       <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
         <div className="share-sheet-handle" />
         <div className="share-sheet-head">
-          <div><h2>Share</h2><p>Select multiple people, or choose a sharing option</p></div>
+          <div><h2>Share {kind === "reel" ? "Reel" : "post"}</h2><p>Select multiple people, or choose a sharing option</p></div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close share"><X /></button>
         </div>
 
@@ -3508,6 +3509,7 @@ function ReelsPage({ onCreate }) {
   const [deletingId, setDeletingId] = useState(null);
   const [feedEnded, setFeedEnded] = useState(false);
   const [commentsReel, setCommentsReel] = useState(null);
+  const [shareReelTarget, setShareReelTarget] = useState(null);
   const [reelComments, setReelComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -3537,6 +3539,12 @@ function ReelsPage({ onCreate }) {
     document.body.classList.add("reelsgo-reels-active");
     return () => document.body.classList.remove("reelsgo-reels-active");
   }, []);
+
+  // Hide the mobile navigation while the comments sheet is open, like Instagram.
+  useEffect(() => {
+    document.body.classList.toggle("reelsgo-comments-open", Boolean(commentsReel));
+    return () => document.body.classList.remove("reelsgo-comments-open");
+  }, [commentsReel]);
 
   useEffect(() => {
     if (!reels.length) return;
@@ -3590,38 +3598,9 @@ function ReelsPage({ onCreate }) {
     }
   }
 
-  async function shareReel(reel) {
-    const reelLink = `${window.location.origin}/reel/${reel._id}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "ReelsGo Reel",
-          text: reel.caption || "Check out this Reel on ReelsGo",
-          url: reelLink
-        });
-      } else {
-        await navigator.clipboard.writeText(reelLink);
-        alert("Reel link copied.");
-      }
-    } catch (error) {
-      if (error?.name !== "AbortError") {
-        try {
-          const field = document.createElement("textarea");
-          field.value = reelLink;
-          field.style.position = "fixed";
-          field.style.opacity = "0";
-          document.body.appendChild(field);
-          field.select();
-          const copied = document.execCommand("copy");
-          field.remove();
-          alert(copied ? "Reel link copied." : `Copy this Reel link: ${reelLink}`);
-        } catch {
-          alert(`Copy this Reel link: ${reelLink}`);
-        }
-      }
-    } finally {
-      setOpenMenuId(null);
-    }
+  function shareReel(reel) {
+    setOpenMenuId(null);
+    setShareReelTarget(reel);
   }
 
   async function deleteReel(reel) {
@@ -4020,6 +3999,9 @@ function ReelsPage({ onCreate }) {
             </button>
           </div>
         </div>
+      )}
+      {shareReelTarget && (
+        <ShareSheet post={shareReelTarget} kind="reel" onClose={() => setShareReelTarget(null)} />
       )}
       {commentsReel && (
         <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
