@@ -7,7 +7,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -3507,6 +3507,13 @@ function ReelsPage({ onCreate }) {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [feedEnded, setFeedEnded] = useState(false);
+  const [commentsReel, setCommentsReel] = useState(null);
+  const [reelComments, setReelComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentSending, setCommentSending] = useState(false);
+  const [commentsError, setCommentsError] = useState("");
+  const [soundEnabledById, setSoundEnabledById] = useState({});
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
   const endCardRef = useRef(null);
@@ -3659,6 +3666,58 @@ function ReelsPage({ onCreate }) {
     }
   }
 
+  async function openReelComments(reel) {
+    setCommentsReel(reel);
+    setReelComments([]);
+    setCommentsError("");
+    setCommentText("");
+    setCommentsLoading(true);
+    try {
+      const data = await api(`/reels/${reel._id}/comments`);
+      setReelComments(Array.isArray(data.comments) ? data.comments : []);
+    } catch (error) {
+      setCommentsError(error?.message || "Could not load comments.");
+    } finally {
+      setCommentsLoading(false);
+    }
+  }
+
+  async function submitReelComment(event) {
+    event.preventDefault();
+    if (!commentsReel || !commentText.trim() || commentSending) return;
+    setCommentSending(true);
+    setCommentsError("");
+    try {
+      const data = await api(`/reels/${commentsReel._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: commentText.trim() })
+      });
+      if (data.comment) setReelComments(current => [...current, data.comment]);
+      setCommentText("");
+      setReels(current => current.map(item => String(item._id) === String(commentsReel._id)
+        ? { ...item, commentsCount: (Number(item.commentsCount) || 0) + 1 }
+        : item));
+    } catch (error) {
+      setCommentsError(error?.message || "Could not post comment.");
+    } finally {
+      setCommentSending(false);
+    }
+  }
+
+  function toggleReelSound(reelId) {
+    const nextEnabled = !soundEnabledById[String(reelId)];
+    setSoundEnabledById(current => ({ ...current, [String(reelId)]: nextEnabled }));
+    const video = scrollRef.current?.querySelector(`[data-reel-id="${String(reelId)}"] video`);
+    if (video) {
+      video.muted = !nextEnabled;
+      if (nextEnabled) {
+        const promise = video.play();
+        if (promise && typeof promise.catch === "function") promise.catch(() => {});
+      }
+    }
+  }
+
   return (
     <div className="page reels-page">
       <div className="reels-mobile-header">
@@ -3706,11 +3765,12 @@ function ReelsPage({ onCreate }) {
                     cardRefs.current[index] = el;
                   }}
                   data-index={index}
+                  data-reel-id={r._id}
                 >
                   <div className="reel-feed-media">
                     <video
                       src={`${SERVER}${r.mediaUrl}`}
-                      muted
+                      muted={!soundEnabledById[String(r._id)]}
                       playsInline
                       controls={false}
                       onClick={e => {
@@ -3727,8 +3787,9 @@ function ReelsPage({ onCreate }) {
 
                     <div className="reels-mobile-actions" aria-label="Reel actions">
                       <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>Like</small></button>
-                      <button type="button" aria-label="Comment on Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-comment-reel", { detail: { id: r._id } }))}><MessageCircle /><small>Comment</small></button>
+                      <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
                     </div>
                     <div className="reel-feed-top">
@@ -3874,6 +3935,13 @@ function ReelsPage({ onCreate }) {
                       </div>
                     </div>
 
+                    <div className="reels-desktop-actions" aria-label="Reel actions">
+                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>{r.likesCount || "Like"}</small></button>
+                      <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
+                      <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
+                    </div>
                     <div className="reel-feed-bottom">
                       <button
                         type="button"
@@ -3951,6 +4019,32 @@ function ReelsPage({ onCreate }) {
               <ChevronDown />
             </button>
           </div>
+        </div>
+      )}
+      {commentsReel && (
+        <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
+          <section className="reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+            <header className="reel-comments-header">
+              <h2>Comments</h2>
+              <button type="button" aria-label="Close comments" onClick={() => setCommentsReel(null)}><X /></button>
+            </header>
+            <div className="reel-comments-list">
+              {commentsLoading ? <p className="reel-comments-status">Loading comments…</p> : null}
+              {!commentsLoading && !reelComments.length && !commentsError ? <p className="reel-comments-status">No comments yet. Be the first to comment.</p> : null}
+              {reelComments.map((comment, index) => (
+                <article className="reel-comment-row" key={comment._id || index}>
+                  <Avatar user={comment.author} size={36} />
+                  <div className="reel-comment-content"><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div>
+                </article>
+              ))}
+              {commentsError && <p className="reel-comments-error" role="alert">{commentsError}</p>}
+            </div>
+            <form className="reel-comment-form" onSubmit={submitReelComment}>
+              <Avatar user={me} size={34} />
+              <input value={commentText} onChange={event => setCommentText(event.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment" />
+              <button type="submit" disabled={!commentText.trim() || commentSending}>{commentSending ? "Posting…" : "Post"}</button>
+            </form>
+          </section>
         </div>
       )}
     </div>
