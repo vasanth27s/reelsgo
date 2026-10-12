@@ -802,6 +802,13 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
+    const openSearch = () => navigate("search");
+    window.addEventListener("vk-open-search", openSearch);
+    return () => window.removeEventListener("vk-open-search", openSearch);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
     const openStoryComposer = () => setStoryOpen(true);
     window.addEventListener("reelsgo-open-story-composer", openStoryComposer);
     return () => window.removeEventListener("reelsgo-open-story-composer", openStoryComposer);
@@ -3499,8 +3506,10 @@ function ReelsPage({ onCreate }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [feedEnded, setFeedEnded] = useState(false);
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
+  const endCardRef = useRef(null);
   const me = getUser();
 
   async function load() {
@@ -3516,39 +3525,60 @@ function ReelsPage({ onCreate }) {
 
   useEffect(() => { load(); }, []);
 
+  // Mark the active page so global floating Messages UI is hidden only on Reels.
+  useEffect(() => {
+    document.body.classList.add("reelsgo-reels-active");
+    return () => document.body.classList.remove("reelsgo-reels-active");
+  }, []);
+
   useEffect(() => {
     if (!reels.length) return;
-
     const root = scrollRef.current;
     if (!root) return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        const visible = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
 
-        if (visible) {
-          const index = Number(visible.target.dataset.index);
-          if (!Number.isNaN(index)) setActiveIndex(index);
-        }
-      },
-      { root, threshold: [0.35, 0.6, 0.8] }
-    );
+      if (visible.target.dataset.feedEnd === "true") {
+        setFeedEnded(true);
+        return;
+      }
+
+      const index = Number(visible.target.dataset.index);
+      if (!Number.isNaN(index)) {
+        setFeedEnded(false);
+        setActiveIndex(index);
+      }
+    }, { root, threshold: [0.35, 0.6, 0.8] });
 
     cardRefs.current.forEach(card => card && observer.observe(card));
+    if (endCardRef.current) observer.observe(endCardRef.current);
     return () => observer.disconnect();
   }, [reels]);
+
+  // Only the visible Reel plays; scrolling away pauses the previous video.
+  useEffect(() => {
+    const videos = scrollRef.current?.querySelectorAll("video") || [];
+    videos.forEach((video, index) => {
+      if (index === activeIndex && !feedEnded) {
+        const promise = video.play();
+        if (promise && typeof promise.catch === "function") promise.catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeIndex, feedEnded, reels]);
 
   function goToReel(index) {
     const next = Math.max(0, Math.min(index, reels.length - 1));
     const card = cardRefs.current[next];
 
     if (card) {
-      card.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+      card.scrollIntoView({ behavior: "smooth", block: "start" });
+      setFeedEnded(false);
       setActiveIndex(next);
     }
   }
@@ -3631,6 +3661,11 @@ function ReelsPage({ onCreate }) {
 
   return (
     <div className="page reels-page">
+      <div className="reels-mobile-header">
+        <button type="button" className="reels-mobile-create" aria-label="Create Reel" onClick={onCreate}><PlusSquare /></button>
+        <div className="reels-mobile-title"><b>Reels</b><button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}>Friends <span className="reels-friends-avatars">{reels.slice(0, 3).map((item, i) => <span key={item._id || i}><Avatar user={item.author} size={19} /></span>)}</span></button></div>
+        <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
+      </div>
       <div className="page-heading reels-heading">
         <div>
           <h1>Reels</h1>
@@ -3677,7 +3712,12 @@ function ReelsPage({ onCreate }) {
                       src={`${SERVER}${r.mediaUrl}`}
                       muted
                       playsInline
-                      controls
+                      controls={false}
+                      onClick={e => {
+                        const video = e.currentTarget;
+                        if (video.paused) video.play().catch(() => {});
+                        else video.pause();
+                      }}
                       preload={
                         index === activeIndex ? "auto" : "metadata"
                       }
@@ -3685,6 +3725,12 @@ function ReelsPage({ onCreate }) {
                       loop
                     />
 
+                    <div className="reels-mobile-actions" aria-label="Reel actions">
+                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>Like</small></button>
+                      <button type="button" aria-label="Comment on Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-comment-reel", { detail: { id: r._id } }))}><MessageCircle /><small>Comment</small></button>
+                      <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
+                    </div>
                     <div className="reel-feed-top">
                       <Avatar user={r.author} size={42} />
 
@@ -3859,6 +3905,14 @@ function ReelsPage({ onCreate }) {
                 </article>
               );
             })}
+            {!loading && reels.length > 0 && (
+              <section className="reels-feed-end" ref={endCardRef} data-feed-end="true">
+                <div className="reels-feed-end-icon"><Check /></div>
+                <h2>You're all caught up</h2>
+                <p>You've reached the end of Reels.</p>
+                <button type="button" onClick={() => goToReel(0)}>Watch from the beginning</button>
+              </section>
+            )}
           </div>
 
           <div
