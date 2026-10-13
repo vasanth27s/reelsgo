@@ -1485,6 +1485,10 @@ function Post({ post, user, onDeleted }) {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [likedUsersOpen, setLikedUsersOpen] = useState(false);
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [likedUsersLoading, setLikedUsersLoading] = useState(false);
+  const [likedUsersError, setLikedUsersError] = useState("");
 
   const media = post.media?.[0];
   const mediaUrl = media?.url ? `${SERVER}${media.url}` : "";
@@ -1506,6 +1510,13 @@ function Post({ post, user, onDeleted }) {
     } catch (e) {
       alert(e.message);
     }
+  }
+
+  async function openLikedUsers() {
+    setLikedUsersOpen(true); setLikedUsersLoading(true); setLikedUsersError(""); setLikedUsers([]);
+    try { const data = await api(`/posts/${post._id}/likes`); setLikedUsers(Array.isArray(data.users) ? data.users : []); }
+    catch (error) { setLikedUsersError(error?.message || "Could not load likes."); }
+    finally { setLikedUsersLoading(false); }
   }
 
   async function loadComments() {
@@ -1731,7 +1742,7 @@ function Post({ post, user, onDeleted }) {
         </div>
 
         <div className="post-body">
-          {!post.hideLikeCount && <b>{post.likesCount || 0} likes</b>}
+          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers}>{post.likesCount || 0} likes</button>}
 
           {post.caption && (
             <p>
@@ -3516,6 +3527,12 @@ function ReelsPage({ onCreate }) {
   const [commentSending, setCommentSending] = useState(false);
   const [commentsError, setCommentsError] = useState("");
   const [soundEnabledById, setSoundEnabledById] = useState({});
+  const [likedById, setLikedById] = useState({});
+  const [savedById, setSavedById] = useState({});
+  const [likesTarget, setLikesTarget] = useState(null);
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [likesLoading, setLikesLoading] = useState(false);
+  const [likesError, setLikesError] = useState("");
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
   const endCardRef = useRef(null);
@@ -3684,6 +3701,49 @@ function ReelsPage({ onCreate }) {
     }
   }
 
+  async function toggleReelLike(reel) {
+    const id = String(reel?._id || "");
+    if (!id) return;
+    try {
+      const result = await api(`/reels/${id}/like`, { method: "POST" });
+      setLikedById(current => ({ ...current, [id]: Boolean(result.liked) }));
+      setReels(current => current.map(item => String(item._id) === id
+        ? { ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }
+        : item));
+    } catch (error) {
+      alert(error?.message || "Could not like this Reel. Please sign in and try again.");
+    }
+  }
+
+  async function toggleReelSave(reel) {
+    const id = String(reel?._id || "");
+    if (!id) return;
+    try {
+      const result = await api(`/reels/${id}/save`, { method: "POST" });
+      setSavedById(current => ({ ...current, [id]: Boolean(result.saved) }));
+      setReels(current => current.map(item => String(item._id) === id
+        ? { ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }
+        : item));
+    } catch (error) {
+      alert(error?.message || "Could not save this Reel. Please sign in and try again.");
+    }
+  }
+
+  async function openReelLikes(reel) {
+    setLikesTarget(reel);
+    setLikedUsers([]);
+    setLikesError("");
+    setLikesLoading(true);
+    try {
+      const result = await api(`/reels/${reel._id}/likes`);
+      setLikedUsers(Array.isArray(result.users) ? result.users : Array.isArray(result.likes) ? result.likes : []);
+    } catch (error) {
+      setLikesError(error?.message || "Could not load the people who liked this Reel.");
+    } finally {
+      setLikesLoading(false);
+    }
+  }
+
   function toggleReelSound(reelId) {
     const nextEnabled = !soundEnabledById[String(reelId)];
     setSoundEnabledById(current => ({ ...current, [String(reelId)]: nextEnabled }));
@@ -3765,11 +3825,11 @@ function ReelsPage({ onCreate }) {
                     />
 
                     <div className="reels-mobile-actions" aria-label="Reel actions">
-                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>Like</small></button>
+                      <button type="button" aria-label="Like Reel" onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /><small>{likedById[String(r._id)] ? "Liked" : "Like"}</small></button>
                       <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
-                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                     </div>
                     <div className="reel-feed-top">
                       <Avatar user={r.author} size={42} />
@@ -3914,11 +3974,12 @@ function ReelsPage({ onCreate }) {
                       </div>
                     </div>
 
+                    <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
                     <div className="reels-desktop-actions" aria-label="Reel actions">
-                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>{r.likesCount || "Like"}</small></button>
+                      <button type="button" aria-label="Like Reel" onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /><small>{r.likesCount || 0} Likes</small></button>
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
-                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
                     </div>
                     <div className="reel-feed-bottom">
@@ -4002,6 +4063,19 @@ function ReelsPage({ onCreate }) {
       )}
       {shareReelTarget && (
         <ShareSheet post={shareReelTarget} kind="reel" onClose={() => setShareReelTarget(null)} />
+      )}
+      {likesTarget && (
+        <div className="reel-comments-backdrop reel-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikesTarget(null); }}>
+          <section className="reel-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this Reel">
+            <header className="reel-comments-header"><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikesTarget(null)}><X /></button></header>
+            <div className="reel-likes-list">
+              {likesLoading && <p className="reel-comments-status">Loading likes…</p>}
+              {!likesLoading && likesError && <p className="reel-comments-error">{likesError}</p>}
+              {!likesLoading && !likesError && !likedUsers.length && <p className="reel-comments-status">No likes to show yet.</p>}
+              {likedUsers.map((entry, index) => { const person = entry.user || entry.actor || entry; return <div className="reel-likes-user" key={person._id || entry._id || index}><Avatar user={person} size={42}/><div><b>{person.username || person.name || "ReelsGo user"}</b><small>{person.name && person.username ? person.name : ""}</small></div></div>; })}
+            </div>
+          </section>
+        </div>
       )}
       {commentsReel && (
         <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
