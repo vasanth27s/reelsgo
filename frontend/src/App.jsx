@@ -5779,34 +5779,27 @@ function SavedPage({ user, embedded = false }) {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    const normalize = (data, kind) => {
+      const raw = kind === "posts"
+        ? (data?.posts || data?.data?.posts || data?.savedPosts || data?.saved || [])
+        : (data?.reels || data?.data?.reels || data?.savedReels || data?.saved || []);
+      return Array.isArray(raw)
+        ? raw.map(item => kind === "posts" ? (item?.post || item) : (item?.reel || item))
+          .filter(item => item && (kind === "posts" ? item._id : item._id && item.mediaUrl))
+        : [];
+    };
+    const refreshSaved = () => {
+      api("/posts/saved").then(data => setPosts(normalize(data, "posts"))).catch(() => {});
+      api("/reels/saved").then(data => setReels(normalize(data, "reels"))).catch(() => {});
+    };
     Promise.all([
-      api("/posts/saved").catch(error => {
-        console.error("Could not load saved posts:", error);
-        return { posts: [] };
-      }),
-      api("/reels/saved").catch(error => {
-        console.error("Could not load saved Reels:", error);
-        return { reels: [] };
-      })
+      api("/posts/saved").catch(error => { console.error("Could not load saved posts:", error); return { posts: [] }; }),
+      api("/reels/saved").catch(error => { console.error("Could not load saved Reels:", error); return { reels: [] }; })
     ]).then(([postData, reelData]) => {
       if (cancelled) return;
-      const rawPosts = postData?.posts || postData?.data?.posts || postData?.savedPosts || postData?.saved || [];
-      const rawReels = reelData?.reels || reelData?.data?.reels || reelData?.savedReels || reelData?.saved || [];
-      setPosts(Array.isArray(rawPosts) ? rawPosts.map(item => item?.post || item).filter(Boolean) : []);
-      setReels(Array.isArray(rawReels) ? rawReels.map(item => item?.reel || item).filter(item => item?._id && item?.mediaUrl) : []);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-    const refreshSaved = () => {
-      api("/posts/saved").then(data => {
-        const items = data?.posts || data?.data?.posts || data?.savedPosts || data?.saved || [];
-        setPosts(Array.isArray(items) ? items.map(item => item?.post || item).filter(Boolean) : []);
-      }).catch(() => {});
-      api("/reels/saved").then(data => {
-        const items = data?.reels || data?.data?.reels || data?.savedReels || data?.saved || [];
-        setReels(Array.isArray(items) ? items.map(item => item?.reel || item).filter(item => item?._id && item?.mediaUrl) : []);
-      }).catch(() => {});
-    };
+      setPosts(normalize(postData, "posts"));
+      setReels(normalize(reelData, "reels"));
+    }).finally(() => { if (!cancelled) setLoading(false); });
     window.addEventListener("reelsgo-saved-content-updated", refreshSaved);
     return () => {
       cancelled = true;
@@ -5814,39 +5807,34 @@ function SavedPage({ user, embedded = false }) {
     };
   }, []);
 
-  const tabStyle = selected => ({
-    border: "1px solid var(--border, #30343b)",
-    borderRadius: 999,
-    padding: "9px 16px",
-    background: selected ? "var(--text, #f5f5f5)" : "transparent",
-    color: selected ? "var(--bg, #101114)" : "inherit",
-    fontWeight: 650,
-    cursor: "pointer"
-  });
-
-  const body = <>
-    <div className="saved-collection-tabs" role="tablist" aria-label="Saved content" style={{ display: "flex", gap: 10, margin: "0 0 18px", flexWrap: "wrap" }}>
-      <button type="button" role="tab" aria-selected={activeType === "posts"} style={tabStyle(activeType === "posts")} onClick={() => setActiveType("posts")}>Posts <span>({posts.length})</span></button>
-      <button type="button" role="tab" aria-selected={activeType === "reels"} style={tabStyle(activeType === "reels")} onClick={() => setActiveType("reels")}>Reels <span>({reels.length})</span></button>
+  const totalSaved = posts.length + reels.length;
+  const body = <section className={`saved-page-content${embedded ? " saved-page-embedded" : ""}`}>
+    {!embedded && <header className="saved-page-header">
+      <div className="saved-page-title-icon"><Bookmark size={25} strokeWidth={1.8} /></div>
+      <div className="saved-page-title-copy"><h1>Saved</h1><p>Keep the posts and Reels you want to come back to.</p></div>
+      <div className="saved-page-total"><strong>{totalSaved}</strong><span>saved items</span></div>
+    </header>}
+    <div className="saved-page-toolbar">
+      <div className="saved-page-tabs" role="tablist" aria-label="Saved content">
+        <button type="button" role="tab" aria-selected={activeType === "posts"} className={activeType === "posts" ? "active" : ""} onClick={() => setActiveType("posts")}><Grid3X3 size={17}/><span>Posts</span><b>{posts.length}</b></button>
+        <button type="button" role="tab" aria-selected={activeType === "reels"} className={activeType === "reels" ? "active" : ""} onClick={() => setActiveType("reels")}><Film size={17}/><span>Reels</span><b>{reels.length}</b></button>
+      </div>
+      <span className="saved-private-note"><Lock size={13}/> Only you can see what you save</span>
     </div>
-    {loading ? <div className="empty"><Bookmark /><p>Loading saved content...</p></div> : activeType === "posts" ? (
-      posts.length ? <div className="profile-grid">{posts.slice(0, 100).map(p => (
-        <GridMedia key={p._id} post={p} user={user} onDeleted={id => setPosts(current => current.filter(item => String(item._id) !== String(id)))} />
-      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved posts yet" text="Posts you save will appear here." />
+    {loading ? <div className="saved-page-state"><div className="saved-loading-mark"><Bookmark size={25}/></div><strong>Loading your saved items</strong><span>Just a moment…</span></div> : activeType === "posts" ? (
+      posts.length ? <div className="profile-grid saved-posts-grid">{posts.slice(0, 100).map(p => <GridMedia key={p._id} post={p} user={user} onDeleted={id => setPosts(current => current.filter(item => String(item._id) !== String(id)))} />)}</div>
+      : <div className="saved-page-empty"><div className="saved-empty-art"><Bookmark size={32} strokeWidth={1.5}/></div><h2>Save your favorites</h2><p>Tap the bookmark on a post to save it here. Your saved posts are private and only visible to you.</p></div>
     ) : (
-      reels.length ? <div className="profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => (
-        <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`} style={{ position: "relative", aspectRatio: "9 / 16", overflow: "hidden", padding: 0, border: 0, background: "#111", cursor: "pointer" }}>
-          <video src={`${SERVER}${reel.mediaUrl}`} muted playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          <span aria-hidden="true" style={{ position: "absolute", right: 10, bottom: 10, color: "white", filter: "drop-shadow(0 1px 3px #000)" }}><Play size={22} fill="currentColor" /></span>
-          {reel.caption ? <span style={{ position: "absolute", left: 8, right: 8, bottom: 36, color: "white", textAlign: "left", fontSize: 12, textShadow: "0 1px 4px #000", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{reel.caption}</span> : null}
-        </button>
-      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved Reels yet" text="Reels you save will appear here." />
+      reels.length ? <div className="profile-grid reels-profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`}>
+        <video src={`${SERVER}${reel.mediaUrl}`} muted playsInline preload="metadata" />
+        <span className="saved-reel-play" aria-hidden="true"><Play size={22} fill="currentColor"/></span>
+        {reel.caption ? <span className="saved-reel-caption">{reel.caption}</span> : null}
+      </button>)}</div> : <div className="saved-page-empty"><div className="saved-empty-art"><Film size={32} strokeWidth={1.5}/></div><h2>Your saved Reels live here</h2><p>When you bookmark a Reel, you can find it here and watch it again anytime.</p></div>
     )}
     {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
-  </>;
-
+  </section>;
   if (embedded) return <div className="embedded-saved">{body}</div>;
-  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved posts and Reels</p></div></div>{body}</div>;
+  return <div className="page saved-page-shell">{body}</div>;
 }
 
 const settingsSections = [
