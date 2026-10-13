@@ -1481,6 +1481,7 @@ function Post({ post, user, onDeleted }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -1814,6 +1815,7 @@ function MediaViewer({ media, post, onClose }) {
   const url = media?.url ? `${SERVER}${media.url}` : "";
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   async function like() {
     try {
@@ -4200,132 +4202,17 @@ function ReelsPage({ onCreate }) {
   );
 }
 
-function ReelViewer({ reel, onClose, onUnsave }) {
-  const me = getUser();
-  const [liked, setLiked] = useState(Boolean(reel?.viewerLiked || reel?.likedByMe || reel?.isLiked));
-  const [saved, setSaved] = useState(true);
-  const [likesCount, setLikesCount] = useState(Number(reel?.likesCount || 0));
-  const [commentsCount, setCommentsCount] = useState(Number(reel?.commentsCount || 0));
-  const [commentsOpen, setCommentsOpen] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
-  const [muted, setMuted] = useState(true);
-  const videoRef = useRef(null);
-  const reelId = String(reel?._id || "");
-  const videoUrl = reel?.mediaUrl ? `${SERVER}${reel.mediaUrl}` : "";
-
-  async function loadComments() {
-    if (!reelId) return;
-    setCommentsLoading(true);
-    setError("");
-    try {
-      const data = await api(`/reels/${reelId}/comments`);
-      const items = Array.isArray(data.comments) ? data.comments : [];
-      setComments(items);
-      setCommentsCount(Number(data.commentsCount ?? items.length));
-    } catch (e) {
-      setError(e?.message || "Could not load comments.");
-    } finally {
-      setCommentsLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (commentsOpen) loadComments();
-  }, [commentsOpen, reelId]);
-
-  async function toggleLike() {
-    try {
-      const data = await api(`/reels/${reelId}/like`, { method: "POST" });
-      setLiked(Boolean(data.liked));
-      setLikesCount(Number(data.likesCount ?? likesCount));
-    } catch (e) { alert(e?.message || "Could not like this Reel."); }
-  }
-
-  async function toggleSave() {
-    try {
-      const data = await api(`/reels/${reelId}/save`, { method: "POST" });
-      setSaved(Boolean(data.saved));
-      if (!data.saved) {
-        onUnsave?.(reelId);
-        onClose?.();
-      }
-    } catch (e) { alert(e?.message || "Could not update saved Reels."); }
-  }
-
-  async function submitComment(event) {
-    event.preventDefault();
-    if (!commentText.trim() || sending) return;
-    setSending(true);
-    setError("");
-    try {
-      const data = await api(`/reels/${reelId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: commentText.trim() })
-      });
-      if (data.comment) setComments(current => [...current, data.comment]);
-      setCommentsCount(current => current + 1);
-      setCommentText("");
-    } catch (e) { setError(e?.message || "Could not post comment."); }
-    finally { setSending(false); }
-  }
-
-  async function deleteComment(comment) {
-    if (!window.confirm("Delete this comment?")) return;
-    try {
-      await api(`/reels/${reelId}/comments/${comment._id}`, { method: "DELETE" });
-      setComments(current => current.filter(item => String(item._id) !== String(comment._id)));
-      setCommentsCount(current => Math.max(0, current - 1));
-    } catch (e) { alert(e?.message || "Could not delete comment."); }
-  }
-
-  function share() {
-    const url = `${window.location.origin}/reels/${reelId}`;
-    if (navigator.share) {
-      navigator.share({ title: "ReelsGo Reel", text: reel?.caption || "Watch this Reel", url }).catch(error => { if (error?.name !== "AbortError") console.error(error); });
-    } else if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).then(() => alert("Reel link copied."));
-    } else window.prompt("Copy this Reel link:", url);
-  }
-
+function ReelViewer({ reel, onClose }) {
   return (
-    <div className="saved-reel-viewer-overlay" onClick={event => { if (event.target === event.currentTarget) onClose?.(); }} role="presentation">
-      <button className="saved-reel-viewer-close" type="button" aria-label="Close Reel" onClick={onClose}><X /></button>
-      <article className="saved-reel-viewer" onClick={event => event.stopPropagation()}>
-        <video ref={videoRef} className="saved-reel-viewer-video" src={videoUrl} autoPlay loop playsInline muted={muted} controls={false} onClick={() => { const v = videoRef.current; if (!v) return; if (v.paused) v.play().catch(() => {}); else v.pause(); }} />
-        <div className="saved-reel-viewer-top">
-          <Avatar user={reel.author} size={40} />
-          <div className="saved-reel-viewer-user"><b>{reel.author?.username ? `@${reel.author.username}` : reel.author?.name || "ReelsGo user"}</b><span>{reel.music || "Original audio"}</span></div>
+    <div className="reel-viewer-overlay" onClick={onClose}>
+      <button className="media-viewer-close" type="button" onClick={onClose}><X /></button>
+      <div className="reel-viewer-card" onClick={e => e.stopPropagation()}>
+        <div className="reel-viewer-user">
+          <Avatar user={reel.author} size={42} />
+          <div><UserLink user={reel.author} /><span>{reel.caption || "Reel"}</span></div>
         </div>
-        <div className="saved-reel-viewer-actions" aria-label="Reel actions">
-          <button type="button" className={liked ? "is-liked" : ""} onClick={toggleLike} aria-label="Like Reel"><Heart fill={liked ? "currentColor" : "none"}/><small>{likesCount}</small></button>
-          <button type="button" onClick={() => setCommentsOpen(true)} aria-label="Comments"><MessageCircle/><small>{commentsCount}</small></button>
-          <button type="button" onClick={share} aria-label="Share Reel"><Send/><small>Share</small></button>
-          <button type="button" className={saved ? "is-saved" : ""} onClick={toggleSave} aria-label="Remove from saved"><Bookmark fill={saved ? "currentColor" : "none"}/><small>{saved ? "Saved" : "Save"}</small></button>
-          <button type="button" onClick={() => { setMuted(value => !value); if (videoRef.current) videoRef.current.muted = !videoRef.current.muted; }} aria-label={muted ? "Enable sound" : "Mute sound"}>{muted ? <VolumeX /> : <Volume2 />}<small>{muted ? "Sound off" : "Sound on"}</small></button>
-        </div>
-        <div className="saved-reel-viewer-caption"><b>{reel.author?.username || reel.author?.name || "user"}</b>{reel.caption || ""}</div>
-      </article>
-      {commentsOpen && <div className="saved-reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsOpen(false); }}>
-        <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
-          <header><h2>Comments <span>{commentsCount}</span></h2><button type="button" aria-label="Close comments" onClick={() => setCommentsOpen(false)}><X/></button></header>
-          <div className="saved-reel-comments-list">
-            {commentsLoading && <p className="saved-reel-comments-status">Loading comments…</p>}
-            {!commentsLoading && !comments.length && !error && <p className="saved-reel-comments-status">No comments yet. Be the first to comment.</p>}
-            {comments.map(comment => {
-              const own = String(comment.author?._id || comment.author) === String(me?._id);
-              const owner = String(reel.author?._id || reel.author) === String(me?._id);
-              return <article className="saved-reel-comment" key={comment._id}><Avatar user={comment.author} size={35}/><div><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div>{(own || owner) && <button type="button" aria-label="Delete comment" onClick={() => deleteComment(comment)}><Trash2 size={16}/></button>}</article>;
-            })}
-            {error && <p className="saved-reel-comments-error">{error}</p>}
-          </div>
-          <form className="saved-reel-comment-form" onSubmit={submitComment}><Avatar user={me} size={32}/><input value={commentText} onChange={event => setCommentText(event.target.value)} placeholder="Add a comment…" maxLength={1000}/><button type="submit" disabled={!commentText.trim() || sending}>{sending ? "Posting…" : "Post"}</button></form>
-        </section>
-      </div>}
+        <video src={`${SERVER}${reel.mediaUrl}`} controls autoPlay loop playsInline />
+      </div>
     </div>
   );
 }
@@ -5745,7 +5632,7 @@ function SavedPage({ user, embedded = false }) {
         </button>
       ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved Reels yet" text="Reels you save will appear here." />
     )}
-    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} onUnsave={id => setReels(current => current.filter(item => String(item._id) !== String(id)))} />}
+    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
   </>;
 
   if (embedded) return <div className="embedded-saved">{body}</div>;
