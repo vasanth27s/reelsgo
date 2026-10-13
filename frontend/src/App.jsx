@@ -10,7 +10,7 @@ import {
   Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX
 } from "lucide-react";
 
-const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
+const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
 
 // Safe browser storage: privacy settings, blocked storage, or quota limits must not
