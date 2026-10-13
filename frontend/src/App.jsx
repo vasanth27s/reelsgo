@@ -1362,6 +1362,25 @@ function StoryViewer({ story, onClose, onDeleted }) {
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const touchStartY = useRef(null);
+
+  function handleStoryTouchStart(e) {
+    touchStartY.current = e.touches?.[0]?.clientY ?? null;
+  }
+
+  function handleStoryTouchEnd(e) {
+    if (touchStartY.current == null) return;
+    const endY = e.changedTouches?.[0]?.clientY;
+    if (typeof endY !== "number") return;
+    const delta = endY - touchStartY.current;
+    if (delta < -55 && isOwner) {
+      // Instagram-style swipe up opens the story viewers panel.
+      openViewers();
+    } else if (delta > 75 && viewersOpen) {
+      setViewersOpen(false);
+    }
+    touchStartY.current = null;
+  }
 
   async function deleteStory() {
     if (!isOwner || deleting) return;
@@ -1401,7 +1420,12 @@ function StoryViewer({ story, onClose, onDeleted }) {
   }, [story?._id, isOwner]);
 
   return (
-    <div className="story-viewer" onClick={onClose}>
+    <div
+      className={`story-viewer${viewersOpen ? " story-viewer-viewers-open" : ""}`}
+      onClick={onClose}
+      onTouchStart={handleStoryTouchStart}
+      onTouchEnd={handleStoryTouchEnd}
+    >
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
@@ -1443,9 +1467,10 @@ function StoryViewer({ story, onClose, onDeleted }) {
           <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>
         )}
       </div>
-      {isOwner && (
+      {isOwner && !viewersOpen && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
-          <Eye /> <span>{viewers.length || story.views?.length || 0} views</span>
+          <span className="story-viewers-grabber" />
+          <Eye /> <span>{viewers.length || story.views?.length || 0} views · Swipe up</span>
         </button>
       )}
       {viewersOpen && (
