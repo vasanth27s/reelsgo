@@ -13061,3 +13061,11 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
   .note-viewer-overlay .note-viewer-content { padding: 20px 18px 22px; }
   .note-viewer-overlay .note-inline-reply { min-height: 48px; }
 }
+
+
+/* Note text visibility and remove relative-age placeholder from note sheet. */
+.note-viewer-copy small { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+.note-viewer-content { display: flex !important; min-height: 100px !important; align-items: center !important; justify-content: center !important; }
+.note-viewer-content p { display: block !important; visibility: visible !important; opacity: 1 !important; white-space: pre-wrap !important; overflow-wrap: anywhere !important; }
+.messages-page .message-note-card.my-note > span { display: block !important; max-width: 82px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+@media (max-width: 700px) { .messages-page .message-note-card.my-note > span { max-width: 72px; } }
