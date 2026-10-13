@@ -13154,19 +13154,3 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
  .shared-message-content{width:min(100%,290px)}
  .message-bubble-wrap{max-width:84%}
 }
-
-
-/* ReelsGo unread badges and notification preferences */
-.nav-icon-wrap,.nav-mobile-icon-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:none}
-.rg-unread-badge{position:absolute;top:-7px;right:-10px;min-width:18px;height:18px;padding:0 5px;border:2px solid #fff;border-radius:999px;background:#ff3040;color:#fff;font-size:10px;font-weight:800;line-height:14px;text-align:center;white-space:nowrap;box-shadow:0 1px 3px #0002;z-index:2}
-.nav .nav-icon-wrap>.rg-unread-badge{top:-8px;right:-12px}
-.nav-mobile-icon-wrap>.rg-unread-badge{top:-8px;right:-12px}
-.mobile-header-actions .mobile-notification-trigger{position:relative}
-.mobile-notification-trigger>.rg-unread-badge{top:1px;right:0}
-.notifications-head-actions{display:flex;align-items:center;gap:8px}
-.push-enable-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;background:#f0efff;color:#4338ca;padding:10px 13px;font-size:12px;font-weight:750;white-space:nowrap}
-.push-enable-button:hover{background:#e7e5ff}
-.push-help-text{margin-top:4px;color:#737985;font-size:12px}
-.push-status-message{margin:10px 0;padding:10px 12px;border-radius:10px;background:#f0efff;color:#3730a3;font-size:13px;line-height:1.45}
-@media(max-width:700px){.push-enable-button{padding:9px 10px;font-size:11px}.notifications-center-head{gap:8px}.notifications-center-head h1{font-size:23px}.notifications-head-actions{gap:4px}.push-help-text{max-width:230px}}
-@media(max-width:390px){.push-enable-button{max-width:145px;white-space:normal;line-height:1.2}.push-help-text{font-size:11px}}

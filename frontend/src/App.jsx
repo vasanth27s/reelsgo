@@ -765,8 +765,7 @@ function App() {
   const [token, setToken] = useState(getToken());
   const [page, setPage] = useState(() => {
     const shared = getSharedRouteFromPath();
-    const openTarget = new URLSearchParams(window.location.search).get("open");
-    return shared ? `shared-${shared.type}` : openTarget === "messages" ? "messages" : "home";
+    return shared ? `shared-${shared.type}` : "home";
   });
   const [sharedPostId, setSharedPostId] = useState(() => getSharedPostIdFromPath());
   const [sharedReelId, setSharedReelId] = useState(() => getSharedReelIdFromPath());
@@ -781,62 +780,6 @@ function App() {
   const [openConversationData, setOpenConversationData] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [verificationAlert, setVerificationAlert] = useState(false);
-  const [unreadMessages, setUnreadMessages] = useState(0);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-
-  // Global inbox polling keeps unread badges updated even when the Messages page is closed.
-  useEffect(() => {
-    if (!token || !user?._id) {
-      setUnreadMessages(0);
-      setUnreadNotifications(0);
-      if ("clearAppBadge" in navigator) navigator.clearAppBadge().catch(() => {});
-      return;
-    }
-    let stopped = false;
-    const refreshUnread = async () => {
-      try {
-        const [conversationData, notificationData] = await Promise.all([
-          api("/messages/conversations"),
-          api("/notifications")
-        ]);
-        if (stopped) return;
-        const messageCount = (conversationData.conversations || []).reduce((sum, c) => sum + Math.max(0, Number(c.unreadCount || 0)), 0);
-        const notificationCount = (notificationData.notifications || []).filter(n => !n.read).length;
-        setUnreadMessages(messageCount);
-        setUnreadNotifications(notificationCount);
-        const total = messageCount + notificationCount;
-        if ("setAppBadge" in navigator) {
-          if (total > 0) navigator.setAppBadge(total).catch(() => {});
-          else if ("clearAppBadge" in navigator) navigator.clearAppBadge().catch(() => {});
-        }
-        document.title = total > 0 ? `(${total > 99 ? "99+" : total}) ReelsGo` : "ReelsGo";
-      } catch (error) {
-        // Keep the last known count if the network is temporarily unavailable.
-        console.debug("Unread notification refresh failed", error?.message || error);
-      }
-    };
-    refreshUnread();
-    const timer = window.setInterval(refreshUnread, 12000);
-    const refreshNow = () => refreshUnread();
-    window.addEventListener("reelsgo-refresh-unread", refreshNow);
-    window.addEventListener("focus", refreshNow);
-    const visibility = () => { if (document.visibilityState === "visible") refreshUnread(); };
-    document.addEventListener("visibilitychange", visibility);
-    return () => {
-      stopped = true;
-      window.clearInterval(timer);
-      window.removeEventListener("reelsgo-refresh-unread", refreshNow);
-      window.removeEventListener("focus", refreshNow);
-      document.removeEventListener("visibilitychange", visibility);
-      document.title = "ReelsGo";
-    };
-  }, [token, user?._id]);
-
-  // Register the service worker for PWA push delivery; permission is requested only after a user taps Enable.
-  useEffect(() => {
-    if (!token || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch(error => console.warn("Push worker registration failed", error));
-  }, [token]);
 
   useEffect(() => {
     const syncRoute = () => {
@@ -952,8 +895,8 @@ function App() {
           <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
-          <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} count={unreadMessages} onClick={() => navigate("messages")} />
-          <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} count={unreadNotifications} onClick={() => { navigate("notifications"); api("/notifications/read-all", { method: "POST" }).then(() => { setUnreadNotifications(0); window.dispatchEvent(new Event("reelsgo-refresh-unread")); }).catch(() => {}); }} />
+          <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+          <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
           <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
           <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={() => navigate("profile")} />
         </div>
@@ -968,7 +911,7 @@ function App() {
       <header className="mobile-header">
         <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
         <div className="mobile-header-actions">
-          <button className="mobile-notification-trigger" onClick={() => { navigate("notifications"); api("/notifications/read-all", { method: "POST" }).then(() => { setUnreadNotifications(0); window.dispatchEvent(new Event("reelsgo-refresh-unread")); }).catch(() => {}); }} aria-label={`Notifications${unreadNotifications ? `, ${unreadNotifications} unread` : ""}`}><Heart />{unreadNotifications > 0 && <span className="rg-unread-badge">{unreadNotifications > 99 ? "99+" : unreadNotifications}</span>}</button>
+          <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
           <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
         </div>
       </header>
@@ -1024,7 +967,7 @@ function App() {
       <nav className="bottom-nav glass-bottom-nav">
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
-        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} count={unreadMessages} onClick={() => navigate("messages")} />
+        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
         <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={() => navigate("profile")} aria-label="Profile">
           <Avatar user={user} size={34} />
@@ -1081,14 +1024,12 @@ function App() {
   );
 }
 
-function Nav({ icon, label, active, onClick, count = 0 }) {
-  return <button className={`nav ${active ? "active" : ""} ${label === "Messages" ? "messages-nav-item" : ""}`} onClick={onClick}>
-    <span className="nav-icon-wrap">{icon}{count > 0 && <span className="rg-unread-badge">{count > 99 ? "99+" : count}</span>}</span>{label}
-  </button>;
+function Nav({ icon, label, active, onClick }) {
+  return <button className={`nav ${active ? "active" : ""} ${label === "Messages" ? "messages-nav-item" : ""}`} onClick={onClick}><span>{icon}</span>{label}</button>;
 }
 
-function NavMobile({ icon, label, active, onClick, count = 0 }) {
-  return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}><span className="nav-mobile-icon-wrap">{icon}{count > 0 && <span className="rg-unread-badge">{count > 99 ? "99+" : count}</span>}</span><span>{label}</span></button>;
+function NavMobile({ icon, label, active, onClick }) {
+  return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
 }
 
 function AuthLogo({ className = "" }) {
@@ -5585,13 +5526,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   );
 }
 
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const raw = window.atob(base64);
-  return Uint8Array.from([...raw].map(char => char.charCodeAt(0)));
-}
-
 function NotificationsPage() {
   const [items, setItems] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -5600,7 +5534,6 @@ function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [requestActionId, setRequestActionId] = useState(null);
-  const [pushStatus, setPushStatus] = useState("");
 
   const me = getUser();
 
@@ -5651,7 +5584,6 @@ function NotificationsPage() {
     loadNotifications();
     loadFollowing();
     loadRequests();
-    api("/notifications/read-all", { method: "POST" }).then(() => window.dispatchEvent(new Event("reelsgo-refresh-unread"))).catch(() => {});
   }, []);
 
   async function acceptRequest(requestId) {
@@ -5719,28 +5651,11 @@ function NotificationsPage() {
   return (
     <div className="page notifications-page">
       <div className="notifications-center-head">
-        <div><h1>Notifications</h1><p className="push-help-text">Get message and activity alerts on this device.</p></div>
-        <div className="notifications-head-actions">
-          <button type="button" className="push-enable-button" onClick={async () => {
-            try {
-              if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-                setPushStatus("This browser does not support web push. Try installing ReelsGo as a PWA in a supported browser."); return;
-              }
-              const permission = await Notification.requestPermission();
-              if (permission !== "granted") { setPushStatus("Notifications are blocked. Enable them in your browser or phone settings."); return; }
-              const keyResponse = await api("/notifications/push/public-key");
-              if (!keyResponse.publicKey) throw new Error("Push is not configured on the server yet. Add VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY to the backend environment.");
-              const registration = await navigator.serviceWorker.ready;
-              let subscription = await registration.pushManager.getSubscription();
-              if (!subscription) subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(keyResponse.publicKey) });
-              await api("/notifications/push/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subscription: subscription.toJSON() }) });
-              setPushStatus("Push notifications are enabled on this device.");
-            } catch (error) { setPushStatus(error?.message || "Could not enable push notifications."); }
-          }}><Bell size={16} /> Enable phone notifications</button>
-          <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); window.dispatchEvent(new Event("reelsgo-refresh-unread")); }} aria-label="Refresh notifications"><Bell /></button>
-        </div>
+        <h1>Notifications</h1>
+        <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
+          <Bell />
+        </button>
       </div>
-      {pushStatus && <div className="push-status-message" role="status">{pushStatus}</div>}
 
       <div className="notification-tabs" role="tablist" aria-label="Notification filters">
         {tabs.map(tab => (
@@ -5835,7 +5750,6 @@ function NotificationsPage() {
                     try {
                       await api(`/notifications/${n._id}`, { method: "DELETE" });
                       setItems(current => current.filter(item => String(item._id) !== String(n._id)));
-                      window.dispatchEvent(new Event("reelsgo-refresh-unread"));
                     } catch (error) {
                       alert(error.message || "Could not delete notification.");
                     }
