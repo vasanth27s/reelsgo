@@ -730,6 +730,15 @@ LIKE POST
 =========================================================
 */
 
+router.get("/:id/likes", auth, async (req, res) => {
+  try {
+    const interactions = await Interaction.find({ targetType: "post", target: req.params.id, type: "like" })
+      .populate("user", "name username avatar updatedAt")
+      .sort({ createdAt: -1 }).limit(500);
+    res.json({ users: interactions.map(item => item.user).filter(Boolean) });
+  } catch (error) { res.status(500).json({ message: error.message }); }
+});
+
 router.post(
   "/:id/like",
   auth,
