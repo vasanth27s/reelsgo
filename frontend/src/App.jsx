@@ -1478,6 +1478,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
 function Post({ post, user, onDeleted }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [likesCount, setLikesCount] = useState(Number(post.likesCount) || 0);
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
@@ -1497,7 +1498,8 @@ function Post({ post, user, onDeleted }) {
   async function like() {
     try {
       const d = await api(`/posts/${post._id}/like`, { method: "POST" });
-      setLiked(d.liked);
+      setLiked(Boolean(d.liked));
+      setLikesCount(Number(d.likesCount ?? likesCount + (d.liked ? 1 : -1)));
     } catch (e) {
       alert(e.message);
     }
@@ -1742,7 +1744,7 @@ function Post({ post, user, onDeleted }) {
         </div>
 
         <div className="post-body">
-          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers}>{post.likesCount || 0} likes</button>}
+          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers} aria-label="See who liked this post">{likesCount} {likesCount === 1 ? "like" : "likes"}</button>}
 
           {post.caption && (
             <p>
@@ -1758,40 +1760,35 @@ function Post({ post, user, onDeleted }) {
             View all comments
           </button>
 
-          {showComments && (
-            <div className="comments">
-              {comments.map(c => (
-                <div className="comment" key={c._id}>
-                  <Avatar user={c.author} size={28} />
-                  <div>
-                    <UserLink user={c.author} />
-                    <span>{c.text}</span>
-                  </div>
-                </div>
-              ))}
 
-              {!post.commentsDisabled && (
-                <div className="comment-input">
-                  <input
-                    value={text}
-                    onChange={e => setText(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        comment();
-                      }
-                    }}
-                    placeholder="Add a comment..."
-                  />
-                  <button onClick={comment} type="button">
-                    Post
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </article>
+
+      {likedUsersOpen && (
+        <div className="reel-comments-backdrop reel-likes-backdrop post-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
+          <section className="reel-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this post">
+            <header className="reel-comments-header"><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikedUsersOpen(false)}><X /></button></header>
+            <div className="reel-likes-list">
+              {likedUsersLoading && <p className="reel-comments-status">Loading likes…</p>}
+              {!likedUsersLoading && likedUsersError && <p className="reel-comments-error">{likedUsersError}</p>}
+              {!likedUsersLoading && !likedUsersError && !likedUsers.length && <p className="reel-comments-status">No likes to show yet.</p>}
+              {likedUsers.map((person, index) => <div className="reel-likes-user" key={person._id || index}><Avatar user={person} size={42}/><div><b>{person.username || person.name || "ReelsGo user"}</b><small>{person.name && person.username ? person.name : ""}</small></div></div>)}
+            </div>
+          </section>
+        </div>
+      )}
+      {showComments && (
+        <div className="reel-comments-backdrop post-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
+          <section className="reel-comments-panel" role="dialog" aria-modal="true" aria-label="Post comments">
+            <header className="reel-comments-header"><h2>Comments</h2><button type="button" aria-label="Close comments" onClick={() => setShowComments(false)}><X /></button></header>
+            <div className="reel-comments-list">
+              {!comments.length && <p className="reel-comments-status">No comments yet. Be the first to comment.</p>}
+              {comments.map((c, index) => <article className="reel-comment-row" key={c._id || index}><Avatar user={c.author} size={36}/><div className="reel-comment-content"><b>{c.author?.username || c.author?.name || "User"}</b><p>{c.text}</p><small>{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</small></div></article>)}
+            </div>
+            {!post.commentsDisabled && <form className="reel-comment-form" onSubmit={event => { event.preventDefault(); comment(); }}><Avatar user={user} size={34}/><input value={text} onChange={event => setText(event.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment"/><button type="submit" disabled={!text.trim()}>Post</button></form>}
+          </section>
+        </div>
+      )}
 
       {shareOpen && (
         <ShareSheet
