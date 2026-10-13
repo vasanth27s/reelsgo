@@ -809,6 +809,18 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
+    const openCreate = () => setCreateOpen(true);
+    const openMenu = () => setMenuOpen(true);
+    window.addEventListener("reelsgo-open-create", openCreate);
+    window.addEventListener("reelsgo-open-menu", openMenu);
+    return () => {
+      window.removeEventListener("reelsgo-open-create", openCreate);
+      window.removeEventListener("reelsgo-open-menu", openMenu);
+    };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
     const openStoryComposer = () => setStoryOpen(true);
     window.addEventListener("reelsgo-open-story-composer", openStoryComposer);
     return () => window.removeEventListener("reelsgo-open-story-composer", openStoryComposer);
@@ -1485,10 +1497,6 @@ function Post({ post, user, onDeleted }) {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [likedUsersOpen, setLikedUsersOpen] = useState(false);
-  const [likedUsers, setLikedUsers] = useState([]);
-  const [likedUsersLoading, setLikedUsersLoading] = useState(false);
-  const [likedUsersError, setLikedUsersError] = useState("");
 
   const media = post.media?.[0];
   const mediaUrl = media?.url ? `${SERVER}${media.url}` : "";
@@ -1510,13 +1518,6 @@ function Post({ post, user, onDeleted }) {
     } catch (e) {
       alert(e.message);
     }
-  }
-
-  async function openLikedUsers() {
-    setLikedUsersOpen(true); setLikedUsersLoading(true); setLikedUsersError(""); setLikedUsers([]);
-    try { const data = await api(`/posts/${post._id}/likes`); setLikedUsers(Array.isArray(data.users) ? data.users : []); }
-    catch (error) { setLikedUsersError(error?.message || "Could not load likes."); }
-    finally { setLikedUsersLoading(false); }
   }
 
   async function loadComments() {
@@ -1742,7 +1743,7 @@ function Post({ post, user, onDeleted }) {
         </div>
 
         <div className="post-body">
-          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers}>{post.likesCount || 0} likes</button>}
+          {!post.hideLikeCount && <b>{post.likesCount || 0} likes</b>}
 
           {post.caption && (
             <p>
@@ -2997,6 +2998,11 @@ function ProfilePage({ user, setUser }) {
 
   return (
     <div className="page profile-page">
+      <div className="profile-mobile-topbar">
+        <button type="button" aria-label="Create post" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-open-create"))}><PlusSquare /></button>
+        <div className="profile-mobile-handle">{user?.username || "profile"}<ChevronDown size={17} /></div>
+        <div className="profile-mobile-actions"><button type="button" aria-label="Threads"><AtSign /></button><button type="button" aria-label="Open menu" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-open-menu"))}><Menu /></button></div>
+      </div>
       <div className="profile-header">
         <div className="profile-avatar-wrap">
           <Avatar user={user} size={96} className="profile-avatar" />
@@ -3527,12 +3533,6 @@ function ReelsPage({ onCreate }) {
   const [commentSending, setCommentSending] = useState(false);
   const [commentsError, setCommentsError] = useState("");
   const [soundEnabledById, setSoundEnabledById] = useState({});
-  const [likedById, setLikedById] = useState({});
-  const [savedById, setSavedById] = useState({});
-  const [likesTarget, setLikesTarget] = useState(null);
-  const [likedUsers, setLikedUsers] = useState([]);
-  const [likesLoading, setLikesLoading] = useState(false);
-  const [likesError, setLikesError] = useState("");
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
   const endCardRef = useRef(null);
@@ -3701,49 +3701,6 @@ function ReelsPage({ onCreate }) {
     }
   }
 
-  async function toggleReelLike(reel) {
-    const id = String(reel?._id || "");
-    if (!id) return;
-    try {
-      const result = await api(`/reels/${id}/like`, { method: "POST" });
-      setLikedById(current => ({ ...current, [id]: Boolean(result.liked) }));
-      setReels(current => current.map(item => String(item._id) === id
-        ? { ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }
-        : item));
-    } catch (error) {
-      alert(error?.message || "Could not like this Reel. Please sign in and try again.");
-    }
-  }
-
-  async function toggleReelSave(reel) {
-    const id = String(reel?._id || "");
-    if (!id) return;
-    try {
-      const result = await api(`/reels/${id}/save`, { method: "POST" });
-      setSavedById(current => ({ ...current, [id]: Boolean(result.saved) }));
-      setReels(current => current.map(item => String(item._id) === id
-        ? { ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }
-        : item));
-    } catch (error) {
-      alert(error?.message || "Could not save this Reel. Please sign in and try again.");
-    }
-  }
-
-  async function openReelLikes(reel) {
-    setLikesTarget(reel);
-    setLikedUsers([]);
-    setLikesError("");
-    setLikesLoading(true);
-    try {
-      const result = await api(`/reels/${reel._id}/likes`);
-      setLikedUsers(Array.isArray(result.users) ? result.users : Array.isArray(result.likes) ? result.likes : []);
-    } catch (error) {
-      setLikesError(error?.message || "Could not load the people who liked this Reel.");
-    } finally {
-      setLikesLoading(false);
-    }
-  }
-
   function toggleReelSound(reelId) {
     const nextEnabled = !soundEnabledById[String(reelId)];
     setSoundEnabledById(current => ({ ...current, [String(reelId)]: nextEnabled }));
@@ -3825,12 +3782,11 @@ function ReelsPage({ onCreate }) {
                     />
 
                     <div className="reels-mobile-actions" aria-label="Reel actions">
-                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
-                      <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
+                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>Like</small></button>
                       <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
-                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
                     </div>
                     <div className="reel-feed-top">
                       <Avatar user={r.author} size={42} />
@@ -3976,11 +3932,10 @@ function ReelsPage({ onCreate }) {
                     </div>
 
                     <div className="reels-desktop-actions" aria-label="Reel actions">
-                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
-                      <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
+                      <button type="button" aria-label="Like Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-like-reel", { detail: { id: r._id } }))}><Heart /><small>{r.likesCount || "Like"}</small></button>
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
-                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => window.dispatchEvent(new CustomEvent("reelsgo-save-reel", { detail: { id: r._id } }))}><Bookmark /><small>Save</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
                     </div>
                     <div className="reel-feed-bottom">
@@ -4064,19 +4019,6 @@ function ReelsPage({ onCreate }) {
       )}
       {shareReelTarget && (
         <ShareSheet post={shareReelTarget} kind="reel" onClose={() => setShareReelTarget(null)} />
-      )}
-      {likesTarget && (
-        <div className="reel-comments-backdrop reel-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikesTarget(null); }}>
-          <section className="reel-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this Reel">
-            <header className="reel-comments-header"><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikesTarget(null)}><X /></button></header>
-            <div className="reel-likes-list">
-              {likesLoading && <p className="reel-comments-status">Loading likes…</p>}
-              {!likesLoading && likesError && <p className="reel-comments-error">{likesError}</p>}
-              {!likesLoading && !likesError && !likedUsers.length && <p className="reel-comments-status">No likes to show yet.</p>}
-              {likedUsers.map((entry, index) => { const person = entry.user || entry.actor || entry; return <div className="reel-likes-user" key={person._id || entry._id || index}><Avatar user={person} size={42}/><div><b>{person.username || person.name || "ReelsGo user"}</b><small>{person.name && person.username ? person.name : ""}</small></div></div>; })}
-            </div>
-          </section>
-        </div>
       )}
       {commentsReel && (
         <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
@@ -5308,66 +5250,25 @@ function NotificationsPage() {
 
 function SavedPage({ user, embedded = false }) {
   const [posts, setPosts] = useState([]);
-  const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeType, setActiveType] = useState("posts");
-  const [activeReel, setActiveReel] = useState(null);
-
   useEffect(() => {
-    let cancelled = false;
     setLoading(true);
-    Promise.all([
-      api("/posts/saved").catch(error => {
-        console.error("Could not load saved posts:", error);
-        return { posts: [] };
-      }),
-      api("/reels/saved").catch(error => {
-        console.error("Could not load saved Reels:", error);
-        return { reels: [] };
-      })
-    ]).then(([postData, reelData]) => {
-      if (cancelled) return;
-      setPosts(Array.isArray(postData.posts) ? postData.posts : []);
-      setReels(Array.isArray(reelData.reels) ? reelData.reels : []);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-    return () => { cancelled = true; };
+    api("/posts/saved").then(d => setPosts(d.posts || [])).catch(() => setPosts([])).finally(() => setLoading(false));
   }, []);
-
-  const tabStyle = selected => ({
-    border: "1px solid var(--border, #30343b)",
-    borderRadius: 999,
-    padding: "9px 16px",
-    background: selected ? "var(--text, #f5f5f5)" : "transparent",
-    color: selected ? "var(--bg, #101114)" : "inherit",
-    fontWeight: 650,
-    cursor: "pointer"
-  });
-
-  const body = <>
-    <div className="saved-collection-tabs" role="tablist" aria-label="Saved content" style={{ display: "flex", gap: 10, margin: "0 0 18px", flexWrap: "wrap" }}>
-      <button type="button" role="tab" aria-selected={activeType === "posts"} style={tabStyle(activeType === "posts")} onClick={() => setActiveType("posts")}>Posts <span>({posts.length})</span></button>
-      <button type="button" role="tab" aria-selected={activeType === "reels"} style={tabStyle(activeType === "reels")} onClick={() => setActiveType("reels")}>Reels <span>({reels.length})</span></button>
-    </div>
-    {loading ? <div className="empty"><Bookmark /><p>Loading saved content...</p></div> : activeType === "posts" ? (
-      posts.length ? <div className="profile-grid">{posts.slice(0, 100).map(p => (
-        <GridMedia key={p._id} post={p} user={user} onDeleted={id => setPosts(current => current.filter(item => String(item._id) !== String(id)))} />
-      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved posts yet" text="Posts you save will appear here." />
-    ) : (
-      reels.length ? <div className="profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => (
-        <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`} style={{ position: "relative", aspectRatio: "9 / 16", overflow: "hidden", padding: 0, border: 0, background: "#111", cursor: "pointer" }}>
-          <video src={`${SERVER}${reel.mediaUrl}`} muted playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          <span aria-hidden="true" style={{ position: "absolute", right: 10, bottom: 10, color: "white", filter: "drop-shadow(0 1px 3px #000)" }}><Play size={22} fill="currentColor" /></span>
-          {reel.caption ? <span style={{ position: "absolute", left: 8, right: 8, bottom: 36, color: "white", textAlign: "left", fontSize: 12, textShadow: "0 1px 4px #000", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{reel.caption}</span> : null}
-        </button>
-      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved Reels yet" text="Reels you save will appear here." />
-    )}
-    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
-  </>;
-
+  const body = loading
+    ? <div className="empty"><Bookmark /><p>Loading saved posts...</p></div>
+    : posts.length
+      ? <div className="profile-grid">{posts.slice(0, 30).map(p => (
+        <GridMedia
+          key={p._id}
+          post={p}
+          user={user}
+          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+        />
+      ))}</div>
+      : <EmptyTab icon={<Bookmark />} title="Saved posts" text="Posts you save will appear here." />;
   if (embedded) return <div className="embedded-saved">{body}</div>;
-  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved posts and Reels</p></div></div>{body}</div>;
+  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved collection</p></div></div>{body}</div>;
 }
 
 const settingsSections = [
