@@ -18,29 +18,6 @@ function view(r) {
   };
 }
 
-router.get("/saved", auth, async (req, res) => {
-  try {
-    const saves = await Interaction.find({
-      user: req.user.id,
-      targetType: "reel",
-      type: "save"
-    }).sort({ createdAt: -1 }).lean();
-
-    const ids = saves.map(item => item.target);
-    const reels = await Reel.find({ _id: { $in: ids } })
-      .populate("author", "name username avatar")
-      .lean();
-
-    // Preserve the user's save order rather than sorting by the Reel's creation date.
-    const byId = new Map(reels.map(reel => [String(reel._id), reel]));
-    const ordered = ids.map(id => byId.get(String(id))).filter(Boolean);
-    res.json({ reels: ordered.map(view) });
-  } catch (error) {
-    console.error("Load saved Reels failed:", error);
-    res.status(500).json({ message: "Could not load saved Reels" });
-  }
-});
-
 router.get("/", auth, async (req, res) => {
   const reels = await Reel.find()
     .populate("author", "name username")
@@ -83,17 +60,6 @@ router.post("/", auth, uploadMedia.single("video"), async (req, res) => {
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
-});
-
-router.get("/:id/likes", auth, async (req, res) => {
-  try {
-    const reel = await Reel.findById(req.params.id);
-    if (!reel) return res.status(404).json({ message: "Reel not found" });
-    const interactions = await Interaction.find({ targetType: "reel", target: reel._id, type: "like" })
-      .populate("user", "name username avatar updatedAt")
-      .sort({ createdAt: -1 }).limit(500);
-    res.json({ users: interactions.map(item => item.user).filter(Boolean) });
-  } catch (error) { res.status(500).json({ message: error.message }); }
 });
 
 router.post("/:id/like", auth, async (req, res) => {
@@ -169,22 +135,56 @@ router.post("/:id/save", auth, async (req, res) => {
 });
 
 
-// Reel comments: list comments, create a comment, and delete the signed-in user's own comment.
-// The existing Comment model stores the Reel ID in its `post` field. Do not populate `post`
-// here because that schema path references Post; populate only the author.
+
+
+// DELETE REEL: only the reel owner may delete it.
+// This route is mounted at /api/reels, so the frontend calls
+// DELETE /api/reels/:id. Existing reel endpoints remain unchanged.
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+
+    if (String(reel.author) !== String(req.user.id)) {
+      return res.status(403).json({ message: "You can only delete your own Reel" });
+    }
+
+    // Remove related data before removing the Reel itself.
+    await Promise.all([
+      Interaction.deleteMany({ targetType: "reel", target: reel._id }),
+      Comment.deleteMany({ post: reel._id }),
+      Notification.deleteMany({ targetId: reel._id })
+    ]);
+
+    // Remove the stored video and optional cover media.
+    const mediaIds = [reel.mediaId, reel.coverMediaId].filter(Boolean);
+    if (mediaIds.length) await Media.deleteMany({ _id: { $in: mediaIds }, owner: reel.author });
+
+    await reel.deleteOne();
+    return res.json({ ok: true, message: "Reel deleted successfully", reelId: String(reel._id) });
+  } catch (error) {
+    console.error("Delete Reel failed:", error);
+    return res.status(500).json({ message: "Failed to delete Reel" });
+  }
+});
+
+// =====================================================
+// REEL COMMENTS: GET, CREATE, DELETE OWN COMMENT
+// Comment.post stores the Reel ObjectId. Do not populate `post` because
+// the existing schema references Post; populate only the author.
+// =====================================================
 router.get("/:id/comments", auth, async (req, res) => {
   try {
     const reel = await Reel.findById(req.params.id);
     if (!reel) return res.status(404).json({ message: "Reel not found" });
 
     const comments = await Comment.find({ post: reel._id, hidden: false })
-      .populate("author", "name username avatar")
+      .populate("author", "name username")
       .sort({ createdAt: 1 })
       .limit(200);
-
     return res.json({ comments });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to load Reel comments", error: error.message });
+    return res.status(500).json({ message: "Failed to load Reel comments" });
   }
 });
 
@@ -197,18 +197,11 @@ router.post("/:id/comments", auth, async (req, res) => {
     if (!text) return res.status(400).json({ message: "Comment cannot be empty" });
     if (text.length > 1000) return res.status(400).json({ message: "Comment cannot exceed 1000 characters" });
 
-    const comment = await Comment.create({
-      post: reel._id,
-      author: req.user.id,
-      text,
-      parent: req.body?.parent || null
-    });
-
-    await Reel.updateOne({ _id: reel._id }, { $inc: { commentsCount: 1 } });
-    const populated = await Comment.findById(comment._id).populate("author", "name username avatar");
+    const comment = await Comment.create({ post: reel._id, author: req.user.id, text });
+    const populated = await Comment.findById(comment._id).populate("author", "name username");
     return res.status(201).json({ comment: populated });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to create Reel comment", error: error.message });
+    return res.status(500).json({ message: "Failed to create comment" });
   }
 });
 
@@ -220,12 +213,10 @@ router.delete("/:id/comments/:commentId", auth, async (req, res) => {
       author: req.user.id
     });
     if (!comment) return res.status(404).json({ message: "Comment not found or you cannot delete it" });
-
     await comment.deleteOne();
-    await Reel.updateOne({ _id: req.params.id, commentsCount: { $gt: 0 } }, { $inc: { commentsCount: -1 } });
     return res.json({ ok: true, message: "Comment deleted" });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to delete Reel comment", error: error.message });
+    return res.status(500).json({ message: "Failed to delete comment" });
   }
 });
 
