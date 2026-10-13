@@ -13036,3 +13036,28 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
 .note-owner-delete{background:#292d32;color:#ff6977}
 @media(min-width:701px){.note-viewer-overlay .note-action-modal{border-radius:24px;max-height:70vh;margin-bottom:24px}.note-viewer-content{min-height:110px}}
 @media(max-width:700px){.note-viewer-overlay .note-action-modal{max-height:58dvh;border-radius:24px 24px 0 0}.note-viewer-content{padding:22px 20px 27px}.note-viewer-content p{font-size:17px}}
+
+
+/* Notes sheets sit above the floating navigation so every action stays reachable. */
+body:has(.note-viewer-overlay) .bottom-nav,
+body:has(.note-viewer-overlay) .glass-bottom-nav,
+body:has(.note-viewer-overlay) .mobile-bottom-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.note-viewer-overlay { z-index: 10000 !important; }
+.note-viewer-overlay .note-action-modal {
+  position: relative;
+  z-index: 10001;
+  max-height: min(76dvh, 700px);
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+}
+.note-viewer-overlay .note-owner-view-actions { padding-bottom: 14px; }
+.note-viewer-overlay .note-owner-view-actions button { min-height: 46px; }
+.note-viewer-overlay .note-inline-reply { margin-bottom: 8px; }
+@media (max-width: 700px) {
+  .note-viewer-overlay .note-action-modal { max-height: 76dvh; border-radius: 24px 24px 0 0; }
+  .note-viewer-overlay .note-viewer-content { padding: 20px 18px 22px; }
+  .note-viewer-overlay .note-inline-reply { min-height: 48px; }
+}
