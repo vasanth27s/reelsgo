@@ -4500,6 +4500,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [noteSaving, setNoteSaving] = useState(false);
   const [noteEditingId, setNoteEditingId] = useState(null);
   const [noteReplyTarget, setNoteReplyTarget] = useState(null);
+  const [noteActionTarget, setNoteActionTarget] = useState(null);
   const [noteReplyDraft, setNoteReplyDraft] = useState("");
   const [noteReplySending, setNoteReplySending] = useState(false);
   const [requests, setRequests] = useState([]);
@@ -4745,10 +4746,12 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
       const conversationResult = await api("/messages/conversations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: [String(targetId)] }) });
       const conversation = conversationResult.conversation;
       if (!conversation?._id) throw new Error("Could not open conversation.");
-      await api(`/messages/conversations/${conversation._id}/messages`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: `Reply to your note: ${messageText}` }) });
-      setNoteReplyDraft(""); setNoteReplyTarget(null);
+      const noteReplyText = `Reply to your note “${String(noteReplyTarget.text || "").trim()}”:\n${messageText}`;
+      await api(`/messages/conversations/${conversation._id}/messages`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: noteReplyText }) });
+      setNoteReplyDraft(""); setNoteReplyTarget(null); setNoteActionTarget(null);
+      // Refresh the inbox and load the persisted message into the opened conversation.
       await loadConversations(conversation._id);
-      setActive(conversation); setMobileChat(true); await openConversation(conversation);
+      await openConversation(conversation);
     } catch (error) { alert(error.message || "Could not send note reply."); }
     finally { setNoteReplySending(false); }
   }
@@ -5098,9 +5101,9 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
             </button>
             {myNote && <div className="note-owner-actions"><button type="button" onClick={() => editMyNote(myNote)} aria-label="Edit note">Edit</button><button type="button" onClick={() => deleteMyNote(myNote)} aria-label="Delete note">Delete</button></div>}
           </div>
-          {otherNotes.map(note => <button className="message-note-card" key={note._id} type="button" onClick={() => { setNoteReplyTarget(note); setNoteReplyDraft(""); }}>
+          {otherNotes.map(note => <button className="message-note-card" key={note._id} type="button" onClick={() => setNoteActionTarget(note)}>
             <div className="message-note-bubble">{note.text}</div><div className="message-note-avatar"><Avatar user={note.author} size={58} /></div>
-            <UserLink user={note.author} /><span>{note.music || 'Tap to reply'}</span>
+            <UserLink user={note.author} /><span>{note.music || 'Tap for options'}</span>
           </button>)}
           {!otherNotes.length && <div className="notes-empty">Follow people and their notes will appear here.</div>}
         </div>
@@ -5121,6 +5124,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         <div className="messages-requests-head"><button type="button" className="note-cancel-button" onClick={() => setNoteComposerOpen(false)}>Cancel</button><b>{noteEditingId ? "Edit note" : "New note"}</b><button type="button" className="note-share-button" disabled={!noteDraft.trim() || noteSaving} onClick={publishNote}>{noteSaving ? (noteEditingId ? "Saving…" : "Sharing…") : (noteEditingId ? "Save" : "Share")}</button></div>
         <form className="note-composer-body" onSubmit={publishNote}><div className="note-composer-profile"><Avatar user={me} size={48}/><div><b>{me?.username || me?.name || "Your note"}</b><small>Visible for 24 hours</small></div></div><textarea value={noteDraft} onChange={e => setNoteDraft(e.target.value.slice(0, 60))} maxLength={60} autoFocus placeholder="Share a thought…" rows={3}/><div className="note-composer-footer"><label htmlFor="note-audience">Audience</label><select id="note-audience" value={noteAudience} onChange={e => setNoteAudience(e.target.value)}><option value="followers">Followers you follow back</option><option value="close-friends">Close Friends</option></select><span>{noteDraft.length}/60</span></div><button className="note-publish-mobile" type="submit" disabled={!noteDraft.trim() || noteSaving}>{noteSaving ? (noteEditingId ? "Saving…" : "Sharing…") : (noteEditingId ? "Save changes" : "Share note")}</button></form>
       </section></div>}
+
+      {noteActionTarget && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNoteActionTarget(null)}><section className="messages-requests-modal note-action-modal" onClick={e => e.stopPropagation()}><div className="messages-requests-head"><b>Note</b><button type="button" aria-label="Close" onClick={() => setNoteActionTarget(null)}><X /></button></div><div className="note-action-preview"><Avatar user={noteActionTarget.author} size={48}/><div><b>@{noteActionTarget.author?.username || noteActionTarget.author?.name || "user"}</b><p>{noteActionTarget.text}</p><small>Notes disappear after 24 hours</small></div></div><button className="note-action-reply-button" type="button" onClick={() => { setNoteReplyTarget(noteActionTarget); setNoteReplyDraft(""); setNoteActionTarget(null); }}><MessageCircle size={19}/> Reply</button></section></div>}
 
       {noteReplyTarget && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNoteReplyTarget(null)}><section className="messages-requests-modal note-composer-modal note-reply-modal" onClick={e => e.stopPropagation()}><div className="messages-requests-head"><button type="button" className="note-cancel-button" onClick={() => setNoteReplyTarget(null)}>Cancel</button><b>Reply to note</b><button type="button" className="note-share-button" disabled={!noteReplyDraft.trim() || noteReplySending} onClick={replyToNote}>{noteReplySending ? "Sending…" : "Send"}</button></div><form className="note-composer-body" onSubmit={replyToNote}><div className="note-composer-profile"><Avatar user={noteReplyTarget.author} size={48}/><div><b>{noteReplyTarget.author?.username || noteReplyTarget.author?.name || "User"}</b><small>“{noteReplyTarget.text}”</small></div></div><textarea value={noteReplyDraft} onChange={e => setNoteReplyDraft(e.target.value)} maxLength={1000} autoFocus placeholder="Reply to their note…" rows={3}/><button className="note-publish-mobile" type="submit" disabled={!noteReplyDraft.trim() || noteReplySending}>{noteReplySending ? "Sending…" : "Send reply"}</button></form></section></div>}
 
