@@ -638,72 +638,6 @@ function getSharedRouteFromPath(pathname = window.location.pathname) {
   return null;
 }
 
-const REELSGO_SHARED_MESSAGE_PREFIX = "REELSGO_SHARE::";
-
-function makeSharedContentMessage(content, kind = "post") {
-  const type = kind === "reel" ? "reel" : "post";
-  const id = String(content?._id || content?.id || "");
-  if (!id) throw new Error(`Cannot share this ${type}: missing content ID.`);
-  const author = content?.author || {};
-  const media = Array.isArray(content?.media) ? content.media[0] : content?.media;
-  const thumbnail = content?.coverUrl || content?.thumbnailUrl || content?.thumbnail ||
-    content?.imageUrl || content?.mediaUrl || media?.url || media?.mediaUrl || media?.src || "";
-  const payload = {
-    type,
-    id,
-    caption: String(content?.caption || content?.text || "").slice(0, 180),
-    username: String(author?.username || ""),
-    authorName: String(author?.name || ""),
-    thumbnail: String(thumbnail || "").slice(0, 500),
-    thumbnailIsVideo: type === "reel" && !content?.coverUrl && !content?.thumbnailUrl && !content?.thumbnail && !content?.imageUrl && Boolean(content?.mediaUrl)
-  };
-  return REELSGO_SHARED_MESSAGE_PREFIX + JSON.stringify(payload);
-}
-
-function parseSharedContentMessage(text) {
-  if (typeof text !== "string" || !text.startsWith(REELSGO_SHARED_MESSAGE_PREFIX)) return null;
-  try {
-    const data = JSON.parse(text.slice(REELSGO_SHARED_MESSAGE_PREFIX.length));
-    if (!data?.id || !["post", "reel"].includes(data.type)) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
-
-function sharedThumbnailUrl(value) {
-  if (!value) return "";
-  if (/^(https?:|data:|blob:)/i.test(value)) return value;
-  return `${SERVER}${value.startsWith("/") ? "" : "/"}${value}`;
-}
-
-function SharedContentMessage({ message }) {
-  const shared = parseSharedContentMessage(message?.text);
-  if (!shared) return <span>{message?.text}</span>;
-  const path = `/${shared.type === "reel" ? "reel" : "post"}/${encodeURIComponent(shared.id)}`;
-  const thumbnail = sharedThumbnailUrl(shared.thumbnail);
-  return (
-    <a className="shared-content-message" href={path} aria-label={`Open shared ${shared.type}`}>
-      {thumbnail ? (
-        shared.type === "reel" && shared.thumbnailIsVideo ? (
-          <video className="shared-content-message-thumb" src={thumbnail} muted playsInline preload="metadata" />
-        ) : (
-          <img className="shared-content-message-thumb" src={thumbnail} alt="" loading="lazy" />
-        )
-      ) : (
-        <div className={`shared-content-message-thumb shared-content-message-placeholder ${shared.type}`}>
-          {shared.type === "reel" ? <Film size={25} /> : <ImageIcon size={25} />}
-        </div>
-      )}
-      <div className="shared-content-message-info">
-        <b>{shared.type === "reel" ? "Shared a Reel" : "Shared a post"}</b>
-        <span>{shared.caption || (shared.username ? `@${shared.username}` : "Tap to view this on ReelsGo")}</span>
-        <small>Tap to view on ReelsGo <Link2 size={11} /></small>
-      </div>
-    </a>
-  );
-}
-
 function SharedPostPage({ postId, user, onBack }) {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1186,55 +1120,21 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [feedError, setFeedError] = useState("");
   const [activeStory, setActiveStory] = useState(null);
-  const loadSequence = useRef(0);
 
   async function load() {
-    const sequence = ++loadSequence.current;
     setLoading(true);
-    setFeedError("");
-
-    // Posts and stories are independent features. A failed stories request must
-    // never prevent the main feed from rendering (the previous Promise.all did).
-    const [postsResult, storiesResult] = await Promise.allSettled([
-      api("/posts"),
-      api("/stories")
-    ]);
-
-    if (sequence !== loadSequence.current) return;
-
-    if (postsResult.status === "fulfilled") {
-      const result = postsResult.value;
-      const nextPosts = Array.isArray(result) ? result : result?.posts;
-      if (Array.isArray(nextPosts)) {
-        setPosts(nextPosts);
-      } else {
-        setPosts([]);
-        setFeedError("The server returned an unexpected feed response. Please try again.");
-      }
-    } else {
-      console.error("ReelsGo feed failed to load:", postsResult.reason);
-      setFeedError(postsResult.reason?.message || "Unable to load your feed. Check your connection and try again.");
+    try {
+      const [p, s] = await Promise.all([api("/posts"), api("/stories")]);
+      setPosts(p.posts || []);
+      setStories(s.stories || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-
-    if (storiesResult.status === "fulfilled") {
-      const result = storiesResult.value;
-      const nextStories = Array.isArray(result) ? result : result?.stories;
-      setStories(Array.isArray(nextStories) ? nextStories : []);
-    } else {
-      // Stories are optional; keep the feed working even if stories are down.
-      console.warn("ReelsGo stories failed to load:", storiesResult.reason);
-      setStories([]);
-    }
-
-    setLoading(false);
   }
-
-  useEffect(() => {
-    load();
-    return () => { loadSequence.current += 1; };
-  }, [refreshKey]);
+  useEffect(() => { load(); }, [refreshKey]);
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
@@ -1274,29 +1174,16 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
       </div>
 
-      {loading ? (
-        <div className="empty feed-loading" role="status" aria-live="polite">
-          <span className="feed-spinner" aria-hidden="true" />
-          <h2>Loading your feed</h2>
-          <p>Getting the latest posts…</p>
-        </div>
-      ) : feedError ? (
-        <div className="empty feed-load-error" role="alert">
-          <AlertTriangle />
-          <h2>Feed couldn’t load</h2>
-          <p>{feedError}</p>
-          <button type="button" className="primary small" onClick={load}>Try again</button>
-        </div>
-      ) : posts.length ? posts.map((p, index) => (
-        <Post
-          key={p._id || `feed-post-${index}`}
-          post={p}
-          user={user}
-          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-        />
-      )) : (
-        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>
-      )}
+      {loading ? <div className="empty">Loading feed...</div> :
+        posts.length ? posts.map(p => (
+          <Post
+            key={p._id}
+            post={p}
+            user={user}
+            onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+          />
+        )) :
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
           {activeStory && (
             <StoryViewer
@@ -2163,11 +2050,10 @@ function ShareSheet({ post, onClose, kind = "post" }) {
           });
           const conversation = d.conversation;
           if (!conversation?._id) throw new Error("Unable to create conversation");
-          const inAppShareText = makeSharedContentMessage(post, kind);
           await api(`/messages/conversations/${conversation._id}/messages`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: inAppShareText })
+            body: JSON.stringify({ text: shareText })
           });
           sent += 1;
         } catch (error) {
@@ -5432,7 +5318,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   </div>
                   <div className="conversation-copy">
                     <div className="conversation-name-line"><UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
-                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{(() => { const shared = parseSharedContentMessage(c.lastMessage?.text); return shared ? `Shared a ${shared.type}` : (c.lastMessage?.text || 'Start a conversation'); })()}</span>
+                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
                 </button>
@@ -5472,7 +5358,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                       }}
                       onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
                     >
-                      <SharedContentMessage message={m} />
+                      <span>{m.text}</span>
                       <div className="message-meta">
                         <small>{time(m.createdAt)}</small>
                         {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
