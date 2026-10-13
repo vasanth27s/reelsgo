@@ -4488,6 +4488,16 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [newMessageOpen, setNewMessageOpen] = useState(false);
+  const [peopleSearch, setPeopleSearch] = useState("");
+  const [peopleResults, setPeopleResults] = useState([]);
+  const [peopleLoading, setPeopleLoading] = useState(false);
+  const [peopleError, setPeopleError] = useState("");
+  const [startingConversationId, setStartingConversationId] = useState(null);
+  const [noteComposerOpen, setNoteComposerOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [noteAudience, setNoteAudience] = useState("followers");
+  const [noteSaving, setNoteSaving] = useState(false);
   const [requests, setRequests] = useState([]);
   const [requestsOpen, setRequestsOpen] = useState(false);
   const [requestActionId, setRequestActionId] = useState(null);
@@ -4600,6 +4610,101 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
 
   async function loadNotes() {
     try { const d = await api('/notes'); setNotes(d.notes || []); } catch { setNotes([]); }
+  }
+
+  async function openNewMessagePicker() {
+    setNewMessageOpen(true);
+    setPeopleSearch("");
+    setPeopleError("");
+    setPeopleLoading(true);
+    try {
+      let users = [];
+      const current = getUser();
+      if (current?._id) {
+        try {
+          const following = await api(`/follows/${current._id}/following`);
+          users = following.following || following.users || [];
+        } catch {}
+      }
+      if (!users.length) {
+        const result = await api(`/users/search?q=${encodeURIComponent("a")}`);
+        users = result.users || result.results || [];
+      }
+      const currentId = String(getUser()?._id || "");
+      const seen = new Set();
+      setPeopleResults(users.map(item => item?.user || item).filter(user => {
+        if (!user?._id || String(user._id) === currentId || seen.has(String(user._id))) return false;
+        seen.add(String(user._id));
+        return true;
+      }));
+    } catch (error) {
+      setPeopleError(error.message || "Could not load users.");
+    } finally { setPeopleLoading(false); }
+  }
+
+  async function searchMessagePeople(value) {
+    setPeopleSearch(value);
+    setPeopleError("");
+    if (!value.trim()) {
+      openNewMessagePicker();
+      return;
+    }
+    setPeopleLoading(true);
+    try {
+      const result = await api(`/users/search?q=${encodeURIComponent(value.trim())}`);
+      const currentId = String(getUser()?._id || "");
+      const seen = new Set();
+      setPeopleResults((result.users || result.results || []).map(item => item?.user || item).filter(user => {
+        if (!user?._id || String(user._id) === currentId || seen.has(String(user._id))) return false;
+        seen.add(String(user._id));
+        return true;
+      }));
+    } catch (error) {
+      setPeopleResults([]);
+      setPeopleError(error.message || "Could not search users.");
+    } finally { setPeopleLoading(false); }
+  }
+
+  async function startConversationWith(user) {
+    if (!user?._id || startingConversationId) return;
+    setStartingConversationId(String(user._id));
+    setPeopleError("");
+    try {
+      const result = await api("/messages/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ members: [String(user._id)] })
+      });
+      const conversation = result.conversation;
+      if (!conversation?._id) throw new Error("The server did not return a conversation.");
+      setConversations(current => [conversation, ...current.filter(item => String(item._id) !== String(conversation._id))]);
+      setNewMessageOpen(false);
+      setActive(conversation);
+      setMobileChat(true);
+      await openConversation(conversation);
+    } catch (error) {
+      setPeopleError(error.message || "Unable to start conversation.");
+    } finally { setStartingConversationId(null); }
+  }
+
+  async function publishNote(event) {
+    event?.preventDefault?.();
+    const clean = noteDraft.trim();
+    if (!clean || noteSaving) return;
+    setNoteSaving(true);
+    try {
+      const result = await api("/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: clean.slice(0, 60), audience: noteAudience })
+      });
+      if (result.note) setNotes(current => [result.note, ...current.filter(note => String(note.author?._id || note.author) !== String(me?._id))]);
+      else await loadNotes();
+      setNoteDraft("");
+      setNoteComposerOpen(false);
+    } catch (error) {
+      alert(error.message || "Could not publish note.");
+    } finally { setNoteSaving(false); }
   }
 
   async function loadRequests() {
@@ -4921,7 +5026,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           <b>{me?.username || me?.name || 'Messages'}</b>
           <ChevronRight className="messages-account-chevron" />
         </div>
-        <button className="messages-compose-button" type="button" aria-label="New message">
+        <button className="messages-compose-button" type="button" aria-label="New message" onClick={openNewMessagePicker}>
           <Edit3 />
         </button>
       </div>
@@ -4940,7 +5045,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
       <div className="messages-notes-section">
         <div className="messages-notes-header"><b>Notes</b><button onClick={loadNotes}>Refresh</button></div>
         <div className="messages-notes-scroll">
-          <button className="message-note-card my-note" type="button">
+          <button className="message-note-card my-note" type="button" onClick={() => { setNoteDraft(myNote?.text || ""); setNoteAudience(myNote?.audience || "followers"); setNoteComposerOpen(true); }}>
             <div className="message-note-avatar-wrap"><Avatar user={me} size={58} />{!myNote && <span className="note-add">+</span>}</div>
             <b>Your note</b><span>{myNote?.text || 'Share a note'}</span>
           </button>
@@ -4954,6 +5059,22 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           {!otherNotes.length && <div className="notes-empty">Follow people and their notes will appear here.</div>}
         </div>
       </div>
+
+      {newMessageOpen && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNewMessageOpen(false)}><section className="messages-requests-modal new-message-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><b>New message</b><button type="button" aria-label="Close" onClick={() => setNewMessageOpen(false)}><X /></button></div>
+        <div className="new-message-search"><label htmlFor="new-message-user-search">To:</label><input id="new-message-user-search" autoFocus value={peopleSearch} onChange={e => searchMessagePeople(e.target.value)} placeholder="Search people" /></div>
+        <div className="new-message-results">
+          {peopleLoading ? <div className="new-message-status">Searching people…</div> : null}
+          {!peopleLoading && !peopleResults.length && !peopleError ? <div className="new-message-status">Search for someone to start a conversation.</div> : null}
+          {peopleResults.map(user => <button className="new-message-user-row" type="button" key={user._id} disabled={!!startingConversationId} onClick={() => startConversationWith(user)}><Avatar user={user} size={46}/><span><b>{user.name || user.username || "User"}</b><small>@{user.username || "user"}</small></span><span className="new-message-start-label">{String(startingConversationId) === String(user._id) ? "Opening…" : "Message"}</span></button>)}
+          {peopleError ? <div className="new-message-error" role="alert">{peopleError}</div> : null}
+        </div>
+      </section></div>}
+
+      {noteComposerOpen && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNoteComposerOpen(false)}><section className="messages-requests-modal note-composer-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><button type="button" className="note-cancel-button" onClick={() => setNoteComposerOpen(false)}>Cancel</button><b>New note</b><button type="button" className="note-share-button" disabled={!noteDraft.trim() || noteSaving} onClick={publishNote}>{noteSaving ? "Sharing…" : "Share"}</button></div>
+        <form className="note-composer-body" onSubmit={publishNote}><div className="note-composer-profile"><Avatar user={me} size={48}/><div><b>{me?.username || me?.name || "Your note"}</b><small>Visible for 24 hours</small></div></div><textarea value={noteDraft} onChange={e => setNoteDraft(e.target.value.slice(0, 60))} maxLength={60} autoFocus placeholder="Share a thought…" rows={3}/><div className="note-composer-footer"><label htmlFor="note-audience">Audience</label><select id="note-audience" value={noteAudience} onChange={e => setNoteAudience(e.target.value)}><option value="followers">Followers you follow back</option><option value="close-friends">Close Friends</option></select><span>{noteDraft.length}/60</span></div><button className="note-publish-mobile" type="submit" disabled={!noteDraft.trim() || noteSaving}>{noteSaving ? "Sharing…" : "Share note"}</button></form>
+      </section></div>}
 
       {requestsOpen && <div className="messages-requests-overlay" onClick={() => setRequestsOpen(false)}><div className="messages-requests-modal" onClick={e => e.stopPropagation()}>
         <div className="messages-requests-head"><b>Follow requests</b><button onClick={() => setRequestsOpen(false)}><X /></button></div>

@@ -12935,3 +12935,50 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
  .reel-comment-options-menu button{min-height:35px;padding:7px 9px;font-size:13px}
  .reel-comments-header h2{padding-top:8px}
 }
+
+/* Messages: new conversation picker and note composer */
+.messages-compose-overlay{z-index:620;background:rgba(0,0,0,.68);backdrop-filter:blur(5px)}
+.new-message-modal,.note-composer-modal{width:min(100%,520px);max-height:min(78vh,720px);background:#111316;color:#f7f7f8;border:1px solid #292c31;border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.new-message-modal .messages-requests-head,.note-composer-modal .messages-requests-head{height:62px;border-bottom:1px solid #282b30;color:#f7f7f8}
+.new-message-modal .messages-requests-head button,.note-composer-modal .messages-requests-head button{background:#25282d;color:#f7f7f8}
+.new-message-search{display:flex;align-items:center;gap:12px;padding:14px 17px;border-bottom:1px solid #282b30;color:#aeb3bc;font-size:14px}
+.new-message-search label{font-weight:700;color:#f7f7f8}
+.new-message-search input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#f7f7f8;font:inherit}
+.new-message-search input::placeholder{color:#777e89}
+.new-message-results{max-height:min(58vh,540px);overflow:auto;padding:4px 0 10px}
+.new-message-user-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 17px;text-align:left;background:transparent;border:0;color:#f7f7f8;cursor:pointer}
+.new-message-user-row:hover{background:#202328}
+.new-message-user-row:disabled{opacity:.6;cursor:wait}
+.new-message-user-row>span:nth-child(2){min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.new-message-user-row b{font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.new-message-user-row small{font-size:12px;color:#9299a4}
+.new-message-start-label{font-size:12px;font-weight:700;color:#8e80ff}
+.new-message-status{padding:30px 18px;text-align:center;color:#969ca6;font-size:13px}
+.new-message-error{padding:12px 17px;color:#ff747e;font-size:13px}
+.note-composer-modal{width:min(100%,460px)}
+.note-composer-modal .messages-requests-head{padding:0 15px}
+.note-cancel-button,.note-share-button{border:0;background:transparent;color:#a7acb5;font-size:13px;font-weight:600;cursor:pointer}
+.note-share-button{color:#9a8cff;font-weight:750}
+.note-share-button:disabled{opacity:.4;cursor:not-allowed}
+.note-composer-body{padding:18px}
+.note-composer-profile{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.note-composer-profile>div{display:flex;flex-direction:column;gap:4px}
+.note-composer-profile b{font-size:14px;color:#f7f7f8}
+.note-composer-profile small{font-size:11px;color:#969ca6}
+.note-composer-body textarea{width:100%;resize:vertical;min-height:105px;max-height:200px;border:0;outline:0;border-radius:13px;padding:13px;background:#202328;color:#f7f7f8;font:inherit;font-size:16px;line-height:1.5}
+.note-composer-body textarea::placeholder{color:#858b95}
+.note-composer-footer{display:flex;align-items:center;gap:10px;margin-top:14px;color:#969ca6;font-size:12px}
+.note-composer-footer label{color:#f7f7f8;font-weight:650}
+.note-composer-footer select{flex:1;min-width:0;padding:8px 10px;background:#202328;border:1px solid #343840;border-radius:9px;color:#f7f7f8;font-size:12px}
+.note-composer-footer>span{white-space:nowrap}
+.note-publish-mobile{display:none}
+@media(max-width:700px){
+  .messages-compose-overlay{align-items:flex-end;padding:0}
+  .new-message-modal,.note-composer-modal{width:100%;max-height:84dvh;border-radius:23px 23px 0 0;border-bottom:0}
+  .new-message-results{max-height:calc(84dvh - 125px)}
+  .new-message-user-row{padding:13px 17px}
+  .note-composer-modal{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .note-composer-body{padding:18px 17px 22px}
+  .note-publish-mobile{display:block;width:100%;margin-top:18px;padding:12px;border:0;border-radius:12px;background:#7461f3;color:white;font-size:14px;font-weight:750}
+  .note-publish-mobile:disabled{opacity:.45}
+}
