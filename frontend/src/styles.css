@@ -12712,3 +12712,117 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
     padding: 0 !important;
   }
 }
+
+
+/* =========================================================
+   ReelsGo floating mobile navigation — only navigation UI
+   Keeps the existing navigation actions and all other UI.
+   ========================================================= */
+@media (max-width: 700px) {
+  body {
+    padding-bottom: 86px !important;
+  }
+
+  .bottom-nav.glass-bottom-nav {
+    position: fixed !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    grid-template-columns: none !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 80px) !important;
+    max-width: 640px !important;
+    min-width: 250px !important;
+    height: 58px !important;
+    padding: 5px 7px !important;
+    border: 1px solid rgba(255,255,255,.13) !important;
+    border-radius: 999px !important;
+    background: rgba(20, 21, 24, .88) !important;
+    background-image: linear-gradient(180deg, rgba(38,39,43,.92), rgba(12,13,16,.94)) !important;
+    box-shadow: 0 5px 22px rgba(0,0,0,.42), inset 0 1px 1px rgba(255,255,255,.12) !important;
+    backdrop-filter: blur(22px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
+    z-index: 999 !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile,
+  .bottom-nav.glass-bottom-nav .mobile-profile {
+    position: relative !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #f7f7f8 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile > span,
+  .bottom-nav.glass-bottom-nav .mobile-profile > span {
+    display: none !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile > svg {
+    width: 23px !important;
+    height: 23px !important;
+    min-width: 23px !important;
+    min-height: 23px !important;
+    stroke-width: 2.1 !important;
+    color: currentColor !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile.active,
+  .bottom-nav.glass-bottom-nav .mobile-profile.active {
+    background: #45464b !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .mobile-profile .avatar {
+    width: 25px !important;
+    height: 25px !important;
+    min-width: 25px !important;
+    min-height: 25px !important;
+    border: 1.5px solid rgba(255,255,255,.75) !important;
+    box-shadow: none !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .mobile-profile.active .avatar {
+    border-color: #fff !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .bottom-nav.glass-bottom-nav {
+    width: calc(100% - 58px) !important;
+    min-width: 245px !important;
+    height: 54px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile,
+  .bottom-nav.glass-bottom-nav .mobile-profile {
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  .bottom-nav.glass-bottom-nav .nav-mobile > svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
