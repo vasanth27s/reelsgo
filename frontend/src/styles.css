@@ -13086,3 +13086,71 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
 .saved-reel-comments-list{padding:14px;overflow:auto;flex:1;min-height:0}.saved-reel-comment{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px}.saved-reel-comment>div{flex:1;min-width:0}.saved-reel-comment b{font-size:12px}.saved-reel-comment p{font-size:13px;line-height:1.45;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}.saved-reel-comment small{color:#9da1aa;font-size:10px}.saved-reel-comment>button{color:#aeb1b8;background:transparent;padding:5px}.saved-reel-comments-status,.saved-reel-comments-error{color:#a5a8b0;text-align:center;padding:30px 10px;font-size:13px}.saved-reel-comments-error{color:#ff727e}
 .saved-reel-comment-form{display:flex;align-items:center;gap:9px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.09);flex-shrink:0}.saved-reel-comment-form input{flex:1;min-width:0;height:40px;background:transparent;border:0;color:#fff;outline:none}.saved-reel-comment-form input::placeholder{color:#92959e}.saved-reel-comment-form button{background:transparent;color:#7aa7ff;font-weight:750;padding:8px}.saved-reel-comment-form button:disabled{opacity:.45}
 @media(max-width:700px){.saved-reel-viewer-overlay{padding:0}.saved-reel-viewer{width:100%;height:100%;border-radius:0;border:0}.saved-reel-viewer-close{right:12px;top:12px}.saved-reel-viewer-actions{right:9px;bottom:95px;gap:18px}.saved-reel-viewer-caption{bottom:calc(18px + env(safe-area-inset-bottom));left:12px}.saved-reel-comments-panel{height:min(76vh,760px);border-radius:22px 22px 0 0}}
+
+
+/* ReelsGo saved Reels: playable media with familiar social actions */
+.saved-reel-viewer-overlay{z-index:250;backdrop-filter:blur(8px)}
+.saved-reel-viewer-card{width:min(100%,520px)!important;max-height:92vh;overflow:auto;border-radius:20px;background:#101114;color:#fff;box-shadow:0 24px 80px #0008}
+.saved-reel-viewer-card .reel-viewer-user{padding:13px 15px;gap:11px;align-items:center}
+.saved-reel-viewer-card .reel-viewer-user>div{min-width:0;display:flex;flex-direction:column;gap:4px}
+.saved-reel-viewer-card .reel-viewer-user>div>span{color:#d1d5db;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+.saved-reel-player-wrap{position:relative;background:#000;max-height:72vh;display:flex;justify-content:center;overflow:hidden}
+.saved-reel-player-wrap>video{width:100%;max-height:72vh;aspect-ratio:9/16;object-fit:contain;background:#000}
+.saved-reel-actions{position:absolute;right:12px;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.saved-reel-actions button{width:46px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:14px;background:#1119;color:#fff;backdrop-filter:blur(8px);padding:5px 3px}
+.saved-reel-actions button svg{width:23px;height:23px}
+.saved-reel-actions button span{font-size:10px;font-weight:700;line-height:1.1}
+.saved-reel-actions button.is-liked{color:#ff4d72}
+.saved-reel-actions button.is-saved{color:#b8aaff}
+.saved-reel-notice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 13px;background:#20232a;color:#f3f4f6;font-size:12px}
+.saved-reel-notice button{background:transparent;color:inherit;display:flex;align-items:center}
+.saved-reel-comments-backdrop{position:fixed;inset:0;z-index:270;background:#0009;display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.saved-reel-comments-panel{width:min(100%,560px);max-height:min(72vh,680px);background:#fff;color:#171717;border-radius:20px 20px 16px 16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px #0004}
+.saved-reel-comments-panel>header{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #eee}
+.saved-reel-comments-panel>header h3{font-size:16px}
+.saved-reel-comments-panel>header h3 span{font-size:12px;color:#777;margin-left:5px}
+.saved-reel-comments-panel>header button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f4f4f5}
+.saved-reel-comments-list{padding:12px 16px;overflow:auto;flex:1;min-height:120px}
+.saved-reel-comment{display:flex;gap:10px;padding:10px 0;align-items:flex-start}
+.saved-reel-comment>div{min-width:0;flex:1}
+.saved-reel-comment b{font-size:13px}
+.saved-reel-comment p{font-size:13px;line-height:1.45;overflow-wrap:anywhere;margin:3px 0}
+.saved-reel-comment small{font-size:10px;color:#8a8a8a}
+.saved-reel-comment-state{padding:34px 10px;text-align:center;color:#777;font-size:13px}
+.saved-reel-comment-form{display:flex;gap:8px;padding:12px;border-top:1px solid #eee}
+.saved-reel-comment-form input{flex:1;min-width:0;border:1px solid #e5e5e5;border-radius:999px;padding:11px 14px}
+.saved-reel-comment-form button{padding:0 15px;background:#4f46e5;color:#fff;border-radius:999px;font-weight:700}
+.saved-reel-comment-form button:disabled{opacity:.5}
+
+/* Shared posts/Reels in DMs render as tappable media cards, not plain URLs */
+.shared-message-content{width:min(100%,340px);min-width:0;margin:2px 0}
+.shared-message-link{display:block;color:inherit!important;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #e5e7eb;text-decoration:none!important}
+.bubble.mine .shared-message-link{background:#fff;color:#171717!important;border-color:#ffffff40}
+.shared-message-media{position:relative;width:100%;max-height:340px;aspect-ratio:4/3;background:#111;overflow:hidden}
+.shared-message-media.is-reel{aspect-ratio:9/12;max-height:380px}
+.shared-message-media img,.shared-message-media video{width:100%;height:100%;object-fit:cover;background:#000}
+.shared-message-media video{object-fit:contain}
+.shared-message-reel-label{position:absolute;left:10px;top:10px;border-radius:999px;background:#111b;color:#fff;display:flex;align-items:center;gap:5px;padding:5px 8px;font-size:11px;font-weight:750}
+.shared-message-preview-copy{padding:10px 12px;color:#171717}
+.shared-message-preview-copy>b{font-size:12px;display:block}
+.shared-message-preview-copy>p{font-size:12px;line-height:1.45;margin:4px 0 8px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
+.shared-message-preview-copy>small{display:flex;align-items:center;gap:2px;color:#666;font-size:10px}
+.shared-message-loading,.shared-message-unavailable,.shared-message-media-fallback{min-height:92px;display:flex;align-items:center;justify-content:center;gap:9px;color:#6b7280;font-size:12px;padding:14px}
+.shared-message-unavailable{flex-direction:column;gap:5px}
+.shared-message-unavailable small{font-size:10px}
+.shared-message-media-fallback{height:100%;color:#fff}
+.message-text-lines{display:block;max-width:100%;min-width:0}
+.message-text-line{display:block;max-width:100%;overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.45}
+.bubble{min-width:0;overflow-wrap:anywhere;word-break:normal}
+.bubble>span{min-width:0}
+.message-line{min-width:0;max-width:100%}
+.message-bubble-wrap{min-width:0;max-width:min(78%,520px)}
+.message-bubble-wrap .bubble{max-width:100%}
+@media(max-width:700px){
+ .saved-reel-viewer-card{width:100%!important;max-height:calc(100dvh - 20px);border-radius:18px}
+ .saved-reel-player-wrap,.saved-reel-player-wrap>video{max-height:calc(100dvh - 180px)}
+ .saved-reel-comments-backdrop{padding:0}
+ .saved-reel-comments-panel{width:100%;max-height:78dvh;border-radius:20px 20px 0 0}
+ .shared-message-content{width:min(100%,290px)}
+ .message-bubble-wrap{max-width:84%}
+}

@@ -3794,6 +3794,7 @@ function ReelsPage({ onCreate }) {
       setReels(current => current.map(item => String(item._id) === id
         ? { ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }
         : item));
+      window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
     } catch (error) {
       alert(error?.message || "Could not save this Reel. Please sign in and try again.");
     }
@@ -4203,16 +4204,121 @@ function ReelsPage({ onCreate }) {
 }
 
 function ReelViewer({ reel, onClose }) {
+  const [currentReel, setCurrentReel] = useState(reel);
+  const [liked, setLiked] = useState(Boolean(reel?.likedByMe || reel?.isLiked));
+  const [saved, setSaved] = useState(true);
+  const [comments, setComments] = useState([]);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentSending, setCommentSending] = useState(false);
+  const [error, setError] = useState("");
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    setCurrentReel(reel);
+    setLiked(Boolean(reel?.likedByMe || reel?.isLiked));
+    setSaved(true);
+  }, [reel]);
+
+  async function toggleLike() {
+    try {
+      const result = await api(`/reels/${currentReel._id}/like`, { method: "POST" });
+      setLiked(Boolean(result.liked));
+      setCurrentReel(item => ({ ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }));
+    } catch (e) { setError(e.message || "Could not like this Reel."); }
+  }
+
+  async function toggleSave() {
+    try {
+      const result = await api(`/reels/${currentReel._id}/save`, { method: "POST" });
+      setSaved(Boolean(result.saved));
+      setCurrentReel(item => ({ ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }));
+      window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
+    } catch (e) { setError(e.message || "Could not save this Reel."); }
+  }
+
+  async function openComments() {
+    setCommentsOpen(true);
+    setCommentsLoading(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${currentReel._id}/comments`);
+      setComments(Array.isArray(data.comments) ? data.comments : Array.isArray(data.data?.comments) ? data.data.comments : []);
+    } catch (e) { setError(e.message || "Could not load comments."); }
+    finally { setCommentsLoading(false); }
+  }
+
+  async function submitComment(e) {
+    e.preventDefault();
+    if (!commentText.trim() || commentSending) return;
+    setCommentSending(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${currentReel._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: commentText.trim() })
+      });
+      const created = data.comment || data.data?.comment;
+      if (created) setComments(items => [...items, created]);
+      else {
+        const refreshed = await api(`/reels/${currentReel._id}/comments`);
+        setComments(Array.isArray(refreshed.comments) ? refreshed.comments : []);
+      }
+      setCurrentReel(item => ({ ...item, commentsCount: Number(item.commentsCount || 0) + 1 }));
+      setCommentText("");
+    } catch (e) { setError(e.message || "Could not post comment."); }
+    finally { setCommentSending(false); }
+  }
+
+  async function shareReel() {
+    const url = `${window.location.origin}/reel/${currentReel._id}`;
+    try {
+      if (navigator.share) await navigator.share({ title: "ReelsGo Reel", text: currentReel.caption || "Watch this Reel", url });
+      else {
+        await navigator.clipboard.writeText(url);
+        setError("Reel link copied.");
+      }
+    } catch (e) {
+      if (e?.name !== "AbortError") setError("Could not share this Reel. Try copying its link.");
+    }
+  }
+
+  const mediaSrc = currentReel?.mediaUrl
+    ? (/^https?:\/\//i.test(currentReel.mediaUrl) ? currentReel.mediaUrl : `${SERVER}${currentReel.mediaUrl.startsWith("/") ? "" : "/"}${currentReel.mediaUrl}`)
+    : "";
+
   return (
-    <div className="reel-viewer-overlay" onClick={onClose}>
-      <button className="media-viewer-close" type="button" onClick={onClose}><X /></button>
-      <div className="reel-viewer-card" onClick={e => e.stopPropagation()}>
+    <div className="reel-viewer-overlay saved-reel-viewer-overlay" onClick={onClose}>
+      <button className="media-viewer-close" type="button" onClick={onClose} aria-label="Close Reel"><X /></button>
+      <div className="reel-viewer-card saved-reel-viewer-card" onClick={e => e.stopPropagation()}>
         <div className="reel-viewer-user">
-          <Avatar user={reel.author} size={42} />
-          <div><UserLink user={reel.author} /><span>{reel.caption || "Reel"}</span></div>
+          <Avatar user={currentReel.author} size={42} />
+          <div><UserLink user={currentReel.author} /><span>{currentReel.caption || "Reel"}</span></div>
         </div>
-        <video src={`${SERVER}${reel.mediaUrl}`} controls autoPlay loop playsInline />
+        <div className="saved-reel-player-wrap">
+          <video ref={videoRef} src={mediaSrc} controls autoPlay loop playsInline preload="auto" />
+          <div className="saved-reel-actions" aria-label="Reel actions">
+            <button type="button" onClick={toggleLike} className={liked ? "is-liked" : ""} aria-label={liked ? "Unlike Reel" : "Like Reel"}><Heart fill={liked ? "currentColor" : "none"} /><span>{Number(currentReel.likesCount || 0)}</span></button>
+            <button type="button" onClick={openComments} aria-label="View comments"><MessageCircle /><span>{Number(currentReel.commentsCount || 0)}</span></button>
+            <button type="button" onClick={shareReel} aria-label="Share Reel"><Send /><span>Share</span></button>
+            <button type="button" onClick={toggleSave} className={saved ? "is-saved" : ""} aria-label={saved ? "Remove saved Reel" : "Save Reel"}><Bookmark fill={saved ? "currentColor" : "none"} /><span>{saved ? "Saved" : "Save"}</span></button>
+          </div>
+        </div>
+        {error && <div className="saved-reel-notice" role="status">{error}<button type="button" onClick={() => setError("")} aria-label="Dismiss message"><X size={14}/></button></div>}
       </div>
+      {commentsOpen && <div className="saved-reel-comments-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setCommentsOpen(false); }}>
+        <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+          <header><h3>Comments <span>{Number(currentReel.commentsCount || comments.length)}</span></h3><button type="button" onClick={() => setCommentsOpen(false)} aria-label="Close comments"><X /></button></header>
+          <div className="saved-reel-comments-list">
+            {commentsLoading ? <p className="saved-reel-comment-state">Loading comments…</p> : null}
+            {!commentsLoading && !comments.length ? <p className="saved-reel-comment-state">No comments yet. Be the first to comment.</p> : null}
+            {comments.map((comment, index) => <article className="saved-reel-comment" key={comment._id || index}><Avatar user={comment.author} size={34}/><div><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div></article>)}
+          </div>
+          <form className="saved-reel-comment-form" onSubmit={submitComment}><input value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment"/><button type="submit" disabled={!commentText.trim() || commentSending}>{commentSending ? "Posting…" : "Post"}</button></form>
+        </section>
+      </div>}
     </div>
   );
 }
@@ -4481,6 +4587,94 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   );
 }
 
+
+function getSharedMediaFromMessage(text) {
+  const value = String(text || "");
+  const match = value.match(/https?:\/\/[^\s]+\/(reel|reels|post|posts)\/([a-zA-Z0-9_-]+)/i);
+  if (!match) return null;
+  const type = ["reel", "reels"].includes(match[1].toLowerCase()) ? "reel" : "post";
+  return { type, id: match[2], url: match[0].replace(/[),.]+$/, "") };
+}
+
+function MessageText({ text }) {
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const chunks = [];
+  for (let i = 0; i < words.length; i += 30) chunks.push(words.slice(i, i + 30).join(" "));
+  return <span className="message-text-lines">{chunks.map((chunk, index) => <span className="message-text-line" key={`${index}-${chunk.slice(0, 12)}`}>{chunk}</span>)}</span>;
+}
+
+function SharedMediaMessage({ text }) {
+  const shared = useMemo(() => getSharedMediaFromMessage(text), [text]);
+  const [media, setMedia] = useState(null);
+  const [loading, setLoading] = useState(Boolean(shared));
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadShared() {
+      if (!shared) { setLoading(false); return; }
+      setLoading(true);
+      setFailed(false);
+      try {
+        const endpoint = shared.type === "reel" ? `/reels/${encodeURIComponent(shared.id)}` : `/posts/${encodeURIComponent(shared.id)}`;
+        let data = null;
+        try {
+          data = await api(endpoint);
+        } catch {}
+        let found = shared.type === "reel"
+          ? (data?.reel || data?.data?.reel || data)
+          : (data?.post || data?.data?.post || data);
+        if (String(found?._id || "") !== String(shared.id)) found = null;
+        if (!found) {
+          const feed = await api(shared.type === "reel" ? "/reels" : "/posts");
+          const items = shared.type === "reel"
+            ? (feed?.reels || feed?.data?.reels || [])
+            : (feed?.posts || feed?.data?.posts || []);
+          found = items.find(item => String(item?._id) === String(shared.id)) || null;
+        }
+        if (!cancelled) {
+          if (found?._id) setMedia(found);
+          else setFailed(true);
+        }
+      } catch {
+        if (!cancelled) setFailed(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadShared();
+    return () => { cancelled = true; };
+  }, [shared?.type, shared?.id]);
+
+  if (!shared) return <MessageText text={text} />;
+
+  const mediaUrl = shared.type === "reel"
+    ? media?.mediaUrl
+    : media?.media?.[0]?.url;
+  const resolvedMediaUrl = mediaUrl
+    ? (/^https?:\/\//i.test(mediaUrl) ? mediaUrl : `${SERVER}${mediaUrl.startsWith("/") ? "" : "/"}${mediaUrl}`)
+    : "";
+
+  return <div className="shared-message-content" onClick={e => e.stopPropagation()}>
+    <a className="shared-message-link" href={shared.url} target="_blank" rel="noreferrer">
+      {loading ? <div className="shared-message-loading"><Film size={20}/><span>Loading {shared.type}…</span></div> :
+        media && !failed ? <>
+          <div className={`shared-message-media ${shared.type === "reel" ? "is-reel" : "is-post"}`}>
+            {resolvedMediaUrl && (shared.type === "reel" || media.media?.[0]?.kind === "video")
+              ? <video src={resolvedMediaUrl} controls playsInline preload="metadata" />
+              : resolvedMediaUrl ? <img src={resolvedMediaUrl} alt={media.caption || "Shared post"} loading="lazy"/> : <div className="shared-message-media-fallback"><ImageIcon/></div>}
+            {shared.type === "reel" && <span className="shared-message-reel-label"><Play size={13} fill="currentColor"/> Reel</span>}
+          </div>
+          <div className="shared-message-preview-copy">
+            <b>{media.author?.username ? `@${media.author.username}` : "ReelsGo"}</b>
+            <p>{media.caption || (shared.type === "reel" ? "Watch this Reel" : "View this post")}</p>
+            <small>Open in ReelsGo <ChevronRight size={13}/></small>
+          </div>
+        </> : <div className="shared-message-unavailable"><Film size={20}/><span>{failed ? `${shared.type === "reel" ? "Reel" : "Post"} preview unavailable` : "Open shared content"}</span><small>Tap to view</small></div>}
+    </a>
+  </div>;
+}
 
 function MessagesPage({ openConversationId = null, openConversationData = null }) {
   const me = getUser();
@@ -5245,7 +5439,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                       }}
                       onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
                     >
-                      <span>{m.text}</span>
+                      <SharedMediaMessage text={m.text} />
                       <div className="message-meta">
                         <small>{time(m.createdAt)}</small>
                         {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
@@ -5596,12 +5790,28 @@ function SavedPage({ user, embedded = false }) {
       })
     ]).then(([postData, reelData]) => {
       if (cancelled) return;
-      setPosts(Array.isArray(postData.posts) ? postData.posts : []);
-      setReels(Array.isArray(reelData.reels) ? reelData.reels : []);
+      const rawPosts = postData?.posts || postData?.data?.posts || postData?.savedPosts || postData?.saved || [];
+      const rawReels = reelData?.reels || reelData?.data?.reels || reelData?.savedReels || reelData?.saved || [];
+      setPosts(Array.isArray(rawPosts) ? rawPosts.map(item => item?.post || item).filter(Boolean) : []);
+      setReels(Array.isArray(rawReels) ? rawReels.map(item => item?.reel || item).filter(item => item?._id && item?.mediaUrl) : []);
     }).finally(() => {
       if (!cancelled) setLoading(false);
     });
-    return () => { cancelled = true; };
+    const refreshSaved = () => {
+      api("/posts/saved").then(data => {
+        const items = data?.posts || data?.data?.posts || data?.savedPosts || data?.saved || [];
+        setPosts(Array.isArray(items) ? items.map(item => item?.post || item).filter(Boolean) : []);
+      }).catch(() => {});
+      api("/reels/saved").then(data => {
+        const items = data?.reels || data?.data?.reels || data?.savedReels || data?.saved || [];
+        setReels(Array.isArray(items) ? items.map(item => item?.reel || item).filter(item => item?._id && item?.mediaUrl) : []);
+      }).catch(() => {});
+    };
+    window.addEventListener("reelsgo-saved-content-updated", refreshSaved);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("reelsgo-saved-content-updated", refreshSaved);
+    };
   }, []);
 
   const tabStyle = selected => ({
