@@ -12662,3 +12662,26 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
 @media(max-width:700px){.reel-likes-panel{width:100%;height:min(74dvh,760px);max-height:calc(100dvh - env(safe-area-inset-top));border-radius:22px 22px 0 0;border:0}.reels-like-count-link{margin-left:6px}}
 .post-likes-link{display:inline-flex;background:transparent;color:inherit;font-weight:750;font-size:13px;padding:2px 0;cursor:pointer}
 .post-likes-link:hover{text-decoration:underline}
+
+
+/* Reels interaction visibility and likes-count fixes (desktop + mobile). */
+@media (min-width:701px) {
+  .reels-page .reels-scroll { overflow-x:hidden !important; }
+  .reels-page .reel-feed-media { overflow:hidden !important; }
+  .reels-page .reels-desktop-actions {
+    left:auto !important; right:12px !important; bottom:24px !important;
+    z-index:40 !important; gap:15px !important; max-height:calc(100% - 130px);
+    justify-content:flex-end; pointer-events:auto;
+  }
+  .reels-page .reels-desktop-actions button { color:#fff !important; text-shadow:0 2px 7px #000; }
+  .reels-page .reels-desktop-actions button.is-liked { color:#ff3b65 !important; }
+  .reels-page .reels-desktop-actions button.is-saved { color:#c4b5fd !important; }
+  .reels-page .reels-like-count-link { position:absolute; z-index:41; right:8px; bottom:calc(24px + 5 * 55px); margin:0; color:#fff; text-shadow:0 2px 7px #000; }
+}
+.reels-mobile-likes-count { background:transparent !important; color:#fff !important; padding:0 2px !important; }
+.reels-mobile-likes-count small { text-decoration:underline; font-size:9px !important; }
+@media(max-width:700px) {
+  .reels-page .reels-like-count-link { display:none !important; }
+  .reels-page .reels-mobile-actions { z-index:50 !important; }
+  .reels-page .reels-mobile-actions button.is-liked { color:#ff3b65 !important; }
+}
