@@ -1186,21 +1186,55 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState("");
   const [activeStory, setActiveStory] = useState(null);
+  const loadSequence = useRef(0);
 
   async function load() {
+    const sequence = ++loadSequence.current;
     setLoading(true);
-    try {
-      const [p, s] = await Promise.all([api("/posts"), api("/stories")]);
-      setPosts(p.posts || []);
-      setStories(s.stories || []);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
+    setFeedError("");
+
+    // Posts and stories are independent features. A failed stories request must
+    // never prevent the main feed from rendering (the previous Promise.all did).
+    const [postsResult, storiesResult] = await Promise.allSettled([
+      api("/posts"),
+      api("/stories")
+    ]);
+
+    if (sequence !== loadSequence.current) return;
+
+    if (postsResult.status === "fulfilled") {
+      const result = postsResult.value;
+      const nextPosts = Array.isArray(result) ? result : result?.posts;
+      if (Array.isArray(nextPosts)) {
+        setPosts(nextPosts);
+      } else {
+        setPosts([]);
+        setFeedError("The server returned an unexpected feed response. Please try again.");
+      }
+    } else {
+      console.error("ReelsGo feed failed to load:", postsResult.reason);
+      setFeedError(postsResult.reason?.message || "Unable to load your feed. Check your connection and try again.");
     }
+
+    if (storiesResult.status === "fulfilled") {
+      const result = storiesResult.value;
+      const nextStories = Array.isArray(result) ? result : result?.stories;
+      setStories(Array.isArray(nextStories) ? nextStories : []);
+    } else {
+      // Stories are optional; keep the feed working even if stories are down.
+      console.warn("ReelsGo stories failed to load:", storiesResult.reason);
+      setStories([]);
+    }
+
+    setLoading(false);
   }
-  useEffect(() => { load(); }, [refreshKey]);
+
+  useEffect(() => {
+    load();
+    return () => { loadSequence.current += 1; };
+  }, [refreshKey]);
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
@@ -1240,16 +1274,29 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
       </div>
 
-      {loading ? <div className="empty">Loading feed...</div> :
-        posts.length ? posts.map(p => (
-          <Post
-            key={p._id}
-            post={p}
-            user={user}
-            onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-          />
-        )) :
-        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+      {loading ? (
+        <div className="empty feed-loading" role="status" aria-live="polite">
+          <span className="feed-spinner" aria-hidden="true" />
+          <h2>Loading your feed</h2>
+          <p>Getting the latest posts…</p>
+        </div>
+      ) : feedError ? (
+        <div className="empty feed-load-error" role="alert">
+          <AlertTriangle />
+          <h2>Feed couldn’t load</h2>
+          <p>{feedError}</p>
+          <button type="button" className="primary small" onClick={load}>Try again</button>
+        </div>
+      ) : posts.length ? posts.map((p, index) => (
+        <Post
+          key={p._id || `feed-post-${index}`}
+          post={p}
+          user={user}
+          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+        />
+      )) : (
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>
+      )}
 
           {activeStory && (
             <StoryViewer

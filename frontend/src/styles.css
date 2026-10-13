@@ -13115,3 +13115,37 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
   .shared-content-message-thumb{width:56px;height:74px;flex-basis:56px;}
   .shared-content-message-info>span{font-size:10px;}
 }
+
+
+/* Feed loading/error states: keep the home feed readable instead of a blank/black panel. */
+.feed-loading,
+.feed-load-error {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  color: #737985;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 30px 20px;
+  text-align: center;
+}
+.feed-loading h2,
+.feed-load-error h2 { color: #111318; margin: 0; }
+.feed-loading p,
+.feed-load-error p { max-width: 460px; overflow-wrap: anywhere; line-height: 1.5; }
+.feed-spinner {
+  display: block;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #e6e7eb;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: reelsgo-feed-spin .8s linear infinite;
+}
+@keyframes reelsgo-feed-spin { to { transform: rotate(360deg); } }
+.feed-load-error > svg { width: 34px; height: 34px; color: #dc2626; }
+@media (prefers-reduced-motion: reduce) { .feed-spinner { animation: none; } }
