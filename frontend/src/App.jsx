@@ -1478,7 +1478,6 @@ function StoryViewer({ story, onClose, onDeleted }) {
 function Post({ post, user, onDeleted }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [likesCount, setLikesCount] = useState(Number(post.likesCount) || 0);
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
@@ -1498,8 +1497,7 @@ function Post({ post, user, onDeleted }) {
   async function like() {
     try {
       const d = await api(`/posts/${post._id}/like`, { method: "POST" });
-      setLiked(Boolean(d.liked));
-      setLikesCount(Number(d.likesCount ?? likesCount + (d.liked ? 1 : -1)));
+      setLiked(d.liked);
     } catch (e) {
       alert(e.message);
     }
@@ -1744,7 +1742,7 @@ function Post({ post, user, onDeleted }) {
         </div>
 
         <div className="post-body">
-          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers} aria-label="See who liked this post">{likesCount} {likesCount === 1 ? "like" : "likes"}</button>}
+          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers}>{post.likesCount || 0} likes</button>}
 
           {post.caption && (
             <p>
@@ -1760,35 +1758,40 @@ function Post({ post, user, onDeleted }) {
             View all comments
           </button>
 
+          {showComments && (
+            <div className="comments">
+              {comments.map(c => (
+                <div className="comment" key={c._id}>
+                  <Avatar user={c.author} size={28} />
+                  <div>
+                    <UserLink user={c.author} />
+                    <span>{c.text}</span>
+                  </div>
+                </div>
+              ))}
 
+              {!post.commentsDisabled && (
+                <div className="comment-input">
+                  <input
+                    value={text}
+                    onChange={e => setText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        comment();
+                      }
+                    }}
+                    placeholder="Add a comment..."
+                  />
+                  <button onClick={comment} type="button">
+                    Post
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </article>
-
-      {likedUsersOpen && (
-        <div className="reel-comments-backdrop reel-likes-backdrop post-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
-          <section className="reel-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this post">
-            <header className="reel-comments-header"><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikedUsersOpen(false)}><X /></button></header>
-            <div className="reel-likes-list">
-              {likedUsersLoading && <p className="reel-comments-status">Loading likes…</p>}
-              {!likedUsersLoading && likedUsersError && <p className="reel-comments-error">{likedUsersError}</p>}
-              {!likedUsersLoading && !likedUsersError && !likedUsers.length && <p className="reel-comments-status">No likes to show yet.</p>}
-              {likedUsers.map((person, index) => <div className="reel-likes-user" key={person._id || index}><Avatar user={person} size={42}/><div><b>{person.username || person.name || "ReelsGo user"}</b><small>{person.name && person.username ? person.name : ""}</small></div></div>)}
-            </div>
-          </section>
-        </div>
-      )}
-      {showComments && (
-        <div className="reel-comments-backdrop post-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
-          <section className="reel-comments-panel" role="dialog" aria-modal="true" aria-label="Post comments">
-            <header className="reel-comments-header"><h2>Comments</h2><button type="button" aria-label="Close comments" onClick={() => setShowComments(false)}><X /></button></header>
-            <div className="reel-comments-list">
-              {!comments.length && <p className="reel-comments-status">No comments yet. Be the first to comment.</p>}
-              {comments.map((c, index) => <article className="reel-comment-row" key={c._id || index}><Avatar user={c.author} size={36}/><div className="reel-comment-content"><b>{c.author?.username || c.author?.name || "User"}</b><p>{c.text}</p><small>{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</small></div></article>)}
-            </div>
-            {!post.commentsDisabled && <form className="reel-comment-form" onSubmit={event => { event.preventDefault(); comment(); }}><Avatar user={user} size={34}/><input value={text} onChange={event => setText(event.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment"/><button type="submit" disabled={!text.trim()}>Post</button></form>}
-          </section>
-        </div>
-      )}
 
       {shareOpen && (
         <ShareSheet
@@ -5304,25 +5307,66 @@ function NotificationsPage() {
 
 function SavedPage({ user, embedded = false }) {
   const [posts, setPosts] = useState([]);
+  const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState("posts");
+  const [activeReel, setActiveReel] = useState(null);
+
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
-    api("/posts/saved").then(d => setPosts(d.posts || [])).catch(() => setPosts([])).finally(() => setLoading(false));
+    Promise.all([
+      api("/posts/saved").catch(error => {
+        console.error("Could not load saved posts:", error);
+        return { posts: [] };
+      }),
+      api("/reels/saved").catch(error => {
+        console.error("Could not load saved Reels:", error);
+        return { reels: [] };
+      })
+    ]).then(([postData, reelData]) => {
+      if (cancelled) return;
+      setPosts(Array.isArray(postData.posts) ? postData.posts : []);
+      setReels(Array.isArray(reelData.reels) ? reelData.reels : []);
+    }).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => { cancelled = true; };
   }, []);
-  const body = loading
-    ? <div className="empty"><Bookmark /><p>Loading saved posts...</p></div>
-    : posts.length
-      ? <div className="profile-grid">{posts.slice(0, 30).map(p => (
-        <GridMedia
-          key={p._id}
-          post={p}
-          user={user}
-          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-        />
-      ))}</div>
-      : <EmptyTab icon={<Bookmark />} title="Saved posts" text="Posts you save will appear here." />;
+
+  const tabStyle = selected => ({
+    border: "1px solid var(--border, #30343b)",
+    borderRadius: 999,
+    padding: "9px 16px",
+    background: selected ? "var(--text, #f5f5f5)" : "transparent",
+    color: selected ? "var(--bg, #101114)" : "inherit",
+    fontWeight: 650,
+    cursor: "pointer"
+  });
+
+  const body = <>
+    <div className="saved-collection-tabs" role="tablist" aria-label="Saved content" style={{ display: "flex", gap: 10, margin: "0 0 18px", flexWrap: "wrap" }}>
+      <button type="button" role="tab" aria-selected={activeType === "posts"} style={tabStyle(activeType === "posts")} onClick={() => setActiveType("posts")}>Posts <span>({posts.length})</span></button>
+      <button type="button" role="tab" aria-selected={activeType === "reels"} style={tabStyle(activeType === "reels")} onClick={() => setActiveType("reels")}>Reels <span>({reels.length})</span></button>
+    </div>
+    {loading ? <div className="empty"><Bookmark /><p>Loading saved content...</p></div> : activeType === "posts" ? (
+      posts.length ? <div className="profile-grid">{posts.slice(0, 100).map(p => (
+        <GridMedia key={p._id} post={p} user={user} onDeleted={id => setPosts(current => current.filter(item => String(item._id) !== String(id)))} />
+      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved posts yet" text="Posts you save will appear here." />
+    ) : (
+      reels.length ? <div className="profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => (
+        <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`} style={{ position: "relative", aspectRatio: "9 / 16", overflow: "hidden", padding: 0, border: 0, background: "#111", cursor: "pointer" }}>
+          <video src={`${SERVER}${reel.mediaUrl}`} muted playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <span aria-hidden="true" style={{ position: "absolute", right: 10, bottom: 10, color: "white", filter: "drop-shadow(0 1px 3px #000)" }}><Play size={22} fill="currentColor" /></span>
+          {reel.caption ? <span style={{ position: "absolute", left: 8, right: 8, bottom: 36, color: "white", textAlign: "left", fontSize: 12, textShadow: "0 1px 4px #000", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{reel.caption}</span> : null}
+        </button>
+      ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved Reels yet" text="Reels you save will appear here." />
+    )}
+    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
+  </>;
+
   if (embedded) return <div className="embedded-saved">{body}</div>;
-  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved collection</p></div></div>{body}</div>;
+  return <div className="page"><div className="page-heading"><div><h1>Saved</h1><p>Your saved posts and Reels</p></div></div>{body}</div>;
 }
 
 const settingsSections = [
