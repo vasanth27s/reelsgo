@@ -18,6 +18,29 @@ function view(r) {
   };
 }
 
+router.get("/saved", auth, async (req, res) => {
+  try {
+    const saves = await Interaction.find({
+      user: req.user.id,
+      targetType: "reel",
+      type: "save"
+    }).sort({ createdAt: -1 }).lean();
+
+    const ids = saves.map(item => item.target);
+    const reels = await Reel.find({ _id: { $in: ids } })
+      .populate("author", "name username avatar")
+      .lean();
+
+    // Preserve the user's save order rather than sorting by the Reel's creation date.
+    const byId = new Map(reels.map(reel => [String(reel._id), reel]));
+    const ordered = ids.map(id => byId.get(String(id))).filter(Boolean);
+    res.json({ reels: ordered.map(view) });
+  } catch (error) {
+    console.error("Load saved Reels failed:", error);
+    res.status(500).json({ message: "Could not load saved Reels" });
+  }
+});
+
 router.get("/", auth, async (req, res) => {
   const reels = await Reel.find()
     .populate("author", "name username")
