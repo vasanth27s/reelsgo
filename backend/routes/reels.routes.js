@@ -25,7 +25,12 @@ router.get("/", auth, async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(50);
 
-  res.json({ reels: reels.map(view) });
+  const withCounts = await Promise.all(reels.map(async reel => {
+    const item = view(reel);
+    item.commentsCount = await Comment.countDocuments({ post: reel._id, hidden: false });
+    return item;
+  }));
+  res.json({ reels: withCounts });
 });
 
 router.post("/", auth, uploadMedia.single("video"), async (req, res) => {
@@ -192,7 +197,8 @@ router.get("/:id/comments", auth, async (req, res) => {
     const visibleComments = isOwner ? comments : comments.filter(c =>
       !restrictedUsers.some(id => String(id) === String(c.author?._id)) || String(c.author?._id) === String(req.user.id)
     );
-    return res.json({ comments: visibleComments });
+    const commentsCount = await Comment.countDocuments({ post: reel._id, hidden: false });
+    return res.json({ comments: visibleComments, commentsCount });
   } catch (error) {
     console.error("Load Reel comments failed:", error);
     return res.status(500).json({ message: "Failed to load Reel comments" });
@@ -214,8 +220,10 @@ router.post("/:id/comments", auth, async (req, res) => {
     if (block) return res.status(403).json({ message: "The Reel owner has blocked you from commenting on this Reel" });
 
     const comment = await Comment.create({ post: reel._id, author: req.user.id, text });
+    reel.commentsCount = Number(reel.commentsCount || 0) + 1;
+    await reel.save();
     const populated = await Comment.findById(comment._id).populate("author", "name username");
-    return res.status(201).json({ comment: populated });
+    return res.status(201).json({ comment: populated, commentsCount: reel.commentsCount });
   } catch (error) {
     return res.status(500).json({ message: "Failed to create comment" });
   }

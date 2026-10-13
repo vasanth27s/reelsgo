@@ -12909,3 +12909,29 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
   .story-viewer-viewers-open .story-viewer-content { transform: translateY(-8vh) scale(.82); transform-origin: top center; }
   .story-viewers-button { bottom: 8px !important; }
 }
+
+
+/* Comment options + visible comment counts (additive overrides). */
+.reel-comments-header h2{display:flex;align-items:center;justify-content:center;gap:7px}
+.reel-comments-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.12);color:#d8dce3;font-size:12px;font-weight:700}
+.reel-comment-row{position:relative}
+.reel-comment-content[role="button"]{cursor:pointer;border-radius:10px}
+.reel-comment-content[role="button"]:focus-visible{outline:2px solid #818cf8;outline-offset:3px}
+.reel-comment-menu-wrap{position:relative;flex:0 0 auto;align-self:flex-start;z-index:5}
+.reel-comment-menu-trigger{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:#aeb6c1;cursor:pointer}
+.reel-comment-menu-trigger:hover,.reel-comment-menu-trigger:focus-visible{background:rgba(255,255,255,.1);color:#fff}
+.reel-comment-options-menu{position:absolute;right:0;top:30px;z-index:50;width:230px;max-width:min(230px,calc(100vw - 38px));padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:23px;background:linear-gradient(145deg,rgba(42,43,47,.98),rgba(28,29,32,.98));box-shadow:0 16px 48px rgba(0,0,0,.58);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:hidden;animation:commentMenuIn .14s ease-out}
+.reel-comment-options-menu button{width:100%;min-height:36px;display:flex;align-items:center;gap:12px;padding:8px 10px;border:0;border-radius:11px;background:transparent;color:#f7f7f8;text-align:left;font-size:13px;line-height:1.2;cursor:pointer}
+.reel-comment-options-menu button svg{width:19px;height:19px;flex:0 0 19px;stroke-width:1.8}
+.reel-comment-options-menu button:hover,.reel-comment-options-menu button:focus-visible{background:rgba(255,255,255,.1);outline:none}
+.reel-comment-options-menu button.danger{color:#ff626d}
+.reel-comment-options-menu button.danger:hover{background:rgba(255,65,80,.12)}
+.reel-comment-options-menu button:disabled{opacity:.45;cursor:wait}
+.reel-comment-inline-actions button{background:transparent;border:0;color:#9099a6;font-size:11px;margin-right:12px;cursor:pointer}
+.reel-comment-inline-actions button:hover{color:#fff}
+@keyframes commentMenuIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:700px){
+ .reel-comment-options-menu{position:fixed;left:18px;right:auto;top:auto;bottom:calc(90px + env(safe-area-inset-bottom));width:min(230px,calc(100vw - 36px));max-width:none;border-radius:25px;padding:9px;background:linear-gradient(145deg,rgba(43,44,47,.98),rgba(30,31,34,.98));box-shadow:0 20px 55px rgba(0,0,0,.62)}
+ .reel-comment-options-menu button{min-height:35px;padding:7px 9px;font-size:13px}
+ .reel-comments-header h2{padding-top:8px}
+}

@@ -1362,25 +1362,6 @@ function StoryViewer({ story, onClose, onDeleted }) {
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const touchStartY = useRef(null);
-
-  function handleStoryTouchStart(e) {
-    touchStartY.current = e.touches?.[0]?.clientY ?? null;
-  }
-
-  function handleStoryTouchEnd(e) {
-    if (touchStartY.current == null) return;
-    const endY = e.changedTouches?.[0]?.clientY;
-    if (typeof endY !== "number") return;
-    const delta = endY - touchStartY.current;
-    if (delta < -55 && isOwner) {
-      // Instagram-style swipe up opens the story viewers panel.
-      openViewers();
-    } else if (delta > 75 && viewersOpen) {
-      setViewersOpen(false);
-    }
-    touchStartY.current = null;
-  }
 
   async function deleteStory() {
     if (!isOwner || deleting) return;
@@ -1420,12 +1401,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
   }, [story?._id, isOwner]);
 
   return (
-    <div
-      className={`story-viewer${viewersOpen ? " story-viewer-viewers-open" : ""}`}
-      onClick={onClose}
-      onTouchStart={handleStoryTouchStart}
-      onTouchEnd={handleStoryTouchEnd}
-    >
+    <div className="story-viewer" onClick={onClose}>
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
@@ -1467,10 +1443,9 @@ function StoryViewer({ story, onClose, onDeleted }) {
           <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>
         )}
       </div>
-      {isOwner && !viewersOpen && (
+      {isOwner && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
-          <span className="story-viewers-grabber" />
-          <Eye /> <span>{viewers.length || story.views?.length || 0} views · Swipe up</span>
+          <Eye /> <span>{viewers.length || story.views?.length || 0} views</span>
         </button>
       )}
       {viewersOpen && (
@@ -3551,6 +3526,8 @@ function ReelsPage({ onCreate }) {
   const [commentText, setCommentText] = useState("");
   const [commentSending, setCommentSending] = useState(false);
   const [commentsError, setCommentsError] = useState("");
+  const [commentMenuId, setCommentMenuId] = useState(null);
+  const [commentActionBusy, setCommentActionBusy] = useState(false);
   const [soundEnabledById, setSoundEnabledById] = useState({});
   const [likedById, setLikedById] = useState({});
   const [savedById, setSavedById] = useState({});
@@ -3689,13 +3666,18 @@ function ReelsPage({ onCreate }) {
 
   async function openReelComments(reel) {
     setCommentsReel(reel);
+    setCommentMenuId(null);
     setReelComments([]);
     setCommentsError("");
     setCommentText("");
     setCommentsLoading(true);
     try {
       const data = await api(`/reels/${reel._id}/comments`);
-      setReelComments(Array.isArray(data.comments) ? data.comments : []);
+      const loadedComments = Array.isArray(data.comments) ? data.comments : [];
+      setReelComments(loadedComments);
+      const actualCount = Number(data.commentsCount ?? loadedComments.length);
+      setCommentsReel(current => current ? { ...current, commentsCount: actualCount } : current);
+      setReels(current => current.map(item => String(item._id) === String(reel._id) ? { ...item, commentsCount: actualCount } : item));
     } catch (error) {
       setCommentsError(error?.message || "Could not load comments.");
     } finally {
@@ -3723,6 +3705,69 @@ function ReelsPage({ onCreate }) {
       setCommentsError(error?.message || "Could not post comment.");
     } finally {
       setCommentSending(false);
+    }
+  }
+
+  async function runCommentAction(action, comment) {
+    if (!commentsReel || !comment || commentActionBusy) return;
+    const isReelOwner = String(commentsReel.author?._id || commentsReel.author) === String(me?._id);
+    const isCommentAuthor = String(comment.author?._id || comment.author) === String(me?._id);
+    const commentId = String(comment._id || "");
+    const targetUserId = String(comment.author?._id || comment.author || "");
+    setCommentMenuId(null);
+
+    try {
+      if (action === "share") {
+        const url = `${window.location.origin}/reels/${commentsReel._id}`;
+        if (navigator.share) {
+          try { await navigator.share({ title: "ReelsGo Reel", text: commentsReel.caption || "Watch this Reel", url }); }
+          catch (error) { if (error?.name !== "AbortError") throw error; }
+        } else if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+          alert("Reel link copied.");
+        } else {
+          window.prompt("Copy this Reel link:", url);
+        }
+        return;
+      }
+      if (action === "story") {
+        window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { reelId: commentsReel._id, url: `${window.location.origin}/reels/${commentsReel._id}` } }));
+        return;
+      }
+      if (action === "replyReel") {
+        setCommentText(`@${comment.author?.username || comment.author?.name || "user"} `);
+        setCommentsReel(null);
+        onCreate?.();
+        return;
+      }
+      if (action === "delete") {
+        if (!isReelOwner && !isCommentAuthor) throw new Error("Only the Reel owner or comment author can delete this comment.");
+        if (!window.confirm("Delete this comment?")) return;
+        setCommentActionBusy(true);
+        await api(`/reels/${commentsReel._id}/comments/${commentId}`, { method: "DELETE" });
+        setReelComments(items => items.filter(item => String(item._id) !== commentId));
+        setReels(items => items.map(item => String(item._id) === String(commentsReel._id) ? { ...item, commentsCount: Math.max(0, Number(item.commentsCount || 0) - 1) } : item));
+        return;
+      }
+      if (action === "pin") {
+        if (!isReelOwner) throw new Error("Only the Reel owner can pin comments.");
+        setCommentActionBusy(true);
+        const data = await api(`/reels/${commentsReel._id}/comments/${commentId}/pin`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pinned: !comment.pinned }) });
+        setReelComments(items => items.map(item => String(item._id) === commentId ? { ...item, pinned: Boolean(data.comment?.pinned) } : item));
+        return;
+      }
+      if (["restrict", "block", "report"].includes(action)) {
+        if (action === "restrict" && !isReelOwner) throw new Error("Only the Reel owner can restrict commenters on this Reel.");
+        if (action === "block" && !isReelOwner) throw new Error("Only the Reel owner can block commenters from this Reel.");
+        setCommentActionBusy(true);
+        const data = await api(`/reels/${commentsReel._id}/comments/${commentId}/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUserId, reason: action === "report" ? "Comment reported by user" : undefined }) });
+        if (action === "report") alert(data.message || "Comment reported.");
+        else alert(data.message || (action === "block" ? "User blocked from interacting with your Reels." : "User restricted on your Reels."));
+      }
+    } catch (error) {
+      setCommentsError(error?.message || "That comment action failed. Please try again.");
+    } finally {
+      setCommentActionBusy(false);
     }
   }
 
@@ -3852,7 +3897,7 @@ function ReelsPage({ onCreate }) {
                     <div className="reels-mobile-actions" aria-label="Reel actions">
                       <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
                       <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
-                      <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
+                      <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
@@ -4003,7 +4048,7 @@ function ReelsPage({ onCreate }) {
                     <div className="reels-desktop-actions" aria-label="Reel actions">
                       <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
                       <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
-                      <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
+                      <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
@@ -4107,18 +4152,42 @@ function ReelsPage({ onCreate }) {
         <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
           <section className="reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
             <header className="reel-comments-header">
-              <h2>Comments</h2>
+              <h2>Comments <span className="reel-comments-count">{Number(commentsReel.commentsCount ?? reelComments.length)}</span></h2>
               <button type="button" aria-label="Close comments" onClick={() => setCommentsReel(null)}><X /></button>
             </header>
             <div className="reel-comments-list">
               {commentsLoading ? <p className="reel-comments-status">Loading comments…</p> : null}
               {!commentsLoading && !reelComments.length && !commentsError ? <p className="reel-comments-status">No comments yet. Be the first to comment.</p> : null}
-              {reelComments.map((comment, index) => (
-                <article className="reel-comment-row" key={comment._id || index}>
-                  <Avatar user={comment.author} size={36} />
-                  <div className="reel-comment-content"><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div>
-                </article>
-              ))}
+              {reelComments.map((comment, index) => {
+                const reelOwner = String(commentsReel.author?._id || commentsReel.author) === String(me?._id);
+                const ownComment = String(comment.author?._id || comment.author) === String(me?._id);
+                return (
+                  <article className={`reel-comment-row ${comment.pinned ? "is-pinned" : ""}`} key={comment._id || index}>
+                    <Avatar user={comment.author} size={36} />
+                    <div className="reel-comment-content" role="button" tabIndex={0} aria-label="Open comment options" onClick={() => setCommentMenuId(String(comment._id))} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setCommentMenuId(String(comment._id)); } }}>
+                      <div className="reel-comment-author-line"><b>{comment.author?.username || comment.author?.name || "User"}</b>{comment.pinned && <span className="reel-comment-pinned-label"><PinOff size={12}/> Pinned</span>}</div>
+                      <p>{comment.text}</p>
+                      <small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small>
+                      <div className="reel-comment-inline-actions"><button type="button" onClick={event => { event.stopPropagation(); setCommentText(`@${comment.author?.username || comment.author?.name || "user"} `); }}>Reply</button>{reelOwner && <button type="button" onClick={event => { event.stopPropagation(); runCommentAction("pin", comment); }}>{comment.pinned ? "Unpin" : "Pin"}</button>}</div>
+                    </div>
+                    <div className="reel-comment-menu-wrap">
+                      <button type="button" className="reel-comment-menu-trigger" aria-label="Comment options" onClick={() => setCommentMenuId(current => current === String(comment._id) ? null : String(comment._id))}><MoreHorizontal size={19}/></button>
+                      {commentMenuId === String(comment._id) && <div className="reel-comment-options-menu">
+                        {reelOwner && <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("pin", comment)}><PinOff size={17}/>{comment.pinned ? "Unpin" : "Pin"}</button>}
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("replyReel", comment)}><Film size={17}/>Reply with a Reel</button>
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("story", comment)}><PlusSquare size={17}/>Add to story</button>
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("share", comment)}><Send size={17}/>Share</button>
+                        {reelOwner && !ownComment && <>
+                          <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("restrict", comment)}><UserMinus size={17}/>Restrict</button>
+                          <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("block", comment)}><Ban size={17}/>Block</button>
+                        </>}
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("report", comment)}><Flag size={17}/>Report</button>
+                        {(reelOwner || ownComment) && <button type="button" className="danger" disabled={commentActionBusy} onClick={() => runCommentAction("delete", comment)}><Trash2 size={17}/>Delete</button>}
+                      </div>}
+                    </div>
+                  </article>
+                );
+              })}
               {commentsError && <p className="reel-comments-error" role="alert">{commentsError}</p>}
             </div>
             <form className="reel-comment-form" onSubmit={submitReelComment}>
