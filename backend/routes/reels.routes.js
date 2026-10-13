@@ -6,6 +6,7 @@ import Reel from "../models/Reel.js";
 import Interaction from "../models/Interaction.js";
 import Notification from "../models/Notification.js";
 import Comment from "../models/Comment.js";
+import CommentModeration from "../models/CommentModeration.js";
 
 const router = express.Router();
 
@@ -178,12 +179,22 @@ router.get("/:id/comments", auth, async (req, res) => {
     const reel = await Reel.findById(req.params.id);
     if (!reel) return res.status(404).json({ message: "Reel not found" });
 
+    const isOwner = String(reel.author) === String(req.user.id);
     const comments = await Comment.find({ post: reel._id, hidden: false })
-      .populate("author", "name username")
-      .sort({ createdAt: 1 })
+      .populate("author", "name username avatar")
+      .sort({ pinned: -1, createdAt: 1 })
       .limit(200);
-    return res.json({ comments });
+
+    // Restricted users can still see their own comments, but other viewers cannot.
+    const restrictedUsers = isOwner ? [] : await CommentModeration.find({
+      actor: reel.author, reel: reel._id, action: "restrict"
+    }).distinct("targetUser");
+    const visibleComments = isOwner ? comments : comments.filter(c =>
+      !restrictedUsers.some(id => String(id) === String(c.author?._id)) || String(c.author?._id) === String(req.user.id)
+    );
+    return res.json({ comments: visibleComments });
   } catch (error) {
+    console.error("Load Reel comments failed:", error);
     return res.status(500).json({ message: "Failed to load Reel comments" });
   }
 });
@@ -197,6 +208,11 @@ router.post("/:id/comments", auth, async (req, res) => {
     if (!text) return res.status(400).json({ message: "Comment cannot be empty" });
     if (text.length > 1000) return res.status(400).json({ message: "Comment cannot exceed 1000 characters" });
 
+    const block = await CommentModeration.findOne({
+      actor: reel.author, targetUser: req.user.id, reel: reel._id, action: "block"
+    });
+    if (block) return res.status(403).json({ message: "The Reel owner has blocked you from commenting on this Reel" });
+
     const comment = await Comment.create({ post: reel._id, author: req.user.id, text });
     const populated = await Comment.findById(comment._id).populate("author", "name username");
     return res.status(201).json({ comment: populated });
@@ -207,16 +223,95 @@ router.post("/:id/comments", auth, async (req, res) => {
 
 router.delete("/:id/comments/:commentId", auth, async (req, res) => {
   try {
-    const comment = await Comment.findOne({
-      _id: req.params.commentId,
-      post: req.params.id,
-      author: req.user.id
-    });
-    if (!comment) return res.status(404).json({ message: "Comment not found or you cannot delete it" });
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+    const comment = await Comment.findOne({ _id: req.params.commentId, post: reel._id });
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    const isReelOwner = String(reel.author) === String(req.user.id);
+    const isCommentOwner = String(comment.author) === String(req.user.id);
+    if (!isReelOwner && !isCommentOwner) {
+      return res.status(403).json({ message: "Only the Reel owner or comment author can delete this comment" });
+    }
+
     await comment.deleteOne();
-    return res.json({ ok: true, message: "Comment deleted" });
+    reel.commentsCount = Math.max(0, Number(reel.commentsCount || 0) - 1);
+    await reel.save();
+    return res.json({ ok: true, message: "Comment deleted", commentId: String(comment._id), commentsCount: reel.commentsCount });
   } catch (error) {
+    console.error("Delete Reel comment failed:", error);
     return res.status(500).json({ message: "Failed to delete comment" });
+  }
+});
+
+// Owner-only pin/unpin. The Comment schema already includes `pinned`.
+router.patch("/:id/comments/:commentId/pin", auth, async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+    if (String(reel.author) !== String(req.user.id)) {
+      return res.status(403).json({ message: "Only the Reel owner can pin comments" });
+    }
+    const comment = await Comment.findOne({ _id: req.params.commentId, post: reel._id });
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+    const requested = req.body?.pinned;
+    comment.pinned = typeof requested === "boolean" ? requested : !comment.pinned;
+    await comment.save();
+    return res.json({ ok: true, comment: { _id: comment._id, pinned: comment.pinned } });
+  } catch (error) {
+    console.error("Pin Reel comment failed:", error);
+    return res.status(500).json({ message: "Failed to update pinned comment" });
+  }
+});
+
+// Owner moderation actions. These records are persisted so block/restrict/report
+// are not just decorative frontend buttons.
+router.post("/:id/comments/:commentId/:action", auth, async (req, res) => {
+  try {
+    const { id, commentId, action } = req.params;
+    if (!["restrict", "block", "report"].includes(action)) {
+      return res.status(404).json({ message: "Comment action API not found" });
+    }
+    const reel = await Reel.findById(id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+    const comment = await Comment.findOne({ _id: commentId, post: reel._id }).populate("author", "name username");
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+    const isOwner = String(reel.author) === String(req.user.id);
+    if (action !== "report" && !isOwner) {
+      return res.status(403).json({ message: "Only the Reel owner can restrict or block a commenter" });
+    }
+    const targetUser = req.body?.targetUserId || comment.author?._id || comment.author;
+    if (!targetUser) return res.status(400).json({ message: "Comment author could not be identified" });
+    if (action === "report") {
+      await CommentModeration.create({ actor: req.user.id, targetUser, reel: reel._id, comment: comment._id, action, reason: String(req.body?.reason || "Reported comment").slice(0, 500) });
+      return res.status(201).json({ ok: true, message: "Comment reported. Thank you for helping keep ReelsGo safe." });
+    }
+    const existing = await CommentModeration.findOne({ actor: req.user.id, targetUser, reel: reel._id, action });
+    if (existing) {
+      await existing.deleteOne();
+      return res.json({ ok: true, active: false, message: action === "block" ? "User unblocked for this Reel" : "User restriction removed" });
+    }
+    await CommentModeration.create({ actor: req.user.id, targetUser, reel: reel._id, comment: comment._id, action, reason: "" });
+    return res.status(201).json({ ok: true, active: true, message: action === "block" ? "User blocked from commenting on this Reel" : "User restricted on this Reel" });
+  } catch (error) {
+    console.error("Reel comment moderation failed:", error);
+    return res.status(500).json({ message: "Failed to apply comment action" });
+  }
+});
+
+// Return likes for the existing frontend likes panel.
+router.get("/:id/likes", auth, async (req, res) => {
+  try {
+    const reel = await Reel.findById(req.params.id);
+    if (!reel) return res.status(404).json({ message: "Reel not found" });
+    const likes = await Interaction.find({ targetType: "reel", target: reel._id, type: "like" })
+      .populate("user", "name username avatar")
+      .sort({ createdAt: -1 }).limit(500);
+    return res.json({ users: likes.map(item => item.user).filter(Boolean) });
+  } catch (error) {
+    console.error("Load Reel likes failed:", error);
+    return res.status(500).json({ message: "Failed to load Reel likes" });
   }
 });
 
