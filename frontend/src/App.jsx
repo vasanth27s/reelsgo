@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Component, useEffect, useMemo, useRef, useState } from "react";
 import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
@@ -12,6 +12,15 @@ import {
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
+
+// Safe browser storage: privacy settings, blocked storage, or quota limits must not
+// crash the entire application. Reads fall back to null; writes/removals fail softly.
+const safeStorage = {
+  getItem(key) { try { return window.safeStorage.getItem(key); } catch (error) { console.warn("ReelsGo storage read failed:", error); return null; } },
+  setItem(key, value) { try { window.safeStorage.setItem(key, value); return true; } catch (error) { console.warn("ReelsGo storage write failed:", error); return false; } },
+  removeItem(key) { try { window.safeStorage.removeItem(key); return true; } catch (error) { console.warn("ReelsGo storage remove failed:", error); return false; } }
+};
+
 
 
 // Built-in emoji picker: no external package required, so it works on desktop,
@@ -45,9 +54,9 @@ const REELSGO_EMOJI_CATEGORIES = {
 
 const REELSGO_EMOJI_TABS = Object.keys(REELSGO_EMOJI_CATEGORIES);
 
-const getToken = () => localStorage.getItem("vk_token");
+const getToken = () => safeStorage.getItem("vk_token");
 const getUser = () => {
-  try { return JSON.parse(localStorage.getItem("vk_user") || "null"); } catch { return null; }
+  try { return JSON.parse(safeStorage.getItem("vk_user") || "null"); } catch { return null; }
 };
 
 function authHeaders(extra = {}) {
@@ -400,20 +409,20 @@ function ReelsGoAdvancedHub({ user }) {
   ];
   const [tab, setTab] = useState("control");
   const [prefs, setPrefs] = useState(() => {
-    try { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false, ...JSON.parse(localStorage.getItem("reelsgo_advanced_prefs") || "{}") }; }
+    try { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false, ...JSON.parse(safeStorage.getItem("reelsgo_advanced_prefs") || "{}") }; }
     catch { return { feed: "For you", chronological: false, autoplay: true, suggestions: true, sponsored: true, sessionLimit: 20, bedtime: false }; }
   });
   const [library, setLibrary] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_smart_library") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_smart_library") || "[]"); } catch { return []; }
   });
   const [drafts, setDrafts] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_creator_drafts") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_creator_drafts") || "[]"); } catch { return []; }
   });
   const [communities, setCommunities] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_communities") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_communities") || "[]"); } catch { return []; }
   });
   const [joined, setJoined] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_joined_communities") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_joined_communities") || "[]"); } catch { return []; }
   });
   const [draftTitle, setDraftTitle] = useState("");
   const [draftDate, setDraftDate] = useState("");
@@ -429,7 +438,7 @@ function ReelsGoAdvancedHub({ user }) {
   const [collabTitle, setCollabTitle] = useState("");
   const [collabUsername, setCollabUsername] = useState("");
   const [collabItems, setCollabItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_collaboration_invites") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_collaboration_invites") || "[]"); } catch { return []; }
   });
   const [editorFile, setEditorFile] = useState(null);
   const [editorCaption, setEditorCaption] = useState("");
@@ -438,14 +447,14 @@ function ReelsGoAdvancedHub({ user }) {
   const [localArea, setLocalArea] = useState("");
   const [localEventTitle, setLocalEventTitle] = useState("");
   const [localEvents, setLocalEvents] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_local_event_drafts") || "[]"); } catch { return []; }
+    try { return JSON.parse(safeStorage.getItem("reelsgo_local_event_drafts") || "[]"); } catch { return []; }
   });
 
-  useEffect(() => { localStorage.setItem("reelsgo_advanced_prefs", JSON.stringify(prefs)); }, [prefs]);
-  useEffect(() => { localStorage.setItem("reelsgo_smart_library", JSON.stringify(library)); }, [library]);
-  useEffect(() => { localStorage.setItem("reelsgo_creator_drafts", JSON.stringify(drafts)); }, [drafts]);
-  useEffect(() => { localStorage.setItem("reelsgo_communities", JSON.stringify(communities)); }, [communities]);
-  useEffect(() => { localStorage.setItem("reelsgo_joined_communities", JSON.stringify(joined)); }, [joined]);
+  useEffect(() => { safeStorage.setItem("reelsgo_advanced_prefs", JSON.stringify(prefs)); }, [prefs]);
+  useEffect(() => { safeStorage.setItem("reelsgo_smart_library", JSON.stringify(library)); }, [library]);
+  useEffect(() => { safeStorage.setItem("reelsgo_creator_drafts", JSON.stringify(drafts)); }, [drafts]);
+  useEffect(() => { safeStorage.setItem("reelsgo_communities", JSON.stringify(communities)); }, [communities]);
+  useEffect(() => { safeStorage.setItem("reelsgo_joined_communities", JSON.stringify(joined)); }, [joined]);
   useEffect(() => {
     if (!focusActive) return;
     const id = window.setInterval(() => setFocusSeconds(v => v + 1), 1000);
@@ -544,7 +553,7 @@ function ReelsGoAdvancedHub({ user }) {
             <Toggle label="Allow downloads" detail="Default preference for your own uploaded content." checked={privacyDownloads} onChange={setPrivacyDownloads}/>
             <Toggle label="Allow remixes and collaborations" detail="Let others request to remix content when supported." checked={privacyRemix} onChange={setPrivacyRemix}/>
             <div className="rg-hub-callout"><Lock size={20}/><span><b>Per-post audience controls</b><small>Choose the audience on every post too. The server must check audience permissions for feeds, direct links, downloads and APIs.</small></span></div>
-            <button className="primary" type="button" onClick={()=>{try{localStorage.setItem("reelsgo_privacy_defaults",JSON.stringify({privacyAudience,privacyComments,privacyDownloads,privacyRemix}));flash("Privacy defaults saved on this device.");}catch{flash("Could not save privacy settings.");}}}>Save privacy defaults</button>
+            <button className="primary" type="button" onClick={()=>{try{safeStorage.setItem("reelsgo_privacy_defaults",JSON.stringify({privacyAudience,privacyComments,privacyDownloads,privacyRemix}));flash("Privacy defaults saved on this device.");}catch{flash("Could not save privacy settings.");}}}>Save privacy defaults</button>
           </>}
 
           {tab === "editor" && <>
@@ -636,6 +645,72 @@ function getSharedRouteFromPath(pathname = window.location.pathname) {
   const reelId = getSharedReelIdFromPath(pathname);
   if (reelId) return { type: "reel", id: reelId };
   return null;
+}
+
+const REELSGO_SHARED_MESSAGE_PREFIX = "REELSGO_SHARE::";
+
+function makeSharedContentMessage(content, kind = "post") {
+  const type = kind === "reel" ? "reel" : "post";
+  const id = String(content?._id || content?.id || "");
+  if (!id) throw new Error(`Cannot share this ${type}: missing content ID.`);
+  const author = content?.author || {};
+  const media = Array.isArray(content?.media) ? content.media[0] : content?.media;
+  const thumbnail = content?.coverUrl || content?.thumbnailUrl || content?.thumbnail ||
+    content?.imageUrl || content?.mediaUrl || media?.url || media?.mediaUrl || media?.src || "";
+  const payload = {
+    type,
+    id,
+    caption: String(content?.caption || content?.text || "").slice(0, 180),
+    username: String(author?.username || ""),
+    authorName: String(author?.name || ""),
+    thumbnail: String(thumbnail || "").slice(0, 500),
+    thumbnailIsVideo: type === "reel" && !content?.coverUrl && !content?.thumbnailUrl && !content?.thumbnail && !content?.imageUrl && Boolean(content?.mediaUrl)
+  };
+  return REELSGO_SHARED_MESSAGE_PREFIX + JSON.stringify(payload);
+}
+
+function parseSharedContentMessage(text) {
+  if (typeof text !== "string" || !text.startsWith(REELSGO_SHARED_MESSAGE_PREFIX)) return null;
+  try {
+    const data = JSON.parse(text.slice(REELSGO_SHARED_MESSAGE_PREFIX.length));
+    if (!data?.id || !["post", "reel"].includes(data.type)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function sharedThumbnailUrl(value) {
+  if (!value) return "";
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  return `${SERVER}${value.startsWith("/") ? "" : "/"}${value}`;
+}
+
+function SharedContentMessage({ message }) {
+  const shared = parseSharedContentMessage(message?.text);
+  if (!shared) return <span>{message?.text}</span>;
+  const path = `/${shared.type === "reel" ? "reel" : "post"}/${encodeURIComponent(shared.id)}`;
+  const thumbnail = sharedThumbnailUrl(shared.thumbnail);
+  return (
+    <a className="shared-content-message" href={path} aria-label={`Open shared ${shared.type}`}>
+      {thumbnail ? (
+        shared.type === "reel" && shared.thumbnailIsVideo ? (
+          <video className="shared-content-message-thumb" src={thumbnail} muted playsInline preload="metadata" />
+        ) : (
+          <img className="shared-content-message-thumb" src={thumbnail} alt="" loading="lazy" />
+        )
+      ) : (
+        <div className={`shared-content-message-thumb shared-content-message-placeholder ${shared.type}`}>
+          {shared.type === "reel" ? <Film size={25} /> : <ImageIcon size={25} />}
+        </div>
+      )}
+      <div className="shared-content-message-info">
+        <b>{shared.type === "reel" ? "Shared a Reel" : "Shared a post"}</b>
+        <span>{shared.caption || (shared.username ? `@${shared.username}` : "Tap to view this on ReelsGo")}</span>
+        <small>Tap to view on ReelsGo <Link2 size={11} /></small>
+      </div>
+    </a>
+  );
 }
 
 function SharedPostPage({ postId, user, onBack }) {
@@ -760,7 +835,28 @@ function SharedReelPage({ reelId, onBack }) {
   );
 }
 
-function App() {
+class ReelsGoErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error, info) { console.error("ReelsGo UI crashed:", error, info); }
+  render() {
+    if (this.state.error) {
+      return (
+        <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24, background: "#f7f7f9", color: "#111318", fontFamily: "system-ui, sans-serif" }}>
+          <section style={{ width: "min(100%, 560px)", padding: 28, border: "1px solid #e6e7eb", borderRadius: 18, background: "#fff", boxShadow: "0 12px 40px #11182712" }}>
+            <h1 style={{ margin: "0 0 10px", fontSize: 24 }}>ReelsGo hit an unexpected error</h1>
+            <p style={{ margin: "0 0 12px", lineHeight: 1.6, color: "#737985" }}>The app caught a rendering error instead of leaving a black screen. Reload the page; if it repeats, open DevTools Console and share the first red error.</p>
+            <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", fontSize: 12, padding: 12, borderRadius: 10, background: "#f7f7f9", color: "#b91c1c" }}>{String(this.state.error?.message || this.state.error)}</pre>
+            <button type="button" onClick={() => window.location.reload()} style={{ marginTop: 14, padding: "11px 16px", borderRadius: 10, background: "#111827", color: "#fff", fontWeight: 700 }}>Reload ReelsGo</button>
+          </section>
+        </main>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function AppContent() {
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
   const [page, setPage] = useState(() => {
@@ -834,14 +930,14 @@ function App() {
     api("/users/me")
       .then(d => {
         setUser(d.user);
-        localStorage.setItem("vk_user", JSON.stringify(d.user));
+        safeStorage.setItem("vk_user", JSON.stringify(d.user));
       })
       .catch(() => {});
   }, [token]);
 
   function login(data) {
-    localStorage.setItem("vk_token", data.token);
-    localStorage.setItem("vk_user", JSON.stringify(data.user));
+    safeStorage.setItem("vk_token", data.token);
+    safeStorage.setItem("vk_user", JSON.stringify(data.user));
     setToken(data.token);
     setUser(data.user);
     const postId = getSharedPostIdFromPath();
@@ -852,8 +948,8 @@ function App() {
   }
 
   function logout() {
-    localStorage.removeItem("vk_token");
-    localStorage.removeItem("vk_user");
+    safeStorage.removeItem("vk_token");
+    safeStorage.removeItem("vk_user");
     setToken(null);
     setUser(null);
     setSettingsOpen(false);
@@ -1120,21 +1216,55 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState("");
   const [activeStory, setActiveStory] = useState(null);
+  const loadSequence = useRef(0);
 
   async function load() {
+    const sequence = ++loadSequence.current;
     setLoading(true);
-    try {
-      const [p, s] = await Promise.all([api("/posts"), api("/stories")]);
-      setPosts(p.posts || []);
-      setStories(s.stories || []);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
+    setFeedError("");
+
+    // Posts and stories are independent features. A failed stories request must
+    // never prevent the main feed from rendering (the previous Promise.all did).
+    const [postsResult, storiesResult] = await Promise.allSettled([
+      api("/posts"),
+      api("/stories")
+    ]);
+
+    if (sequence !== loadSequence.current) return;
+
+    if (postsResult.status === "fulfilled") {
+      const result = postsResult.value;
+      const nextPosts = Array.isArray(result) ? result : result?.posts;
+      if (Array.isArray(nextPosts)) {
+        setPosts(nextPosts);
+      } else {
+        setPosts([]);
+        setFeedError("The server returned an unexpected feed response. Please try again.");
+      }
+    } else {
+      console.error("ReelsGo feed failed to load:", postsResult.reason);
+      setFeedError(postsResult.reason?.message || "Unable to load your feed. Check your connection and try again.");
     }
+
+    if (storiesResult.status === "fulfilled") {
+      const result = storiesResult.value;
+      const nextStories = Array.isArray(result) ? result : result?.stories;
+      setStories(Array.isArray(nextStories) ? nextStories : []);
+    } else {
+      // Stories are optional; keep the feed working even if stories are down.
+      console.warn("ReelsGo stories failed to load:", storiesResult.reason);
+      setStories([]);
+    }
+
+    setLoading(false);
   }
-  useEffect(() => { load(); }, [refreshKey]);
+
+  useEffect(() => {
+    load();
+    return () => { loadSequence.current += 1; };
+  }, [refreshKey]);
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
@@ -1174,16 +1304,29 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
       </div>
 
-      {loading ? <div className="empty">Loading feed...</div> :
-        posts.length ? posts.map(p => (
-          <Post
-            key={p._id}
-            post={p}
-            user={user}
-            onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-          />
-        )) :
-        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+      {loading ? (
+        <div className="empty feed-loading" role="status" aria-live="polite">
+          <span className="feed-spinner" aria-hidden="true" />
+          <h2>Loading your feed</h2>
+          <p>Getting the latest posts…</p>
+        </div>
+      ) : feedError ? (
+        <div className="empty feed-load-error" role="alert">
+          <AlertTriangle />
+          <h2>Feed couldn’t load</h2>
+          <p>{feedError}</p>
+          <button type="button" className="primary small" onClick={load}>Try again</button>
+        </div>
+      ) : posts.length ? posts.map((p, index) => (
+        <Post
+          key={p._id || `feed-post-${index}`}
+          post={p}
+          user={user}
+          onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+        />
+      )) : (
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>
+      )}
 
           {activeStory && (
             <StoryViewer
@@ -1481,7 +1624,6 @@ function Post({ post, user, onDeleted }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -1815,7 +1957,6 @@ function MediaViewer({ media, post, onClose }) {
   const url = media?.url ? `${SERVER}${media.url}` : "";
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
 
   async function like() {
     try {
@@ -2052,10 +2193,11 @@ function ShareSheet({ post, onClose, kind = "post" }) {
           });
           const conversation = d.conversation;
           if (!conversation?._id) throw new Error("Unable to create conversation");
+          const inAppShareText = makeSharedContentMessage(post, kind);
           await api(`/messages/conversations/${conversation._id}/messages`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: shareText })
+            body: JSON.stringify({ text: inAppShareText })
           });
           sent += 1;
         } catch (error) {
@@ -2965,7 +3107,7 @@ function ProfilePage({ user, setUser }) {
       setSaving(true);
       const d = await api("/users/me/avatar", { method: "POST", body: fd });
       setUser(d.user);
-      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      safeStorage.setItem("vk_user", JSON.stringify(d.user));
     } catch (e) {
       alert(e.message);
     } finally {
@@ -2984,7 +3126,7 @@ function ProfilePage({ user, setUser }) {
       });
 
       setUser(d.user);
-      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      safeStorage.setItem("vk_user", JSON.stringify(d.user));
       setEditOpen(false);
     } catch (e) {
       alert(e.message);
@@ -4202,17 +4344,132 @@ function ReelsPage({ onCreate }) {
   );
 }
 
-function ReelViewer({ reel, onClose }) {
+function ReelViewer({ reel, onClose, onUnsave }) {
+  const me = getUser();
+  const [liked, setLiked] = useState(Boolean(reel?.viewerLiked || reel?.likedByMe || reel?.isLiked));
+  const [saved, setSaved] = useState(true);
+  const [likesCount, setLikesCount] = useState(Number(reel?.likesCount || 0));
+  const [commentsCount, setCommentsCount] = useState(Number(reel?.commentsCount || 0));
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef(null);
+  const reelId = String(reel?._id || "");
+  const videoUrl = reel?.mediaUrl ? `${SERVER}${reel.mediaUrl}` : "";
+
+  async function loadComments() {
+    if (!reelId) return;
+    setCommentsLoading(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${reelId}/comments`);
+      const items = Array.isArray(data.comments) ? data.comments : [];
+      setComments(items);
+      setCommentsCount(Number(data.commentsCount ?? items.length));
+    } catch (e) {
+      setError(e?.message || "Could not load comments.");
+    } finally {
+      setCommentsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (commentsOpen) loadComments();
+  }, [commentsOpen, reelId]);
+
+  async function toggleLike() {
+    try {
+      const data = await api(`/reels/${reelId}/like`, { method: "POST" });
+      setLiked(Boolean(data.liked));
+      setLikesCount(Number(data.likesCount ?? likesCount));
+    } catch (e) { alert(e?.message || "Could not like this Reel."); }
+  }
+
+  async function toggleSave() {
+    try {
+      const data = await api(`/reels/${reelId}/save`, { method: "POST" });
+      setSaved(Boolean(data.saved));
+      if (!data.saved) {
+        onUnsave?.(reelId);
+        onClose?.();
+      }
+    } catch (e) { alert(e?.message || "Could not update saved Reels."); }
+  }
+
+  async function submitComment(event) {
+    event.preventDefault();
+    if (!commentText.trim() || sending) return;
+    setSending(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${reelId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: commentText.trim() })
+      });
+      if (data.comment) setComments(current => [...current, data.comment]);
+      setCommentsCount(current => current + 1);
+      setCommentText("");
+    } catch (e) { setError(e?.message || "Could not post comment."); }
+    finally { setSending(false); }
+  }
+
+  async function deleteComment(comment) {
+    if (!window.confirm("Delete this comment?")) return;
+    try {
+      await api(`/reels/${reelId}/comments/${comment._id}`, { method: "DELETE" });
+      setComments(current => current.filter(item => String(item._id) !== String(comment._id)));
+      setCommentsCount(current => Math.max(0, current - 1));
+    } catch (e) { alert(e?.message || "Could not delete comment."); }
+  }
+
+  function share() {
+    const url = `${window.location.origin}/reels/${reelId}`;
+    if (navigator.share) {
+      navigator.share({ title: "ReelsGo Reel", text: reel?.caption || "Watch this Reel", url }).catch(error => { if (error?.name !== "AbortError") console.error(error); });
+    } else if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(() => alert("Reel link copied."));
+    } else window.prompt("Copy this Reel link:", url);
+  }
+
   return (
-    <div className="reel-viewer-overlay" onClick={onClose}>
-      <button className="media-viewer-close" type="button" onClick={onClose}><X /></button>
-      <div className="reel-viewer-card" onClick={e => e.stopPropagation()}>
-        <div className="reel-viewer-user">
-          <Avatar user={reel.author} size={42} />
-          <div><UserLink user={reel.author} /><span>{reel.caption || "Reel"}</span></div>
+    <div className="saved-reel-viewer-overlay" onClick={event => { if (event.target === event.currentTarget) onClose?.(); }} role="presentation">
+      <button className="saved-reel-viewer-close" type="button" aria-label="Close Reel" onClick={onClose}><X /></button>
+      <article className="saved-reel-viewer" onClick={event => event.stopPropagation()}>
+        <video ref={videoRef} className="saved-reel-viewer-video" src={videoUrl} autoPlay loop playsInline muted={muted} controls={false} onClick={() => { const v = videoRef.current; if (!v) return; if (v.paused) v.play().catch(() => {}); else v.pause(); }} />
+        <div className="saved-reel-viewer-top">
+          <Avatar user={reel.author} size={40} />
+          <div className="saved-reel-viewer-user"><b>{reel.author?.username ? `@${reel.author.username}` : reel.author?.name || "ReelsGo user"}</b><span>{reel.music || "Original audio"}</span></div>
         </div>
-        <video src={`${SERVER}${reel.mediaUrl}`} controls autoPlay loop playsInline />
-      </div>
+        <div className="saved-reel-viewer-actions" aria-label="Reel actions">
+          <button type="button" className={liked ? "is-liked" : ""} onClick={toggleLike} aria-label="Like Reel"><Heart fill={liked ? "currentColor" : "none"}/><small>{likesCount}</small></button>
+          <button type="button" onClick={() => setCommentsOpen(true)} aria-label="Comments"><MessageCircle/><small>{commentsCount}</small></button>
+          <button type="button" onClick={share} aria-label="Share Reel"><Send/><small>Share</small></button>
+          <button type="button" className={saved ? "is-saved" : ""} onClick={toggleSave} aria-label="Remove from saved"><Bookmark fill={saved ? "currentColor" : "none"}/><small>{saved ? "Saved" : "Save"}</small></button>
+          <button type="button" onClick={() => { setMuted(value => !value); if (videoRef.current) videoRef.current.muted = !videoRef.current.muted; }} aria-label={muted ? "Enable sound" : "Mute sound"}>{muted ? <VolumeX /> : <Volume2 />}<small>{muted ? "Sound off" : "Sound on"}</small></button>
+        </div>
+        <div className="saved-reel-viewer-caption"><b>{reel.author?.username || reel.author?.name || "user"}</b>{reel.caption || ""}</div>
+      </article>
+      {commentsOpen && <div className="saved-reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsOpen(false); }}>
+        <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+          <header><h2>Comments <span>{commentsCount}</span></h2><button type="button" aria-label="Close comments" onClick={() => setCommentsOpen(false)}><X/></button></header>
+          <div className="saved-reel-comments-list">
+            {commentsLoading && <p className="saved-reel-comments-status">Loading comments…</p>}
+            {!commentsLoading && !comments.length && !error && <p className="saved-reel-comments-status">No comments yet. Be the first to comment.</p>}
+            {comments.map(comment => {
+              const own = String(comment.author?._id || comment.author) === String(me?._id);
+              const owner = String(reel.author?._id || reel.author) === String(me?._id);
+              return <article className="saved-reel-comment" key={comment._id}><Avatar user={comment.author} size={35}/><div><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div>{(own || owner) && <button type="button" aria-label="Delete comment" onClick={() => deleteComment(comment)}><Trash2 size={16}/></button>}</article>;
+            })}
+            {error && <p className="saved-reel-comments-error">{error}</p>}
+          </div>
+          <form className="saved-reel-comment-form" onSubmit={submitComment}><Avatar user={me} size={32}/><input value={commentText} onChange={event => setCommentText(event.target.value)} placeholder="Add a comment…" maxLength={1000}/><button type="submit" disabled={!commentText.trim() || sending}>{sending ? "Posting…" : "Post"}</button></form>
+        </section>
+      </div>}
     </div>
   );
 }
@@ -4221,7 +4478,7 @@ const RECENT_PROFILE_SEARCHES_KEY = "reelsgo_recent_opened_profiles_v1";
 
 function readRecentProfiles() {
   try {
-    const value = JSON.parse(localStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) || "[]");
+    const value = JSON.parse(safeStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) || "[]");
     return Array.isArray(value) ? value.filter(item => item && item._id) : [];
   } catch { return []; }
 }
@@ -4252,20 +4509,20 @@ function SearchPage({ onOpenProfile, onBack }) {
     // Only add a person after the user actually opens their profile, not just from search results.
     const previous = readRecentProfiles();
     const updated = [person, ...previous.filter(item => String(item._id) !== String(person._id))].slice(0, 20);
-    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not save recent profiles", e); }
+    try { safeStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not save recent profiles", e); }
     setRecent(updated);
     onOpenProfile(person._id);
   }
 
   function clearRecent() {
-    try { localStorage.removeItem(RECENT_PROFILE_SEARCHES_KEY); } catch {}
+    try { safeStorage.removeItem(RECENT_PROFILE_SEARCHES_KEY); } catch {}
     setRecent([]);
     setRecentMenuId(null);
   }
 
   function deleteRecentProfile(profileId) {
     const updated = readRecentProfiles().filter(item => String(item._id) !== String(profileId));
-    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not update recent profiles", e); }
+    try { safeStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not update recent profiles", e); }
     setRecent(updated);
     setRecentMenuId(null);
   }
@@ -4515,8 +4772,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
   const [deletingConversationId, setDeletingConversationId] = useState(null);
   const [mobileConversationActions, setMobileConversationActions] = useState(null);
-  const [pinnedConversationIds, setPinnedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_pinned_conversations") || "[]").map(String); } catch { return []; } });
-  const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
+  const [pinnedConversationIds, setPinnedConversationIds] = useState(() => { try { return JSON.parse(safeStorage.getItem("reelsgo_pinned_conversations") || "[]").map(String); } catch { return []; } });
+  const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(safeStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
   const longPressTimer = useRef(null);
   const suppressConversationClick = useRef(false);
   const [messageMenuId, setMessageMenuId] = useState(null);
@@ -4525,8 +4782,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [emojiCategory, setEmojiCategory] = useState("Smileys");
   const emojiPickerRef = useRef(null);
 
-  useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
-  useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
+  useEffect(() => { try { safeStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
+  useEffect(() => { try { safeStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
 
   function cancelConversationLongPress() {
     if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
@@ -4571,7 +4828,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
       const serverRows = d.conversations || [];
       // Keep locally deleted conversations hidden when the backend has no DELETE route.
       let hiddenIds = [];
-      try { hiddenIds = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]"); } catch {}
+      try { hiddenIds = JSON.parse(safeStorage.getItem("reelsgo_hidden_conversations") || "[]"); } catch {}
       const rows = serverRows.filter(c => !hiddenIds.includes(String(c._id)));
       setConversations(rows);
       if (selectId) {
@@ -4593,8 +4850,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     // does not implement DELETE /messages/conversations/:id.
     const hideLocally = () => {
       try {
-        const existing = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]");
-        localStorage.setItem("reelsgo_hidden_conversations", JSON.stringify([...new Set([...existing.map(String), id])]));
+        const existing = JSON.parse(safeStorage.getItem("reelsgo_hidden_conversations") || "[]");
+        safeStorage.setItem("reelsgo_hidden_conversations", JSON.stringify([...new Set([...existing.map(String), id])]));
       } catch {}
       setConversations(prev => prev.filter(c => String(c._id) !== id));
       if (String(active?._id) === id) {
@@ -5205,7 +5462,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   </div>
                   <div className="conversation-copy">
                     <div className="conversation-name-line"><UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
-                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
+                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{(() => { const shared = parseSharedContentMessage(c.lastMessage?.text); return shared ? `Shared a ${shared.type}` : (c.lastMessage?.text || 'Start a conversation'); })()}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
                 </button>
@@ -5245,7 +5502,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                       }}
                       onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
                     >
-                      <span>{m.text}</span>
+                      <SharedContentMessage message={m} />
                       <div className="message-meta">
                         <small>{time(m.createdAt)}</small>
                         {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
@@ -5632,7 +5889,7 @@ function SavedPage({ user, embedded = false }) {
         </button>
       ))}</div> : <EmptyTab icon={<Bookmark />} title="No saved Reels yet" text="Reels you save will appear here." />
     )}
-    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
+    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} onUnsave={id => setReels(current => current.filter(item => String(item._id) !== String(id)))} />}
   </>;
 
   if (embedded) return <div className="embedded-saved">{body}</div>;
@@ -5906,7 +6163,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
         body: JSON.stringify({ isPrivate: privateAccount })
       });
       setUser(d.user);
-      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      safeStorage.setItem("vk_user", JSON.stringify(d.user));
       alert("Privacy updated");
     } catch (e) {
       alert(e.message);
@@ -5923,7 +6180,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
         body: JSON.stringify({ isPrivate: next })
       });
       setUser(d.user);
-      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      safeStorage.setItem("vk_user", JSON.stringify(d.user));
     } catch (e) {
       setPrivateAccount(previous);
       alert(e.message);
@@ -6347,7 +6604,7 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
       const serverUser = data?.user || data || {};
       const updated = { ...(user || {}), ...serverUser, name, username, email, bio, website };
       setUser?.(updated);
-      localStorage.setItem("vk_user", JSON.stringify(updated));
+      safeStorage.setItem("vk_user", JSON.stringify(updated));
       setName(updated.name || "");
       setUsername(updated.username || "");
       setEmail(updated.email || "");
@@ -6464,7 +6721,7 @@ function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
       <label>New password<input type="password" autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={8} required /></label>
       <label>Confirm new password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} minLength={8} required /></label>
       <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Updating…" : "Update password"}</button>
-    </form> : isPrivateAccount ? <div className="rg-detail-control-card"><div><b>Private account</b><p>When enabled, only approved followers should be able to see your private content. Your backend content routes must enforce this.</p></div><Toggle checked={Boolean(user?.isPrivate)} onChange={async next => { setSaving(true); setError(""); try { const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) }); setUser?.(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user)); setNotice("Account privacy updated."); } catch (e) { setError(e.message); } finally { setSaving(false); } }} disabled={saving} /></div> : item === "Deactivate or delete account" ? <div className="rg-detail-control-card danger"><div><b>Account deactivation and deletion</b><p>These actions require a dedicated server endpoint and confirmation flow. No destructive action will be taken from this screen.</p></div></div> : <div className="rg-detail-control-card"><div><b>{item}</b><p>{descriptions[item] || "Turn this preference on or off. This choice is saved to your ReelsGo account."}</p><small>{loading ? "Loading saved value…" : `Currently ${value ? "on" : "off"}`}</small></div><Toggle checked={value} disabled={loading || saving} onChange={saveBoolean} /></div>}
+    </form> : isPrivateAccount ? <div className="rg-detail-control-card"><div><b>Private account</b><p>When enabled, only approved followers should be able to see your private content. Your backend content routes must enforce this.</p></div><Toggle checked={Boolean(user?.isPrivate)} onChange={async next => { setSaving(true); setError(""); try { const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) }); setUser?.(d.user); safeStorage.setItem("vk_user", JSON.stringify(d.user)); setNotice("Account privacy updated."); } catch (e) { setError(e.message); } finally { setSaving(false); } }} disabled={saving} /></div> : item === "Deactivate or delete account" ? <div className="rg-detail-control-card danger"><div><b>Account deactivation and deletion</b><p>These actions require a dedicated server endpoint and confirmation flow. No destructive action will be taken from this screen.</p></div></div> : <div className="rg-detail-control-card"><div><b>{item}</b><p>{descriptions[item] || "Turn this preference on or off. This choice is saved to your ReelsGo account."}</p><small>{loading ? "Loading saved value…" : `Currently ${value ? "on" : "off"}`}</small></div><Toggle checked={value} disabled={loading || saving} onChange={saveBoolean} /></div>}
     {!isProfile && !isPassword && !isPrivateAccount && !isPeopleList && item !== "Deactivate or delete account" && <p className="rg-detail-footnote">Changes are saved to your account. Some preferences also require the corresponding ReelsGo feature to enforce them in the backend.</p>}
   </section>;
 }
@@ -6480,5 +6737,7 @@ function SettingRow({ icon, title, description, action, danger, onClick }) {
 function Modal({ title, onClose, children }) {
   return <div className="overlay" onClick={onClose}><div className="modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button onClick={onClose}><X /></button></div><div className="modal-body">{children}</div></div></div>;
 }
+
+function App() { return <ReelsGoErrorBoundary><AppContent /></ReelsGoErrorBoundary>; }
 
 export default App;
