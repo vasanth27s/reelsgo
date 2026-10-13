@@ -3825,8 +3825,8 @@ function ReelsPage({ onCreate }) {
                     />
 
                     <div className="reels-mobile-actions" aria-label="Reel actions">
-                      <button type="button" aria-label="Like Reel" onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /><small>{Number(r.likesCount || 0)} Likes</small></button>
-                      <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>View likes</small></button>
+                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
+                      <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
                       <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
@@ -3975,9 +3975,9 @@ function ReelsPage({ onCreate }) {
                       </div>
                     </div>
 
-                    <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
                     <div className="reels-desktop-actions" aria-label="Reel actions">
-                      <button type="button" aria-label="Like Reel" onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /><small>{r.likesCount || 0} Likes</small></button>
+                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
+                      <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{r.commentsCount || "Comment"}</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
