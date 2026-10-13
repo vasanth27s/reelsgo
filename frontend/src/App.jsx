@@ -4213,12 +4213,14 @@ function ReelViewer({ reel, onClose }) {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentSending, setCommentSending] = useState(false);
   const [error, setError] = useState("");
+  const [playing, setPlaying] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
     setCurrentReel(reel);
     setLiked(Boolean(reel?.likedByMe || reel?.isLiked));
     setSaved(true);
+    setPlaying(true);
   }, [reel]);
 
   async function toggleLike() {
@@ -4235,7 +4237,8 @@ function ReelViewer({ reel, onClose }) {
       setSaved(Boolean(result.saved));
       setCurrentReel(item => ({ ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }));
       window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
-    } catch (e) { setError(e.message || "Could not save this Reel."); }
+      if (!result.saved) setError("Removed from Saved.");
+    } catch (e) { setError(e.message || "Could not update saved status."); }
   }
 
   async function openComments() {
@@ -4256,9 +4259,7 @@ function ReelViewer({ reel, onClose }) {
     setError("");
     try {
       const data = await api(`/reels/${currentReel._id}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: commentText.trim() })
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: commentText.trim() })
       });
       const created = data.comment || data.data?.comment;
       if (created) setComments(items => [...items, created]);
@@ -4276,37 +4277,45 @@ function ReelViewer({ reel, onClose }) {
     const url = `${window.location.origin}/reel/${currentReel._id}`;
     try {
       if (navigator.share) await navigator.share({ title: "ReelsGo Reel", text: currentReel.caption || "Watch this Reel", url });
-      else {
-        await navigator.clipboard.writeText(url);
-        setError("Reel link copied.");
-      }
-    } catch (e) {
-      if (e?.name !== "AbortError") setError("Could not share this Reel. Try copying its link.");
-    }
+      else { await navigator.clipboard.writeText(url); setError("Reel link copied."); }
+    } catch (e) { if (e?.name !== "AbortError") setError("Could not share this Reel. Try copying its link."); }
+  }
+
+  function togglePlayback() {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) { video.play().then(() => setPlaying(true)).catch(() => setPlaying(false)); }
+    else { video.pause(); setPlaying(false); }
   }
 
   const mediaSrc = currentReel?.mediaUrl
     ? (/^https?:\/\//i.test(currentReel.mediaUrl) ? currentReel.mediaUrl : `${SERVER}${currentReel.mediaUrl.startsWith("/") ? "" : "/"}${currentReel.mediaUrl}`)
     : "";
+  const authorName = currentReel.author?.username || currentReel.author?.name || "ReelsGo creator";
 
   return (
-    <div className="reel-viewer-overlay saved-reel-viewer-overlay" onClick={onClose}>
-      <button className="media-viewer-close" type="button" onClick={onClose} aria-label="Close Reel"><X /></button>
-      <div className="reel-viewer-card saved-reel-viewer-card" onClick={e => e.stopPropagation()}>
-        <div className="reel-viewer-user">
-          <Avatar user={currentReel.author} size={42} />
-          <div><UserLink user={currentReel.author} /><span>{currentReel.caption || "Reel"}</span></div>
+    <div className="reel-viewer-overlay saved-reel-viewer-overlay saved-reel-fullscreen" onClick={onClose}>
+      <button className="saved-reel-close" type="button" onClick={onClose} aria-label="Close saved Reel"><X /></button>
+      <div className="saved-reel-fullscreen-stage" onClick={e => e.stopPropagation()}>
+        {mediaSrc ? <video ref={videoRef} className="saved-reel-fullscreen-video" src={mediaSrc} autoPlay loop playsInline preload="auto" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onClick={togglePlayback} /> : <div className="saved-reel-no-media">This Reel’s video is unavailable.</div>}
+        <div className="saved-reel-top-gradient" />
+        <div className="saved-reel-topbar">
+          <Avatar user={currentReel.author} size={38} />
+          <div className="saved-reel-author-copy"><strong>@{authorName}</strong><span>Saved Reel</span></div>
+          <button type="button" className="saved-reel-soundless-label" onClick={togglePlayback}>{playing ? "Playing" : "Paused"}</button>
         </div>
-        <div className="saved-reel-player-wrap">
-          <video ref={videoRef} src={mediaSrc} controls autoPlay loop playsInline preload="auto" />
-          <div className="saved-reel-actions" aria-label="Reel actions">
-            <button type="button" onClick={toggleLike} className={liked ? "is-liked" : ""} aria-label={liked ? "Unlike Reel" : "Like Reel"}><Heart fill={liked ? "currentColor" : "none"} /><span>{Number(currentReel.likesCount || 0)}</span></button>
-            <button type="button" onClick={openComments} aria-label="View comments"><MessageCircle /><span>{Number(currentReel.commentsCount || 0)}</span></button>
-            <button type="button" onClick={shareReel} aria-label="Share Reel"><Send /><span>Share</span></button>
-            <button type="button" onClick={toggleSave} className={saved ? "is-saved" : ""} aria-label={saved ? "Remove saved Reel" : "Save Reel"}><Bookmark fill={saved ? "currentColor" : "none"} /><span>{saved ? "Saved" : "Save"}</span></button>
-          </div>
+        <button type="button" className={`saved-reel-play-toggle ${playing ? "is-playing" : ""}`} onClick={togglePlayback} aria-label={playing ? "Pause Reel" : "Play Reel"}>
+          {!playing && <Play size={32} fill="currentColor" />}
+        </button>
+        <div className="saved-reel-fullscreen-actions" aria-label="Reel actions">
+          <button type="button" onClick={toggleLike} className={liked ? "is-liked" : ""} aria-label={liked ? "Unlike Reel" : "Like Reel"}><Heart fill={liked ? "currentColor" : "none"}/><span>{Number(currentReel.likesCount || 0)}</span></button>
+          <button type="button" onClick={openComments} aria-label="View comments"><MessageCircle/><span>{Number(currentReel.commentsCount || 0)}</span></button>
+          <button type="button" onClick={shareReel} aria-label="Share Reel"><Send/><span>Share</span></button>
+          <button type="button" onClick={toggleSave} className={saved ? "is-saved" : ""} aria-label={saved ? "Remove saved Reel" : "Save Reel"}><Bookmark fill={saved ? "currentColor" : "none"}/><span>{saved ? "Saved" : "Save"}</span></button>
         </div>
-        {error && <div className="saved-reel-notice" role="status">{error}<button type="button" onClick={() => setError("")} aria-label="Dismiss message"><X size={14}/></button></div>}
+        <div className="saved-reel-bottom-gradient" />
+        <div className="saved-reel-fullscreen-caption"><strong>@{authorName}</strong><p>{currentReel.caption || "Watch this Reel again."}</p><span><Film size={13}/> Original Reel</span></div>
+        {error && <div className="saved-reel-fullscreen-notice" role="status">{error}<button type="button" onClick={() => setError("")} aria-label="Dismiss message"><X size={14}/></button></div>}
       </div>
       {commentsOpen && <div className="saved-reel-comments-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setCommentsOpen(false); }}>
         <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
@@ -5826,7 +5835,7 @@ function SavedPage({ user, embedded = false }) {
       : <div className="saved-page-empty"><div className="saved-empty-art"><Bookmark size={32} strokeWidth={1.5}/></div><h2>Save your favorites</h2><p>Tap the bookmark on a post to save it here. Your saved posts are private and only visible to you.</p></div>
     ) : (
       reels.length ? <div className="profile-grid reels-profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`}>
-        <video src={`${SERVER}${reel.mediaUrl}`} muted playsInline preload="metadata" />
+        <video src={/^https?:\/\//i.test(reel.mediaUrl || "") ? reel.mediaUrl : `${SERVER}${String(reel.mediaUrl || "").startsWith("/") ? "" : "/"}${reel.mediaUrl || ""}`} muted playsInline preload="metadata" />
         <span className="saved-reel-play" aria-hidden="true"><Play size={22} fill="currentColor"/></span>
         {reel.caption ? <span className="saved-reel-caption">{reel.caption}</span> : null}
       </button>)}</div> : <div className="saved-page-empty"><div className="saved-empty-art"><Film size={32} strokeWidth={1.5}/></div><h2>Your saved Reels live here</h2><p>When you bookmark a Reel, you can find it here and watch it again anytime.</p></div>
