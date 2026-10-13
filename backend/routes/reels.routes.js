@@ -25,12 +25,7 @@ router.get("/", auth, async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(50);
 
-  const withCounts = await Promise.all(reels.map(async reel => {
-    const item = view(reel);
-    item.commentsCount = await Comment.countDocuments({ post: reel._id, hidden: false });
-    return item;
-  }));
-  res.json({ reels: withCounts });
+  res.json({ reels: reels.map(view) });
 });
 
 router.post("/", auth, uploadMedia.single("video"), async (req, res) => {
@@ -65,6 +60,45 @@ router.post("/", auth, uploadMedia.single("video"), async (req, res) => {
     res.status(201).json({ reel: view(populated) });
   } catch (e) {
     res.status(500).json({ message: e.message });
+  }
+});
+
+// GET SAVED REELS FOR THE SIGNED-IN USER
+// This must be mounted under /api/reels, matching the frontend Saved page.
+router.get("/saved", auth, async (req, res) => {
+  try {
+    const savedInteractions = await Interaction.find({
+      user: req.user.id,
+      targetType: "reel",
+      type: "save"
+    })
+      .sort({ createdAt: -1 })
+      .select("target")
+      .lean();
+
+    const reelIds = savedInteractions
+      .map(item => item.target)
+      .filter(Boolean);
+
+    if (!reelIds.length) {
+      return res.json({ reels: [] });
+    }
+
+    const foundReels = await Reel.find({ _id: { $in: reelIds } })
+      .populate("author", "name username")
+      .lean();
+
+    // Preserve the order in which the user saved the Reels.
+    const byId = new Map(foundReels.map(reel => [String(reel._id), reel]));
+    const reels = reelIds
+      .map(id => byId.get(String(id)))
+      .filter(Boolean)
+      .map(view);
+
+    return res.json({ reels });
+  } catch (error) {
+    console.error("GET saved Reels failed:", error);
+    return res.status(500).json({ message: "Failed to load saved Reels" });
   }
 });
 
@@ -197,8 +231,7 @@ router.get("/:id/comments", auth, async (req, res) => {
     const visibleComments = isOwner ? comments : comments.filter(c =>
       !restrictedUsers.some(id => String(id) === String(c.author?._id)) || String(c.author?._id) === String(req.user.id)
     );
-    const commentsCount = await Comment.countDocuments({ post: reel._id, hidden: false });
-    return res.json({ comments: visibleComments, commentsCount });
+    return res.json({ comments: visibleComments });
   } catch (error) {
     console.error("Load Reel comments failed:", error);
     return res.status(500).json({ message: "Failed to load Reel comments" });
@@ -220,10 +253,8 @@ router.post("/:id/comments", auth, async (req, res) => {
     if (block) return res.status(403).json({ message: "The Reel owner has blocked you from commenting on this Reel" });
 
     const comment = await Comment.create({ post: reel._id, author: req.user.id, text });
-    reel.commentsCount = Number(reel.commentsCount || 0) + 1;
-    await reel.save();
     const populated = await Comment.findById(comment._id).populate("author", "name username");
-    return res.status(201).json({ comment: populated, commentsCount: reel.commentsCount });
+    return res.status(201).json({ comment: populated });
   } catch (error) {
     return res.status(500).json({ message: "Failed to create comment" });
   }
