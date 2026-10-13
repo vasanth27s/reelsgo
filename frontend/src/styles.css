@@ -12685,3 +12685,30 @@ body.reelsgo-comments-open .main { padding-bottom:0 !important; }
   .reels-page .reels-mobile-actions { z-index:50 !important; }
   .reels-page .reels-mobile-actions button.is-liked { color:#ff3b65 !important; }
 }
+
+/* Compact Reel action spacing: keep Like, Comment, Share, Sound and Save grouped. */
+@media (max-width:700px) {
+  .reels-page .reels-mobile-actions {
+    gap: 9px !important;
+    bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+  }
+  .reels-page .reels-mobile-actions button {
+    gap: 2px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+  .reels-page .reels-mobile-actions svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+@media (min-width:701px) {
+  .reels-page .reels-desktop-actions {
+    gap: 9px !important;
+  }
+  .reels-page .reels-desktop-actions button {
+    gap: 2px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+}
