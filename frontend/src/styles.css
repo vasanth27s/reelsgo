@@ -13460,3 +13460,89 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
  .rg-qr-palette-dots{margin-top:13px}
  .rg-qr-scanner-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
 }
+
+
+/* ===== ReelsGo messages: Instagram-inspired mobile inbox and chat customization ===== */
+.messages-page .messages-instagram-head { color:#f8fafc; }
+.messages-page .conversation-name-line { display:flex; align-items:center; gap:5px; min-width:0; }
+.messages-page .conversation-username { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#f5f7fb; font-size:13px; font-weight:650; }
+.messages-page .conversation-username.is-unread { font-weight:800; }
+.messages-page .conversation-options-button { width:30px; height:30px; }
+.messages-page .conversation-options-button svg { width:19px; height:19px; }
+.chat-customize-button { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:50%; background:transparent; color:#f5f5f7; }
+.chat-customize-button:hover { background:#272b32; }
+.chat-layout.instagram-chat-layout { --rg-chat-accent:#c026d3; --rg-chat-wallpaper:none; }
+.chat-layout.instagram-chat-layout .chat-messages.instagram-chat-messages { background-color:#090d10; background-image:linear-gradient(rgba(8,12,16,.82),rgba(8,12,16,.82)),var(--rg-chat-wallpaper); background-size:cover; background-position:center; }
+.chat-layout.instagram-chat-layout .bubble.mine { background:var(--rg-chat-accent)!important; }
+.rg-chat-customize-overlay { position:fixed; inset:0; z-index:1600; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.66); backdrop-filter:blur(8px); }
+.rg-chat-customize-panel { width:min(100%,440px); max-height:min(84vh,760px); overflow:auto; border:1px solid #30343c; border-radius:24px; background:#12151a; color:#f8fafc; padding:20px; box-shadow:0 25px 90px #0009; }
+.rg-chat-customize-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:18px; border-bottom:1px solid #292d34; }
+.rg-chat-customize-head>div { display:flex; flex-direction:column; gap:5px; }
+.rg-chat-customize-head b { font-size:21px; }
+.rg-chat-customize-head span,.rg-chat-customize-section p { color:#9ca3af; font-size:12px; }
+.rg-chat-customize-head>button { width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#242830;color:#f5f5f7; }
+.rg-chat-customize-section { padding:19px 0; border-bottom:1px solid #292d34; }
+.rg-chat-customize-section> b { display:block; font-size:15px; }
+.rg-chat-customize-section p { margin-top:5px; line-height:1.45; }
+.rg-chat-theme-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:15px; }
+.rg-chat-theme-grid button { display:flex; flex-direction:column; align-items:center; gap:7px; padding:9px 4px; border:1px solid transparent; border-radius:13px; background:#1d2128; color:#d9dde5; font-size:11px; }
+.rg-chat-theme-grid button.active { border-color:#f5f5f7; background:#282c35; }
+.rg-chat-theme-grid i { display:block; width:30px; height:30px; border-radius:50%; box-shadow:inset 0 0 0 2px #ffffff25; }
+.rg-chat-gallery-input { display:none; }
+.rg-chat-browse-gallery { display:flex; align-items:center; gap:12px; width:100%; margin-top:13px; padding:13px; border-radius:14px; background:#20242c; color:#f8fafc; text-align:left; }
+.rg-chat-browse-gallery>span { display:flex; flex:1; flex-direction:column; gap:4px; }
+.rg-chat-browse-gallery small { color:#9ca3af; font-size:11px; }
+.rg-chat-wallpaper-preview { height:95px; margin-top:12px; border-radius:13px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+.rg-chat-wallpaper-preview button { position:absolute; right:8px; bottom:8px; border-radius:999px; padding:7px 10px; color:#fff; background:#000b; font-size:11px; }
+.rg-chat-customize-done { width:100%; min-height:44px; margin-top:17px; border-radius:13px; background:linear-gradient(135deg,#c026d3,#7c3aed); color:#fff; font-weight:750; }
+@media (max-width:700px) {
+  .messages-page:not(.is-mobile-chat) { width:100%; min-height:calc(100dvh - 60px); padding:8px 5px calc(86px + env(safe-area-inset-bottom)); background:#080d10; color:#f5f7fb; }
+  .messages-page .messages-instagram-head { padding:7px 10px 10px; margin:0; min-height:42px; }
+  .messages-page .messages-account-title b { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:17px; color:#f5f7fb; }
+  .messages-page .messages-compose-button { width:36px; height:36px; color:#f5f7fb; }
+  .messages-page .messages-search-bar { min-height:40px; height:40px; margin:3px 8px 12px; padding:0 12px; border:0; border-radius:999px; background:#22272d; color:#a8b0ba; }
+  .messages-page .messages-search-bar input { color:#f5f7fb; font-size:13px; }
+  .messages-page .messages-search-bar input::placeholder { color:#a5abb5; }
+  .messages-page .messages-notes-section { padding:0 0 12px; margin:0; }
+  .messages-page .messages-notes-header { display:none; }
+  .messages-page .messages-notes-scroll { gap:11px; padding:2px 5px 10px; }
+  .messages-page .message-note-card { min-width:70px; width:70px; color:#f5f7fb; }
+  .messages-page .message-note-avatar,.messages-page .message-note-avatar-wrap { width:58px; height:58px; }
+  .messages-page .message-note-card>b { margin-top:5px; color:#f5f7fb; font-size:10px; }
+  .messages-page .message-note-card>span { color:#9ca3af; font-size:9px; }
+  .messages-page .message-note-bubble { background:#242930; border:1px solid #343a43; color:#e5e7eb; box-shadow:none; }
+  .messages-page .notes-empty { min-width:190px; color:#9ca3af; }
+  .messages-page .instagram-chat-layout { display:flex; flex-direction:column; min-height:0; height:auto; border:0; border-radius:0; background:#080d10; box-shadow:none; overflow:visible; }
+  .messages-page .instagram-conversation-list { width:100%; min-width:0; border:0; background:#080d10; }
+  .messages-page .conversation-list-title { height:38px; padding:0 9px 4px; border:0; background:transparent; }
+  .messages-page .conversation-list-title b { font-size:17px; font-weight:750; color:#f8fafc; }
+  .messages-page .conversation-list-title .messages-requests-button { color:#aeb5c0; font-size:11px; }
+  .messages-page .conversation-scroll { max-height:none; overflow:visible; }
+  .messages-page .conversation-item-shell { min-height:68px; border:0; background:transparent; }
+  .messages-page .conversation-item { min-height:68px; padding:7px 39px 7px 7px; gap:10px; border:0; border-radius:0; background:transparent; color:#f5f7fb; }
+  .messages-page .conversation-item:hover,.messages-page .conversation-item.active { background:#11161b; box-shadow:none; }
+  .messages-page .conversation-avatar-wrap .avatar { width:48px!important; height:48px!important; min-width:48px!important; min-height:48px!important; }
+  .messages-page .conversation-copy b { font-size:12px; color:#f5f7fb; }
+  .messages-page .conversation-copy span { margin-top:3px; color:#9ca3af; font-size:10px; }
+  .messages-page .conversation-copy small { font-size:9px; color:#737d89; }
+  .messages-page .conversation-options-wrap { top:18px; right:3px; }
+  .messages-page .conversation-options-button { width:30px; height:30px; color:#8f98a5; }
+  .messages-page .conversation-options-menu { right:4px; top:33px; min-width:190px; }
+  .messages-page .instagram-chat-placeholder { display:none; }
+  .messages-page.is-mobile-chat { position:fixed; inset:0; z-index:130; width:100%; height:100dvh; min-height:0; padding:0 0 env(safe-area-inset-bottom); overflow:hidden; background:#080d10; }
+  .messages-page.is-mobile-chat .messages-instagram-head,.messages-page.is-mobile-chat .messages-search-bar,.messages-page.is-mobile-chat .messages-notes-section { display:none; }
+  .messages-page.is-mobile-chat .instagram-chat-layout { display:block!important; width:100%; height:100%; min-height:0; }
+  .messages-page.is-mobile-chat .instagram-conversation-list { display:none; }
+  .messages-page.is-mobile-chat .instagram-chat { display:flex!important; flex-direction:column; width:100%; height:100%; min-height:0; }
+  .messages-page.is-mobile-chat .instagram-chat-head { min-height:58px; height:58px; padding:7px 10px; gap:8px; background:#0b0f13; border-bottom:1px solid #191f26; }
+  .messages-page.is-mobile-chat .chat-profile-open .avatar { width:34px!important; height:34px!important; min-width:34px!important; min-height:34px!important; }
+  .messages-page.is-mobile-chat .chat-profile-title b { font-size:13px; color:#f8fafc; }
+  .messages-page.is-mobile-chat .chat-profile-title span { display:none; }
+  .messages-page.is-mobile-chat .chat-customize-button { width:32px; height:32px; flex-basis:32px; }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1; min-height:0; padding:14px 10px; overflow-y:auto; }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input { flex:0 0 56px; height:56px; padding:7px 9px; background:#11161b; border-top:1px solid #222831; }
+  .messages-page.is-mobile-chat .chat-input input { background:#20252c; color:#f8fafc; }
+  .messages-page.is-mobile-chat .bottom-nav { display:none!important; }
+  .rg-chat-customize-overlay { align-items:flex-end; padding:0; }
+  .rg-chat-customize-panel { width:100%; max-height:88dvh; padding:19px 18px calc(18px + env(safe-area-inset-bottom)); border-radius:24px 24px 0 0; }
+}

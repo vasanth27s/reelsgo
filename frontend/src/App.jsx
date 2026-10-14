@@ -4962,6 +4962,48 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState("Smileys");
   const emojiPickerRef = useRef(null);
+  const chatGalleryInput = useRef(null);
+  const [chatCustomizeOpen, setChatCustomizeOpen] = useState(false);
+  const [chatTheme, setChatTheme] = useState({ accent: "#c026d3", background: "" });
+  const chatThemes = [
+    { name: "Berry", accent: "#c026d3" },
+    { name: "Sunset", accent: "#f97316" },
+    { name: "Ocean", accent: "#0ea5e9" },
+    { name: "Emerald", accent: "#10b981" },
+    { name: "Violet", accent: "#8b5cf6" },
+    { name: "Rose", accent: "#f43f5e" },
+    { name: "Gold", accent: "#d4a017" },
+    { name: "Ice", accent: "#38bdf8" }
+  ];
+  const chatThemeStorageKey = active?._id ? `reelsgo_chat_theme_${String(active._id)}` : "";
+
+  useEffect(() => {
+    if (!chatThemeStorageKey) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(chatThemeStorageKey) || "null");
+      setChatTheme(saved && typeof saved === "object" ? { accent: saved.accent || "#c026d3", background: saved.background || "" } : { accent: "#c026d3", background: "" });
+    } catch { setChatTheme({ accent: "#c026d3", background: "" }); }
+  }, [chatThemeStorageKey]);
+
+  function saveChatTheme(nextTheme) {
+    setChatTheme(nextTheme);
+    if (chatThemeStorageKey) {
+      try { localStorage.setItem(chatThemeStorageKey, JSON.stringify(nextTheme)); }
+      catch { alert("This image is too large to save. Choose a smaller image."); }
+    }
+  }
+
+  function chooseChatWallpaper(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Choose an image file."); event.target.value = ""; return; }
+    if (file.size > 3 * 1024 * 1024) { alert("Choose an image under 3 MB for chat wallpaper."); event.target.value = ""; return; }
+    const reader = new FileReader();
+    reader.onload = () => saveChatTheme({ ...chatTheme, background: String(reader.result || "") });
+    reader.onerror = () => alert("Could not read that image. Please try another one.");
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  }
 
   useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
   useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
@@ -5613,7 +5655,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         )}
       </div></div>}
 
-      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`}>
+      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`} style={{ "--rg-chat-accent": chatTheme.accent, "--rg-chat-wallpaper": chatTheme.background ? `url("${chatTheme.background}")` : "none" }}>
         <div className="conversation-list instagram-conversation-list">
           <div className="conversation-list-title">
             <b>Messages</b>
@@ -5642,7 +5684,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                     {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
                   </div>
                   <div className="conversation-copy">
-                    <div className="conversation-name-line"><UserLink user={u} className={`conversation-username ${unread ? 'is-unread' : ''}`} />{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
+                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.username || u?.name || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
                     <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
@@ -5661,7 +5703,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
             <div className="chat-head instagram-chat-head">
               <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
               <button type="button" className="chat-profile-open" onClick={() => openUserProfile(other(active)?._id)} aria-label="Open user profile"><Avatar user={other(active)} size={44} /></button>
-              <div className="chat-profile-title"><UserLink user={other(active)} /><span>Active now</span></div>
+              <div className="chat-profile-title"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></div>
+              <button type="button" className="chat-customize-button" aria-label="Customize chat" title="Customize chat" onClick={() => setChatCustomizeOpen(true)}><Palette size={20} /></button>
               <div className="chat-header-options-wrap">
                 <button type="button" className="chat-header-options-button" aria-label="Conversation options" onClick={() => setConversationMenuOpen(v => !v)}><MoreHorizontal /></button>
                 {conversationMenuOpen && <div className="conversation-options-menu chat-header-options-menu"><button type="button" disabled={deletingConversationId === String(active._id)} onClick={() => deleteConversation(active)}><Trash2 size={15}/>{deletingConversationId === String(active._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
@@ -5754,6 +5797,17 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           </>}
         </div>
       </div>
+      {chatCustomizeOpen && active && (
+        <div className="rg-chat-customize-overlay" onClick={() => setChatCustomizeOpen(false)}>
+          <section className="rg-chat-customize-panel" role="dialog" aria-modal="true" aria-label="Customize chat" onClick={e => e.stopPropagation()}>
+            <div className="rg-chat-customize-head"><div><b>Customize chat</b><span>Make this conversation yours</span></div><button type="button" aria-label="Close" onClick={() => setChatCustomizeOpen(false)}><X /></button></div>
+            <div className="rg-chat-customize-section"><b>Chat colours</b><p>Choose a colour for your messages.</p><div className="rg-chat-theme-grid">{chatThemes.map(theme => <button type="button" key={theme.name} className={chatTheme.accent === theme.accent ? "active" : ""} onClick={() => saveChatTheme({ ...chatTheme, accent: theme.accent })}><i style={{ background: theme.accent }} /><span>{theme.name}</span></button>)}</div></div>
+            <div className="rg-chat-customize-section rg-chat-wallpaper-section"><b>Chat background</b><p>Use a photo from your gallery as this conversation's background.</p>{chatTheme.background && <div className="rg-chat-wallpaper-preview" style={{ backgroundImage: `url("${chatTheme.background}")` }}><button type="button" onClick={() => saveChatTheme({ ...chatTheme, background: "" })}>Remove photo</button></div>}<input ref={chatGalleryInput} className="rg-chat-gallery-input" type="file" accept="image/*" onChange={chooseChatWallpaper} /><button type="button" className="rg-chat-browse-gallery" onClick={() => chatGalleryInput.current?.click()}><ImageIcon size={19}/><span><b>Browse from gallery</b><small>Choose a photo from your device</small></span><ChevronRight size={18}/></button></div>
+            <button type="button" className="rg-chat-customize-done" onClick={() => setChatCustomizeOpen(false)}>Done</button>
+          </section>
+        </div>
+      )}
+
       {mobileConversationActions && (
         <div className="mobile-conversation-action-overlay" role="presentation" onClick={() => { setMobileConversationActions(null); setConversationMenuId(null); }}>
           <section className="mobile-conversation-action-sheet" role="dialog" aria-modal="true" aria-label="Conversation actions" onClick={e => e.stopPropagation()}>
