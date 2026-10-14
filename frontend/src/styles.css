@@ -13624,3 +13624,57 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
  .messages-page.is-mobile-chat .chat-input.instagram-chat-input { border-top:0 !important; }
  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { border:0 !important; }
 }
+
+
+/* Mobile chat viewport: keep the conversation full-screen and let the on-screen
+   keyboard resize the visible chat area instead of covering the composer. */
+@media (max-width:700px) {
+  .messages-page.is-mobile-chat {
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:auto !important;
+    width:100% !important;
+    height:var(--rg-visual-viewport-height, 100dvh) !important;
+    min-height:0 !important;
+    max-height:var(--rg-visual-viewport-height, 100dvh) !important;
+    padding:env(safe-area-inset-top) 0 0 !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-layout {
+    display:block !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat {
+    display:flex !important;
+    flex-direction:column !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    overflow:hidden !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-head { flex:0 0 58px !important; }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+  }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    flex:0 0 48px !important;
+    min-height:48px !important;
+    height:48px !important;
+    padding-bottom:max(5px, env(safe-area-inset-bottom)) !important;
+    box-sizing:border-box !important;
+  }
+  .messages-page.is-mobile-chat .chat-message-field input {
+    font-size:16px !important; /* prevents iOS auto-zoom when tapping Message */
+    min-width:0;
+  }
+}

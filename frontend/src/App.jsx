@@ -4981,6 +4981,25 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   ];
   const chatThemeStorageKey = active?._id ? `reelsgo_chat_theme_${String(active._id)}` : "";
 
+  // Track the actual visible viewport on mobile browsers. When the on-screen
+  // keyboard opens, VisualViewport.height shrinks; the chat then fits above it.
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const updateVisibleViewport = () => {
+      const height = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--rg-visual-viewport-height", `${Math.round(height)}px`);
+    };
+    updateVisibleViewport();
+    window.visualViewport?.addEventListener("resize", updateVisibleViewport);
+    window.visualViewport?.addEventListener("scroll", updateVisibleViewport);
+    window.addEventListener("resize", updateVisibleViewport);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", updateVisibleViewport);
+      window.visualViewport?.removeEventListener("scroll", updateVisibleViewport);
+      window.removeEventListener("resize", updateVisibleViewport);
+    };
+  }, []);
+
   useEffect(() => {
     if (!chatThemeStorageKey) return;
     try {
@@ -5791,7 +5810,11 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                 <input
                   value={text}
                   onChange={e => setText(e.target.value)}
-                  onFocus={() => {}}
+                  onFocus={e => {
+                    // Only a user tap/click opens the keyboard; opening a chat never focuses this input.
+                    const input = e.currentTarget;
+                    window.requestAnimationFrame(() => input.scrollIntoView({ block: "nearest", behavior: "auto" }));
+                  }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Message..."
                   disabled={sending}
