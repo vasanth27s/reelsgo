@@ -13817,3 +13817,182 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     box-shadow: none !important;
   }
 }
+
+
+/* ===== Mobile Messages: screenshot-matched inbox + reliable full-screen chat ===== */
+@media (max-width:700px) {
+  /* Messages owns its own Instagram-like header; don't stack the global REELSGO bar above it. */
+  body:has(.messages-page) .mobile-header { display:none !important; }
+  body:has(.messages-page) .main { padding-top:0 !important; }
+  body:has(.messages-page) .page.messages-page:not(.is-mobile-chat) {
+    width:100% !important;
+    max-width:none !important;
+    min-height:100dvh !important;
+    margin:0 !important;
+    padding: max( env(safe-area-inset-top), 6px ) 8px calc(78px + env(safe-area-inset-bottom)) !important;
+    background:#080b0e !important;
+    color:#f5f6f8 !important;
+  }
+  .messages-page .messages-instagram-head {
+    min-height:46px !important;
+    padding:4px 8px 8px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+  }
+  .messages-page .messages-search-bar {
+    margin:4px 0 12px !important;
+    width:100% !important;
+  }
+  .messages-page .messages-notes-section { margin:0 !important; padding:0 0 8px !important; }
+  .messages-page .messages-notes-scroll { padding:2px 0 8px !important; }
+  .messages-page .conversation-list-title { padding:0 2px 6px !important; }
+  .messages-page .conversation-list-title b { font-size:14px !important; }
+  .messages-page .instagram-conversation-list,
+  .messages-page .conversation-scroll,
+  .messages-page .conversation-item-shell,
+  .messages-page .conversation-item {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page .conversation-item-shell { min-height:67px !important; }
+  .messages-page .conversation-item {
+    min-height:67px !important;
+    padding:7px 30px 7px 3px !important;
+    gap:10px !important;
+  }
+  .messages-page .conversation-avatar-wrap .avatar {
+    width:46px !important; height:46px !important;
+    min-width:46px !important; min-height:46px !important;
+  }
+
+  /* While a conversation is open: no inbox/search/notes/global nav behind the chat. */
+  .messages-page.is-mobile-chat {
+    position:fixed !important;
+    inset:0 !important;
+    z-index:200 !important;
+    width:100vw !important;
+    height:var(--rg-visual-viewport-height, 100dvh) !important;
+    max-height:var(--rg-visual-viewport-height, 100dvh) !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) !important;
+    overflow:hidden !important;
+    background:#080b0e !important;
+  }
+  .messages-page.is-mobile-chat .messages-instagram-head,
+  .messages-page.is-mobile-chat .messages-search-bar,
+  .messages-page.is-mobile-chat .messages-notes-section,
+  .messages-page.is-mobile-chat .instagram-conversation-list {
+    display:none !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-layout {
+    display:flex !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:100% !important;
+    max-height:100% !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    overflow:hidden !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat {
+    display:flex !important;
+    flex:1 1 auto !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:100% !important;
+    max-height:100% !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+    border:0 !important;
+    border-radius:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background-color:#080b0e !important;
+    background-image:var(--rg-chat-wallpaper) !important;
+    background-size:cover !important;
+    background-position:center !important;
+    background-repeat:no-repeat !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-head {
+    display:flex !important;
+    flex:0 0 58px !important;
+    min-height:58px !important;
+    height:58px !important;
+    position:relative !important;
+    z-index:5 !important;
+    padding:4px 10px !important;
+    gap:7px !important;
+    background:rgba(8,11,14,.28) !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .chat-back-button {
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    flex:0 0 38px !important;
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    align-items:center !important;
+    justify-content:center !important;
+    position:relative !important;
+    z-index:10 !important;
+    border-radius:50% !important;
+    background:rgba(40,44,50,.88) !important;
+    color:#fff !important;
+    pointer-events:auto !important;
+  }
+  .messages-page.is-mobile-chat .chat-back-button svg {
+    display:block !important;
+    width:22px !important;
+    height:22px !important;
+    transform:rotate(180deg);
+  }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    width:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    padding:12px 10px !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    display:flex !important;
+    flex:0 0 auto !important;
+    min-height:50px !important;
+    height:auto !important;
+    width:100% !important;
+    padding:5px 8px calc(5px + env(safe-area-inset-bottom)) !important;
+    background:rgba(8,11,14,.20) !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .chat-message-field {
+    min-width:0 !important;
+    background:rgba(28,32,38,.88) !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+    box-shadow:none !important;
+    border-radius:24px !important;
+  }
+  .messages-page.is-mobile-chat .chat-message-field > input {
+    color:#fff !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .bottom-nav { display:none !important; }
+}
