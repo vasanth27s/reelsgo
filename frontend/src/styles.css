@@ -13758,3 +13758,66 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     background:#080d10 !important;
   }
 }
+
+
+/* ReelsGo final mobile chat: one continuous wallpaper, no stacked black panels/borders.
+   The wallpaper belongs to the whole chat shell so it remains visible behind the
+   messages and composer when the mobile keyboard resizes the viewport. */
+@media (max-width:700px) {
+  .messages-page.is-mobile-chat,
+  .messages-page.is-mobile-chat .instagram-chat-layout,
+  .messages-page.is-mobile-chat .instagram-chat {
+    background-color:#080d10 !important;
+    border:0 !important;
+    outline:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat {
+    background-image:var(--rg-chat-wallpaper) !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-attachment:scroll !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-head,
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages,
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    background-color:transparent !important;
+    background-image:none !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    border-radius:0 !important;
+  }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    flex:0 0 auto !important;
+    width:100% !important;
+    min-height:54px !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:6px 8px max(6px,env(safe-area-inset-bottom)) !important;
+    box-sizing:border-box !important;
+  }
+  .messages-page.is-mobile-chat .chat-message-field > input {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background:rgba(20,25,31,.82) !important;
+  }
+  .messages-page.is-mobile-chat .chat-profile-title,
+  .messages-page.is-mobile-chat .chat-profile-open,
+  .messages-page.is-mobile-chat .chat-back-button,
+  .messages-page.is-mobile-chat .chat-customize-button,
+  .messages-page.is-mobile-chat .chat-header-options-button {
+    border:0 !important;
+    box-shadow:none !important;
+  }
+}
