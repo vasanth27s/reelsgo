@@ -885,6 +885,23 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // The own-profile controls always open the signed-in ReelsGo profile,
+  // never the currently selected chat or another user's profile.
+  const openOwnProfile = () => {
+    setOpenConversationId(null);
+    setOpenConversationData(null);
+    setProfileUserId(null);
+    setPage("profile");
+    setMenuOpen(false);
+    setSettingsOpen(false);
+    if (getProfileIdFromUrl()) {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("profile");
+      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // Shared post/Reel links should open directly in a browser, even when the visitor
   // is not logged in. Other sections still require authentication as before.
   if (!token && sharedPostId) {
@@ -912,7 +929,7 @@ function App() {
           <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
           <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
           <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
-          <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={() => navigate("profile")} />
+          <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={openOwnProfile} />
         </div>
 
         <div className="nav-bottom">
@@ -938,7 +955,7 @@ function App() {
               <div><b>{user?.name}</b><span>@{user?.username}</span></div>
               <button onClick={() => setMenuOpen(false)}><X /></button>
             </div>
-            <button onClick={() => navigate("profile")}><User /> Profile</button>
+            <button onClick={openOwnProfile}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
@@ -983,7 +1000,7 @@ function App() {
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
         <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={() => navigate("profile")} aria-label="Profile">
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={openOwnProfile} aria-label="Profile">
           <Avatar user={user} size={34} />
           <span>Profile</span>
         </button>
@@ -6045,6 +6062,45 @@ function NotificationsPage() {
     return items;
   }, [items, activeTab, followingIds]);
 
+  // Combine likes only when the backend identifies the same target post/reel/story.
+  // Notifications without a shared target ID stay separate to avoid false grouping.
+  const displayNotifications = useMemo(() => {
+    const result = [];
+    const likeGroups = new Map();
+    for (const item of filteredItems) {
+      if (notificationType(item) !== "like") {
+        result.push(item);
+        continue;
+      }
+      const targetId = item?.post?._id || item?.postId || item?.targetPostId ||
+        item?.target?._id || item?.targetId || item?.contentId ||
+        item?.reel?._id || item?.reelId || item?.story?._id || item?.storyId;
+      if (!targetId) {
+        result.push(item);
+        continue;
+      }
+      const key = `like:${String(targetId)}`;
+      if (!likeGroups.has(key)) {
+        const group = { ...item, _isGroupedLike: true, _groupedItems: [item], _groupedActors: [item.actor].filter(Boolean), _groupKey: key };
+        likeGroups.set(key, group);
+        result.push(group);
+      } else {
+        const group = likeGroups.get(key);
+        group._groupedItems.push(item);
+        if (item.actor && !group._groupedActors.some(actor => String(actor?._id) === String(item.actor?._id))) {
+          group._groupedActors.push(item.actor);
+        }
+        const itemTime = new Date(item.createdAt || 0).getTime();
+        const groupTime = new Date(group.createdAt || 0).getTime();
+        if (itemTime > groupTime) {
+          group.createdAt = item.createdAt;
+          group._latestNotificationId = item._id;
+        }
+      }
+    }
+    return result;
+  }, [filteredItems]);
+
   const tabs = [
     { id: "all", label: "All" },
     { id: "people", label: "People you follow" },
@@ -6130,18 +6186,35 @@ function NotificationsPage() {
         <section className="notification-feed">
           {loading ? (
             <div className="notification-center-state">Loading notifications...</div>
-          ) : filteredItems.length ? (
-            filteredItems.map(n => {
-              const notificationId = String(n._id);
+          ) : displayNotifications.length ? (
+            displayNotifications.map(n => {
+              const notificationId = String(n._groupKey || n._id);
               const isMenuOpen = notificationMenuId === notificationId;
+              const actorId = String(n?.actor?._id || n?.actorId || n?.userId || "");
+              const isFollowingActor = actorId && followingIds.has(actorId);
+              const groupedItems = n._isGroupedLike ? n._groupedItems : [n];
               async function deleteNotification(e) {
                 e.stopPropagation();
                 try {
-                  await api(`/notifications/${n._id}`, { method: "DELETE" });
-                  setItems(current => current.filter(item => String(item._id) !== notificationId));
+                  await Promise.all(groupedItems.map(item => api(`/notifications/${item._id}`, { method: "DELETE" })));
+                  const deletedIds = new Set(groupedItems.map(item => String(item._id)));
+                  setItems(current => current.filter(item => !deletedIds.has(String(item._id))));
                   setNotificationMenuId(null);
                 } catch (error) {
                   alert(error.message || "Could not delete notification.");
+                }
+              }
+              async function followBack(e) {
+                e.stopPropagation();
+                if (!actorId || isFollowingActor || requestActionId) return;
+                setRequestActionId(actorId);
+                try {
+                  await api(`/follows/${actorId}`, { method: "POST" });
+                  setFollowingIds(current => new Set([...current, actorId]));
+                } catch (error) {
+                  alert(error.message || "Unable to follow this person.");
+                } finally {
+                  setRequestActionId(null);
                 }
               }
               return (
@@ -6152,12 +6225,34 @@ function NotificationsPage() {
                     aria-expanded={isMenuOpen}
                     onClick={() => setNotificationMenuId(current => current === notificationId ? null : notificationId)}
                   >
-                    <Avatar user={n.actor} size={48} />
+                    {n._isGroupedLike ? (
+                      <span className="notification-avatar-stack" aria-hidden="true">
+                        {n._groupedActors.slice(0, 3).map((actor, index) => <span key={actor?._id || index} style={{ zIndex: 4 - index, marginLeft: index ? -13 : 0 }}><Avatar user={actor} size={38} /></span>)}
+                      </span>
+                    ) : <Avatar user={n.actor} size={48} />}
                     <span className="notification-copy">
-                      <span><UserLink user={n.actor} /> {n.text || n.message || "New activity on your account"}</span>
+                      <span>
+                        {n._isGroupedLike ? (
+                          <>
+                            <UserLink user={n._groupedActors[0] || n.actor} />
+                            {n._groupedActors[1] ? <> , <UserLink user={n._groupedActors[1]} /></> : null}
+                            {" "}{n._groupedItems.length > 2 ? `and ${n._groupedItems.length - 2} others liked your ${n?.reelId || n?.reel?._id ? "reel" : n?.storyId || n?.story?._id ? "story" : "post"}.` : `liked your ${n?.reelId || n?.reel?._id ? "reel" : n?.storyId || n?.story?._id ? "story" : "post"}.`}
+                          </>
+                        ) : <><UserLink user={n.actor} />{" "}{n.text || n.message || "New activity on your account"}</>}
+                      </span>
                       <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
                     </span>
                   </button>
+                  {notificationType(n) === "follow" && actorId && actorId !== String(me?._id || "") && (
+                    <button
+                      type="button"
+                      className={`notification-followback${isFollowingActor ? " is-following" : ""}`}
+                      disabled={!!requestActionId || !!isFollowingActor}
+                      onClick={followBack}
+                    >
+                      {requestActionId === actorId ? "…" : isFollowingActor ? "Following" : "Follow back"}
+                    </button>
+                  )}
                   {isMenuOpen && (
                     <div className="notification-inline-actions" role="group" aria-label="Notification actions">
                       <button type="button" className="notification-option-delete" onClick={deleteNotification}>

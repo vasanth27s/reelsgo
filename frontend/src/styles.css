@@ -13817,3 +13817,40 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     box-shadow: none !important;
   }
 }
+
+
+/* Follow-back action and grouped like notifications */
+.notification-swipe-shell{position:relative;}
+.notification-followback{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  margin:0 4px 0 8px!important;
+  min-width:94px!important;
+  height:34px!important;
+  padding:0 13px!important;
+  border-radius:9px!important;
+  background:#4f5df5!important;
+  color:#fff!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  white-space:nowrap!important;
+}
+.notification-followback:disabled{opacity:.72!important;}
+.notification-followback.is-following{background:#252a30!important;color:#f5f7fa!important;}
+.notification-avatar-stack{
+  flex:0 0 48px!important;
+  width:48px!important;
+  height:48px!important;
+  display:flex!important;
+  align-items:center!important;
+  padding-left:0!important;
+  overflow:visible!important;
+}
+.notification-avatar-stack>span{display:block!important;flex:0 0 38px!important;width:38px!important;height:38px!important;border-radius:50%!important;border:2px solid #0b0f12!important;overflow:hidden!important;}
+.notification-avatar-stack .avatar{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
+@media(max-width:700px){
+  .notification-followback{min-width:82px!important;height:32px!important;padding:0 9px!important;font-size:11px!important;}
+  .notification-avatar-stack{flex-basis:43px!important;width:43px!important;}
+  .notification-avatar-stack>span{flex-basis:34px!important;width:34px!important;height:34px!important;}
+  .notification-avatar-stack .avatar{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;}
+}
