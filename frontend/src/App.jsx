@@ -2944,65 +2944,117 @@ function ConnectionsModal({ user, type, onClose }) {
 }
 
 function ProfileQRCodeModal({ user, onClose }) {
+  const palettes = [
+    { name: "AURORA", qr: "6D35D4", bg: "radial-gradient(ellipse at 15% 10%,#ff7eb3 0%,transparent 34%),radial-gradient(ellipse at 85% 18%,#7c5cff 0%,transparent 35%),linear-gradient(145deg,#20104d 0%,#4330a8 48%,#0b8fbd 100%)", accent: "#6d35d4" },
+    { name: "SUNSET", qr: "E34274", bg: "radial-gradient(ellipse at 20% 10%,#ffcf70 0%,transparent 36%),linear-gradient(145deg,#ff6b6b 0%,#c73876 48%,#5b2c83 100%)", accent: "#e34274" },
+    { name: "OCEAN", qr: "087EAA", bg: "radial-gradient(ellipse at 15% 15%,#62f4d2 0%,transparent 34%),linear-gradient(145deg,#052f5f 0%,#087eaa 50%,#4438a8 100%)", accent: "#087eaa" },
+    { name: "CANDY", qr: "D629A8", bg: "radial-gradient(ellipse at 20% 10%,#fff0a6 0%,transparent 34%),linear-gradient(145deg,#ff7ad9 0%,#a63be4 52%,#4546c7 100%)", accent: "#d629a8" },
+    { name: "EMERALD", qr: "087F5B", bg: "radial-gradient(ellipse at 15% 10%,#a7f3d0 0%,transparent 35%),linear-gradient(145deg,#064e3b 0%,#0f9f85 52%,#164e9a 100%)", accent: "#087f5b" },
+    { name: "GOLD", qr: "A65D03", bg: "radial-gradient(ellipse at 15% 10%,#fff1a8 0%,transparent 36%),linear-gradient(145deg,#7c2d12 0%,#c47b18 48%,#7c2d72 100%)", accent: "#a65d03" },
+    { name: "BERRY", qr: "9D174D", bg: "radial-gradient(ellipse at 80% 12%,#f9a8d4 0%,transparent 35%),linear-gradient(145deg,#500724 0%,#9d174d 48%,#4c1d95 100%)", accent: "#9d174d" },
+    { name: "MIDNIGHT", qr: "3346B8", bg: "radial-gradient(ellipse at 20% 10%,#93c5fd 0%,transparent 35%),linear-gradient(145deg,#101b42 0%,#3346b8 55%,#5b21b6 100%)", accent: "#3346b8" }
+  ];
   const [scannerOpen, setScannerOpen] = useState(false);
-  const [colorIndex, setColorIndex] = useState(0);
+  const [colorIndex, setColorIndex] = useState(() => Math.floor(Math.random() * 8));
   const [cameraError, setCameraError] = useState("");
   const [manualLink, setManualLink] = useState("");
+  const [scanBusy, setScanBusy] = useState(false);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanTimerRef = useRef(null);
-  const qrColors = ["3778ff", "6c4cff", "e1306c", "111827"];
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const palette = palettes[colorIndex];
   const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || user?.username || "")}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=18&ecc=H&color=${qrColors[colorIndex]}&bgcolor=ffffff&data=${encodeURIComponent(profileUrl)}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=700x700&margin=20&ecc=H&color=${palette.qr}&bgcolor=ffffff&data=${encodeURIComponent(profileUrl)}`;
 
   function openScannedLink(value) {
     const raw = String(value || "").trim();
     if (!raw) return;
     let target;
     try { target = new URL(raw, window.location.origin); }
-    catch { setCameraError("That does not look like a valid profile link."); return; }
+    catch { setCameraError("This QR code does not contain a valid web link."); return; }
     if (!/^https?:$/.test(target.protocol)) {
-      setCameraError("Only web links can be opened.");
-      return;
+      setCameraError("This QR code is not a web link."); return;
     }
-    window.location.href = target.href;
+    // Keep links on this ReelsGo site in the current tab; external URLs open separately.
+    if (target.origin === window.location.origin) window.location.href = target.href;
+    else window.open(target.href, "_blank", "noopener,noreferrer");
+  }
+
+  function loadJsQR() {
+    if (typeof window.jsQR === "function") return Promise.resolve(window.jsQR);
+    if (window.__reelsGoJsQrPromise) return window.__reelsGoJsQrPromise;
+    window.__reelsGoJsQrPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+      script.async = true;
+      script.onload = () => typeof window.jsQR === "function" ? resolve(window.jsQR) : reject(new Error("QR decoder did not load"));
+      script.onerror = () => reject(new Error("QR decoder could not load. Check your internet connection."));
+      document.head.appendChild(script);
+    });
+    return window.__reelsGoJsQrPromise;
   }
 
   useEffect(() => {
     if (!scannerOpen) return undefined;
     let cancelled = false;
+    let detector = null;
+    let decoder = null;
+    let scanning = false;
     async function startScanner() {
       setCameraError("");
+      if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        setCameraError("Camera scanning needs HTTPS. Open ReelsGo using its secure https:// address, or choose Scan image below.");
+      }
       if (!navigator.mediaDevices?.getUserMedia) {
-        setCameraError("Camera access is not available in this browser. Paste a profile link below instead.");
+        setCameraError("This browser or webview does not provide camera access. Use Scan image or paste a profile link below.");
         return;
       }
-      if (!("BarcodeDetector" in window)) {
-        setCameraError("Automatic QR scanning is not supported by this browser. Paste a profile link below instead.");
-      }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+        try { if ("BarcodeDetector" in window) detector = new window.BarcodeDetector({ formats: ["qr_code"] }); } catch { detector = null; }
+        try { decoder = await loadJsQR(); } catch (e) { if (!detector) setCameraError("The QR compatibility decoder could not load. Check internet access, or use a browser with built-in QR scanning / paste a link."); }
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
         if (cancelled) { stream.getTracks().forEach(track => track.stop()); return; }
         streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => {});
-        }
-        if (!("BarcodeDetector" in window)) return;
-        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        if (!videoRef.current) return;
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
         const scan = async () => {
-          if (cancelled || !videoRef.current) return;
+          if (cancelled || scanning || !videoRef.current) return;
+          scanning = true;
           try {
-            if (videoRef.current.readyState >= 2) {
-              const codes = await detector.detect(videoRef.current);
-              if (codes?.length && codes[0]?.rawValue) { openScannedLink(codes[0].rawValue); return; }
+            const video = videoRef.current;
+            if (video.readyState >= 2 && video.videoWidth > 0) {
+              if (detector) {
+                try {
+                  const codes = await detector.detect(video);
+                  if (codes?.length && codes[0]?.rawValue) { openScannedLink(codes[0].rawValue); return; }
+                } catch { detector = null; }
+              }
+              if (decoder) {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                  const maxSide = 900;
+                  const scale = Math.min(1, maxSide / Math.max(video.videoWidth, video.videoHeight));
+                  canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
+                  canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
+                  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+                  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                  const code = decoder(pixels.data, pixels.width, pixels.height, { inversionAttempts: "attemptBoth" });
+                  if (code?.data) { openScannedLink(code.data); return; }
+                }
+              }
             }
-          } catch {}
-          scanTimerRef.current = window.setTimeout(scan, 350);
+          } catch { /* Keep scanning; individual frames can fail on some cameras. */ }
+          finally { scanning = false; }
+          if (!cancelled) scanTimerRef.current = window.setTimeout(scan, 220);
         };
         scan();
       } catch (error) {
-        setCameraError(error?.name === "NotAllowedError" ? "Allow camera access to scan a QR code." : "Could not start the camera. Paste a profile link below instead.");
+        const name = error?.name;
+        setCameraError(name === "NotAllowedError" ? "Camera permission was denied. Allow camera access in your browser settings, or choose Scan image." : name === "NotFoundError" ? "No camera was found on this device. Choose Scan image to scan a saved QR picture." : name === "NotReadableError" ? "The camera is already being used by another app. Close it and try again." : "Could not start the camera. Check permissions and use HTTPS, or choose Scan image.");
       }
     }
     startScanner();
@@ -3014,68 +3066,92 @@ function ProfileQRCodeModal({ user, onClose }) {
     };
   }, [scannerOpen]);
 
-  async function copyProfileLink() {
+  async function scanImageFile(file) {
+    if (!file) return;
+    setScanBusy(true); setCameraError("");
     try {
-      await navigator.clipboard.writeText(profileUrl);
-      alert("Profile link copied.");
+      const decoder = await loadJsQR();
+      const image = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      image.onload = () => {
+        try {
+          const canvas = canvasRef.current || document.createElement("canvas");
+          const maxSide = 1800;
+          const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = decoder(pixels.data, pixels.width, pixels.height, { inversionAttempts: "attemptBoth" });
+          URL.revokeObjectURL(objectUrl);
+          setScanBusy(false);
+          if (code?.data) openScannedLink(code.data);
+          else setCameraError("No readable QR code was found in that image. Try a clearer, uncropped image.");
+        } catch {
+          URL.revokeObjectURL(objectUrl); setScanBusy(false); setCameraError("Could not read that image. Try another QR image.");
+        }
+      };
+      image.onerror = () => { URL.revokeObjectURL(objectUrl); setScanBusy(false); setCameraError("Could not open that image."); };
+      image.src = objectUrl;
     } catch {
-      window.prompt("Copy your profile link:", profileUrl);
+      setScanBusy(false); setCameraError("QR image scanning needs the decoder library. Check your internet connection and try again.");
     }
   }
 
+  async function copyProfileLink() {
+    try { await navigator.clipboard.writeText(profileUrl); alert("Profile link copied."); }
+    catch { window.prompt("Copy your profile link:", profileUrl); }
+  }
   async function downloadQr() {
     try {
       const response = await fetch(qrUrl);
       if (!response.ok) throw new Error("QR image unavailable");
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = objectUrl;
-      a.download = `${user?.username || "reelsgo-profile"}-qr.png`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch {
-      window.open(qrUrl, "_blank", "noopener,noreferrer");
-    }
+      const a = document.createElement("a"); a.href = objectUrl; a.download = `${user?.username || "reelsgo-profile"}-qr.png`;
+      document.body.appendChild(a); a.click(); a.remove(); window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch { window.open(qrUrl, "_blank", "noopener,noreferrer"); }
   }
-
   async function shareProfile() {
     try {
       if (navigator.share) await navigator.share({ title: `${user?.username || "ReelsGo"}'s profile`, text: "Find me on ReelsGo", url: profileUrl });
       else await copyProfileLink();
-    } catch (error) {
-      if (error?.name !== "AbortError") copyProfileLink();
-    }
+    } catch (error) { if (error?.name !== "AbortError") copyProfileLink(); }
   }
 
   return (
     <div className="rg-profile-qr-overlay" role="dialog" aria-modal="true" aria-label={scannerOpen ? "Scan profile QR code" : "Share profile QR code"} onMouseDown={e => { if (e.target === e.currentTarget) scannerOpen ? setScannerOpen(false) : onClose(); }}>
-      <section className={`rg-profile-qr-screen ${scannerOpen ? "is-scanner" : ""}`}>
+      <section className="rg-profile-qr-screen" style={{ background: scannerOpen ? "linear-gradient(145deg,#10172b,#202c55)" : palette.bg, "--rg-qr-accent": palette.accent }}>
         <header className="rg-profile-qr-topbar">
           <button type="button" className="rg-qr-round-button" aria-label="Close" onClick={() => scannerOpen ? setScannerOpen(false) : onClose()}><X /></button>
-          <button type="button" className="rg-qr-colour-button" onClick={() => setColorIndex(i => (i + 1) % qrColors.length)}><Palette size={14}/> COLOUR</button>
-          <button type="button" className="rg-qr-round-button" aria-label="Open QR scanner" onClick={() => setScannerOpen(true)}><ScanLine /></button>
+          {!scannerOpen ? <button type="button" className="rg-qr-colour-button" onClick={() => setColorIndex(i => (i + 1) % palettes.length)}><Palette size={14}/> {palette.name} · CHANGE</button> : <span className="rg-qr-scanner-label">LIVE SCANNER</span>}
+          <button type="button" className="rg-qr-round-button" aria-label="Open QR scanner" onClick={() => { setCameraError(""); setScannerOpen(true); }}><ScanLine /></button>
         </header>
         {scannerOpen ? (
           <div className="rg-qr-scanner-content">
             <h2>Scan a profile QR code</h2>
-            <p>Point your camera at a ReelsGo profile QR code.</p>
-            <div className="rg-qr-camera-frame"><video ref={videoRef} muted playsInline /><span className="rg-qr-scan-corner top-left"/><span className="rg-qr-scan-corner top-right"/><span className="rg-qr-scan-corner bottom-left"/><span className="rg-qr-scan-corner bottom-right"/></div>
-            {cameraError && <p className="rg-qr-camera-error">{cameraError}</p>}
-            <form className="rg-qr-manual-form" onSubmit={e => { e.preventDefault(); openScannedLink(manualLink); }}><input value={manualLink} onChange={e => setManualLink(e.target.value)} placeholder="Paste a profile link" aria-label="Profile link"/><button type="submit">Open profile</button></form>
+            <p>Center any QR code in the frame. Compatible camera scanning uses native detection or the fallback decoder.</p>
+            <div className="rg-qr-camera-frame"><video ref={videoRef} muted playsInline autoPlay /><canvas ref={canvasRef} className="rg-qr-hidden-canvas" aria-hidden="true"/><span className="rg-qr-scan-corner top-left"/><span className="rg-qr-scan-corner top-right"/><span className="rg-qr-scan-corner bottom-left"/><span className="rg-qr-scan-corner bottom-right"/></div>
+            {cameraError && <p className="rg-qr-camera-error" role="status">{cameraError}</p>}
+            <div className="rg-qr-scanner-alternatives"><button type="button" onClick={() => fileInputRef.current?.click()} disabled={scanBusy}><ImageIcon size={17}/>{scanBusy ? "Reading image…" : "Scan image"}</button><input ref={fileInputRef} className="rg-qr-file-input" type="file" accept="image/*" onChange={e => { const file = e.target.files?.[0]; if (file) scanImageFile(file); e.target.value = ""; }}/></div>
+            <form className="rg-qr-manual-form" onSubmit={e => { e.preventDefault(); openScannedLink(manualLink); }}><input value={manualLink} onChange={e => setManualLink(e.target.value)} placeholder="Paste a profile link" aria-label="Profile link"/><button type="submit">Open link</button></form>
+            <small className="rg-qr-scanner-footnote">Camera scanning requires HTTPS and camera permission. Image scanning works with a saved QR screenshot.</small>
           </div>
         ) : (
           <div className="rg-profile-qr-content">
-            <div className="rg-profile-qr-card">
+            <div className="rg-profile-qr-card" style={{ "--rg-qr-accent": palette.accent }}>
               <div className="rg-profile-qr-image-wrap"><img src={qrUrl} alt={`QR code for ${user?.username || "your ReelsGo profile"}`} /><div className="rg-profile-qr-center-mark"><QrCode /></div></div>
               <div className="rg-profile-qr-username">@{user?.username || "reelsgo"}</div>
+              <div className="rg-qr-card-caption">SCAN TO CONNECT · REELSGO</div>
             </div>
             <div className="rg-profile-qr-actions">
-              <button type="button" onClick={shareProfile}><Share2 /><span>Share profile</span></button>
-              <button type="button" onClick={copyProfileLink}><LinkIcon /><span>Copy link</span></button>
-              <button type="button" onClick={downloadQr}><Download /><span>Download</span></button>
+              <button type="button" onClick={shareProfile}><Share2/><span>Share profile</span></button>
+              <button type="button" onClick={copyProfileLink}><LinkIcon/><span>Copy link</span></button>
+              <button type="button" onClick={downloadQr}><Download/><span>Download</span></button>
             </div>
-            <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>3 of 3</span><p>Share a link to your profile.</p></div>
+            <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>PROFILE QR</span><p>Change the colours and share your profile anywhere.</p></div>
+            <div className="rg-qr-palette-dots" aria-label="Choose QR design">{palettes.map((p, i) => <button key={p.name} type="button" title={p.name} aria-label={`${p.name} colour theme`} className={i === colorIndex ? "active" : ""} style={{ background: p.accent }} onClick={() => setColorIndex(i)} />)}</div>
           </div>
         )}
       </section>

@@ -13433,3 +13433,30 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
   .rg-profile-action-row{padding:0 4px;margin:0 0 18px;gap:5px}
   .rg-profile-action-button{min-height:38px;padding:8px 10px;font-size:12px}
 }
+
+
+/* ReelsGo QR refresh: colorful palettes + browser-compatible scanning fallback */
+.rg-profile-qr-screen{transition:background .45s ease;background-size:cover;background-attachment:fixed}
+.rg-profile-qr-card{color:var(--rg-qr-accent,#6d35d4);box-shadow:0 24px 70px #080b242e,0 2px 0 #ffffffaa inset;}
+.rg-profile-qr-center-mark{color:var(--rg-qr-accent,#6d35d4);box-shadow:0 0 0 2px #fff}
+.rg-profile-qr-username{color:var(--rg-qr-accent,#6d35d4)}
+.rg-qr-card-caption{margin-top:7px;font-size:8px;font-weight:800;letter-spacing:.19em;color:#777;}
+.rg-qr-colour-button{background:#ffffff20;backdrop-filter:blur(16px);font-weight:800;}
+.rg-profile-qr-actions button{box-shadow:0 8px 24px #0002;transition:transform .18s ease,box-shadow .18s ease;}
+.rg-profile-qr-actions button:active{transform:scale(.97)}
+.rg-qr-palette-dots{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:15px;padding:7px 12px;border:1px solid #ffffff38;border-radius:999px;background:#11182728;backdrop-filter:blur(12px)}
+.rg-qr-palette-dots button{width:18px;height:18px;border:2px solid #ffffff80;border-radius:50%;box-shadow:0 2px 8px #0002;}
+.rg-qr-palette-dots button.active{outline:2px solid #fff;outline-offset:3px;transform:scale(1.12)}
+.rg-qr-scanner-label{justify-self:center;font-size:10px;letter-spacing:.18em;font-weight:800;color:#f3f4ff}
+.rg-qr-hidden-canvas,.rg-qr-file-input{display:none!important}
+.rg-qr-scanner-alternatives{display:flex;justify-content:center;}
+.rg-qr-scanner-alternatives button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid #ffffff55;border-radius:999px;background:#ffffff18;color:#fff;font-size:13px;font-weight:700;}
+.rg-qr-scanner-alternatives button:disabled{opacity:.65}
+.rg-qr-scanner-footnote{max-width:360px;color:#cbd5e1;font-size:11px;line-height:1.45;text-align:center}
+.rg-qr-camera-frame video{object-fit:cover;transform:translateZ(0)}
+@media(max-width:700px){
+ .rg-profile-qr-content{padding-top:8px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+ .rg-profile-qr-card{box-shadow:0 22px 65px #0003,0 2px 0 #ffffffaa inset}
+ .rg-qr-palette-dots{margin-top:13px}
+ .rg-qr-scanner-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
