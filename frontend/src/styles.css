@@ -13209,3 +13209,101 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
 .saved-reel-fullscreen-notice{position:absolute;z-index:10;left:12px;right:70px;bottom:105px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:12px;background:rgba(20,20,22,.82);font-size:12px;backdrop-filter:blur(10px)}.saved-reel-fullscreen-notice button{background:transparent;color:#fff;display:grid;place-items:center}
 .saved-reels-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;align-items:start!important}.saved-reels-grid .saved-reel-tile{display:block!important;position:relative!important;width:100%!important;min-width:0!important;aspect-ratio:9/16!important;height:auto!important;min-height:0!important;overflow:hidden!important;border-radius:5px!important;background:#111!important;box-shadow:none!important}.saved-reels-grid .saved-reel-tile video{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover!important}.saved-reels-grid .saved-reel-tile:focus-visible{outline:2px solid #a78bfa;outline-offset:2px}.saved-reels-grid .saved-reel-caption{font-size:clamp(9px,1.5vw,12px);line-height:1.3;left:7px;right:7px;bottom:8px;-webkit-line-clamp:2}.saved-reels-grid .saved-reel-play{right:7px;top:7px;filter:drop-shadow(0 1px 5px #000b)}
 @media(max-width:600px){.saved-reel-fullscreen{align-items:stretch!important}.saved-reel-fullscreen-stage{width:100%;height:100dvh;height:100svh;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none}.saved-reel-fullscreen-video{object-fit:cover}.saved-reel-topbar{top:max(16px,env(safe-area-inset-top));left:14px;right:12px}.saved-reel-fullscreen-actions{right:10px;bottom:calc(112px + env(safe-area-inset-bottom));gap:11px}.saved-reel-fullscreen-actions button{width:44px;min-height:44px;border-radius:13px;background:rgba(25,25,27,.54)}.saved-reel-fullscreen-actions svg{width:22px;height:22px}.saved-reel-fullscreen-caption{left:14px;right:68px;bottom:calc(18px + env(safe-area-inset-bottom))}.saved-reel-fullscreen-caption p{font-size:12.5px;-webkit-line-clamp:3}.saved-reel-play-toggle{width:58px;height:58px}.saved-reel-fullscreen-notice{bottom:calc(100px + env(safe-area-inset-bottom))}.saved-reel-fullscreen .saved-reel-close{left:10px;top:max(10px,env(safe-area-inset-top));width:38px;height:38px}.saved-reels-grid{gap:2px!important}.saved-reels-grid .saved-reel-tile{border-radius:2px!important}}
+
+
+/* ============================================================
+   REELSGO NOTIFICATIONS — INSTAGRAM-INSPIRED RESPONSIVE CENTER
+   Desktop opens as a left drawer over the current page; mobile
+   stays a full-screen page. Notification rows are flat, not cards.
+   ============================================================ */
+.notifications-drawer-backdrop{
+  position:fixed!important;inset:0!important;z-index:999!important;
+  background:rgba(0,0,0,.22)!important;display:flex!important;align-items:stretch!important;
+}
+.notifications-drawer{
+  width:min(490px,42vw)!important;min-width:410px!important;height:100dvh!important;
+  overflow:hidden!important;background:#0b0f12!important;border-right:1px solid #292e33!important;
+  box-shadow:16px 0 48px rgba(0,0,0,.24)!important;
+}
+.notifications-page{
+  width:100%!important;max-width:none!important;min-height:100dvh!important;height:100%!important;
+  margin:0!important;padding:28px 42px 34px!important;background:#0b0f12!important;color:#f5f7fa!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+}
+.notifications-drawer-page{padding:26px 42px 30px!important;}
+.notifications-center-head{
+  width:100%!important;max-width:none!important;min-height:52px!important;height:52px!important;
+  margin:0 0 14px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:12px!important;position:relative!important;
+}
+.notifications-center-head h1{font-size:25px!important;font-weight:800!important;letter-spacing:-.55px!important;margin:0!important;color:#f7f8fa!important;flex:1!important;}
+.notifications-mobile-title,.notifications-mobile-back{display:none!important;}
+.notifications-close,.notifications-mobile-back{
+  flex:0 0 32px!important;width:32px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  color:#f5f7fa!important;background:transparent!important;border:0!important;border-radius:50%!important;padding:0!important;
+}
+.notifications-close svg,.notifications-mobile-back svg{width:22px!important;height:22px!important;}
+.notifications-refresh{flex:0 0 34px!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;border:0!important;background:transparent!important;border-radius:50%!important;color:#f5f7fa!important;}
+.notifications-refresh svg{width:21px!important;height:21px!important;}
+.notification-tabs{width:100%!important;max-width:none!important;margin:0 0 13px!important;display:flex!important;gap:8px!important;overflow-x:auto!important;scrollbar-width:none!important;}
+.notification-tabs::-webkit-scrollbar{display:none!important;}
+.notification-tabs button{height:36px!important;min-height:36px!important;padding:0 15px!important;border-radius:999px!important;border:1px solid #41464c!important;background:transparent!important;color:#f2f4f7!important;font-size:12px!important;font-weight:700!important;}
+.notification-tabs button.active{background:#252a30!important;color:#fff!important;border-color:#252a30!important;}
+.notification-feed,.notification-request-center{width:100%!important;max-width:none!important;margin:0!important;}
+.notification-group{margin:0 0 20px!important;}
+.notification-group h2{font-size:15px!important;font-weight:800!important;line-height:1.2!important;margin:0 0 12px!important;color:#f5f7fa!important;}
+.notification-group-list{width:100%!important;}
+.notification-swipe-shell{position:relative!important;overflow:hidden!important;width:100%!important;isolation:isolate!important;}
+.notification-swipe-actions{position:absolute!important;left:0!important;top:0!important;bottom:0!important;width:166px!important;display:flex!important;align-items:stretch!important;gap:5px!important;padding:8px 4px!important;opacity:0!important;pointer-events:none!important;z-index:0!important;}
+.notification-swipe-shell.is-swiped .notification-swipe-actions{opacity:1!important;pointer-events:auto!important;}
+.notification-swipe-actions button{flex:1!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;border:0!important;border-radius:10px!important;color:#fff!important;font-size:11px!important;font-weight:750!important;}
+.notification-swipe-delete{background:#e23d4f!important;}
+.notification-swipe-cancel{background:#343a42!important;}
+.notification-swipe-actions svg{width:17px!important;height:17px!important;}
+.notification-card{
+  position:relative!important;z-index:1!important;width:100%!important;min-height:70px!important;margin:0!important;padding:9px 0!important;
+  display:flex!important;align-items:center!important;gap:11px!important;text-align:left!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.11)!important;
+  border-radius:0!important;background:#0b0f12!important;color:#f5f7fa!important;box-shadow:none!important;
+  transform:translateX(0);transition:transform .22s ease!important;touch-action:pan-y!important;cursor:pointer!important;
+}
+.notification-swipe-shell.is-swiped .notification-card{transform:translateX(166px)!important;}
+.notification-card:hover{background:#0b0f12!important;}
+.notification-card .avatar{flex:0 0 48px!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;}
+.notification-copy{flex:1 1 auto!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:2px!important;}
+.notification-copy>span{display:block!important;color:#f5f7fa!important;font-size:13px!important;line-height:1.3!important;overflow-wrap:anywhere!important;}
+.notification-copy .profile-username-link{display:inline!important;color:#fff!important;font-weight:800!important;}
+.notification-copy small{color:#9299a4!important;font-size:11px!important;}
+.notification-copy .notification-inline-time{display:inline!important;white-space:nowrap!important;margin-left:3px!important;color:#9299a4!important;font-size:11px!important;}
+.notification-detail-time{display:none!important;}
+.notification-thumb{flex:0 0 48px!important;width:48px!important;height:48px!important;overflow:hidden!important;border-radius:7px!important;background:#1c2228!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#aaa!important;}
+.notification-thumb img{width:100%!important;height:100%!important;object-fit:cover!important;}
+.notification-center-state{min-height:190px!important;border:0!important;border-radius:0!important;background:transparent!important;}
+.notification-request-row{border:0!important;border-bottom:1px solid rgba(255,255,255,.11)!important;border-radius:0!important;background:transparent!important;padding:12px 0!important;}
+
+@media(max-width:700px){
+  .notifications-drawer-backdrop{display:none!important;}
+  .notifications-page{width:100%!important;max-width:none!important;min-height:calc(100dvh - 57px)!important;height:auto!important;margin:0!important;padding:8px 14px 86px!important;background:#0b0f12!important;}
+  .notifications-center-head{height:44px!important;min-height:44px!important;margin:0 0 8px!important;gap:8px!important;}
+  .notifications-center-head h1{font-size:16px!important;text-align:left!important;letter-spacing:0!important;}
+  .notifications-desktop-title{display:none!important;}
+  .notifications-mobile-title{display:inline!important;}
+  .notifications-mobile-back{display:flex!important;flex:0 0 36px!important;width:36px!important;height:36px!important;border-radius:50%!important;background:#20252b!important;}
+  .notifications-mobile-back svg{transform:rotate(180deg)!important;width:20px!important;height:20px!important;}
+  .notifications-close{display:none!important;}
+  .notifications-refresh{flex:0 0 34px!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;}
+  .notification-tabs{width:calc(100% + 28px)!important;margin:0 -14px 14px!important;padding:0 14px 2px!important;gap:7px!important;}
+  .notification-tabs button{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:7px!important;font-size:10px!important;background:#252a30!important;border-color:#252a30!important;}
+  .notification-tabs button.active{background:#f5f6f7!important;color:#111!important;border-color:#f5f6f7!important;}
+  .notification-group{margin-bottom:17px!important;}
+  .notification-group h2{font-size:12px!important;margin-bottom:8px!important;}
+  .notification-card{min-height:67px!important;padding:8px 0!important;gap:9px!important;}
+  .notification-card .avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;}
+  .notification-copy>span{font-size:11px!important;line-height:1.28!important;}
+  .notification-copy .notification-inline-time{font-size:10px!important;}
+  .notification-thumb{flex:0 0 38px!important;width:38px!important;height:38px!important;border-radius:5px!important;}
+  .notification-swipe-actions{width:150px!important;}
+  .notification-swipe-shell.is-swiped .notification-card{transform:translateX(150px)!important;}
+  .notification-swipe-actions button{font-size:10px!important;}
+  .notification-request-row{display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;padding:10px 0!important;gap:8px!important;}
+  .notification-request-actions{grid-column:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;}
+}

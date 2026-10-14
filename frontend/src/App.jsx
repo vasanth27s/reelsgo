@@ -819,6 +819,7 @@ function App() {
     const openProfile = (event) => {
       const id = event?.detail?.id;
       if (!id) return;
+      setNotificationsOpen(false);
       setProfileUserId(String(id));
       setPage("user-profile");
       setMenuOpen(false);
