@@ -13328,3 +13328,41 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
  .notification-more-button{width:38px!important;height:38px!important;}
  .notification-options-menu{right:2px!important;width:132px!important;}
 }
+
+/* Final notification interaction: tap a row to expand Delete / Cancel inline.
+   No swipe gesture, no three-dot button, and no separator lines between rows. */
+.notification-swipe-shell{
+  position:relative!important;display:block!important;width:100%!important;overflow:visible!important;
+  isolation:auto!important;touch-action:auto!important;margin:0!important;padding:0!important;
+}
+.notification-card{
+  position:relative!important;z-index:auto!important;display:flex!important;width:100%!important;
+  min-height:70px!important;margin:0!important;padding:10px 0!important;transform:none!important;
+  border:0!important;border-bottom:0!important;border-radius:0!important;outline:0!important;
+  background:transparent!important;color:#f5f7fa!important;box-shadow:none!important;
+  text-align:left!important;cursor:pointer!important;transition:background .15s ease!important;
+}
+.notification-card:hover,.notification-card:focus-visible{background:rgba(255,255,255,.035)!important;}
+.notification-swipe-reveal,.notification-swipe-actions{display:none!important;}
+.notification-inline-actions{
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;
+  width:100%!important;padding:0 0 10px 58px!important;margin:0!important;border:0!important;
+  background:transparent!important;
+}
+.notification-inline-actions button{
+  min-width:88px!important;min-height:34px!important;padding:7px 14px!important;border:0!important;
+  border-radius:8px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:7px!important;font-size:12px!important;font-weight:750!important;cursor:pointer!important;
+}
+.notification-inline-actions .notification-option-delete{background:#e23d4f!important;color:#fff!important;}
+.notification-inline-actions .notification-option-cancel{background:#252a30!important;color:#f5f7fa!important;}
+.notification-inline-actions button:hover{filter:brightness(1.08)!important;}
+.notification-copy{min-width:0!important;}
+.notification-feed .notification-swipe-shell+.notification-swipe-shell{border:0!important;margin-top:0!important;}
+.notification-feed .notification-card,.notification-feed .notification-swipe-shell,
+.notification-feed .notification-copy,.notification-feed .notification-group-list{border-bottom:0!important;}
+@media(max-width:700px){
+  .notification-card{min-height:66px!important;padding:8px 0!important;}
+  .notification-inline-actions{padding:0 0 9px 55px!important;gap:7px!important;}
+  .notification-inline-actions button{min-height:32px!important;min-width:82px!important;font-size:11px!important;}
+}

@@ -5544,11 +5544,9 @@ function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [requestActionId, setRequestActionId] = useState(null);
-  // Swipe a row in either direction to reveal the overflow menu. Deletion is
-  // never performed by swiping; the user must choose Delete in the menu.
-  const [swipedNotificationId, setSwipedNotificationId] = useState(null);
+  // Tap a notification to show its Delete / Cancel actions inline.
+  // Nothing is deleted until the user explicitly confirms Delete.
   const [notificationMenuId, setNotificationMenuId] = useState(null);
-  const swipeStartRef = useRef(null);
 
   const me = getUser();
 
@@ -5743,90 +5741,41 @@ function NotificationsPage() {
           ) : filteredItems.length ? (
             filteredItems.map(n => {
               const notificationId = String(n._id);
-              const isSwiped = swipedNotificationId === notificationId;
               const isMenuOpen = notificationMenuId === notificationId;
-              const openActorProfile = () => {
-                if (isMenuOpen || isSwiped) return;
-                const actorId = n?.actor?._id || n?.actorId;
-                if (actorId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: actorId } }));
-              };
               async function deleteNotification(e) {
                 e.stopPropagation();
                 try {
                   await api(`/notifications/${n._id}`, { method: "DELETE" });
                   setItems(current => current.filter(item => String(item._id) !== notificationId));
-                  setSwipedNotificationId(null);
                   setNotificationMenuId(null);
                 } catch (error) {
                   alert(error.message || "Could not delete notification.");
                 }
               }
               return (
-                <div
-                  className={`notification-swipe-shell${isSwiped ? " is-swiped" : ""}${isMenuOpen ? " menu-open" : ""}`}
-                  key={notificationId}
-                  onPointerDown={e => {
-                    swipeStartRef.current = { id: notificationId, x: e.clientX, y: e.clientY };
-                  }}
-                  onPointerUp={e => {
-                    const start = swipeStartRef.current;
-                    swipeStartRef.current = null;
-                    if (!start || start.id !== notificationId) return;
-                    const dx = e.clientX - start.x;
-                    const dy = e.clientY - start.y;
-                    if (Math.abs(dx) > 38 && Math.abs(dx) > Math.abs(dy) * 1.15) {
-                      e.preventDefault();
-                      setSwipedNotificationId(notificationId);
-                      setNotificationMenuId(null);
-                    }
-                  }}
-                  onPointerCancel={() => { swipeStartRef.current = null; }}
-                >
-                  <div className="notification-swipe-reveal" aria-hidden={!isSwiped}>
-                    <button
-                      type="button"
-                      className="notification-more-button"
-                      aria-label="Notification options"
-                      title="Notification options"
-                      tabIndex={isSwiped ? 0 : -1}
-                      onClick={e => {
-                        e.stopPropagation();
-                        setNotificationMenuId(current => current === notificationId ? null : notificationId);
-                      }}
-                    ><MoreHorizontal size={22} /></button>
-                    {isMenuOpen && (
-                      <div className="notification-options-menu" role="menu" onClick={e => e.stopPropagation()}>
-                        <button type="button" role="menuitem" className="notification-option-delete" onClick={deleteNotification}>
-                          <Trash2 size={16} /> Delete
-                        </button>
-                        <button type="button" role="menuitem" className="notification-option-cancel" onClick={() => {
-                          setNotificationMenuId(null);
-                          setSwipedNotificationId(null);
-                        }}>Cancel</button>
-                      </div>
-                    )}
-                  </div>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    className={`notification notification-card${isSwiped ? " is-swiped" : ""}`}
-                    onClick={openActorProfile}
-                    onKeyDown={e => {
-                      if (e.key === "Escape") {
-                        setNotificationMenuId(null);
-                        setSwipedNotificationId(null);
-                      } else if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        openActorProfile();
-                      }
-                    }}
+                <div className={`notification-swipe-shell${isMenuOpen ? " menu-open" : ""}`} key={notificationId}>
+                  <button
+                    type="button"
+                    className="notification notification-card"
+                    aria-expanded={isMenuOpen}
+                    onClick={() => setNotificationMenuId(current => current === notificationId ? null : notificationId)}
                   >
                     <Avatar user={n.actor} size={48} />
                     <span className="notification-copy">
                       <span><UserLink user={n.actor} /> {n.text || n.message || "New activity on your account"}</span>
                       <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
                     </span>
-                  </div>
+                  </button>
+                  {isMenuOpen && (
+                    <div className="notification-inline-actions" role="group" aria-label="Notification actions">
+                      <button type="button" className="notification-option-delete" onClick={deleteNotification}>
+                        <Trash2 size={16} /> Delete
+                      </button>
+                      <button type="button" className="notification-option-cancel" onClick={() => setNotificationMenuId(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })
