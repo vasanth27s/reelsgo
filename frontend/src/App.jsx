@@ -826,11 +826,20 @@ function App() {
     const openProfile = (event) => {
       const id = event?.detail?.id;
       if (!id) return;
-      setNotificationsOpen(false);
-      setProfileUserId(String(id));
-      setPage("user-profile");
+      const targetId = String(id);
+      const ownId = String(getUser()?._id || "");
+      setOpenConversationId(null);
+      setOpenConversationData(null);
       setMenuOpen(false);
       setSettingsOpen(false);
+      if (ownId && targetId === ownId) {
+        // A notification referring to the signed-in account must open its own profile.
+        setProfileUserId(null);
+        setPage("profile");
+      } else {
+        setProfileUserId(targetId);
+        setPage("user-profile");
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
     window.addEventListener("vk-open-profile", openProfile);
@@ -870,6 +879,12 @@ function App() {
   }
 
   const navigate = p => {
+    // Do not let a stale selected conversation keep the Messages screen active
+    // when navigating to Profile, Notifications, or another section.
+    if (p !== "messages") {
+      setOpenConversationId(null);
+      setOpenConversationData(null);
+    }
     setPage(p);
     if (p !== "user-profile" && getProfileIdFromUrl()) {
       const cleanUrl = new URL(window.location.href); cleanUrl.searchParams.delete("profile");
@@ -887,7 +902,9 @@ function App() {
 
   // The own-profile controls always open the signed-in ReelsGo profile,
   // never the currently selected chat or another user's profile.
-  const openOwnProfile = () => {
+  const openOwnProfile = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
     setOpenConversationId(null);
     setOpenConversationData(null);
     setProfileUserId(null);
@@ -955,7 +972,7 @@ function App() {
               <div><b>{user?.name}</b><span>@{user?.username}</span></div>
               <button onClick={() => setMenuOpen(false)}><X /></button>
             </div>
-            <button onClick={openOwnProfile}><User /> Profile</button>
+            <button onClick={(event) => openOwnProfile(event)}><User /> Profile</button>
             <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
             <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
             <button onClick={logout}><LogOut /> Logout</button>
@@ -1000,7 +1017,7 @@ function App() {
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
         <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={openOwnProfile} aria-label="Profile">
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={(event) => openOwnProfile(event)} aria-label="Profile">
           <Avatar user={user} size={34} />
           <span>Profile</span>
         </button>
@@ -6222,8 +6239,12 @@ function NotificationsPage() {
                   <button
                     type="button"
                     className="notification notification-card"
-                    aria-expanded={isMenuOpen}
-                    onClick={() => setNotificationMenuId(current => current === notificationId ? null : notificationId)}
+                    aria-label={`Open profile for ${n?.actor?.username || n?.actor?.name || "notification user"}`}
+                    onClick={() => {
+                      const profileActor = n._isGroupedLike ? (n._groupedActors[0] || n.actor) : n.actor;
+                      const targetProfileId = profileActor?._id || n?.actorId || n?.userId;
+                      if (targetProfileId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: String(targetProfileId) } }));
+                    }}
                   >
                     {n._isGroupedLike ? (
                       <span className="notification-avatar-stack" aria-hidden="true">
@@ -6243,6 +6264,14 @@ function NotificationsPage() {
                       <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
                     </span>
                   </button>
+                  <button
+                    type="button"
+                    className="notification-options-trigger"
+                    aria-label="Notification options"
+                    title="Notification options"
+                    aria-expanded={isMenuOpen}
+                    onClick={(event) => { event.stopPropagation(); setNotificationMenuId(current => current === notificationId ? null : notificationId); }}
+                  ><MoreHorizontal size={19} /></button>
                   {notificationType(n) === "follow" && actorId && actorId !== String(me?._id || "") && (
                     <button
                       type="button"
