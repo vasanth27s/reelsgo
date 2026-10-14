@@ -13307,3 +13307,24 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
   .notification-request-row{display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;padding:10px 0!important;gap:8px!important;}
   .notification-request-actions{grid-column:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;}
 }
+
+
+/* Notification actions: swipe only reveals the three-dot menu. Deletion always requires confirmation by menu choice. */
+.notification-swipe-shell{position:relative!important;overflow:hidden!important;width:100%!important;isolation:isolate!important;touch-action:pan-y!important;}
+.notification-swipe-reveal{position:absolute!important;z-index:0!important;right:0!important;top:0!important;bottom:0!important;width:58px!important;display:flex!important;align-items:center!important;justify-content:center!important;opacity:0!important;pointer-events:none!important;background:transparent!important;}
+.notification-swipe-shell.is-swiped .notification-swipe-reveal{opacity:1!important;pointer-events:auto!important;}
+.notification-card{position:relative!important;z-index:1!important;transform:translateX(0)!important;transition:transform .2s ease!important;touch-action:pan-y!important;}
+.notification-card.is-swiped{transform:translateX(-58px)!important;}
+.notification-more-button{width:42px!important;height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;border:0!important;border-radius:50%!important;background:#252a30!important;color:#f5f7fa!important;}
+.notification-more-button:hover{background:#343a42!important;}
+.notification-options-menu{position:absolute!important;z-index:5!important;right:5px!important;top:50%!important;transform:translateY(-50%)!important;width:142px!important;padding:5px!important;border:1px solid #343a42!important;border-radius:12px!important;background:#20252b!important;box-shadow:0 10px 28px rgba(0,0,0,.38)!important;display:flex!important;flex-direction:column!important;gap:3px!important;}
+.notification-options-menu button{width:100%!important;min-height:36px!important;display:flex!important;align-items:center!important;gap:9px!important;padding:8px 10px!important;border:0!important;border-radius:8px!important;text-align:left!important;background:transparent!important;color:#f5f7fa!important;font-size:12px!important;font-weight:650!important;}
+.notification-options-menu button:hover{background:#343a42!important;}
+.notification-options-menu .notification-option-delete{color:#ff6878!important;}
+.notification-swipe-shell.is-swiped .notification-card:hover{background:#0b0f12!important;}
+@media(max-width:700px){
+ .notification-swipe-reveal{width:52px!important;}
+ .notification-card.is-swiped{transform:translateX(-52px)!important;}
+ .notification-more-button{width:38px!important;height:38px!important;}
+ .notification-options-menu{right:2px!important;width:132px!important;}
+}
