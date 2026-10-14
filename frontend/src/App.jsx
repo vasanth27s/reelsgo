@@ -7,7 +7,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX
+  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -620,6 +620,11 @@ function CalendarDaysFallback() {
 }
 
 
+function getProfileIdFromUrl() {
+  try { return new URLSearchParams(window.location.search).get("profile") || null; }
+  catch { return null; }
+}
+
 function getSharedPostIdFromPath(pathname = window.location.pathname) {
   const match = pathname.match(/^\/post\/([^/]+)\/?$/);
   return match ? decodeURIComponent(match[1]) : null;
@@ -765,7 +770,7 @@ function App() {
   const [token, setToken] = useState(getToken());
   const [page, setPage] = useState(() => {
     const shared = getSharedRouteFromPath();
-    return shared ? `shared-${shared.type}` : "home";
+    return shared ? `shared-${shared.type}` : (getProfileIdFromUrl() ? "user-profile" : "home");
   });
   const [sharedPostId, setSharedPostId] = useState(() => getSharedPostIdFromPath());
   const [sharedReelId, setSharedReelId] = useState(() => getSharedReelIdFromPath());
@@ -775,7 +780,7 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [feedRefresh, setFeedRefresh] = useState(0);
-  const [profileUserId, setProfileUserId] = useState(null);
+  const [profileUserId, setProfileUserId] = useState(() => getProfileIdFromUrl());
   const [openConversationId, setOpenConversationId] = useState(null);
   const [openConversationData, setOpenConversationData] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
@@ -787,7 +792,9 @@ function App() {
       const reelId = getSharedReelIdFromPath();
       setSharedPostId(postId);
       setSharedReelId(reelId);
-      setPage(postId ? "shared-post" : reelId ? "shared-reel" : "home");
+      const profileId = getProfileIdFromUrl();
+      setProfileUserId(profileId);
+      setPage(postId ? "shared-post" : reelId ? "shared-reel" : profileId ? "user-profile" : "home");
     };
     window.addEventListener("popstate", syncRoute);
     return () => window.removeEventListener("popstate", syncRoute);
@@ -849,7 +856,9 @@ function App() {
     const reelId = getSharedReelIdFromPath();
     setSharedPostId(postId);
     setSharedReelId(reelId);
-    setPage(postId ? "shared-post" : reelId ? "shared-reel" : "home");
+    const profileId = getProfileIdFromUrl();
+    setProfileUserId(profileId);
+    setPage(postId ? "shared-post" : reelId ? "shared-reel" : profileId ? "user-profile" : "home");
   }
 
   function logout() {
@@ -862,6 +871,10 @@ function App() {
 
   const navigate = p => {
     setPage(p);
+    if (p !== "user-profile" && getProfileIdFromUrl()) {
+      const cleanUrl = new URL(window.location.href); cleanUrl.searchParams.delete("profile");
+      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    }
     if (p !== "user-profile") setProfileUserId(null);
     if (p !== "shared-post" && p !== "shared-reel" && getSharedRouteFromPath()) {
       window.history.pushState({}, "", "/");
@@ -2930,6 +2943,146 @@ function ConnectionsModal({ user, type, onClose }) {
   );
 }
 
+function ProfileQRCodeModal({ user, onClose }) {
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [colorIndex, setColorIndex] = useState(0);
+  const [cameraError, setCameraError] = useState("");
+  const [manualLink, setManualLink] = useState("");
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanTimerRef = useRef(null);
+  const qrColors = ["3778ff", "6c4cff", "e1306c", "111827"];
+  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || user?.username || "")}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=18&ecc=H&color=${qrColors[colorIndex]}&bgcolor=ffffff&data=${encodeURIComponent(profileUrl)}`;
+
+  function openScannedLink(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return;
+    let target;
+    try { target = new URL(raw, window.location.origin); }
+    catch { setCameraError("That does not look like a valid profile link."); return; }
+    if (!/^https?:$/.test(target.protocol)) {
+      setCameraError("Only web links can be opened.");
+      return;
+    }
+    window.location.href = target.href;
+  }
+
+  useEffect(() => {
+    if (!scannerOpen) return undefined;
+    let cancelled = false;
+    async function startScanner() {
+      setCameraError("");
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError("Camera access is not available in this browser. Paste a profile link below instead.");
+        return;
+      }
+      if (!("BarcodeDetector" in window)) {
+        setCameraError("Automatic QR scanning is not supported by this browser. Paste a profile link below instead.");
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false });
+        if (cancelled) { stream.getTracks().forEach(track => track.stop()); return; }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play().catch(() => {});
+        }
+        if (!("BarcodeDetector" in window)) return;
+        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const scan = async () => {
+          if (cancelled || !videoRef.current) return;
+          try {
+            if (videoRef.current.readyState >= 2) {
+              const codes = await detector.detect(videoRef.current);
+              if (codes?.length && codes[0]?.rawValue) { openScannedLink(codes[0].rawValue); return; }
+            }
+          } catch {}
+          scanTimerRef.current = window.setTimeout(scan, 350);
+        };
+        scan();
+      } catch (error) {
+        setCameraError(error?.name === "NotAllowedError" ? "Allow camera access to scan a QR code." : "Could not start the camera. Paste a profile link below instead.");
+      }
+    }
+    startScanner();
+    return () => {
+      cancelled = true;
+      if (scanTimerRef.current) window.clearTimeout(scanTimerRef.current);
+      if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    };
+  }, [scannerOpen]);
+
+  async function copyProfileLink() {
+    try {
+      await navigator.clipboard.writeText(profileUrl);
+      alert("Profile link copied.");
+    } catch {
+      window.prompt("Copy your profile link:", profileUrl);
+    }
+  }
+
+  async function downloadQr() {
+    try {
+      const response = await fetch(qrUrl);
+      if (!response.ok) throw new Error("QR image unavailable");
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = `${user?.username || "reelsgo-profile"}-qr.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      window.open(qrUrl, "_blank", "noopener,noreferrer");
+    }
+  }
+
+  async function shareProfile() {
+    try {
+      if (navigator.share) await navigator.share({ title: `${user?.username || "ReelsGo"}'s profile`, text: "Find me on ReelsGo", url: profileUrl });
+      else await copyProfileLink();
+    } catch (error) {
+      if (error?.name !== "AbortError") copyProfileLink();
+    }
+  }
+
+  return (
+    <div className="rg-profile-qr-overlay" role="dialog" aria-modal="true" aria-label={scannerOpen ? "Scan profile QR code" : "Share profile QR code"} onMouseDown={e => { if (e.target === e.currentTarget) scannerOpen ? setScannerOpen(false) : onClose(); }}>
+      <section className={`rg-profile-qr-screen ${scannerOpen ? "is-scanner" : ""}`}>
+        <header className="rg-profile-qr-topbar">
+          <button type="button" className="rg-qr-round-button" aria-label="Close" onClick={() => scannerOpen ? setScannerOpen(false) : onClose()}><X /></button>
+          <button type="button" className="rg-qr-colour-button" onClick={() => setColorIndex(i => (i + 1) % qrColors.length)}><Palette size={14}/> COLOUR</button>
+          <button type="button" className="rg-qr-round-button" aria-label="Open QR scanner" onClick={() => setScannerOpen(true)}><ScanLine /></button>
+        </header>
+        {scannerOpen ? (
+          <div className="rg-qr-scanner-content">
+            <h2>Scan a profile QR code</h2>
+            <p>Point your camera at a ReelsGo profile QR code.</p>
+            <div className="rg-qr-camera-frame"><video ref={videoRef} muted playsInline /><span className="rg-qr-scan-corner top-left"/><span className="rg-qr-scan-corner top-right"/><span className="rg-qr-scan-corner bottom-left"/><span className="rg-qr-scan-corner bottom-right"/></div>
+            {cameraError && <p className="rg-qr-camera-error">{cameraError}</p>}
+            <form className="rg-qr-manual-form" onSubmit={e => { e.preventDefault(); openScannedLink(manualLink); }}><input value={manualLink} onChange={e => setManualLink(e.target.value)} placeholder="Paste a profile link" aria-label="Profile link"/><button type="submit">Open profile</button></form>
+          </div>
+        ) : (
+          <div className="rg-profile-qr-content">
+            <div className="rg-profile-qr-card">
+              <div className="rg-profile-qr-image-wrap"><img src={qrUrl} alt={`QR code for ${user?.username || "your ReelsGo profile"}`} /><div className="rg-profile-qr-center-mark"><QrCode /></div></div>
+              <div className="rg-profile-qr-username">@{user?.username || "reelsgo"}</div>
+            </div>
+            <div className="rg-profile-qr-actions">
+              <button type="button" onClick={shareProfile}><Share2 /><span>Share profile</span></button>
+              <button type="button" onClick={copyProfileLink}><LinkIcon /><span>Copy link</span></button>
+              <button type="button" onClick={downloadQr}><Download /><span>Download</span></button>
+            </div>
+            <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>3 of 3</span><p>Share a link to your profile.</p></div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
 function ProfilePage({ user, setUser }) {
   const [tab, setTab] = useState("posts");
   const [posts, setPosts] = useState([]);
@@ -2942,6 +3095,7 @@ function ProfilePage({ user, setUser }) {
   const [website, setWebsite] = useState(user?.website || "");
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
+  const [shareQrOpen, setShareQrOpen] = useState(false);
 
   async function load() {
     try {
@@ -3025,6 +3179,9 @@ function ProfilePage({ user, setUser }) {
               onClick={() => setEditOpen(true)}
             >
               <Edit3 /> Edit profile
+            </button>
+            <button type="button" className="secondary rg-share-profile-trigger" onClick={() => setShareQrOpen(true)}>
+              <Share2 /> Share profile
             </button>
             <button className="icon-button profile-more">
               <MoreHorizontal />
@@ -3158,6 +3315,7 @@ function ProfilePage({ user, setUser }) {
       )}
 
       {tab === "saved" && <SavedPage embedded user={user} />}
+      {shareQrOpen && <ProfileQRCodeModal user={user} onClose={() => setShareQrOpen(false)} />}
 
       {connectionsOpen && (
         <ConnectionsModal
