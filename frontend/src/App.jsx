@@ -5811,12 +5811,12 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   value={text}
                   onChange={e => setText(e.target.value)}
                   onFocus={() => {
-                    // Let the mobile browser open its native keyboard without scrolling
-                    // the entire fixed chat page. Keep the latest messages visible instead.
+                    // Never scroll the document or call scrollIntoView when the keyboard opens.
+                    // Scroll only the message pane so the latest message stays visible.
                     window.requestAnimationFrame(() => {
                       const page = document.querySelector(".messages-page.is-mobile-chat");
                       const messages = page?.querySelector(".chat-messages.instagram-chat-messages");
-                      if (messages) messages.scrollTop = messages.scrollHeight;
+                      if (messages) messages.scrollTop = Math.max(0, messages.scrollHeight - messages.clientHeight);
                     });
                   }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}

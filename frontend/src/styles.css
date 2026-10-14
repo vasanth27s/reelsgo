@@ -13693,7 +13693,7 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .messages-page.is-mobile-chat .instagram-chat-layout { display:block !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; overflow:hidden !important; }
   .messages-page.is-mobile-chat .instagram-chat { display:flex !important; flex-direction:column !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; overflow:hidden !important; background:#080d10 !important; }
   .messages-page.is-mobile-chat .instagram-chat-head { flex:0 0 58px !important; height:58px !important; min-height:58px !important; padding:6px 10px !important; border:0 !important; background:#080d10 !important; }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1 1 auto !important; min-height:0 !important; width:100% !important; padding:12px 10px !important; margin:0 !important; border:0 !important; overflow-x:hidden !important; overflow-y:auto !important; background-color:#080d10 !important; background-image:linear-gradient(rgba(8,13,16,.42),rgba(8,13,16,.42)),var(--rg-chat-wallpaper) !important; background-size:cover !important; background-position:center !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1 1 auto !important; min-height:0 !important; width:100% !important; padding:12px 10px !important; margin:0 !important; border:0 !important; overflow-x:hidden !important; overflow-y:auto !important; background-color:#080d10 !important; background-image:var(--rg-chat-wallpaper) !important; background-size:cover !important; background-position:center center !important; background-repeat:no-repeat !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
   .messages-page.is-mobile-chat .chat-input.instagram-chat-input { position:relative !important; z-index:2 !important; display:flex !important; flex:0 0 auto !important; align-items:center !important; gap:5px !important; width:100% !important; min-width:0 !important; min-height:54px !important; height:auto !important; margin:0 !important; padding:6px 8px calc(6px + env(safe-area-inset-bottom)) !important; border:0 !important; border-radius:0 !important; background:#080d10 !important; box-shadow:none !important; box-sizing:border-box !important; }
   .messages-page.is-mobile-chat .chat-message-field { display:flex !important; flex:1 1 0 !important; min-width:0 !important; width:auto !important; }
   .messages-page.is-mobile-chat .chat-message-field > input { display:block !important; visibility:visible !important; opacity:1 !important; width:100% !important; min-width:0 !important; height:42px !important; padding:0 42px 0 13px !important; border:1px solid #262b32 !important; border-radius:22px !important; outline:none !important; background:#191e24 !important; color:#f8fafc !important; font-size:16px !important; line-height:42px !important; box-sizing:border-box !important; }
@@ -13718,5 +13718,43 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   }
   body:has(.messages-page.is-mobile-chat) {
     overflow:hidden !important;
+  }
+}
+
+
+/* Final mobile chat viewport + wallpaper fix (2026-10-14).
+   Keep the selected wallpaper visible across the entire message pane; do not
+   tint it with a dark gradient. Resize only the chat container when the keyboard opens. */
+@media (max-width:700px) {
+  .messages-page.is-mobile-chat {
+    box-sizing:border-box !important;
+    height:var(--rg-visual-viewport-height, 100dvh) !important;
+    max-height:var(--rg-visual-viewport-height, 100dvh) !important;
+    overflow:hidden !important;
+    background:#080d10 !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat,
+  .messages-page.is-mobile-chat .instagram-chat-layout {
+    box-sizing:border-box !important;
+    height:100% !important;
+    max-height:100% !important;
+    min-height:0 !important;
+  }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    background-color:#080d10 !important;
+    background-image:var(--rg-chat-wallpaper) !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+    background-attachment:scroll !important;
+  }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    flex:0 0 auto !important;
+    min-height:54px !important;
+    height:auto !important;
+    padding-bottom:max(6px, env(safe-area-inset-bottom)) !important;
+    background:#080d10 !important;
   }
 }
