@@ -5810,10 +5810,14 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                 <input
                   value={text}
                   onChange={e => setText(e.target.value)}
-                  onFocus={e => {
-                    // Only a user tap/click opens the keyboard; opening a chat never focuses this input.
-                    const input = e.currentTarget;
-                    window.requestAnimationFrame(() => input.scrollIntoView({ block: "nearest", behavior: "auto" }));
+                  onFocus={() => {
+                    // Let the mobile browser open its native keyboard without scrolling
+                    // the entire fixed chat page. Keep the latest messages visible instead.
+                    window.requestAnimationFrame(() => {
+                      const page = document.querySelector(".messages-page.is-mobile-chat");
+                      const messages = page?.querySelector(".chat-messages.instagram-chat-messages");
+                      if (messages) messages.scrollTop = messages.scrollHeight;
+                    });
                   }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Message..."
