@@ -5614,7 +5614,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))));
 
   return (
-    <div className={`page messages-page ${mobileChat && active ? "is-mobile-chat" : ""}`}>
+    <div className={`page messages-page ${active && (mobileChat || (typeof window !== "undefined" && window.innerWidth <= 700)) ? "is-mobile-chat" : ""}`}>
       <div className="messages-instagram-head">
         <div className="messages-account-title">
           <b>{me?.username || me?.name || 'Messages'}</b>

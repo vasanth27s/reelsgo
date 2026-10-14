@@ -13678,3 +13678,29 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     min-width:0;
   }
 }
+
+
+/* ReelsGo mobile direct-chat correction: no inbox search/notes/nav while a chat is open; keep the composer visible and usable. */
+@media (max-width:700px) {
+  .messages-page.is-mobile-chat .messages-instagram-head,
+  .messages-page.is-mobile-chat .messages-search-bar,
+  .messages-page.is-mobile-chat .messages-notes-section,
+  .messages-page.is-mobile-chat .conversation-list,
+  .messages-page.is-mobile-chat .bottom-nav,
+  .messages-page.is-mobile-chat .mobile-bottom-nav,
+  .messages-page.is-mobile-chat .glass-bottom-nav { display:none !important; }
+  .messages-page.is-mobile-chat { position:fixed !important; inset:0 !important; width:100vw !important; height:var(--rg-visual-viewport-height, 100dvh) !important; max-height:var(--rg-visual-viewport-height, 100dvh) !important; min-height:0 !important; padding:env(safe-area-inset-top) 0 0 !important; margin:0 !important; overflow:hidden !important; background:#080d10 !important; z-index:130 !important; }
+  .messages-page.is-mobile-chat .instagram-chat-layout { display:block !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; overflow:hidden !important; }
+  .messages-page.is-mobile-chat .instagram-chat { display:flex !important; flex-direction:column !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; overflow:hidden !important; background:#080d10 !important; }
+  .messages-page.is-mobile-chat .instagram-chat-head { flex:0 0 58px !important; height:58px !important; min-height:58px !important; padding:6px 10px !important; border:0 !important; background:#080d10 !important; }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1 1 auto !important; min-height:0 !important; width:100% !important; padding:12px 10px !important; margin:0 !important; border:0 !important; overflow-x:hidden !important; overflow-y:auto !important; background-color:#080d10 !important; background-image:linear-gradient(rgba(8,13,16,.42),rgba(8,13,16,.42)),var(--rg-chat-wallpaper) !important; background-size:cover !important; background-position:center !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input { position:relative !important; z-index:2 !important; display:flex !important; flex:0 0 auto !important; align-items:center !important; gap:5px !important; width:100% !important; min-width:0 !important; min-height:54px !important; height:auto !important; margin:0 !important; padding:6px 8px calc(6px + env(safe-area-inset-bottom)) !important; border:0 !important; border-radius:0 !important; background:#080d10 !important; box-shadow:none !important; box-sizing:border-box !important; }
+  .messages-page.is-mobile-chat .chat-message-field { display:flex !important; flex:1 1 0 !important; min-width:0 !important; width:auto !important; }
+  .messages-page.is-mobile-chat .chat-message-field > input { display:block !important; visibility:visible !important; opacity:1 !important; width:100% !important; min-width:0 !important; height:42px !important; padding:0 42px 0 13px !important; border:1px solid #262b32 !important; border-radius:22px !important; outline:none !important; background:#191e24 !important; color:#f8fafc !important; font-size:16px !important; line-height:42px !important; box-sizing:border-box !important; }
+  .messages-page.is-mobile-chat .chat-message-field > input::placeholder { color:#9aa2ad !important; opacity:1 !important; }
+  .messages-page.is-mobile-chat .chat-attach-button,
+  .messages-page.is-mobile-chat .chat-smile-button,
+  .messages-page.is-mobile-chat .chat-send-button { flex:0 0 34px !important; width:34px !important; min-width:34px !important; height:38px !important; min-height:38px !important; padding:0 !important; color:#e8edf4 !important; }
+  .messages-page.is-mobile-chat .chat-back-button { display:flex !important; flex:0 0 34px !important; }
+  .messages-page.is-mobile-chat .reelsgo-emoji-picker { z-index:10 !important; bottom:calc(100% + 6px) !important; }
+}
