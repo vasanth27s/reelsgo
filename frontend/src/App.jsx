@@ -5315,7 +5315,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     }
   }
 
-  useEffect(() => { loadConversations(); loadNotes(); loadRequests(); }, []);
+  useEffect(() => { loadConversations(); loadNotes(); }, []);
 
   // Refresh unread state and the active conversation periodically.
   // This also picks up the exact seenAt time from the server so the
@@ -5454,6 +5454,11 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   }, [openConversationId, openConversationData]);
 
   async function openConversation(c) {
+    // Opening a conversation must not trigger the mobile keyboard.
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    setEmojiOpen(false);
+    setChatCustomizeOpen(false);
+    setChatDetailsOpen(false);
     setActive({ ...c, unreadCount: 0 });
     setMobileChat(true);
     try {
@@ -5699,9 +5704,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         <div className="conversation-list instagram-conversation-list">
           <div className="conversation-list-title">
             <b>Messages</b>
-            <button className="messages-requests-button" onClick={() => { setRequestsOpen(true); loadRequests(); }}>
-              Requests {requests.length > 0 && <span>{requests.length}</span>}
-            </button>
           </div>
           {loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
             {filteredConversations.map(c => {

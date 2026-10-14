@@ -13602,3 +13602,25 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
  .rg-chat-details-profile { padding-top:12px;padding-bottom:18px; }
  .rg-chat-details-grid { gap:2px; }
 }
+
+
+/* Final chat polish: no auto-keyboard, no requests shortcut, no panel divider lines. */
+.messages-page .conversation-list-title { border:0 !important; box-shadow:none !important; }
+.messages-page .conversation-list-title .messages-requests-button { display:none !important; }
+.messages-page .instagram-chat-head { border-bottom:0 !important; box-shadow:none !important; }
+.messages-page .chat-input.instagram-chat-input { border-top:0 !important; box-shadow:none !important; }
+.messages-page .instagram-chat-layout,
+.messages-page .instagram-conversation-list,
+.messages-page .instagram-chat,
+.messages-page .instagram-chat-messages { border:0 !important; outline:0 !important; box-shadow:none !important; }
+.messages-page .conversation-item-shell + .conversation-item-shell { border-top:0 !important; }
+.rg-chat-customize-overlay { z-index:2147483000 !important; }
+.rg-chat-customize-panel { position:relative; z-index:2147483001; }
+body:has(.rg-chat-customize-overlay) .bottom-nav,
+body:has(.rg-chat-customize-overlay) .glass-bottom-nav,
+body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !important; }
+@media (max-width:700px) {
+ .messages-page.is-mobile-chat .instagram-chat-head { border-bottom:0 !important; }
+ .messages-page.is-mobile-chat .chat-input.instagram-chat-input { border-top:0 !important; }
+ .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { border:0 !important; }
+}
