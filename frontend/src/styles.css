@@ -13409,3 +13409,27 @@ body:has(.note-viewer-overlay) .mobile-bottom-nav {
 .rg-share-profile-trigger{white-space:nowrap}
 @media(min-width:701px){.rg-profile-qr-overlay{padding:0}.rg-profile-qr-screen{max-width:100%;}.rg-profile-qr-content{padding-top:20px;padding-bottom:30px}.rg-profile-qr-card{width:310px}.rg-profile-qr-actions{width:310px}}
 @media(max-width:700px){.rg-profile-qr-topbar{height:76px;padding-left:16px;padding-right:16px}.rg-profile-qr-content{padding:10px 24px 34px}.rg-profile-qr-card{width:min(100%,310px);padding:20px 17px 17px}.rg-profile-qr-image-wrap{max-width:238px}.rg-profile-qr-actions{width:min(100%,310px)}.rg-profile-qr-pagination{margin-top:14px}.rg-profile-qr-username{font-size:19px}.rg-share-profile-trigger{flex:1}}
+
+
+/* Profile actions sit below the profile details, matching the supplied reference. */
+.rg-profile-action-row{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:0 0 22px;
+  padding:0 14px;
+}
+.rg-profile-action-button{
+  min-height:42px;
+  width:100%;
+  border-radius:9px;
+  justify-content:center;
+  gap:8px;
+  white-space:nowrap;
+}
+.rg-profile-action-button svg{width:16px;height:16px;flex:none}
+@media(max-width:700px){
+  .rg-profile-action-row{padding:0 4px;margin:0 0 18px;gap:5px}
+  .rg-profile-action-button{min-height:38px;padding:8px 10px;font-size:12px}
+}

@@ -3174,15 +3174,6 @@ function ProfilePage({ user, setUser }) {
         <div className="profile-details">
           <div className="profile-line">
             <h1>{user?.username} <VerifiedBadge userId={user?._id} /></h1>
-            <button
-              className="secondary"
-              onClick={() => setEditOpen(true)}
-            >
-              <Edit3 /> Edit profile
-            </button>
-            <button type="button" className="secondary rg-share-profile-trigger" onClick={() => setShareQrOpen(true)}>
-              <Share2 /> Share profile
-            </button>
             <button className="icon-button profile-more">
               <MoreHorizontal />
             </button>
@@ -3224,6 +3215,15 @@ function ProfilePage({ user, setUser }) {
             </a>
           )}
         </div>
+      </div>
+
+      <div className="rg-profile-action-row" aria-label="Profile actions">
+        <button type="button" className="secondary rg-profile-action-button" onClick={() => setEditOpen(true)}>
+          <Edit3 /> Edit profile
+        </button>
+        <button type="button" className="secondary rg-profile-action-button rg-share-profile-trigger" onClick={() => setShareQrOpen(true)}>
+          <Share2 /> Share profile
+        </button>
       </div>
 
       <div className="profile-tabs">
