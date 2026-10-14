@@ -13704,3 +13704,19 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .messages-page.is-mobile-chat .chat-back-button { display:flex !important; flex:0 0 34px !important; }
   .messages-page.is-mobile-chat .reelsgo-emoji-picker { z-index:10 !important; bottom:calc(100% + 6px) !important; }
 }
+
+/* Hide the app-wide bottom navigation only while a mobile conversation is open.
+   The chat back button clears .is-mobile-chat, so navigation returns to the inbox. */
+@media (max-width:700px) {
+  body:has(.messages-page.is-mobile-chat) .bottom-nav,
+  body:has(.messages-page.is-mobile-chat) .glass-bottom-nav,
+  body:has(.messages-page.is-mobile-chat) .mobile-bottom-nav,
+  body:has(.messages-page.is-mobile-chat) nav[aria-label="Bottom navigation"] {
+    display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+  body:has(.messages-page.is-mobile-chat) {
+    overflow:hidden !important;
+  }
+}
