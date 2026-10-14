@@ -4964,6 +4964,10 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const emojiPickerRef = useRef(null);
   const chatGalleryInput = useRef(null);
   const [chatCustomizeOpen, setChatCustomizeOpen] = useState(false);
+  const [chatDetailsOpen, setChatDetailsOpen] = useState(false);
+  const [chatDetailsProfile, setChatDetailsProfile] = useState(null);
+  const [chatDetailsLoading, setChatDetailsLoading] = useState(false);
+  const [chatDetailsTab, setChatDetailsTab] = useState("posts");
   const [chatTheme, setChatTheme] = useState({ accent: "#c026d3", background: "" });
   const chatThemes = [
     { name: "Berry", accent: "#c026d3" },
@@ -4997,12 +5001,48 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) { alert("Choose an image file."); event.target.value = ""; return; }
-    if (file.size > 3 * 1024 * 1024) { alert("Choose an image under 3 MB for chat wallpaper."); event.target.value = ""; return; }
+    // Resize/compress the selected image before saving to localStorage. This avoids
+    // quota errors and makes gallery wallpapers persist for this conversation.
     const reader = new FileReader();
-    reader.onload = () => saveChatTheme({ ...chatTheme, background: String(reader.result || "") });
     reader.onerror = () => alert("Could not read that image. Please try another one.");
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => alert("That image could not be opened. Try another image.");
+      image.onload = () => {
+        const maxSide = 1100;
+        const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { alert("Your browser could not process that image."); return; }
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        let compressed = canvas.toDataURL("image/jpeg", 0.78);
+        if (compressed.length > 1_250_000) compressed = canvas.toDataURL("image/jpeg", 0.58);
+        saveChatTheme({ ...chatTheme, background: compressed });
+      };
+      image.src = String(reader.result || "");
+    };
     reader.readAsDataURL(file);
     event.target.value = "";
+  }
+
+  async function openChatDetails() {
+    if (!active) return;
+    setChatDetailsOpen(true);
+    setChatDetailsTab("posts");
+    setChatDetailsLoading(true);
+    setChatDetailsProfile(null);
+    const person = other(active);
+    try {
+      const data = await api(`/users/${person?._id}/profile`);
+      setChatDetailsProfile(data);
+    } catch (error) {
+      console.warn("Could not load chat profile details", error);
+      setChatDetailsProfile({ user: person, posts: [], reels: [], tagged: [] });
+    } finally {
+      setChatDetailsLoading(false);
+    }
   }
 
   useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
@@ -5702,8 +5742,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
               <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
-              <button type="button" className="chat-profile-open" onClick={() => openUserProfile(other(active)?._id)} aria-label="Open user profile"><Avatar user={other(active)} size={44} /></button>
-              <div className="chat-profile-title"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></div>
+              <button type="button" className="chat-profile-open" onClick={openChatDetails} aria-label="Open chat details"><Avatar user={other(active)} size={44} /></button>
+              <button type="button" className="chat-profile-title chat-profile-title-button" onClick={openChatDetails} aria-label="Open chat details"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></button>
               <button type="button" className="chat-customize-button" aria-label="Customize chat" title="Customize chat" onClick={() => setChatCustomizeOpen(true)}><Palette size={20} /></button>
               <div className="chat-header-options-wrap">
                 <button type="button" className="chat-header-options-button" aria-label="Conversation options" onClick={() => setConversationMenuOpen(v => !v)}><MoreHorizontal /></button>
@@ -5797,6 +5837,41 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           </>}
         </div>
       </div>
+      {chatDetailsOpen && active && (
+        <div className="rg-chat-details-screen">
+          <header className="rg-chat-details-topbar">
+            <button type="button" aria-label="Back to chat" onClick={() => setChatDetailsOpen(false)}><ChevronRight style={{ transform: "rotate(180deg)" }} /></button>
+            <div className="rg-chat-details-top-actions">
+              <button type="button" aria-label="Search messages" onClick={() => { setChatDetailsOpen(false); document.querySelector(".chat-message-field input")?.focus(); }}><Search /></button>
+              <button type="button" aria-label="Customize chat" onClick={() => { setChatDetailsOpen(false); setChatCustomizeOpen(true); }}><Settings /></button>
+            </div>
+          </header>
+          <div className="rg-chat-details-profile">
+            <Avatar user={other(active)} size={92} />
+            <h2>{chatDetailsProfile?.user?.name || other(active)?.name || other(active)?.username || "User"}</h2>
+            <p>@{other(active)?.username || "user"}</p>
+            <div className="rg-chat-details-actions">
+              <button type="button" onClick={() => { setChatDetailsOpen(false); setChatCustomizeOpen(true); }}><Palette /><span>Customise</span></button>
+              <button type="button" onClick={() => { setChatDetailsOpen(false); openUserProfile(other(active)?._id); }}><User /><span>Profile</span></button>
+              <button type="button" onClick={() => { const id = String(active?._id); setMutedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]); }}><Bell /><span>{mutedConversationIds.includes(String(active?._id)) ? "Unmute" : "Mute"}</span></button>
+            </div>
+          </div>
+          <div className="rg-chat-details-tabs" role="tablist" aria-label="Profile media">
+            <button type="button" className={chatDetailsTab === "posts" ? "active" : ""} onClick={() => setChatDetailsTab("posts")} aria-label="Posts"><Grid3X3 /></button>
+            <button type="button" className={chatDetailsTab === "reels" ? "active" : ""} onClick={() => setChatDetailsTab("reels")} aria-label="Reels"><Film /></button>
+          </div>
+          {chatDetailsLoading ? <div className="rg-chat-details-status">Loading profile…</div> : (() => {
+            const items = chatDetailsTab === "reels" ? (chatDetailsProfile?.reels || []) : (chatDetailsProfile?.posts || []);
+            return items.length ? <div className="rg-chat-details-grid">{items.map((item, index) => {
+              const raw = item.mediaUrl || item.media?.[0]?.url || item.imageUrl || "";
+              const src = raw ? (/^https?:\/\//i.test(raw) ? raw : `${SERVER}${String(raw).startsWith("/") ? "" : "/"}${raw}`) : "";
+              const video = chatDetailsTab === "reels" || item.kind === "video" || item.type === "video";
+              return <button type="button" key={item._id || index} className="rg-chat-details-tile" onClick={() => { setChatDetailsOpen(false); openUserProfile(other(active)?._id); }} aria-label="Open profile media">{src ? (video ? <video src={src} muted playsInline preload="metadata" /> : <img src={src} alt="" loading="lazy" />) : <span>{item.caption || "Post"}</span>}{video && <i><Film size={15}/></i>}</button>;
+            })}</div> : <div className="rg-chat-details-status">{chatDetailsTab === "reels" ? "No Reels to show" : "No posts to show"}</div>;
+          })()}
+        </div>
+      )}
+
       {chatCustomizeOpen && active && (
         <div className="rg-chat-customize-overlay" onClick={() => setChatCustomizeOpen(false)}>
           <section className="rg-chat-customize-panel" role="dialog" aria-modal="true" aria-label="Customize chat" onClick={e => e.stopPropagation()}>
