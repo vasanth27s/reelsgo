@@ -14439,3 +14439,165 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
  .messages-page:not(.is-mobile-chat) .instagram-chat{display:none!important;}
  .messages-page:not(.is-mobile-chat) .chat-empty-list{min-height:170px;background:transparent!important;color:#aab1bc!important;}
 }
+
+/* Final inbox correction: restore search + compose controls, keep the inbox flat black. */
+@media (max-width:700px) {
+  .messages-page:not(.is-mobile-chat) .messages-instagram-head,
+  .messages-page:not(.is-mobile-chat) .messages-search-bar {
+    display:flex !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-instagram-head {
+    height:34px !important;
+    min-height:34px !important;
+    margin:0 0 5px !important;
+    padding:0 4px !important;
+    justify-content:space-between !important;
+    background:#000 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-account-title b {
+    color:#f7f8fa !important;
+    font-size:16px !important;
+    line-height:1 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-account-chevron {
+    width:14px !important;
+    height:14px !important;
+    color:#f7f8fa !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-compose-button {
+    display:flex !important;
+    width:32px !important;
+    height:32px !important;
+    padding:0 !important;
+    color:#f7f8fa !important;
+    background:transparent !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-compose-button svg {
+    width:21px !important;
+    height:21px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-search-bar {
+    width:100% !important;
+    height:36px !important;
+    min-height:36px !important;
+    margin:0 0 7px !important;
+    padding:0 11px !important;
+    gap:8px !important;
+    border:0 !important;
+    border-radius:8px !important;
+    background:#171717 !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-search-bar > svg {
+    width:16px !important;
+    height:16px !important;
+    color:#a6a6a6 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-search-bar input {
+    color:#fff !important;
+    font-size:13px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-search-bar input::placeholder { color:#9b9b9b !important; }
+  .messages-page:not(.is-mobile-chat) .messages-notes-section {
+    background:#000 !important;
+    padding-top:0 !important;
+    padding-bottom:7px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs {
+    gap:6px !important;
+    margin:0 0 6px !important;
+    padding:0 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button {
+    height:30px !important;
+    border-radius:7px !important;
+    font-size:10px !important;
+    background:#24272b !important;
+    color:#e7e9ed !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button.active {
+    background:#f8fafc !important;
+    color:#171a1f !important;
+  }
+  .messages-page:not(.is-mobile-chat) .instagram-chat-layout,
+  .messages-page:not(.is-mobile-chat) .instagram-conversation-list,
+  .messages-page:not(.is-mobile-chat) .conversation-scroll,
+  .messages-page:not(.is-mobile-chat) .conversation-item-shell,
+  .messages-page:not(.is-mobile-chat) .conversation-item {
+    background:#000 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-item-shell {
+    min-height:62px !important;
+    height:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-item {
+    min-height:62px !important;
+    height:auto !important;
+    padding:6px 3px !important;
+    gap:10px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-item:hover,
+  .messages-page:not(.is-mobile-chat) .conversation-item.active,
+  .messages-page:not(.is-mobile-chat) .conversation-item-shell.active {
+    background:#000 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-item .avatar,
+  .messages-page:not(.is-mobile-chat) .conversation-avatar-wrap .avatar {
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    min-height:42px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-copy b,
+  .messages-page:not(.is-mobile-chat) .conversation-username {
+    color:#f5f5f5 !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-copy span,
+  .messages-page:not(.is-mobile-chat) .conversation-preview {
+    color:#9b9b9b !important;
+    font-size:10px !important;
+    line-height:1.2 !important;
+    margin-top:3px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-copy small {
+    color:#777 !important;
+    font-size:9px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .conversation-options-wrap { background:transparent !important; }
+  .messages-page:not(.is-mobile-chat) .conversation-options-button { color:#888 !important; }
+  /* Open conversation: remove grey panels and keep one seamless black canvas. */
+  .messages-page.is-mobile-chat,
+  .messages-page.is-mobile-chat .instagram-chat-layout,
+  .messages-page.is-mobile-chat .instagram-chat,
+  .messages-page.is-mobile-chat .instagram-chat-head,
+  .messages-page.is-mobile-chat .instagram-chat-messages,
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    background:#000 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
+    background-color:#000 !important;
+    background-image:none !important;
+  }
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input input {
+    background:#000 !important;
+    border:1px solid #343434 !important;
+    border-radius:22px !important;
+    color:#fff !important;
+  }
+  .messages-page.is-mobile-chat .message-line .bubble:not(.mine) {
+    background:#171717 !important;
+    color:#f5f5f5 !important;
+    border:0 !important;
+  }
+}
