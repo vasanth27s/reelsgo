@@ -14335,3 +14335,40 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .rg-pro-dashboard-group h3 { margin-left:24px !important; margin-right:24px !important; }
   .rg-pro-dashboard-row { padding-left:24px !important; padding-right:24px !important; }
 }
+
+/* Compact Professional Dashboard entry — match Edit profile / Share profile buttons. */
+.rg-pro-dashboard-entry {
+  width: 100% !important;
+  margin: 0 0 14px !important;
+  padding: 0 4px !important;
+}
+.rg-pro-dashboard-entry-button {
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 7px 11px !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  background: #eef0f3 !important;
+  color: #222 !important;
+  box-shadow: none !important;
+}
+.rg-pro-entry-icon {
+  width: 20px !important;
+  height: 20px !important;
+  color: #333 !important;
+}
+.rg-pro-entry-icon svg { width: 16px !important; height: 16px !important; }
+.rg-pro-entry-copy { gap: 0 !important; }
+.rg-pro-entry-copy b {
+  color: #222 !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+}
+.rg-pro-entry-copy small { display: none !important; }
+.rg-pro-dashboard-entry-button > svg { width: 16px !important; height: 16px !important; color: #555 !important; }
+@media (max-width:700px) {
+  .rg-pro-dashboard-entry { padding: 0 !important; margin-bottom: 12px !important; }
+  .rg-pro-dashboard-entry-button { min-height: 36px !important; height: 36px !important; padding: 6px 10px !important; }
+}
