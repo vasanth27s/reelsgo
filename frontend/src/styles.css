@@ -14372,3 +14372,30 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .rg-pro-dashboard-entry { padding: 0 !important; margin-bottom: 12px !important; }
   .rg-pro-dashboard-entry-button { min-height: 36px !important; height: 36px !important; padding: 6px 10px !important; }
 }
+
+
+/* Final targeted updates: compact grey professional dashboard card and Reel download action. */
+.rg-pro-dashboard-entry-button,
+.rg-pro-dashboard-entry-button:hover,
+.rg-pro-dashboard-entry-button:focus-visible {
+  background: #e5e7eb !important;
+  background-color: #e5e7eb !important;
+  color: #202124 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.reels-page .reels-mobile-actions button[aria-label="Download Reel"],
+.reels-page .reels-desktop-actions button[aria-label="Download Reel"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: inherit;
+}
+.reels-page .reels-mobile-actions button[aria-label="Download Reel"] small,
+.reels-page .reels-desktop-actions button[aria-label="Download Reel"] small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.1;
+}

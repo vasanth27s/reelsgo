@@ -4138,6 +4138,49 @@ function ReelsPage({ onCreate }) {
     setShareReelTarget(reel);
   }
 
+  async function downloadReel(reel) {
+    const rawUrl = reel?.mediaUrl || reel?.videoUrl || reel?.url;
+    if (!rawUrl) {
+      alert("This Reel's video is unavailable for download.");
+      return;
+    }
+
+    const mediaUrl = /^https?:\/\//i.test(rawUrl)
+      ? rawUrl
+      : `${SERVER}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+    const safeName = String(reel?.caption || reel?.author?.username || "reelsgo-reel")
+      .normalize("NFKD")
+      .replace(/[^a-zA-Z0-9-_ ]/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 70) || "reelsgo-reel";
+
+    try {
+      const response = await fetch(mediaUrl);
+      if (!response.ok) throw new Error("Download request failed");
+      const blob = await response.blob();
+      if (!blob.size) throw new Error("The video file is empty");
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = `${safeName}.mp4`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+    } catch (error) {
+      // A direct download link is a useful fallback for hosts that do not allow fetch().
+      const anchor = document.createElement("a");
+      anchor.href = mediaUrl;
+      anchor.download = `${safeName}.mp4`;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+  }
+
   async function deleteReel(reel) {
     const isOwner =
       String(reel.author?._id || reel.author) === String(me?._id);
@@ -4416,6 +4459,7 @@ function ReelsPage({ onCreate }) {
                       <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
                       <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Download Reel" onClick={() => downloadReel(r)}><Download /><small>Download</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                     </div>
@@ -4567,6 +4611,7 @@ function ReelsPage({ onCreate }) {
                       <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Download Reel" onClick={() => downloadReel(r)}><Download /><small>Download</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                       <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
                     </div>
@@ -4834,6 +4879,32 @@ function ReelViewer({ reel, onClose }) {
           <button type="button" onClick={toggleLike} className={liked ? "is-liked" : ""} aria-label={liked ? "Unlike Reel" : "Like Reel"}><Heart fill={liked ? "currentColor" : "none"}/><span>{Number(currentReel.likesCount || 0)}</span></button>
           <button type="button" onClick={openComments} aria-label="View comments"><MessageCircle/><span>{Number(currentReel.commentsCount || 0)}</span></button>
           <button type="button" onClick={shareReel} aria-label="Share Reel"><Send/><span>Share</span></button>
+          <button type="button" onClick={async () => {
+            if (!mediaSrc) { setError("This Reel's video is unavailable for download."); return; }
+            const filename = `reelsgo-${currentReel?._id || "reel"}.mp4`;
+            try {
+              const response = await fetch(mediaSrc);
+              if (!response.ok) throw new Error("Download failed");
+              const blob = await response.blob();
+              const objectUrl = URL.createObjectURL(blob);
+              const anchor = document.createElement("a");
+              anchor.href = objectUrl;
+              anchor.download = filename;
+              document.body.appendChild(anchor);
+              anchor.click();
+              anchor.remove();
+              window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+            } catch {
+              const anchor = document.createElement("a");
+              anchor.href = mediaSrc;
+              anchor.download = filename;
+              anchor.target = "_blank";
+              anchor.rel = "noopener noreferrer";
+              document.body.appendChild(anchor);
+              anchor.click();
+              anchor.remove();
+            }
+          }} aria-label="Download Reel"><Download/><span>Download</span></button>
           <button type="button" onClick={toggleSave} className={saved ? "is-saved" : ""} aria-label={saved ? "Remove saved Reel" : "Save Reel"}><Bookmark fill={saved ? "currentColor" : "none"}/><span>{saved ? "Saved" : "Save"}</span></button>
         </div>
         <div className="saved-reel-bottom-gradient" />
