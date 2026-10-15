@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import reelsGoLogo from "../image.png";
+import ProfessionalPanelDetails from "./ProfessionalPanelDetails.jsx";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
@@ -3204,6 +3205,7 @@ function ProfileQRCodeModal({ user, onClose }) {
 }
 
 function ProfilePage({ user, setUser }) {
+  const token = getToken();
   const [tab, setTab] = useState("posts");
   const [posts, setPosts] = useState([]);
   const [reels, setReels] = useState([]);
@@ -3217,15 +3219,68 @@ function ProfilePage({ user, setUser }) {
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [professionalPanel, setProfessionalPanel] = useState("");
+  const [professionalAnalytics, setProfessionalAnalytics] = useState(null);
+  const [professionalReplies, setProfessionalReplies] = useState([]);
+  const [professionalToolData, setProfessionalToolData] = useState({});
+  const [professionalLoading, setProfessionalLoading] = useState(false);
+  const [professionalActionMessage, setProfessionalActionMessage] = useState("");
+  const [savedReplyShortcut, setSavedReplyShortcut] = useState("");
+  const [savedReplyMessage, setSavedReplyMessage] = useState("");
   const isProfessional = user?.accountType === "professional";
 
-  function switchToPersonalAccount() {
+  useEffect(() => {
+    if (!professionalPanel || !token) return;
+    let cancelled = false;
+    setProfessionalActionMessage("");
+    if (["Your dashboard", "Views", "New followers", "Content you shared", "Insights"].includes(professionalPanel)) {
+      setProfessionalLoading(true);
+      api("/professional/dashboard?days=30")
+        .then(data => { if (!cancelled) setProfessionalAnalytics(data); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Analytics could not be loaded."); })
+        .finally(() => { if (!cancelled) setProfessionalLoading(false); });
+    }
+    if (professionalPanel === "Saved replies") {
+      api("/professional/saved-replies").then(data => { if (!cancelled) setProfessionalReplies(data.replies || []); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Saved replies could not be loaded."); });
+    }
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (toolSlug) api(`/professional/tools/${toolSlug}`).then(data => { if (!cancelled) setProfessionalToolData(data.data || {}); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [professionalPanel, token]);
+
+  async function switchToPersonalAccount() {
     if (!window.confirm("Switch back to a personal account? Your posts, Reels, followers, and messages will stay unchanged.")) return;
     const nextUser = { ...user, accountType: "personal" };
+    try { if (token) await api("/professional/account-type", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "personal" }) }); }
+    catch (error) { setProfessionalActionMessage(`Could not save account type on server: ${error.message}`); return; }
     setUser(nextUser);
     localStorage.setItem("vk_user", JSON.stringify(nextUser));
     localStorage.setItem("vk_account_type", "personal");
     setProfessionalPanel("");
+  }
+
+  async function saveProfessionalToolData(data) {
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (!toolSlug) return;
+    try {
+      const result = await api(`/professional/tools/${toolSlug}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data }) });
+      setProfessionalToolData(result.data || data);
+      setProfessionalActionMessage("Saved successfully.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not save changes."); }
+  }
+
+  async function createProfessionalSavedReply(event) {
+    event.preventDefault();
+    try {
+      const result = await api("/professional/saved-replies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shortcut: savedReplyShortcut, message: savedReplyMessage }) });
+      setProfessionalReplies(current => [result.reply, ...current]);
+      setSavedReplyShortcut(""); setSavedReplyMessage(""); setProfessionalActionMessage("Saved reply created.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not create saved reply."); }
+  }
+
+  async function deleteProfessionalSavedReply(id) {
+    try { await api(`/professional/saved-replies/${id}`, { method: "DELETE" }); setProfessionalReplies(current => current.filter(reply => reply._id !== id)); setProfessionalActionMessage("Saved reply deleted."); }
+    catch (error) { setProfessionalActionMessage(error.message || "Could not delete saved reply."); }
   }
 
   async function load() {
@@ -3363,8 +3418,9 @@ function ProfilePage({ user, setUser }) {
       {isProfessional && (
         <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
           <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
-            <span className="rg-pro-entry-copy"><b>Your dashboard</b><small><span className="rg-pro-entry-trend">↗</span> {posts.length + reels.length} views in the last 30 days.</small></span>
-            <ChevronRight size={18} />
+            <span className="rg-pro-entry-icon"><SlidersHorizontal size={19} /></span>
+            <span className="rg-pro-entry-copy"><b>Professional dashboard</b><small>Insights, tools and resources</small></span>
+            <ChevronRight size={19} />
           </button>
           {professionalPanel && (
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
@@ -3377,15 +3433,15 @@ function ProfilePage({ user, setUser }) {
                 {professionalPanel === "Your dashboard" ? <>
                   <div className="rg-pro-dashboard-scroll">
                     <div className="rg-pro-dashboard-group">
-                      <h3>Insights <small>15 Sep–14 Oct</small></h3>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {posts.length + reels.length}</b><ChevronRight size={17}/></button>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{user?.followersCount || 0}</b><ChevronRight size={17}/></button>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{posts.length + reels.length}</b><ChevronRight size={17}/></button>
+                      <h3>Insights <small>Last 30 days</small></h3>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {professionalAnalytics?.summary?.views ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{professionalAnalytics?.summary?.netFollowers ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{professionalAnalytics?.summary?.contentShared ?? (posts.length + reels.length)}</b><ChevronRight size={17}/></button>
                     </div>
                     <div className="rg-pro-dashboard-group">
                       <h3>Your tools <button type="button" onClick={() => setProfessionalPanel("All tools")}>See all</button></h3>
                       {[
-                        ["Monthly recap","See what you made happen last month.","◷","New"], ["Best practices","Tips to help create, grow and thrive.","◇","New"], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧","New"], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷","New"], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""]
+                        ["Monthly recap","See what you made happen last month.","◷",""], ["Best practices","Tips to help create, grow and thrive.","◇",""], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧",""], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷",""], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""], ["Account status","Review account restrictions and recommendation eligibility.","✓",""]
                       ].map(([label,desc,ico,badge]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b>{label === "Monthly recap" || label === "Saved replies" ? <small>{desc}</small> : null}</span>{badge ? <em>{badge}</em> : null}<ChevronRight size={17}/></button>)}
                     </div>
                     <div className="rg-pro-dashboard-group">
@@ -3396,16 +3452,26 @@ function ProfilePage({ user, setUser }) {
                     <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
                   </div>
                 </> : <>
-                  {["Views","Insights","New followers","Content you shared"].includes(professionalPanel) ? <>
-                    <p>Performance overview for your ReelsGo account.</p>
-                    <div className="rg-pro-detail-stats"><div><b>{posts.length + reels.length}</b><small>Content shared</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div><div><b>{reels.length}</b><small>Reels</small></div></div>
-                    <p className="rg-pro-detail-note">Detailed reach, impressions and audience analytics require the corresponding backend analytics data.</p>
-                  </> : <>
-                    <p>{({"Monthly recap":"Review a summary of your recent posts, Reels and audience activity.","Best practices":"Explore guidance for creation, engagement, reach and monetization.","Inspiration":"Find content ideas and creative inspiration for your next post.","Branded content":"Manage paid partnership labels and creator approvals. Some features require eligibility.","Affiliate programmes":"Affiliate connections and commissions require a supported partner integration.","Partnership ads":"Review partner permissions and promotion settings. Ad delivery requires an advertising integration.","Ad tools":"Prepare a promotion for a post or Reel. Campaign creation requires an ad-service integration.","Trial reels":"Trial Reels let you test content with non-followers when supported by the app.","Payouts":"Payout details, transactions and tax forms require a configured payout provider.","Gifts":"Gift availability and earnings depend on account eligibility and a payout setup.","Saved replies":"Create reusable answers for common messages. Saved replies are a local interface feature in this version.","Trending audio":"Discover trending audio to inspire your Reels.","Other helpful resources":"Find resources for creators, comment management and account safety.","All tools":"All professional tools available in ReelsGo are listed on the dashboard.","Dashboard settings":"Manage professional dashboard preferences and account tools."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p>
-                    <div className="rg-pro-detail-note">Your existing posts, Reels, followers and messages remain unchanged. External ad, affiliate, payout and platform-only features need their respective service integrations.</div>
-                  </>}
+                  <ProfessionalPanelDetails
+                    panel={professionalPanel}
+                    analytics={professionalAnalytics}
+                    loading={professionalLoading}
+                    user={user}
+                    toolData={professionalToolData}
+                    setToolData={setProfessionalToolData}
+                    saveToolData={saveProfessionalToolData}
+                    replies={professionalReplies}
+                    createSavedReply={createProfessionalSavedReply}
+                    deleteSavedReply={deleteProfessionalSavedReply}
+                    savedReplyShortcut={savedReplyShortcut}
+                    setSavedReplyShortcut={setSavedReplyShortcut}
+                    savedReplyMessage={savedReplyMessage}
+                    setSavedReplyMessage={setSavedReplyMessage}
+                    actionMessage={professionalActionMessage}
+                  />
                 </>}
-                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>}
+                {professionalActionMessage && <p className="rg-pro-detail-note" role="status">{professionalActionMessage}</p>}
+                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")}>Back to dashboard</button>}
               </section>
             </div>
           )}
@@ -3531,11 +3597,17 @@ function ProfilePage({ user, setUser }) {
           onSwitchPersonal={switchToPersonalAccount}
           onSwitchProfessional={(details) => {
             const nextUser = { ...user, isPrivate: false, accountType: "professional", professionalProfile: details };
-            setIsPrivate(false);
-            setUser(nextUser);
-            localStorage.setItem("vk_user", JSON.stringify(nextUser));
-            localStorage.setItem("vk_account_type", "professional");
-            localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+            const saveProfile = async () => {
+              try {
+                await api("/professional/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "professional", category: details.category, showCategory: details.contact?.showCategory !== false, contact: details.contact || {} }) });
+                setIsPrivate(false);
+                setUser(nextUser);
+                localStorage.setItem("vk_user", JSON.stringify(nextUser));
+                localStorage.setItem("vk_account_type", "professional");
+                localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+              } catch (error) { alert(`Could not save professional account settings: ${error.message}`); }
+            };
+            return saveProfile();
           }}
         />
       )}
@@ -3820,7 +3892,7 @@ function EditProfilePage({
                     </div>
                   </main>
                   <footer className="pro-ig-footer pro-ig-category-footer">
-                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={async () => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { await onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
                     <p>Switching makes your profile public and all of your content can appear in search engines. <span>Learn how to manage</span></p>
                   </footer>
                 </>
@@ -4667,6 +4739,11 @@ function ReelViewer({ reel, onClose }) {
     setLiked(Boolean(reel?.likedByMe || reel?.isLiked));
     setSaved(true);
     setPlaying(true);
+    if (reel?._id && getToken()) {
+      const event = { contentId: String(reel._id), contentType: "reel" };
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "impression" }) }).catch(() => {});
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "view" }) }).catch(() => {});
+    }
   }, [reel]);
 
   async function toggleLike() {
@@ -4674,6 +4751,7 @@ function ReelViewer({ reel, onClose }) {
       const result = await api(`/reels/${currentReel._id}/like`, { method: "POST" });
       setLiked(Boolean(result.liked));
       setCurrentReel(item => ({ ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }));
+      if (result.liked) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "like" }) }).catch(() => {});
     } catch (e) { setError(e.message || "Could not like this Reel."); }
   }
 
@@ -4682,6 +4760,7 @@ function ReelViewer({ reel, onClose }) {
       const result = await api(`/reels/${currentReel._id}/save`, { method: "POST" });
       setSaved(Boolean(result.saved));
       setCurrentReel(item => ({ ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }));
+      if (result.saved) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "save" }) }).catch(() => {});
       window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
       if (!result.saved) setError("Removed from Saved.");
     } catch (e) { setError(e.message || "Could not update saved status."); }

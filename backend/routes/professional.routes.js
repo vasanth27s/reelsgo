@@ -54,16 +54,16 @@ router.get("/dashboard", async (req, res, next) => {
         { $match: { owner, createdAt: { $gte: since } } },
         { $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          views: { $sum: { $cond: [{ $in: ["$type", ["view", "impression"]] }, 1, 0] } },
+          views: { $sum: { $cond: [{ $eq: ["$type", "view"] }, 1, 0] } },
           interactions: { $sum: { $cond: [{ $in: ["$type", ["like", "comment", "share", "save"]] }, 1, 0] } }
         } },
         { $sort: { _id: 1 } }
       ]),
-      Event.aggregate([{ $match: { owner, createdAt: { $gte: since }, contentId: { $ne: null } } }, { $group: { _id: { contentId: "$contentId", contentType: "$contentType" }, views: { $sum: { $cond: [{ $in: ["$type", ["view", "impression"]] }, 1, 0] } }, likes: { $sum: { $cond: [{ $eq: ["$type", "like"] }, 1, 0] } }, comments: { $sum: { $cond: [{ $eq: ["$type", "comment"] }, 1, 0] } }, shares: { $sum: { $cond: [{ $eq: ["$type", "share"] }, 1, 0] } }, saves: { $sum: { $cond: [{ $eq: ["$type", "save"] }, 1, 0] } } } }, { $sort: { views: -1 } }, { $limit: 20 }]),
+      Event.aggregate([{ $match: { owner, createdAt: { $gte: since }, contentId: { $ne: null } } }, { $group: { _id: { contentId: "$contentId", contentType: "$contentType" }, views: { $sum: { $cond: [{ $eq: ["$type", "view"] }, 1, 0] } }, likes: { $sum: { $cond: [{ $eq: ["$type", "like"] }, 1, 0] } }, comments: { $sum: { $cond: [{ $eq: ["$type", "comment"] }, 1, 0] } }, shares: { $sum: { $cond: [{ $eq: ["$type", "share"] }, 1, 0] } }, saves: { $sum: { $cond: [{ $eq: ["$type", "save"] }, 1, 0] } } } }, { $sort: { views: -1 } }, { $limit: 20 }]),
       ProfessionalSettings.findOne({ user: owner }).lean()
     ]);
     const totals = Object.fromEntries(eventTotals.map(x => [x._id, { count: x.count, uniqueActors: x.uniqueActors.filter(Boolean).length }]));
-    const views = (totals.view?.count || 0) + (totals.impression?.count || 0);
+    const views = totals.view?.count || 0;
     const interactions = ["like", "comment", "share", "save"].reduce((n, key) => n + (totals[key]?.count || 0), 0);
     res.json({
       range: { days, from: since.toISOString(), to: new Date().toISOString() },
@@ -79,18 +79,22 @@ router.post("/events", async (req, res, next) => {
     const { type, contentId, contentType = "other" } = req.body || {};
     if (!allowedEvents.has(type)) return res.status(400).json({ message: "Unsupported analytics event type" });
     let ownerId = null;
-    if (contentId && mongoose.isValidObjectId(contentId)) {
+    let resolvedContentType = contentType;
+    if (contentId) {
+      if (!mongoose.isValidObjectId(contentId)) return res.status(400).json({ message: "Invalid contentId" });
       if (contentType === "post") ownerId = (await Post.findById(contentId).select("author"))?.author;
       else if (contentType === "reel") ownerId = (await Reel.findById(contentId).select("author"))?.author;
       else return res.status(400).json({ message: "contentType must be post or reel when contentId is supplied" });
       if (!ownerId) return res.status(404).json({ message: "Content not found" });
-    } else if (type === "profile_visit" && mongoose.isValidObjectId(req.body.ownerId)) {
+    } else if (["profile_visit", "follow", "unfollow"].includes(type) && mongoose.isValidObjectId(req.body.ownerId)) {
       ownerId = req.body.ownerId;
+      resolvedContentType = "profile";
+      if (!(await User.exists({ _id: ownerId }))) return res.status(404).json({ message: "Profile owner not found" });
     } else {
-      return res.status(400).json({ message: "Provide a valid post/reel contentId, or ownerId for profile_visit" });
+      return res.status(400).json({ message: "Provide a valid post/reel contentId, or ownerId for profile_visit/follow/unfollow" });
     }
     if (String(ownerId) === String(req.user.id) && ["view", "impression", "profile_visit"].includes(type)) return res.status(200).json({ ok: true, ignoredSelfView: true });
-    await Event.create({ owner: ownerId, actor: req.user.id, contentId: contentId || null, contentType, type });
+    await Event.create({ owner: ownerId, actor: req.user.id, contentId: contentId || null, contentType: resolvedContentType, type }); 
     res.status(201).json({ ok: true });
   } catch (error) { next(error); }
 });
