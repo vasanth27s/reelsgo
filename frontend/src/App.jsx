@@ -5282,6 +5282,12 @@ function SharedMediaMessage({ text }) {
 function MessagesPage({ openConversationId = null, openConversationData = null }) {
   const me = getUser();
   const [conversations, setConversations] = useState([]);
+  const [inboxTab, setInboxTab] = useState(() => {
+    try { return localStorage.getItem("reelsgo_inbox_tab") || "Primary"; } catch { return "Primary"; }
+  });
+  const [conversationFolders, setConversationFolders] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_conversation_folders") || "{}"); } catch { return {}; }
+  });
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notes, setNotes] = useState([]);
@@ -5427,6 +5433,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
 
   useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
   useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_conversation_folders", JSON.stringify(conversationFolders)); } catch {} }, [conversationFolders]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_inbox_tab", inboxTab); } catch {} }, [inboxTab]);
 
   function cancelConversationLongPress() {
     if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
@@ -5456,6 +5464,9 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     if (action === "unread") {
       setConversations(prev => prev.map(c => String(c._id) === id ? { ...c, unreadCount: Math.max(1, Number(c.unreadCount || 0)) } : c));
       if (String(active?._id) === id) setActive(prev => prev ? { ...prev, unreadCount: 1 } : prev);
+    } else if (action === "primary" || action === "general") {
+      setConversationFolders(prev => ({ ...prev, [id]: action === "general" ? "General" : "Primary" }));
+      setInboxTab(action === "general" ? "General" : "Primary");
     } else if (action === "pin") {
       setPinnedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev]);
     } else if (action === "mute") {
@@ -5999,9 +6010,12 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const otherNotes = notes.filter(n => String(n.author?._id) !== String(me?._id));
   const filteredConversations = conversations.filter(c => {
     const q = conversationQuery.trim().toLowerCase();
-    if (!q) return true;
-    const u = other(c);
-    return String(u?.username || '').toLowerCase().includes(q) || String(u?.name || '').toLowerCase().includes(q);
+    if (q) {
+      const u = other(c);
+      if (!String(u?.username || '').toLowerCase().includes(q) && !String(u?.name || '').toLowerCase().includes(q)) return false;
+    }
+    const folder = conversationFolders[String(c._id)] || "Primary";
+    return inboxTab === "Requests" ? false : folder === inboxTab;
   }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))));
 
   return (
@@ -6110,12 +6124,16 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         )}
       </div></div>}
 
+      {!active && <div className="messages-inbox-tabs" role="tablist" aria-label="Message folders">
+        {["Primary", "General", "Requests"].map(tab => <button type="button" key={tab} role="tab" aria-selected={inboxTab === tab} className={inboxTab === tab ? "active" : ""} onClick={() => setInboxTab(tab)}>{tab}{tab === "Requests" && requests.length > 0 ? <span>{requests.length}</span> : null}</button>)}
+      </div>}
+
       <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`} style={{ "--rg-chat-accent": chatTheme.accent, "--rg-chat-wallpaper": chatTheme.background ? `url("${chatTheme.background}")` : "none" }}>
         <div className="conversation-list instagram-conversation-list">
           <div className="conversation-list-title">
-            <b>Messages</b>
+            <b>{inboxTab === "Requests" ? "Message requests" : inboxTab}</b>
           </div>
-          {loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
+          {inboxTab === "Requests" ? (requests.length ? <div className="conversation-scroll">{requests.map(r => { const u = r.follower || r.requester || r.actor || {}; return <div className="conversation-item-shell" key={r._id}><div className="conversation-item"><div className="conversation-avatar-wrap"><Avatar user={u} size={52}/></div><div className="conversation-copy"><b>{u.username || u.name || "User"}</b><span className="conversation-preview">wants to follow you</span></div><div className="request-actions"><button type="button" className="request-accept-btn" onClick={() => acceptFollowRequest(r._id)}>Accept</button><button type="button" className="request-reject-btn" onClick={() => declineFollowRequest(r._id)}>Delete</button></div></div></div>; })}</div> : <div className="chat-empty-list"><MessageCircle/><b>No requests</b><span>New requests will appear here.</span></div>) : loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
             {filteredConversations.map(c => {
               const u = other(c); const selected = String(active?._id) === String(c._id);
               const unread = Number(c.unreadCount || 0) > 0;
@@ -6143,7 +6161,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                 </button>
                 <div className="conversation-options-wrap">
                   <button type="button" className="conversation-options-button" aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`} onClick={() => { setConversationMenuId(v => v === String(c._id) ? null : String(c._id)); setConversationMenuOpen(false); }}><MoreHorizontal size={19} /></button>
-                  {conversationMenuId === String(c._id) && !mobileConversationActions && <div className="conversation-options-menu"><button type="button" onClick={() => runConversationAction('unread', c)}><Mail size={17}/>Mark as unread</button><button type="button" onClick={() => runConversationAction('pin', c)}><PinOff size={17}/>{pinnedConversationIds.includes(String(c._id)) ? 'Unpin' : 'Pin'}</button><button type="button" onClick={() => runConversationAction('mute', c)}><Bell size={17}/>{mutedConversationIds.includes(String(c._id)) ? 'Unmute' : 'Mute'}</button><button className="conversation-delete-action" type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={17}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete'}</button></div>}
+                  {conversationMenuId === String(c._id) && !mobileConversationActions && <div className="conversation-options-menu"><button type="button" onClick={() => runConversationAction('primary', c)}><Mail size={17}/>Move to Primary</button><button type="button" onClick={() => runConversationAction('general', c)}><Mail size={17}/>Move to General</button><button type="button" onClick={() => runConversationAction('unread', c)}><Mail size={17}/>Mark as unread</button><button type="button" onClick={() => runConversationAction('pin', c)}><PinOff size={17}/>{pinnedConversationIds.includes(String(c._id)) ? 'Unpin' : 'Pin'}</button><button type="button" onClick={() => runConversationAction('mute', c)}><Bell size={17}/>{mutedConversationIds.includes(String(c._id)) ? 'Unmute' : 'Mute'}</button><button className="conversation-delete-action" type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={17}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete'}</button></div>}
                 </div>
               </div>;
             })}
@@ -6329,6 +6347,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           <section className="mobile-conversation-action-sheet" role="dialog" aria-modal="true" aria-label="Conversation actions" onClick={e => e.stopPropagation()}>
             <div className="mobile-action-sheet-handle" />
             <div className="mobile-action-sheet-user"><Avatar user={other(mobileConversationActions)} size={42} /><div><b>{other(mobileConversationActions)?.username ? `@${other(mobileConversationActions).username}` : other(mobileConversationActions)?.name || 'Conversation'}</b><span>Conversation options</span></div></div>
+            <button type="button" onClick={() => runConversationAction('primary', mobileConversationActions)}><Mail size={22}/><span>Move to Primary</span></button>
+            <button type="button" onClick={() => runConversationAction('general', mobileConversationActions)}><Mail size={22}/><span>Move to General</span></button>
             <button type="button" onClick={() => runConversationAction('unread', mobileConversationActions)}><Mail size={22}/><span>Mark as unread</span></button>
             <button type="button" onClick={() => runConversationAction('pin', mobileConversationActions)}><PinOff size={22}/><span>{pinnedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unpin' : 'Pin'}</span></button>
             <button type="button" onClick={() => runConversationAction('mute', mobileConversationActions)}><Bell size={22}/><span>{mutedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unmute' : 'Mute'}</span></button>

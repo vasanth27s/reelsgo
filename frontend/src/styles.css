@@ -14410,3 +14410,32 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   font-size: 10px;
   line-height: 1.1;
 }
+
+
+/* Messages inbox layout: Instagram-inspired Notes + Primary/General/Requests tabs. */
+.messages-inbox-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 12px;padding:0 2px;}
+.messages-inbox-tabs button{height:38px;border-radius:9px;background:#24292e;color:#e7e9ed;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;}
+.messages-inbox-tabs button.active{background:#f8fafc;color:#171a1f;}
+.messages-inbox-tabs button span{display:inline-flex;min-width:18px;height:18px;padding:0 5px;align-items:center;justify-content:center;border-radius:999px;background:#ed4956;color:#fff;font-size:10px;}
+@media(max-width:700px){
+ .messages-page:not(.is-mobile-chat){width:100%!important;max-width:none!important;min-height:calc(100dvh - 68px);padding:8px 10px 80px!important;margin:0!important;background:#080d10!important;color:#f7f8fa!important;}
+ .messages-page:not(.is-mobile-chat) .messages-instagram-head,.messages-page:not(.is-mobile-chat) .messages-search-bar{display:none!important;}
+ .messages-page:not(.is-mobile-chat) .messages-notes-section{background:transparent!important;border:0!important;border-radius:0!important;padding:0 0 10px!important;margin:0!important;}
+ .messages-page:not(.is-mobile-chat) .messages-notes-header{display:none!important;}
+ .messages-page:not(.is-mobile-chat) .messages-notes-scroll{gap:14px;padding:0 2px 4px!important;}
+ .messages-page:not(.is-mobile-chat) .message-note-card{min-width:82px!important;width:82px!important;color:#e9edf2!important;}
+ .messages-page:not(.is-mobile-chat) .message-note-card>span{color:#aab1bc!important;}
+ .messages-page:not(.is-mobile-chat) .messages-inbox-tabs{margin-top:2px;margin-bottom:9px;gap:7px;}
+ .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button{height:36px;font-size:11px;}
+ .messages-page:not(.is-mobile-chat) .instagram-chat-layout{display:block!important;min-height:0!important;height:auto!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important;}
+ .messages-page:not(.is-mobile-chat) .instagram-conversation-list{display:flex!important;width:100%!important;min-width:0!important;border:0!important;background:transparent!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-list-title{display:none!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-scroll{max-height:none!important;overflow:visible!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-item-shell{background:transparent!important;border:0!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-item{min-height:64px!important;padding:9px 3px!important;background:transparent!important;color:#f7f8fa!important;border:0!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-copy b,.messages-page:not(.is-mobile-chat) .conversation-username{color:#f7f8fa!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-preview,.messages-page:not(.is-mobile-chat) .conversation-copy small{color:#9ea6b2!important;}
+ .messages-page:not(.is-mobile-chat) .conversation-options-button{color:#aab1bc!important;}
+ .messages-page:not(.is-mobile-chat) .instagram-chat{display:none!important;}
+ .messages-page:not(.is-mobile-chat) .chat-empty-list{min-height:170px;background:transparent!important;color:#aab1bc!important;}
+}
