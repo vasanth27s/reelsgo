@@ -14601,3 +14601,36 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     border:0 !important;
   }
 }
+
+
+/* Final requested inbox colour fix: keep the entire messages screen pure black.
+   Only the Primary / General / Requests tab buttons retain their existing colours. */
+@media (max-width:700px) {
+  body:has(.messages-page:not(.is-mobile-chat)),
+  .app:has(.messages-page:not(.is-mobile-chat)),
+  .main:has(.messages-page:not(.is-mobile-chat)),
+  .page:has(.messages-page:not(.is-mobile-chat)),
+  .messages-page:not(.is-mobile-chat),
+  .messages-page:not(.is-mobile-chat) > *,
+  .messages-page:not(.is-mobile-chat) .messages-notes-section,
+  .messages-page:not(.is-mobile-chat) .messages-notes-scroll,
+  .messages-page:not(.is-mobile-chat) .instagram-chat-layout,
+  .messages-page:not(.is-mobile-chat) .instagram-conversation-list,
+  .messages-page:not(.is-mobile-chat) .conversation-scroll,
+  .messages-page:not(.is-mobile-chat) .conversation-item-shell,
+  .messages-page:not(.is-mobile-chat) .conversation-item,
+  .messages-page:not(.is-mobile-chat) .chat-empty-list {
+    background-color:#000 !important;
+    background-image:none !important;
+    box-shadow:none !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-search-bar {
+    background:#171717 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button {
+    background:#24272b !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button.active {
+    background:#f8fafc !important;
+  }
+}
