@@ -966,12 +966,26 @@ function App() {
         </div>
       </aside>
 
-      <header className="mobile-header">
-        <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
-        <div className="mobile-header-actions">
-          <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
-          <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
-        </div>
+      <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""}`}>
+        {page === "home" ? (
+          <>
+            <button className="mobile-home-create" onClick={() => setCreateOpen(true)} aria-label="Create a post"><PlusSquare /></button>
+            <button className="mobile-brand mobile-brand-centered" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
+            <div className="mobile-header-actions">
+              <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
+              <button onClick={() => setCreateOpen(true)} aria-label="Create post"><PlusSquare /></button>
+              <button onClick={() => setMenuOpen(true)} aria-label="More options"><Menu /></button>
+            </div>
+          </>
+        ) : (
+          <>
+            <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
+            <div className="mobile-header-actions">
+              <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
+              <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
+            </div>
+          </>
+        )}
       </header>
 
       {menuOpen && (
@@ -1539,6 +1553,8 @@ function Post({ post, user, onDeleted }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsError, setCommentsError] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1572,18 +1588,22 @@ function Post({ post, user, onDeleted }) {
 
   async function openLikedUsers() {
     setLikedUsersOpen(true); setLikedUsersLoading(true); setLikedUsersError(""); setLikedUsers([]);
-    try { const data = await api(`/posts/${post._id}/likes`); setLikedUsers(Array.isArray(data.users) ? data.users : []); }
+    try { const data = await api(`/posts/${post._id}/likes`); setLikedUsers(Array.isArray(data.users) ? data.users : Array.isArray(data.likes) ? data.likes : []); }
     catch (error) { setLikedUsersError(error?.message || "Could not load likes."); }
     finally { setLikedUsersLoading(false); }
   }
 
   async function loadComments() {
+    setShowComments(true);
+    setCommentsLoading(true);
+    setCommentsError("");
     try {
       const d = await api(`/posts/${post._id}/comments`);
-      setComments(d.comments || []);
-      setShowComments(true);
+      setComments(Array.isArray(d.comments) ? d.comments : []);
     } catch (e) {
-      alert(e.message);
+      setCommentsError(e?.message || "Could not load comments.");
+    } finally {
+      setCommentsLoading(false);
     }
   }
 
@@ -1598,7 +1618,7 @@ function Post({ post, user, onDeleted }) {
       setText("");
       await loadComments();
     } catch (e) {
-      alert(e.message);
+      setCommentsError(e?.message || "Could not post comment.");
     }
   }
 
@@ -1816,40 +1836,36 @@ function Post({ post, user, onDeleted }) {
             View all comments
           </button>
 
-          {showComments && (
-            <div className="comments">
-              {comments.map(c => (
-                <div className="comment" key={c._id}>
-                  <Avatar user={c.author} size={28} />
-                  <div>
-                    <UserLink user={c.author} />
-                    <span>{c.text}</span>
-                  </div>
-                </div>
-              ))}
 
-              {!post.commentsDisabled && (
-                <div className="comment-input">
-                  <input
-                    value={text}
-                    onChange={e => setText(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        comment();
-                      }
-                    }}
-                    placeholder="Add a comment..."
-                  />
-                  <button onClick={comment} type="button">
-                    Post
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </article>
+
+      {likedUsersOpen && (
+        <div className="post-likes-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
+          <section className="post-likes-sheet" role="dialog" aria-modal="true" aria-label="People who liked this post">
+            <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikedUsersOpen(false)}><X /></button></header>
+            <div className="post-likes-sheet-list">
+              {likedUsersLoading ? <p className="post-sheet-status">Loading likes…</p> : likedUsersError ? <p className="post-sheet-status">{likedUsersError}</p> : likedUsers.length ? likedUsers.map((person, index) => {
+                const likedUser = person?.user || person?.author || person;
+                const personId = likedUser?._id || `liked-${index}`;
+                return <div className="post-likes-user-row" key={personId}><Avatar user={likedUser} size={44} /><div><UserLink user={likedUser} /><small>{likedUser?.name || "ReelsGo user"}</small></div></div>;
+              }) : <p className="post-sheet-status">No likes to show yet.</p>}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {showComments && (
+        <div className="post-comments-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
+          <section className="post-comments-sheet" role="dialog" aria-modal="true" aria-label="Comments">
+            <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Comments</h2><button type="button" className="post-comments-send" aria-label="Share post" onClick={() => { setShowComments(false); setShareOpen(true); }}><Send /></button></header>
+            <div className="post-comments-sheet-list">
+              {commentsLoading ? <p className="post-sheet-status">Loading comments…</p> : commentsError ? <p className="post-sheet-status">{commentsError}</p> : comments.length ? comments.map((c, index) => <div className="post-comment-row" key={c._id || `comment-${index}`}><Avatar user={c.author} size={38} /><div className="post-comment-copy"><div><UserLink user={c.author} /><span>{c.text}</span></div><small>Reply · Like</small></div></div>) : <div className="post-comments-empty"><b>No comments yet</b><span>Start the conversation.</span></div>}
+            </div>
+            {!post.commentsDisabled && <div className="post-comment-composer-wrap"><div className="post-comment-emoji-row">{["❤️","🙌","🔥","👏","😢","😍","😮","😂"].map(emoji => <button type="button" key={emoji} onClick={() => setText(value => value + emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div><div className="post-comment-composer"><Avatar user={user} size={36} /><input value={text} onChange={event => setText(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); comment(); } }} placeholder={`Add a comment for ${post.author?.username || post.author?.name || "this post"}…`} aria-label="Add a comment"/><button type="button" className="post-comment-gif" onClick={() => setText(value => value + " GIF ")} aria-label="Add GIF">GIF</button><button type="button" className="post-comment-submit" onClick={comment} disabled={!text.trim() || commentsLoading}>Post</button></div></div>}
+          </section>
+        </div>
+      )}
 
       {shareOpen && (
         <ShareSheet
