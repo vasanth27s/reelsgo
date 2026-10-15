@@ -14214,3 +14214,124 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
  .rg-pro-daily-list>div span:last-child{grid-column:2}
  .rg-pro-content-performance article{align-items:flex-start;flex-direction:column}
 }
+
+
+/* FINAL professional dashboard layout correction: compact profile card + true full-screen page. */
+.rg-pro-dashboard-entry {
+  display: block !important;
+  width: 100% !important;
+  margin: 10px 0 14px !important;
+  padding: 0 !important;
+  order: 3;
+}
+.rg-pro-dashboard-entry-button {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-height: 60px !important;
+  padding: 11px 14px !important;
+  border: 1px solid #dedfe2 !important;
+  border-radius: 10px !important;
+  background: #eeeeef !important;
+  color: #202124 !important;
+  text-align: left !important;
+  box-shadow: none !important;
+}
+.rg-pro-entry-copy { display:flex !important; flex:1 !important; min-width:0 !important; flex-direction:column !important; gap:4px !important; }
+.rg-pro-entry-copy b { color:#202124 !important; font-size:14px !important; font-weight:700 !important; }
+.rg-pro-entry-copy small { color:#656970 !important; font-size:11px !important; line-height:1.35 !important; }
+.rg-pro-dashboard-entry-button > svg { color:#646970 !important; flex:none !important; }
+.rg-pro-detail-backdrop {
+  position:fixed !important;
+  inset:0 !important;
+  z-index:10070 !important;
+  display:block !important;
+  width:100vw !important;
+  height:100dvh !important;
+  max-width:none !important;
+  max-height:none !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  background:#0b0f12 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+.rg-pro-dashboard-sheet {
+  position:relative !important;
+  inset:auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  width:100vw !important;
+  max-width:none !important;
+  height:100dvh !important;
+  max-height:100dvh !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:calc(8px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom) !important;
+  overflow:hidden !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:#0b0f12 !important;
+  color:#f5f5f5 !important;
+}
+.rg-pro-sheet-header {
+  display:grid !important;
+  grid-template-columns:42px minmax(0,1fr) 42px !important;
+  align-items:center !important;
+  gap:8px !important;
+  flex:none !important;
+  min-height:54px !important;
+  margin:0 !important;
+  padding:2px 12px 9px !important;
+  border:0 !important;
+  border-bottom:1px solid #24282d !important;
+  background:#0b0f12 !important;
+}
+.rg-pro-sheet-header h2 {
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  color:#f5f5f5 !important;
+  text-align:center !important;
+  font-size:15px !important;
+  font-weight:650 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.rg-pro-sheet-back, .rg-pro-sheet-settings {
+  display:grid !important;
+  place-items:center !important;
+  width:38px !important;
+  height:38px !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:transparent !important;
+  color:#f5f5f5 !important;
+  cursor:pointer !important;
+}
+.rg-pro-sheet-back { justify-self:start !important; }
+.rg-pro-sheet-settings { justify-self:end !important; }
+.rg-pro-dashboard-scroll {
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  width:100% !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+  padding:0 0 max(12px,env(safe-area-inset-bottom)) !important;
+}
+.rg-pro-dashboard-group { padding-bottom:8px !important; margin:0 0 8px !important; border-bottom:1px solid #24282d !important; }
+.rg-pro-dashboard-group h3 { margin:14px 18px 8px !important; font-size:13px !important; }
+.rg-pro-dashboard-row { min-height:46px !important; padding:11px 18px !important; border-radius:0 !important; }
+.rg-pro-dashboard-tool-row { min-height:48px !important; }
+.rg-pro-detail-backdrop .rg-pro-detail-primary { flex:none !important; width:calc(100% - 32px) !important; margin:12px 16px max(12px,env(safe-area-inset-bottom)) !important; }
+@media (min-width:601px) {
+  .rg-pro-dashboard-sheet { padding-top:8px !important; }
+  .rg-pro-sheet-header { padding-left:24px !important; padding-right:24px !important; }
+  .rg-pro-dashboard-scroll { padding-left:max(0px,calc((100vw - 900px)/2)) !important; padding-right:max(0px,calc((100vw - 900px)/2)) !important; }
+  .rg-pro-dashboard-group h3 { margin-left:24px !important; margin-right:24px !important; }
+  .rg-pro-dashboard-row { padding-left:24px !important; padding-right:24px !important; }
+}

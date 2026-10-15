@@ -3417,8 +3417,7 @@ function ProfilePage({ user, setUser }) {
       {isProfessional && (
         <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
           <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
-            <span className="rg-pro-entry-icon"><SlidersHorizontal size={19} /></span>
-            <span className="rg-pro-entry-copy"><b>Professional dashboard</b><small>Insights, tools and resources</small></span>
+            <span className="rg-pro-entry-copy"><b>Your dashboard</b><small>Insights, tools and resources</small></span>
             <ChevronRight size={19} />
           </button>
           {professionalPanel && (
