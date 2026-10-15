@@ -3217,7 +3217,6 @@ function ProfilePage({ user, setUser }) {
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [professionalPanel, setProfessionalPanel] = useState("");
-  const [professionalDashboardOpen, setProfessionalDashboardOpen] = useState(false);
   const isProfessional = user?.accountType === "professional";
 
   function switchToPersonalAccount() {
@@ -3227,7 +3226,6 @@ function ProfilePage({ user, setUser }) {
     localStorage.setItem("vk_user", JSON.stringify(nextUser));
     localStorage.setItem("vk_account_type", "personal");
     setProfessionalPanel("");
-    setProfessionalDashboardOpen(false);
   }
 
   async function load() {
@@ -3352,44 +3350,39 @@ function ProfilePage({ user, setUser }) {
         </div>
       </div>
 
-      {isProfessional && professionalDashboardOpen && (
-        <section className="rg-pro-dashboard rg-pro-dashboard-screen" aria-label="Professional dashboard">
-          <header className="rg-pro-dashboard-topbar">
-            <button type="button" className="rg-pro-dashboard-back" onClick={() => { setProfessionalDashboardOpen(false); setProfessionalPanel(""); }} aria-label="Back to profile"><ArrowLeft size={23} /></button>
-            <b>Your dashboard</b>
-            <button type="button" className="rg-pro-dashboard-settings" onClick={() => setProfessionalPanel("Dashboard settings")} aria-label="Dashboard settings"><Settings size={22} /></button>
-          </header>
-
-          <div className="rg-pro-dashboard-section">
-            <h3>Your tools</h3>
-            <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Best practices")}><span className="rg-pro-row-icon">◇</span><span>Best practices</span><em>New</em><ChevronRight size={18}/></button>
-            <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Trending audio")}><span className="rg-pro-row-icon">↗</span><span>Trending audio</span><em>New</em><ChevronRight size={18}/></button>
+      {isProfessional && (
+        <section className="rg-pro-dashboard" aria-label="Professional dashboard">
+          <div className="rg-pro-dashboard-heading">
+            <div className="rg-pro-dashboard-mark"><SlidersHorizontal size={18} /></div>
+            <div><b>Professional dashboard</b><small>{user?.professionalProfile?.type || "Creator"} account · {user?.professionalProfile?.category || "Digital creator"}</small></div>
+            <span className="rg-pro-live-pill">ACTIVE</span>
           </div>
-
-          <div className="rg-pro-dashboard-section">
-            <h3>Tools to set up</h3>
-            <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Insights")}><span className="rg-pro-row-icon">▥</span><span>Insights</span><ChevronRight size={18}/></button>
+          <div className="rg-pro-insight-strip">
+            <div><small>Posts</small><b>{posts.length}</b></div>
+            <div><small>Reels</small><b>{reels.length}</b></div>
+            <div><small>Followers</small><b>{user?.followersCount || 0}</b></div>
           </div>
-
-          <div className="rg-pro-dashboard-section">
-            <h3>Professional tools</h3>
+          <div className="rg-pro-tools-grid">
             {[
-              { id: "Monetization", icon: "▧" },
-              { id: "Ad tools", icon: "↗" },
-              { id: "Branded content", icon: "♧" },
-              { id: "Messaging tools", icon: "⌁" },
-              { id: "Account status", icon: "✓" }
-            ].map(tool => <button type="button" key={tool.id} className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel(tool.id)}><span className="rg-pro-row-icon">{tool.icon}</span><span>{tool.id}</span><ChevronRight size={18}/></button>)}
-            <p className="rg-pro-dashboard-help">Some tools require a professional account, eligibility, or additional service integration.</p>
-            <button type="button" className="rg-pro-dashboard-switch" onClick={switchToPersonalAccount}>Switch to personal account</button>
+              { id: "Insights", icon: "↗", desc: "Content and audience overview" },
+              { id: "Ad tools", icon: "◈", desc: "Promotion readiness" },
+              { id: "Branded content", icon: "✧", desc: "Partnership tools" },
+              { id: "Messaging tools", icon: "⌁", desc: "Contact and conversation options" },
+              { id: "Monetization", icon: "◇", desc: "Eligibility and earning tools" },
+              { id: "Account status", icon: "✓", desc: "Review your account setup" }
+            ].map(tool => <button type="button" key={tool.id} className="rg-pro-tool" onClick={() => setProfessionalPanel(tool.id)}><span>{tool.icon}</span><b>{tool.id}</b><small>{tool.desc}</small><ChevronRight size={15} /></button>)}
           </div>
-
+          <div className="rg-pro-dashboard-footer">
+            <span>Professional tools are ready. Some features require eligible activity or additional backend integrations.</span>
+            <button type="button" onClick={switchToPersonalAccount}>Switch to personal account</button>
+          </div>
           {professionalPanel && (
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
               <section className="rg-pro-detail-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
                 <button type="button" className="rg-pro-detail-close" onClick={() => setProfessionalPanel("")} aria-label="Close">×</button>
+                <span className="rg-pro-detail-symbol">✦</span>
                 <h2>{professionalPanel}</h2>
-                {professionalPanel === "Insights" ? <><p>Overview of your ReelsGo activity.</p><div className="rg-pro-detail-stats"><div><b>{posts.length}</b><small>Published posts</small></div><div><b>{reels.length}</b><small>Published Reels</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div></div><p className="rg-pro-detail-note">Reach, impressions, watch time and audience trends appear here when analytics data is provided by the backend.</p></> : <><p>{({"Best practices":"Tips to improve your posts, Reels, engagement, and account setup.","Trending audio":"Discover audio trends and use them in your Reels when available.","Ad tools":"Prepare promotions for posts and Reels. Live ad delivery requires an advertising integration.","Branded content":"Manage creator and brand partnership details. Some tools may require eligibility.","Messaging tools":"Manage conversations using your existing ReelsGo inbox.","Monetization":"Review earning features when eligible. Availability depends on region and account requirements.","Account status":"Review your account setup. Full enforcement and eligibility data require backend support.","Dashboard settings":"Manage professional dashboard preferences.","Insights":"Your account insights."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p><div className="rg-pro-detail-note">Your existing posts, Reels, followers, and messages remain unchanged.</div></>}
+                {professionalPanel === "Insights" ? <><p>Overview of your ReelsGo activity.</p><div className="rg-pro-detail-stats"><div><b>{posts.length}</b><small>Published posts</small></div><div><b>{reels.length}</b><small>Published Reels</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div></div><p className="rg-pro-detail-note">Reach, impressions, watch time and audience trends can appear here when analytics data is provided by the backend.</p></> : <><p>{({"Ad tools":"Prepare promotions for posts and Reels. Advertising delivery requires an ad-service integration.","Branded content":"Manage creator and brand partnership details. Partnership publishing tools may require eligibility.","Messaging tools":"Use your existing messages inbox and professional contact details to manage conversations.","Monetization":"Review eligible earning features. Availability depends on account eligibility and region.","Account status":"Your professional category and contact preferences are saved on this device. Server-side account status requires backend support."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p><div className="rg-pro-detail-note">Your existing posts, Reels, followers, and messages remain unchanged.</div></>}
                 <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>
               </section>
             </div>
@@ -3405,13 +3398,6 @@ function ProfilePage({ user, setUser }) {
           <Share2 /> Share profile
         </button>
       </div>
-      {isProfessional && (
-        <button type="button" className="rg-profile-dashboard-trigger" onClick={() => { setProfessionalPanel(""); setProfessionalDashboardOpen(true); }}>
-          <SlidersHorizontal size={18} />
-          <span><b>Professional dashboard</b><small>Insights, tools and account activity</small></span>
-          <ChevronRight size={19} />
-        </button>
-      )}
 
       <div className="profile-tabs">
         <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>
@@ -3543,6 +3529,11 @@ function ProfilePage({ user, setUser }) {
   );
 }
 
+
+function ChartNoAxesColumnIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27h24M7 27V17h6v10M14 27V6h6v21M21 27V12h5v15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
+function TrendingUpIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 25 13 16l5 5L28 8M19 8h9v9" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
+function BanknoteIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="1" fill="none" stroke="currentColor" strokeWidth="2.2"/><circle cx="16" cy="16" r="4" fill="none" stroke="currentColor" strokeWidth="2.2"/><path d="M6 11h3M23 21h3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>; }
+
 function EditProfilePage({
   user,
   name,
@@ -3564,6 +3555,7 @@ function EditProfilePage({
   const [pronouns, setPronouns] = useState(user?.pronouns || "");
   const [professionalOpen, setProfessionalOpen] = useState(false);
   const [professionalStep, setProfessionalStep] = useState(0);
+  const [professionalSearch, setProfessionalSearch] = useState("");
   const savedPro = (() => { try { return JSON.parse(localStorage.getItem("vk_professional_profile") || "null") || {}; } catch { return {}; } })();
   const [professionalType, setProfessionalType] = useState(savedPro.type || "Creator");
   const [professionalCategory, setProfessionalCategory] = useState(savedPro.category || "Digital creator");
@@ -3751,90 +3743,73 @@ function EditProfilePage({
                 <span />
               </button>
             </div>
-          </section>
-        </main>
+            </section>
+          </main>
 
-        {professionalOpen && (
+          {professionalOpen && (
           <div className="pro-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="pro-setup-title">
-            <section className="pro-setup-panel">
-              <header className="pro-setup-header">
-                <button type="button" className="pro-setup-icon-button" onClick={() => professionalStep === 0 ? setProfessionalOpen(false) : setProfessionalStep(s => Math.max(0, s - 1))} aria-label={professionalStep === 0 ? "Close" : "Previous step"}>
-                  <ArrowLeft />
+            <section className="pro-setup-panel pro-ig-panel">
+              <header className={`pro-setup-header pro-ig-header ${professionalStep === 0 ? "intro" : ""}`}>
+                <button type="button" className="pro-setup-icon-button pro-ig-back" onClick={() => professionalStep === 0 ? setProfessionalOpen(false) : setProfessionalStep(s => Math.max(0, s - 1))} aria-label={professionalStep === 0 ? "Close setup" : "Go back"}>
+                  {professionalStep === 0 ? <X /> : <ArrowLeft />}
                 </button>
-                <div className="pro-setup-progress" aria-label={`Step ${professionalStep + 1} of 4`}>
-                  {[0,1,2,3].map(n => <span key={n} className={n <= professionalStep ? "active" : ""} />)}
-                </div>
-                <button type="button" className="pro-setup-skip" onClick={() => setProfessionalOpen(false)}>Cancel</button>
+                <h1>{professionalStep === 0 ? "Switch to professional" : professionalStep === 1 ? "" : ""}</h1>
+                <span className="pro-ig-header-spacer" />
               </header>
 
               {professionalStep === 0 && (
-                <div className="pro-setup-content">
-                  <div className="pro-setup-orb"><span>✦</span><i>↗</i><b>R</b></div>
-                  <p className="pro-setup-eyebrow">REELSGO · ACCOUNT TYPE</p>
-                  <h2 id="pro-setup-title">Switch to a professional account</h2>
-                  <p className="pro-setup-lede">Get tools to understand your audience, manage your presence, and grow your creator or business profile.</p>
-                  <div className="pro-setup-feature-grid">
-                    <article><span>▥</span><b>Professional dashboard</b><small>See account tools and activity in one place.</small></article>
-                    <article><span>↗</span><b>Insights</b><small>Track your posts, Reels, and audience totals.</small></article>
-                    <article><span>✉</span><b>Contact options</b><small>Choose whether to show business contact details.</small></article>
-                    <article><span>◇</span><b>Promotions & partnerships</b><small>Explore tools; availability may depend on eligibility.</small></article>
-                  </div>
-                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(1)}>Continue <ChevronRight /></button>
-                  <p className="pro-setup-footnote">Switching is free. You can switch back to a personal account later.</p>
-                </div>
+                <>
+                  <main className="pro-ig-intro-scroll">
+                    <div className="pro-ig-avatar"><Avatar user={user} size={148} /></div>
+                    <h2 id="pro-setup-title">Get more tools and switch for free</h2>
+                    <div className="pro-ig-benefits">
+                      <article><ChartNoAxesColumnIcon /><div><b>Access insights</b><p>See what content is getting the most attention and the best times to post.</p></div></article>
+                      <article><TrendingUpIcon /><div><b>Run ads</b><p>Get your content in front of more people and bring them to your profile or website to drive brand awareness and sales.</p></div></article>
+                      <article><BanknoteIcon /><div><b>Get paid</b><p>Earn money when you become eligible for features such as bonuses and subscriptions.</p></div></article>
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer">
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => setProfessionalStep(1)}>Next</button>
+                  </footer>
+                </>
               )}
 
               {professionalStep === 1 && (
-                <div className="pro-setup-content">
-                  <p className="pro-setup-eyebrow">01 / YOUR DIRECTION</p>
-                  <h2 id="pro-setup-title">What are you building?</h2>
-                  <p className="pro-setup-lede">Choose the workspace that fits how you show up on ReelsGo.</p>
-                  <div className="pro-setup-choice-list">
-                    {[{id:"Creator",icon:"✦",title:"Creator",desc:"For creators, artists, public figures and communities."},{id:"Business",icon:"▦",title:"Business",desc:"For brands, shops, services and organizations."}].map(item => (
-                      <button key={item.id} type="button" className={`pro-setup-choice ${professionalType === item.id ? "selected" : ""}`} onClick={() => { setProfessionalType(item.id); setProfessionalCategory(item.id === "Creator" ? "Digital creator" : "Product / service"); }}>
-                        <span className="pro-setup-choice-icon">{item.icon}</span><span><b>{item.title}</b><small>{item.desc}</small></span><i>{professionalType === item.id ? "✓" : "○"}</i>
-                      </button>
-                    ))}
-                  </div>
-                  <label className="pro-setup-label" htmlFor="pro-category">Choose a category</label>
-                  <select id="pro-category" className="pro-setup-select" value={professionalCategory} onChange={e => setProfessionalCategory(e.target.value)}>
-                    {(professionalType === "Creator" ? ["Digital creator","Artist","Blogger","Video creator","Gamer","Musician / band","Writer","Photographer","Public figure","Actor","Comedian","Athlete","Coach","Chef","Fashion model","Beauty, cosmetic & personal care","Education","Personal blog","Podcaster","Entrepreneur","Community","Journalist","Dancer","Designer","Author","Motivational speaker","Scientist","Other creator"] : ["Product / service","Shopping & retail","Clothing brand","Beauty, cosmetic & personal care","Restaurant","Cafe","Grocery store","Local service","Software / technology","Education","Health / wellness","Travel agency","Hotel / lodging","Real estate","Automotive","Financial service","Nonprofit organization","Organization","Media / news company","Food & beverage","Home goods","Professional service","E-commerce website","Retail company","Other business"]).map(x => <option key={x}>{x}</option>)}
-                  </select>
-                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(2)}>Continue <ChevronRight /></button>
-                </div>
+                <>
+                  <main className="pro-ig-choice-scroll">
+                    <h2 id="pro-setup-title">What type of professional are you?</h2>
+                    <div className="pro-ig-type-list">
+                      {[{id:"Creator",desc:"Best for public figures, content producers, artists and influencers."},{id:"Business",desc:"Best for retailers, local businesses, brands, organisations and service providers."}].map(item => (
+                        <button key={item.id} type="button" className={`pro-ig-type ${professionalType === item.id ? "selected" : ""}`} onClick={() => { setProfessionalType(item.id); setProfessionalCategory(item.id === "Creator" ? "Digital creator" : "Product / service"); }}>
+                          <span><b>{item.id}</b><small>{item.desc}</small></span><i aria-hidden="true">{professionalType === item.id ? <span /> : null}</i>
+                        </button>
+                      ))}
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer"><button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => setProfessionalStep(2)}>Next</button></footer>
+                </>
               )}
 
               {professionalStep === 2 && (
-                <div className="pro-setup-content">
-                  <p className="pro-setup-eyebrow">02 / YOUR MISSION</p>
-                  <h2 id="pro-setup-title">What matters most?</h2>
-                  <p className="pro-setup-lede">Pick all the goals you want ReelsGo Studio to help with.</p>
-                  <div className="pro-setup-goals">
-                    {[{id:"Reach more people",icon:"↗",desc:"Grow discovery and reach"},{id:"Understand my audience",icon:"◉",desc:"Learn who engages with you"},{id:"Create better content",icon:"✧",desc:"Improve your content strategy"},{id:"Get more messages",icon:"⌁",desc:"Start more conversations"},{id:"Promote products or services",icon:"◇",desc:"Showcase what you offer"},{id:"Build partnerships",icon:"∞",desc:"Connect with collaborators"},{id:"Grow my community",icon:"◎",desc:"Build a loyal audience"},{id:"Sell products",icon:"▦",desc:"Reach potential customers"},{id:"Drive website visits",icon:"↗",desc:"Send people to a link"},{id:"Get leads",icon:"✉",desc:"Help people contact me"},{id:"Learn about monetization",icon:"＄",desc:"Explore eligible earning tools"},{id:"Build a personal brand",icon:"✦",desc:"Develop a recognizable identity"}].map(g => { const selected = professionalGoals.includes(g.id); return <button key={g.id} type="button" className={`pro-setup-goal ${selected ? "selected" : ""}`} onClick={() => setProfessionalGoals(current => selected ? current.filter(x => x !== g.id) : [...current, g.id])}><span>{g.icon}</span><b>{g.id}</b><small>{g.desc}</small><i>{selected ? "✓" : "+"}</i></button>; })}
-                  </div>
-                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(3)}>Continue <ChevronRight /></button>
-                </div>
-              )}
-
-              {professionalStep === 3 && (
-                <form className="pro-setup-content" onSubmit={e => { e.preventDefault(); setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }}>
-                  <p className="pro-setup-eyebrow">03 / YOUR PUBLIC PRESENCE</p>
-                  <h2 id="pro-setup-title">Make it easy to connect.</h2>
-                  <p className="pro-setup-lede">Add optional contact details. You can keep them private or show them on your profile.</p>
-                  <label className="pro-setup-label" htmlFor="pro-email">Email <span>Optional</span></label>
-                  <input id="pro-email" className="pro-setup-input" type="email" value={professionalContact.email} onChange={e => setProfessionalContact(v => ({...v,email:e.target.value}))} placeholder="hello@example.com" />
-                  <label className="pro-setup-label" htmlFor="pro-phone">Phone number <span>Optional</span></label>
-                  <input id="pro-phone" className="pro-setup-input" type="tel" value={professionalContact.phone} onChange={e => setProfessionalContact(v => ({...v,phone:e.target.value}))} placeholder="Add a contact number" />
-                  <label className="pro-setup-label" htmlFor="pro-address">Business address <span>Optional</span></label>
-                  <input id="pro-address" className="pro-setup-input" type="text" value={professionalContact.address} onChange={e => setProfessionalContact(v => ({...v,address:e.target.value}))} placeholder="Street, city, or service area" />
-                  <label className="pro-setup-label" htmlFor="pro-page">Facebook Page <span>Optional</span></label>
-                  <input id="pro-page" className="pro-setup-input" type="text" value={professionalContact.connectedPage} onChange={e => setProfessionalContact(v => ({...v,connectedPage:e.target.value}))} placeholder="Page name (connection is not automatic)" />
-                  <button type="button" className={`pro-setup-public-toggle ${professionalContact.showCategory ? "on" : ""}`} onClick={() => setProfessionalContact(v => ({...v,showCategory:!v.showCategory}))}><span><b>Display category label</b><small>Show “{professionalCategory}” below your profile name.</small></span><i>{professionalContact.showCategory ? "✓" : ""}</i></button>
-                  <button type="button" className={`pro-setup-public-toggle ${professionalContact.showContact ? "on" : ""}`} onClick={() => setProfessionalContact(v => ({...v,showContact:!v.showContact}))}><span><b>Display contact information</b><small>Allow visitors to see your chosen professional contact details.</small></span><i>{professionalContact.showContact ? "✓" : ""}</i></button>
-                  <div className="pro-setup-summary"><span>✦</span><div><b>{professionalType} account</b><small>{professionalCategory} · {professionalGoals.length} goal{professionalGoals.length === 1 ? "" : "s"} selected</small></div><Check /></div>
-                  <button type="submit" className="pro-setup-primary" disabled={professionalSaving}>{professionalSaving ? "Activating..." : "Complete setup"} <ChevronRight /></button>
-                  <p className="pro-setup-footnote">Account type and setup details are saved on this device. Server-wide syncing and live analytics require backend support.</p>
-                </form>
+                <>
+                  <main className="pro-ig-category-scroll">
+                    <h2 id="pro-setup-title">What best describes you?</h2>
+                    <p className="pro-ig-category-lede">Categories help people find profiles like yours. You can change this at any time.</p>
+                    <div className="pro-ig-display-row"><span>Display on profile</span><button type="button" role="switch" aria-checked={professionalContact.showCategory} className={`pro-ig-switch ${professionalContact.showCategory ? "on" : ""}`} onClick={() => setProfessionalContact(v => ({...v,showCategory:!v.showCategory}))}><i /></button></div>
+                    <label className="pro-ig-search"><Search /><input value={professionalSearch} onChange={e => setProfessionalSearch(e.target.value)} placeholder="Search categories" aria-label="Search categories" /></label>
+                    <h3>{professionalSearch.trim() ? "Categories" : "Suggested"}</h3>
+                    <div className="pro-ig-category-list">
+                      {((professionalType === "Creator" ? ["Actor","Artist","Athlete","Author","Blogger","Chef","Coach","Comedian","Community","Dancer","Digital creator","Education","Entrepreneur","Fashion model","Gamer","Journalist","Musician/band","Photographer","Podcaster","Public figure","Scientist","Video creator","Writer"] : ["Advertising/marketing","Automotive","Beauty, cosmetic & personal care","Clothing (brand)","Community","Education","Entrepreneur","Health/beauty","Hotel","Local service","Media/news company","Product/service","Real estate","Restaurant","Retail company","Shopping & retail","Software","Travel agency"]).filter(c => c.toLowerCase().includes(professionalSearch.trim().toLowerCase()))).map(category => (
+                        <button type="button" key={category} className="pro-ig-category-option" onClick={() => setProfessionalCategory(category)}><span>{category}</span><i className={professionalCategory === category ? "selected" : ""}>{professionalCategory === category ? <span /> : null}</i></button>
+                      ))}
+                      {((professionalType === "Creator" ? ["Actor","Artist","Athlete","Author","Blogger","Chef","Coach","Comedian","Community","Dancer","Digital creator","Education","Entrepreneur","Fashion model","Gamer","Journalist","Musician/band","Photographer","Podcaster","Public figure","Scientist","Video creator","Writer"] : ["Advertising/marketing","Automotive","Beauty, cosmetic & personal care","Clothing (brand)","Community","Education","Entrepreneur","Health/beauty","Hotel","Local service","Media/news company","Product/service","Real estate","Restaurant","Retail company","Shopping & retail","Software","Travel agency"]).filter(c => c.toLowerCase().includes(professionalSearch.trim().toLowerCase())).length === 0) ? <p className="pro-ig-no-results">No categories found.</p> : null}
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer pro-ig-category-footer">
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
+                    <p>Switching makes your profile public and all of your content can appear in search engines. <span>Learn how to manage</span></p>
+                  </footer>
+                </>
               )}
             </section>
           </div>
