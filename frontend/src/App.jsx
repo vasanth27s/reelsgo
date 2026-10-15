@@ -3363,9 +3363,8 @@ function ProfilePage({ user, setUser }) {
       {isProfessional && (
         <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
           <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
-            <span className="rg-pro-entry-icon"><SlidersHorizontal size={19} /></span>
-            <span className="rg-pro-entry-copy"><b>Professional dashboard</b><small>Insights, tools and resources</small></span>
-            <ChevronRight size={19} />
+            <span className="rg-pro-entry-copy"><b>Your dashboard</b><small><span className="rg-pro-entry-trend">↗</span> {posts.length + reels.length} views in the last 30 days.</small></span>
+            <ChevronRight size={18} />
           </button>
           {professionalPanel && (
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
