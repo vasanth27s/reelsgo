@@ -3350,45 +3350,6 @@ function ProfilePage({ user, setUser }) {
         </div>
       </div>
 
-      {isProfessional && (
-        <section className="rg-pro-dashboard" aria-label="Professional dashboard">
-          <div className="rg-pro-dashboard-heading">
-            <div className="rg-pro-dashboard-mark"><SlidersHorizontal size={18} /></div>
-            <div><b>Professional dashboard</b><small>{user?.professionalProfile?.type || "Creator"} account · {user?.professionalProfile?.category || "Digital creator"}</small></div>
-            <span className="rg-pro-live-pill">ACTIVE</span>
-          </div>
-          <div className="rg-pro-insight-strip">
-            <div><small>Posts</small><b>{posts.length}</b></div>
-            <div><small>Reels</small><b>{reels.length}</b></div>
-            <div><small>Followers</small><b>{user?.followersCount || 0}</b></div>
-          </div>
-          <div className="rg-pro-tools-grid">
-            {[
-              { id: "Insights", icon: "↗", desc: "Content and audience overview" },
-              { id: "Ad tools", icon: "◈", desc: "Promotion readiness" },
-              { id: "Branded content", icon: "✧", desc: "Partnership tools" },
-              { id: "Messaging tools", icon: "⌁", desc: "Contact and conversation options" },
-              { id: "Monetization", icon: "◇", desc: "Eligibility and earning tools" },
-              { id: "Account status", icon: "✓", desc: "Review your account setup" }
-            ].map(tool => <button type="button" key={tool.id} className="rg-pro-tool" onClick={() => setProfessionalPanel(tool.id)}><span>{tool.icon}</span><b>{tool.id}</b><small>{tool.desc}</small><ChevronRight size={15} /></button>)}
-          </div>
-          <div className="rg-pro-dashboard-footer">
-            <span>Professional tools are ready. Some features require eligible activity or additional backend integrations.</span>
-            <button type="button" onClick={switchToPersonalAccount}>Switch to personal account</button>
-          </div>
-          {professionalPanel && (
-            <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
-              <section className="rg-pro-detail-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
-                <button type="button" className="rg-pro-detail-close" onClick={() => setProfessionalPanel("")} aria-label="Close">×</button>
-                <span className="rg-pro-detail-symbol">✦</span>
-                <h2>{professionalPanel}</h2>
-                {professionalPanel === "Insights" ? <><p>Overview of your ReelsGo activity.</p><div className="rg-pro-detail-stats"><div><b>{posts.length}</b><small>Published posts</small></div><div><b>{reels.length}</b><small>Published Reels</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div></div><p className="rg-pro-detail-note">Reach, impressions, watch time and audience trends can appear here when analytics data is provided by the backend.</p></> : <><p>{({"Ad tools":"Prepare promotions for posts and Reels. Advertising delivery requires an ad-service integration.","Branded content":"Manage creator and brand partnership details. Partnership publishing tools may require eligibility.","Messaging tools":"Use your existing messages inbox and professional contact details to manage conversations.","Monetization":"Review eligible earning features. Availability depends on account eligibility and region.","Account status":"Your professional category and contact preferences are saved on this device. Server-side account status requires backend support."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p><div className="rg-pro-detail-note">Your existing posts, Reels, followers, and messages remain unchanged.</div></>}
-                <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>
-              </section>
-            </div>
-          )}
-        </section>
-      )}
 
       <div className="rg-profile-action-row" aria-label="Profile actions">
         <button type="button" className="secondary rg-profile-action-button" onClick={() => setEditOpen(true)}>
@@ -3398,6 +3359,59 @@ function ProfilePage({ user, setUser }) {
           <Share2 /> Share profile
         </button>
       </div>
+
+      {isProfessional && (
+        <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
+          <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
+            <span className="rg-pro-entry-icon"><SlidersHorizontal size={19} /></span>
+            <span className="rg-pro-entry-copy"><b>Professional dashboard</b><small>Insights, tools and resources</small></span>
+            <ChevronRight size={19} />
+          </button>
+          {professionalPanel && (
+            <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
+              <section className="rg-pro-detail-sheet rg-pro-dashboard-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
+                <button type="button" className="rg-pro-detail-close" onClick={() => setProfessionalPanel("")} aria-label="Close">×</button>
+                {professionalPanel === "Your dashboard" ? <>
+                  <h2>Your dashboard</h2>
+                  <div className="rg-pro-dashboard-scroll">
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Insights <small>15 Sep–14 Oct</small></h3>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {posts.length + reels.length}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{user?.followersCount || 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{posts.length + reels.length}</b><ChevronRight size={17}/></button>
+                    </div>
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Your tools <button type="button" onClick={() => setProfessionalPanel("All tools")}>See all</button></h3>
+                      {[
+                        ["Monthly recap","See what you made happen last month.","◷","New"], ["Best practices","Tips to help create, grow and thrive.","◇","New"], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧","New"], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷","New"], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""]
+                      ].map(([label,desc,ico,badge]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b>{label === "Monthly recap" || label === "Saved replies" ? <small>{desc}</small> : null}</span>{badge ? <em>{badge}</em> : null}<ChevronRight size={17}/></button>)}
+                    </div>
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Tips and resources</h3>
+                      {[ ["Trending audio","↗"], ["Other helpful resources","↗"] ].map(([label,ico]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b></span><ChevronRight size={17}/></button>)}
+                    </div>
+                    <button type="button" className="rg-pro-switch-personal" onClick={switchToPersonalAccount}>Switch to personal account</button>
+                    <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
+                  </div>
+                </> : <>
+                  <button type="button" className="rg-pro-detail-back" onClick={() => setProfessionalPanel("Your dashboard")}>‹ <span>Your dashboard</span></button>
+                  <h2>{professionalPanel}</h2>
+                  {["Views","Insights","New followers","Content you shared"].includes(professionalPanel) ? <>
+                    <p>Performance overview for your ReelsGo account.</p>
+                    <div className="rg-pro-detail-stats"><div><b>{posts.length + reels.length}</b><small>Content shared</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div><div><b>{reels.length}</b><small>Reels</small></div></div>
+                    <p className="rg-pro-detail-note">Detailed reach, impressions and audience analytics require the corresponding backend analytics data.</p>
+                  </> : <>
+                    <p>{({"Monthly recap":"Review a summary of your recent posts, Reels and audience activity.","Best practices":"Explore guidance for creation, engagement, reach and monetization.","Inspiration":"Find content ideas and creative inspiration for your next post.","Branded content":"Manage paid partnership labels and creator approvals. Some features require eligibility.","Affiliate programmes":"Affiliate connections and commissions require a supported partner integration.","Partnership ads":"Review partner permissions and promotion settings. Ad delivery requires an advertising integration.","Ad tools":"Prepare a promotion for a post or Reel. Campaign creation requires an ad-service integration.","Trial reels":"Trial Reels let you test content with non-followers when supported by the app.","Payouts":"Payout details, transactions and tax forms require a configured payout provider.","Gifts":"Gift availability and earnings depend on account eligibility and a payout setup.","Saved replies":"Create reusable answers for common messages. Saved replies are a local interface feature in this version.","Trending audio":"Discover trending audio to inspire your Reels.","Other helpful resources":"Find resources for creators, comment management and account safety.","All tools":"All professional tools available in ReelsGo are listed on the dashboard."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p>
+                    <div className="rg-pro-detail-note">Your existing posts, Reels, followers and messages remain unchanged. External ad, affiliate, payout and platform-only features need their respective service integrations.</div>
+                  </>}
+                </>}
+                <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>
+              </section>
+            </div>
+          )}
+        </section>
+      )}
+
 
       <div className="profile-tabs">
         <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>
