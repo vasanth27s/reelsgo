@@ -14374,15 +14374,26 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
 }
 
 
-/* Final targeted updates: compact grey professional dashboard card and Reel download action. */
+/* Final targeted updates: preserve dashboard position; use the compact dark-grey card shown in the profile reference. */
 .rg-pro-dashboard-entry-button,
 .rg-pro-dashboard-entry-button:hover,
 .rg-pro-dashboard-entry-button:focus-visible {
-  background: #e5e7eb !important;
-  background-color: #e5e7eb !important;
-  color: #202124 !important;
+  min-height: 56px !important;
+  height: 56px !important;
+  padding: 8px 12px !important;
+  background: #2b3036 !important;
+  background-color: #2b3036 !important;
+  color: #f5f6f7 !important;
   border: 0 !important;
+  border-radius: 10px !important;
   box-shadow: none !important;
+}
+.rg-pro-entry-copy { gap: 2px !important; }
+.rg-pro-entry-copy b { color: #f5f6f7 !important; font-size: 12px !important; line-height: 1.25 !important; }
+.rg-pro-entry-copy small { display: block !important; color: #aeb4bc !important; font-size: 10px !important; line-height: 1.25 !important; }
+.rg-pro-dashboard-entry-button > svg { color: #aeb4bc !important; }
+@media (max-width:700px) {
+  .rg-pro-dashboard-entry-button { min-height: 56px !important; height: 56px !important; padding: 8px 12px !important; }
 }
 .reels-page .reels-mobile-actions button[aria-label="Download Reel"],
 .reels-page .reels-desktop-actions button[aria-label="Download Reel"] {
