@@ -3450,6 +3450,12 @@ function ProfilePage({ user, setUser }) {
           onClose={() => setEditOpen(false)}
           onAvatarClick={() => input.current?.click()}
           onSave={saveProfile}
+          onSwitchProfessional={(details) => {
+            const nextUser = { ...user, accountType: "professional", professionalProfile: details };
+            setUser(nextUser);
+            localStorage.setItem("vk_user", JSON.stringify(nextUser));
+            localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+          }}
         />
       )}
     </div>
@@ -3469,9 +3475,17 @@ function EditProfilePage({
   saving,
   onClose,
   onAvatarClick,
-  onSave
+  onSave,
+  onSwitchProfessional
 }) {
   const [pronouns, setPronouns] = useState(user?.pronouns || "");
+  const [professionalOpen, setProfessionalOpen] = useState(false);
+  const [professionalStep, setProfessionalStep] = useState(0);
+  const [professionalType, setProfessionalType] = useState("Creator");
+  const [professionalCategory, setProfessionalCategory] = useState("Digital creator");
+  const [professionalGoals, setProfessionalGoals] = useState(["Reach more people", "Understand my audience"]);
+  const [professionalContact, setProfessionalContact] = useState({ email: "", phone: "", showContact: false });
+  const [professionalSaving, setProfessionalSaving] = useState(false);
   const [gender, setGender] = useState(user?.gender || "Man");
   const [aiCreator, setAiCreator] = useState(!!user?.aiCreator);
 
@@ -3591,11 +3605,6 @@ function EditProfilePage({
               </span>
             </button>
 
-            <button type="button" className="edit-profile-action-row">
-              <span>Reorder grid</span>
-              <ChevronRight />
-            </button>
-
             <button
               type="button"
               className="edit-profile-action-row"
@@ -3630,8 +3639,8 @@ function EditProfilePage({
               </button>
             </div>
 
-            <button type="button" className="edit-profile-professional">
-              Switch to professional account
+            <button type="button" className="edit-profile-professional" onClick={() => { setProfessionalStep(0); setProfessionalOpen(true); }}>
+              <span>Switch to professional account</span><ChevronRight />
             </button>
 
             <div className="edit-profile-privacy">
@@ -3651,6 +3660,87 @@ function EditProfilePage({
             </div>
           </section>
         </main>
+
+        {professionalOpen && (
+          <div className="pro-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="pro-setup-title">
+            <section className="pro-setup-panel">
+              <header className="pro-setup-header">
+                <button type="button" className="pro-setup-icon-button" onClick={() => professionalStep === 0 ? setProfessionalOpen(false) : setProfessionalStep(s => Math.max(0, s - 1))} aria-label={professionalStep === 0 ? "Close" : "Previous step"}>
+                  <ArrowLeft />
+                </button>
+                <div className="pro-setup-progress" aria-label={`Step ${professionalStep + 1} of 4`}>
+                  {[0,1,2,3].map(n => <span key={n} className={n <= professionalStep ? "active" : ""} />)}
+                </div>
+                <button type="button" className="pro-setup-skip" onClick={() => setProfessionalOpen(false)}>Cancel</button>
+              </header>
+
+              {professionalStep === 0 && (
+                <div className="pro-setup-content">
+                  <div className="pro-setup-orb"><span>✦</span><i>↗</i><b>R</b></div>
+                  <p className="pro-setup-eyebrow">REELSGO STUDIO / 2050</p>
+                  <h2 id="pro-setup-title">Build your next chapter.</h2>
+                  <p className="pro-setup-lede">Unlock creator intelligence, audience insights, and tools designed around your goals.</p>
+                  <div className="pro-setup-feature-grid">
+                    <article><span>◈</span><b>Live insights</b><small>Know what resonates.</small></article>
+                    <article><span>✧</span><b>Smart reach</b><small>Find your community.</small></article>
+                    <article><span>⌘</span><b>Creator tools</b><small>Make every post count.</small></article>
+                    <article><span>◎</span><b>Professional hub</b><small>Everything in one place.</small></article>
+                  </div>
+                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(1)}>Start setup <ChevronRight /></button>
+                  <p className="pro-setup-footnote">Free to switch. You can update your choices later.</p>
+                </div>
+              )}
+
+              {professionalStep === 1 && (
+                <div className="pro-setup-content">
+                  <p className="pro-setup-eyebrow">01 / YOUR DIRECTION</p>
+                  <h2 id="pro-setup-title">What are you building?</h2>
+                  <p className="pro-setup-lede">Choose the workspace that fits how you show up on ReelsGo.</p>
+                  <div className="pro-setup-choice-list">
+                    {[{id:"Creator",icon:"✦",title:"Creator",desc:"For creators, artists, public figures and communities."},{id:"Business",icon:"▦",title:"Business",desc:"For brands, shops, services and organizations."}].map(item => (
+                      <button key={item.id} type="button" className={`pro-setup-choice ${professionalType === item.id ? "selected" : ""}`} onClick={() => { setProfessionalType(item.id); setProfessionalCategory(item.id === "Creator" ? "Digital creator" : "Product / service"); }}>
+                        <span className="pro-setup-choice-icon">{item.icon}</span><span><b>{item.title}</b><small>{item.desc}</small></span><i>{professionalType === item.id ? "✓" : "○"}</i>
+                      </button>
+                    ))}
+                  </div>
+                  <label className="pro-setup-label" htmlFor="pro-category">Choose a category</label>
+                  <select id="pro-category" className="pro-setup-select" value={professionalCategory} onChange={e => setProfessionalCategory(e.target.value)}>
+                    {(professionalType === "Creator" ? ["Digital creator","Artist","Musician / band","Video creator","Gamer","Writer","Education","Personal blog","Public figure","Other creator"] : ["Product / service","Shopping & retail","Clothing brand","Beauty & wellness","Restaurant","Local service","Software / technology","Education","Organization","Other business"]).map(x => <option key={x}>{x}</option>)}
+                  </select>
+                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(2)}>Continue <ChevronRight /></button>
+                </div>
+              )}
+
+              {professionalStep === 2 && (
+                <div className="pro-setup-content">
+                  <p className="pro-setup-eyebrow">02 / YOUR MISSION</p>
+                  <h2 id="pro-setup-title">What matters most?</h2>
+                  <p className="pro-setup-lede">Pick all the goals you want ReelsGo Studio to help with.</p>
+                  <div className="pro-setup-goals">
+                    {[{id:"Reach more people",icon:"↗",desc:"Grow discovery and reach"},{id:"Understand my audience",icon:"◉",desc:"Learn who engages with you"},{id:"Create better content",icon:"✧",desc:"Improve your content strategy"},{id:"Get more messages",icon:"⌁",desc:"Start more conversations"},{id:"Promote products or services",icon:"◇",desc:"Showcase what you offer"},{id:"Build partnerships",icon:"∞",desc:"Connect with collaborators"}].map(g => { const selected = professionalGoals.includes(g.id); return <button key={g.id} type="button" className={`pro-setup-goal ${selected ? "selected" : ""}`} onClick={() => setProfessionalGoals(current => selected ? current.filter(x => x !== g.id) : [...current, g.id])}><span>{g.icon}</span><b>{g.id}</b><small>{g.desc}</small><i>{selected ? "✓" : "+"}</i></button>; })}
+                  </div>
+                  <button type="button" className="pro-setup-primary" onClick={() => setProfessionalStep(3)}>Continue <ChevronRight /></button>
+                </div>
+              )}
+
+              {professionalStep === 3 && (
+                <form className="pro-setup-content" onSubmit={e => { e.preventDefault(); setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }}>
+                  <p className="pro-setup-eyebrow">03 / YOUR PUBLIC PRESENCE</p>
+                  <h2 id="pro-setup-title">Make it easy to connect.</h2>
+                  <p className="pro-setup-lede">Add optional contact details. You can keep them private or show them on your profile.</p>
+                  <label className="pro-setup-label" htmlFor="pro-email">Professional email <span>Optional</span></label>
+                  <input id="pro-email" className="pro-setup-input" type="email" value={professionalContact.email} onChange={e => setProfessionalContact(v => ({...v,email:e.target.value}))} placeholder="hello@example.com" />
+                  <label className="pro-setup-label" htmlFor="pro-phone">Business phone <span>Optional</span></label>
+                  <input id="pro-phone" className="pro-setup-input" type="tel" value={professionalContact.phone} onChange={e => setProfessionalContact(v => ({...v,phone:e.target.value}))} placeholder="Add a contact number" />
+                  <button type="button" className={`pro-setup-public-toggle ${professionalContact.showContact ? "on" : ""}`} onClick={() => setProfessionalContact(v => ({...v,showContact:!v.showContact}))}><span><b>Show contact options on my profile</b><small>Your email and phone are only shown if you choose this.</small></span><i>{professionalContact.showContact ? "✓" : ""}</i></button>
+                  <div className="pro-setup-summary"><span>✦</span><div><b>{professionalType} account</b><small>{professionalCategory} · {professionalGoals.length} goal{professionalGoals.length === 1 ? "" : "s"} selected</small></div><Check /></div>
+                  <button type="submit" className="pro-setup-primary" disabled={professionalSaving}>{professionalSaving ? "Activating..." : "Activate professional tools"} <ChevronRight /></button>
+                  <p className="pro-setup-footnote">This saves your professional profile preference on this device. Server-side account conversion can be connected when a backend endpoint is available.</p>
+                </form>
+              )}
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );
