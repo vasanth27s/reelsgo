@@ -3204,6 +3204,7 @@ function ProfileQRCodeModal({ user, onClose }) {
 }
 
 function ProfilePage({ user, setUser }) {
+  const token = getToken();
   const [tab, setTab] = useState("posts");
   const [posts, setPosts] = useState([]);
   const [reels, setReels] = useState([]);
@@ -3217,15 +3218,68 @@ function ProfilePage({ user, setUser }) {
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [professionalPanel, setProfessionalPanel] = useState("");
+  const [professionalAnalytics, setProfessionalAnalytics] = useState(null);
+  const [professionalReplies, setProfessionalReplies] = useState([]);
+  const [professionalToolData, setProfessionalToolData] = useState({});
+  const [professionalLoading, setProfessionalLoading] = useState(false);
+  const [professionalActionMessage, setProfessionalActionMessage] = useState("");
+  const [savedReplyShortcut, setSavedReplyShortcut] = useState("");
+  const [savedReplyMessage, setSavedReplyMessage] = useState("");
   const isProfessional = user?.accountType === "professional";
 
-  function switchToPersonalAccount() {
+  useEffect(() => {
+    if (!professionalPanel || !token) return;
+    let cancelled = false;
+    setProfessionalActionMessage("");
+    if (["Your dashboard", "Views", "New followers", "Content you shared", "Insights"].includes(professionalPanel)) {
+      setProfessionalLoading(true);
+      api("/professional/dashboard?days=30")
+        .then(data => { if (!cancelled) setProfessionalAnalytics(data); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Analytics could not be loaded."); })
+        .finally(() => { if (!cancelled) setProfessionalLoading(false); });
+    }
+    if (professionalPanel === "Saved replies") {
+      api("/professional/saved-replies").then(data => { if (!cancelled) setProfessionalReplies(data.replies || []); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Saved replies could not be loaded."); });
+    }
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (toolSlug) api(`/professional/tools/${toolSlug}`).then(data => { if (!cancelled) setProfessionalToolData(data.data || {}); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [professionalPanel, token]);
+
+  async function switchToPersonalAccount() {
     if (!window.confirm("Switch back to a personal account? Your posts, Reels, followers, and messages will stay unchanged.")) return;
     const nextUser = { ...user, accountType: "personal" };
+    try { if (token) await api("/professional/account-type", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "personal" }) }); }
+    catch (error) { setProfessionalActionMessage(`Could not save account type on server: ${error.message}`); return; }
     setUser(nextUser);
     localStorage.setItem("vk_user", JSON.stringify(nextUser));
     localStorage.setItem("vk_account_type", "personal");
     setProfessionalPanel("");
+  }
+
+  async function saveProfessionalToolData(data) {
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (!toolSlug) return;
+    try {
+      const result = await api(`/professional/tools/${toolSlug}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data }) });
+      setProfessionalToolData(result.data || data);
+      setProfessionalActionMessage("Saved successfully.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not save changes."); }
+  }
+
+  async function createProfessionalSavedReply(event) {
+    event.preventDefault();
+    try {
+      const result = await api("/professional/saved-replies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shortcut: savedReplyShortcut, message: savedReplyMessage }) });
+      setProfessionalReplies(current => [result.reply, ...current]);
+      setSavedReplyShortcut(""); setSavedReplyMessage(""); setProfessionalActionMessage("Saved reply created.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not create saved reply."); }
+  }
+
+  async function deleteProfessionalSavedReply(id) {
+    try { await api(`/professional/saved-replies/${id}`, { method: "DELETE" }); setProfessionalReplies(current => current.filter(reply => reply._id !== id)); setProfessionalActionMessage("Saved reply deleted."); }
+    catch (error) { setProfessionalActionMessage(error.message || "Could not delete saved reply."); }
   }
 
   async function load() {
@@ -3363,8 +3417,9 @@ function ProfilePage({ user, setUser }) {
       {isProfessional && (
         <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
           <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
-            <span className="rg-pro-entry-copy"><b>Your dashboard</b><small><span className="rg-pro-entry-trend">↗</span> {posts.length + reels.length} views in the last 30 days.</small></span>
-            <ChevronRight size={18} />
+            <span className="rg-pro-entry-icon"><SlidersHorizontal size={19} /></span>
+            <span className="rg-pro-entry-copy"><b>Professional dashboard</b><small>Insights, tools and resources</small></span>
+            <ChevronRight size={19} />
           </button>
           {professionalPanel && (
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
@@ -3377,15 +3432,15 @@ function ProfilePage({ user, setUser }) {
                 {professionalPanel === "Your dashboard" ? <>
                   <div className="rg-pro-dashboard-scroll">
                     <div className="rg-pro-dashboard-group">
-                      <h3>Insights <small>15 Sep–14 Oct</small></h3>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {posts.length + reels.length}</b><ChevronRight size={17}/></button>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{user?.followersCount || 0}</b><ChevronRight size={17}/></button>
-                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{posts.length + reels.length}</b><ChevronRight size={17}/></button>
+                      <h3>Insights <small>Last 30 days</small></h3>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {professionalAnalytics?.summary?.views ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{professionalAnalytics?.summary?.netFollowers ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{professionalAnalytics?.summary?.contentShared ?? (posts.length + reels.length)}</b><ChevronRight size={17}/></button>
                     </div>
                     <div className="rg-pro-dashboard-group">
                       <h3>Your tools <button type="button" onClick={() => setProfessionalPanel("All tools")}>See all</button></h3>
                       {[
-                        ["Monthly recap","See what you made happen last month.","◷","New"], ["Best practices","Tips to help create, grow and thrive.","◇","New"], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧","New"], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷","New"], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""]
+                        ["Monthly recap","See what you made happen last month.","◷",""], ["Best practices","Tips to help create, grow and thrive.","◇",""], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧",""], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷",""], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""], ["Account status","Review account restrictions and recommendation eligibility.","✓",""]
                       ].map(([label,desc,ico,badge]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b>{label === "Monthly recap" || label === "Saved replies" ? <small>{desc}</small> : null}</span>{badge ? <em>{badge}</em> : null}<ChevronRight size={17}/></button>)}
                     </div>
                     <div className="rg-pro-dashboard-group">
@@ -3396,16 +3451,26 @@ function ProfilePage({ user, setUser }) {
                     <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
                   </div>
                 </> : <>
-                  {["Views","Insights","New followers","Content you shared"].includes(professionalPanel) ? <>
-                    <p>Performance overview for your ReelsGo account.</p>
-                    <div className="rg-pro-detail-stats"><div><b>{posts.length + reels.length}</b><small>Content shared</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div><div><b>{reels.length}</b><small>Reels</small></div></div>
-                    <p className="rg-pro-detail-note">Detailed reach, impressions and audience analytics require the corresponding backend analytics data.</p>
-                  </> : <>
-                    <p>{({"Monthly recap":"Review a summary of your recent posts, Reels and audience activity.","Best practices":"Explore guidance for creation, engagement, reach and monetization.","Inspiration":"Find content ideas and creative inspiration for your next post.","Branded content":"Manage paid partnership labels and creator approvals. Some features require eligibility.","Affiliate programmes":"Affiliate connections and commissions require a supported partner integration.","Partnership ads":"Review partner permissions and promotion settings. Ad delivery requires an advertising integration.","Ad tools":"Prepare a promotion for a post or Reel. Campaign creation requires an ad-service integration.","Trial reels":"Trial Reels let you test content with non-followers when supported by the app.","Payouts":"Payout details, transactions and tax forms require a configured payout provider.","Gifts":"Gift availability and earnings depend on account eligibility and a payout setup.","Saved replies":"Create reusable answers for common messages. Saved replies are a local interface feature in this version.","Trending audio":"Discover trending audio to inspire your Reels.","Other helpful resources":"Find resources for creators, comment management and account safety.","All tools":"All professional tools available in ReelsGo are listed on the dashboard.","Dashboard settings":"Manage professional dashboard preferences and account tools."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p>
-                    <div className="rg-pro-detail-note">Your existing posts, Reels, followers and messages remain unchanged. External ad, affiliate, payout and platform-only features need their respective service integrations.</div>
-                  </>}
+                  <ProfessionalPanelDetails
+                    panel={professionalPanel}
+                    analytics={professionalAnalytics}
+                    loading={professionalLoading}
+                    user={user}
+                    toolData={professionalToolData}
+                    setToolData={setProfessionalToolData}
+                    saveToolData={saveProfessionalToolData}
+                    replies={professionalReplies}
+                    createSavedReply={createProfessionalSavedReply}
+                    deleteSavedReply={deleteProfessionalSavedReply}
+                    savedReplyShortcut={savedReplyShortcut}
+                    setSavedReplyShortcut={setSavedReplyShortcut}
+                    savedReplyMessage={savedReplyMessage}
+                    setSavedReplyMessage={setSavedReplyMessage}
+                    actionMessage={professionalActionMessage}
+                  />
                 </>}
-                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>}
+                {professionalActionMessage && <p className="rg-pro-detail-note" role="status">{professionalActionMessage}</p>}
+                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")}>Back to dashboard</button>}
               </section>
             </div>
           )}
@@ -3531,11 +3596,17 @@ function ProfilePage({ user, setUser }) {
           onSwitchPersonal={switchToPersonalAccount}
           onSwitchProfessional={(details) => {
             const nextUser = { ...user, isPrivate: false, accountType: "professional", professionalProfile: details };
-            setIsPrivate(false);
-            setUser(nextUser);
-            localStorage.setItem("vk_user", JSON.stringify(nextUser));
-            localStorage.setItem("vk_account_type", "professional");
-            localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+            const saveProfile = async () => {
+              try {
+                await api("/professional/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "professional", category: details.category, showCategory: details.contact?.showCategory !== false, contact: details.contact || {} }) });
+                setIsPrivate(false);
+                setUser(nextUser);
+                localStorage.setItem("vk_user", JSON.stringify(nextUser));
+                localStorage.setItem("vk_account_type", "professional");
+                localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+              } catch (error) { alert(`Could not save professional account settings: ${error.message}`); }
+            };
+            return saveProfile();
           }}
         />
       )}
@@ -3820,7 +3891,7 @@ function EditProfilePage({
                     </div>
                   </main>
                   <footer className="pro-ig-footer pro-ig-category-footer">
-                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={async () => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { await onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
                     <p>Switching makes your profile public and all of your content can appear in search engines. <span>Learn how to manage</span></p>
                   </footer>
                 </>
@@ -4667,6 +4738,11 @@ function ReelViewer({ reel, onClose }) {
     setLiked(Boolean(reel?.likedByMe || reel?.isLiked));
     setSaved(true);
     setPlaying(true);
+    if (reel?._id && getToken()) {
+      const event = { contentId: String(reel._id), contentType: "reel" };
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "impression" }) }).catch(() => {});
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "view" }) }).catch(() => {});
+    }
   }, [reel]);
 
   async function toggleLike() {
@@ -4674,6 +4750,7 @@ function ReelViewer({ reel, onClose }) {
       const result = await api(`/reels/${currentReel._id}/like`, { method: "POST" });
       setLiked(Boolean(result.liked));
       setCurrentReel(item => ({ ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }));
+      if (result.liked) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "like" }) }).catch(() => {});
     } catch (e) { setError(e.message || "Could not like this Reel."); }
   }
 
@@ -4682,6 +4759,7 @@ function ReelViewer({ reel, onClose }) {
       const result = await api(`/reels/${currentReel._id}/save`, { method: "POST" });
       setSaved(Boolean(result.saved));
       setCurrentReel(item => ({ ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }));
+      if (result.saved) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "save" }) }).catch(() => {});
       window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
       if (!result.saved) setError("Removed from Saved.");
     } catch (e) { setError(e.message || "Could not update saved status."); }
@@ -7471,3 +7549,267 @@ function Modal({ title, onClose, children }) {
 }
 
 export default App;
+
+
+// Professional dashboard panel details are kept in this file so App.jsx is self-contained.
+const TOOL_SLUGS = {
+  "Monthly recap": "monthly-recap",
+  "Best practices": "best-practices",
+  "Inspiration": "inspiration",
+  "Branded content": "branded-content",
+  "Affiliate programmes": "affiliate-programmes",
+  "Partnership ads": "partnership-ads",
+  "Ad tools": "ad-tools",
+  "Trial reels": "trial-reels",
+  "Payouts": "payouts",
+  "Gifts": "gifts",
+  "Trending audio": "trending-audio",
+  "Other helpful resources": "helpful-resources",
+  "Account status": "account-status",
+  "Dashboard settings": "dashboard-settings"
+};
+
+function Metric({ value, label }) {
+  return <div className="rg-pro-metric"><b>{Number(value || 0).toLocaleString()}</b><small>{label}</small></div>;
+}
+function Section({ title, children }) {
+  return <section className="rg-pro-data-section"><h3>{title}</h3>{children}</section>;
+}
+function EmptyState({ children }) {
+  return <p className="rg-pro-empty-state">{children}</p>;
+}
+function SaveButton({ onClick, children = "Save changes" }) {
+  return <button type="button" className="rg-pro-detail-primary" onClick={onClick}>{children}</button>;
+}
+function TextSetting({ label, value, onChange, placeholder = "", maxLength = 1000 }) {
+  return <label className="rg-pro-field">{label}<textarea value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} rows={3} /></label>;
+}
+function Toggle({ checked, onChange, children }) {
+  return <label className="rg-pro-toggle"><input type="checkbox" checked={!!checked} onChange={e => onChange(e.target.checked)} /> <span>{children}</span></label>;
+}
+
+function ProfessionalPanelDetails({
+  panel, analytics, loading, user, toolData, setToolData, saveToolData,
+  replies, createSavedReply, deleteSavedReply, savedReplyShortcut, setSavedReplyShortcut,
+  savedReplyMessage, setSavedReplyMessage
+}) {
+  const summary = analytics?.summary || {};
+  const daily = analytics?.daily || [];
+  const topContent = analytics?.topContent || [];
+  const update = (key, value) => setToolData(current => ({ ...current, [key]: value }));
+  const save = () => saveToolData(toolData || {});
+  const metrics = (
+    <div className="rg-pro-detail-stats">
+      <Metric value={summary.views} label="Views recorded" />
+      <Metric value={summary.reach} label="Accounts reached" />
+      <Metric value={summary.impressions} label="Impressions recorded" />
+      <Metric value={summary.interactions} label="Interactions" />
+      <Metric value={summary.likes} label="Likes" />
+      <Metric value={summary.comments} label="Comments" />
+    </div>
+  );
+  const trackedDaily = daily.slice(-14).reverse();
+
+  if (["Views", "Insights"].includes(panel)) {
+    return <>
+      <p className="rg-pro-panel-intro">Performance from activity recorded by ReelsGo in the last 30 days.</p>
+      {metrics}
+      <Section title="Daily activity">
+        {loading ? <EmptyState>Loading recorded activity…</EmptyState> : trackedDaily.length ? <div className="rg-pro-daily-list">{trackedDaily.map(day =>
+          <div key={day._id}><b>{day._id}</b><span>{Number(day.views || 0).toLocaleString()} views</span><span>{Number(day.interactions || 0).toLocaleString()} interactions</span></div>
+        )}</div> : <EmptyState>No analytics events have been recorded in this period yet. Views and interactions will appear here after ReelsGo records them.</EmptyState>}
+      </Section>
+      <Section title="Audience and engagement">
+        <div className="rg-pro-detail-stats"><Metric value={summary.followers} label="Current followers" /><Metric value={summary.profileVisits} label="Profile visits recorded" /><Metric value={summary.saves} label="Saves recorded" /></div>
+      </Section>
+    </>;
+  }
+
+  if (panel === "New followers") {
+    return <>
+      <p className="rg-pro-panel-intro">Follower changes recorded by ReelsGo during the last 30 days. Current follower total comes from your account record.</p>
+      <div className="rg-pro-detail-stats"><Metric value={summary.followers} label="Current followers" /><Metric value={summary.newFollowers} label="New follows recorded" /><Metric value={summary.unfollows} label="Unfollows recorded" /><Metric value={summary.netFollowers} label="Net change recorded" /></div>
+      <Section title="Recent daily activity">
+        {trackedDaily.length ? <div className="rg-pro-daily-list">{trackedDaily.map(day => <div key={day._id}><b>{day._id}</b><span>{Number(day.views || 0).toLocaleString()} views</span><span>{Number(day.interactions || 0).toLocaleString()} interactions</span></div>)}</div> : <EmptyState>No dated analytics events are available yet. This panel does not estimate or invent follower growth.</EmptyState>}
+      </Section>
+    </>;
+  }
+
+  if (panel === "Content you shared") {
+    return <>
+      <div className="rg-pro-detail-stats"><Metric value={summary.contentShared} label="Total content" /><Metric value={summary.posts} label="Posts" /><Metric value={summary.reels} label="Reels" /></div>
+      <Section title="Content performance">
+        {topContent.length ? <div className="rg-pro-content-performance">{topContent.map((item, index) =>
+          <article key={`${item._id?.contentId || index}-${item._id?.contentType || "content"}`}><div><b>{item._id?.contentType === "reel" ? "Reel" : "Post"} · {String(item._id?.contentId || "").slice(-6)}</b><small>Views recorded: {Number(item.views || 0).toLocaleString()}</small></div><span>{Number(item.likes || 0)} likes · {Number(item.comments || 0)} comments · {Number(item.shares || 0)} shares</span></article>
+        )}</div> : <EmptyState>Your content count comes from published database records. Per-post performance will appear here when view and interaction events are recorded.</EmptyState>}
+      </Section>
+    </>;
+  }
+
+  if (panel === "Monthly recap") {
+    return <>
+      <p className="rg-pro-panel-intro">A recap of recorded activity for the current 30-day dashboard period.</p>
+      <div className="rg-pro-detail-stats"><Metric value={summary.contentShared} label="Content shared" /><Metric value={summary.views} label="Views recorded" /><Metric value={summary.interactions} label="Interactions recorded" /><Metric value={summary.netFollowers} label="Net follows recorded" /></div>
+      <Section title="Activity summary"><div className="rg-pro-recap-lines">
+        <p><b>Posts:</b> {Number(summary.posts || 0).toLocaleString()}</p>
+        <p><b>Reels:</b> {Number(summary.reels || 0).toLocaleString()}</p>
+        <p><b>Likes / comments / shares / saves:</b> {summary.likes || 0} / {summary.comments || 0} / {summary.shares || 0} / {summary.saves || 0}</p>
+      </div></Section>
+      {!summary.views && !summary.interactions && <EmptyState>No analytics events have been recorded in this period. Counts above reflect available account records only.</EmptyState>}
+    </>;
+  }
+
+  if (panel === "Saved replies") {
+    return <div className="rg-pro-tool-form">
+      <p className="rg-pro-panel-intro">Create reusable replies stored in your ReelsGo account.</p>
+      <form onSubmit={createSavedReply}>
+        <label className="rg-pro-field">Shortcut<input value={savedReplyShortcut} onChange={e => setSavedReplyShortcut(e.target.value)} placeholder="e.g. thanks" maxLength={40} required /></label>
+        <label className="rg-pro-field">Reply message<textarea value={savedReplyMessage} onChange={e => setSavedReplyMessage(e.target.value)} placeholder="Write the reply you want to reuse" maxLength={2000} required rows={4} /></label>
+        <button type="submit" className="rg-pro-detail-primary">Save reply</button>
+      </form>
+      <Section title={`Saved replies (${replies.length})`}>
+        {replies.length ? <div className="rg-pro-saved-replies">{replies.map(reply => <article key={reply._id}><b>/{reply.shortcut}</b><p>{reply.message}</p><button type="button" onClick={() => deleteSavedReply(reply._id)}>Delete</button></article>)}</div> : <EmptyState>You have not saved any replies yet.</EmptyState>}
+      </Section>
+    </div>;
+  }
+
+  if (panel === "Best practices") {
+    const checks = [
+      ["profileComplete", "Keep your name, profile photo and bio current"],
+      ["captionChecked", "Review captions and accessibility before publishing"],
+      ["privacyChecked", "Review privacy and comment settings"],
+      ["weeklyReview", "Review insights before planning the next post"]
+    ];
+    const checklist = toolData.checklist || {};
+    return <>
+      <p className="rg-pro-panel-intro">A practical creator checklist. Your completion choices are saved to your ReelsGo tool settings.</p>
+      <Section title="Account checklist">{checks.map(([key, label]) => <Toggle key={key} checked={checklist[key]} onChange={value => update("checklist", { ...checklist, [key]: value })}>{label}</Toggle>)}</Section>
+      <SaveButton onClick={save}>Save checklist</SaveButton>
+    </>;
+  }
+
+  if (panel === "Inspiration") {
+    const ideas = [
+      "Show a short before-and-after process.",
+      "Answer one question people commonly ask you.",
+      "Share three steps from a skill you use.",
+      "Explain the story behind a recent project.",
+      "Turn a useful comment into a follow-up post."
+    ];
+    return <>
+      <p className="rg-pro-panel-intro">Content prompts you can adapt to your own topic; these are ideas, not performance predictions.</p>
+      <Section title="Ideas to develop"><div className="rg-pro-idea-list">{ideas.map((idea, i) => <article key={idea}><span>{String(i + 1).padStart(2, "0")}</span><p>{idea}</p></article>)}</div></Section>
+      <TextSetting label="My next content idea" value={toolData.nextIdea} onChange={value => update("nextIdea", value)} placeholder="Write your own idea or draft…" />
+      <SaveButton onClick={save}>Save idea</SaveButton>
+    </>;
+  }
+
+  if (panel === "Branded content") {
+    return <>
+      <p className="rg-pro-panel-intro">Record partnership details for your own workflow. This does not publish a paid-partnership label to external platforms.</p>
+      <TextSetting label="Brand / partner name" value={toolData.partnerName} onChange={value => update("partnerName", value)} placeholder="Enter a brand or partner" maxLength={160} />
+      <TextSetting label="Campaign notes" value={toolData.campaignNotes} onChange={value => update("campaignNotes", value)} placeholder="Deliverables, dates, disclosure notes…" maxLength={4000} />
+      <Toggle checked={toolData.disclosureReminder} onChange={value => update("disclosureReminder", value)}>Remind me to check sponsorship disclosure before publishing</Toggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Affiliate programmes") {
+    return <>
+      <p className="rg-pro-panel-intro">Track an affiliate programme manually. No affiliate network is connected, so commissions and links are not imported.</p>
+      <TextSetting label="Programme / network" value={toolData.programmeName} onChange={value => update("programmeName", value)} placeholder="Programme name" maxLength={160} />
+      <TextSetting label="Affiliate link or application URL" value={toolData.affiliateUrl} onChange={value => update("affiliateUrl", value)} placeholder="https://…" maxLength={1000} />
+      <TextSetting label="Notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Application status, terms, or next steps" maxLength={4000} />
+      <div className="rg-pro-integration-status"><b>Network connection</b><span>Not connected</span><small>Affiliate clicks and commissions cannot be reported until a provider integration is configured.</small></div>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Partnership ads" || panel === "Ad tools") {
+    return <>
+      <p className="rg-pro-panel-intro">{panel === "Ad tools" ? "Prepare campaign notes and a draft budget." : "Keep partner authorization and campaign notes in one place."} These settings do not launch ads.</p>
+      {panel === "Partnership ads" && <TextSetting label="Partner / business account" value={toolData.partnerName} onChange={value => update("partnerName", value)} placeholder="Partner name or account" maxLength={160} />}
+      <TextSetting label="Campaign name" value={toolData.campaignName} onChange={value => update("campaignName", value)} placeholder="Campaign draft name" maxLength={160} />
+      <TextSetting label="Campaign objective" value={toolData.objective} onChange={value => update("objective", value)} placeholder="e.g. profile visits, product awareness" maxLength={300} />
+      <label className="rg-pro-field">Draft budget (optional)<input type="number" min="0" step="0.01" value={toolData.budget ?? ""} onChange={e => update("budget", e.target.value === "" ? "" : Math.max(0, Number(e.target.value)))} placeholder="0.00" /></label>
+      <TextSetting label="Campaign notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Audience, dates, creative to prepare…" maxLength={4000} />
+      <div className="rg-pro-integration-status"><b>Ad delivery</b><span>Not connected</span><small>A configured advertising provider is required to create or run campaigns.</small></div>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Trial reels") {
+    return <>
+      <p className="rg-pro-panel-intro">Plan a test Reel here. ReelsGo does not currently distribute trial Reels to a separate non-follower audience automatically.</p>
+      <TextSetting label="Test Reel concept" value={toolData.concept} onChange={value => update("concept", value)} placeholder="What are you testing?" maxLength={1000} />
+      <TextSetting label="Hypothesis / success criteria" value={toolData.successCriteria} onChange={value => update("successCriteria", value)} placeholder="What would make this test useful?" maxLength={1000} />
+      <Toggle checked={toolData.readyToPublish} onChange={value => update("readyToPublish", value)}>Mark this test plan ready</Toggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Payouts" || panel === "Gifts") {
+    return <>
+      <p className="rg-pro-panel-intro">{panel === "Payouts" ? "No payout provider is connected, so there are no verified balances, transactions or tax records to display." : "Gift delivery and earnings are not configured in this ReelsGo build. No earnings are estimated."}</p>
+      <div className="rg-pro-integration-status"><b>{panel === "Payouts" ? "Payout provider" : "Gifts provider"}</b><span>Not connected</span><small>Connect an eligible provider before showing payment or earning information.</small></div>
+      <TextSetting label="Setup notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Record setup steps or questions…" maxLength={4000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Trending audio") {
+    return <>
+      <p className="rg-pro-panel-intro">No licensed trending-audio feed is connected. Save audio ideas or reference links manually without implying they are currently trending.</p>
+      <TextSetting label="Audio name / reference" value={toolData.audioName} onChange={value => update("audioName", value)} placeholder="Audio title or artist" maxLength={200} />
+      <TextSetting label="Reference URL" value={toolData.audioUrl} onChange={value => update("audioUrl", value)} placeholder="https://…" maxLength={1000} />
+      <TextSetting label="Notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Idea for how to use this audio" maxLength={2000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Account status") {
+    const checks = [
+      ["Profile has a name", !!user?.name],
+      ["Username is set", !!user?.username],
+      ["Profile has a bio", !!String(user?.bio || "").trim()],
+      ["Public account", !user?.isPrivate]
+    ];
+    return <>
+      <p className="rg-pro-panel-intro">These are profile setup checks only. This app does not currently have a moderation enforcement or recommendation-eligibility feed.</p>
+      <Section title="Profile setup">{checks.map(([label, ok]) => <div className="rg-pro-status-row" key={label}><span>{label}</span><b className={ok ? "is-ok" : "is-missing"}>{ok ? "Complete" : "Review"}</b></div>)}</Section>
+      <EmptyState>For restrictions, reports, or recommendation eligibility, a moderation/status service must provide that data. No account restriction is assumed here.</EmptyState>
+    </>;
+  }
+
+  if (panel === "Dashboard settings") {
+    return <>
+      <p className="rg-pro-panel-intro">These preferences are stored with your ReelsGo professional tool settings.</p>
+      <label className="rg-pro-field">Dashboard note / goal<textarea value={toolData.dashboardGoal || ""} onChange={e => update("dashboardGoal", e.target.value)} placeholder="What do you want to focus on this month?" maxLength={1000} rows={3} /></label>
+      <Toggle checked={toolData.showZeroMetrics !== false} onChange={value => update("showZeroMetrics", value)}>Show metrics even when the recorded value is zero</Toggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Other helpful resources") {
+    return <>
+      <p className="rg-pro-panel-intro">Use these practical resources to review your ReelsGo account.</p>
+      <Section title="Account workflow"><div className="rg-pro-resource-list">
+        <article><b>Profile setup</b><p>Review your name, username, bio, profile image and public/private setting.</p></article>
+        <article><b>Publishing checklist</b><p>Check the media, caption, audience and comment settings before publishing.</p></article>
+        <article><b>Performance review</b><p>Use recorded views and interactions to compare content; do not treat missing events as zero audience interest.</p></article>
+        <article><b>Account safety</b><p>Keep sign-in details private and review your account security settings regularly.</p></article>
+      </div></Section>
+      <TextSetting label="Resource notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Save useful reminders…" maxLength={3000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "All tools") {
+    return <Section title="Professional tools"><div className="rg-pro-resource-list">
+      {Object.keys(TOOL_SLUGS).map(name => <article key={name}><b>{name}</b><p>Open this item from the dashboard to view its available data and settings.</p></article>)}
+    </div></Section>;
+  }
+
+  return <EmptyState>There is no panel configured for this option yet.</EmptyState>;
+}
+
