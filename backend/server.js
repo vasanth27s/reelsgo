@@ -20,6 +20,7 @@ import notificationRoutes from "./routes/notifications.routes.js";
 import noteRoutes from "./routes/notes.routes.js";
 import reportRoutes from "./routes/reports.routes.js";
 import verificationRoutes from "./routes/verification.routes.js";
+import professionalRoutes from "./routes/professional.routes.js";
 // ===============================
 // LOAD ENVIRONMENT
 // ===============================
@@ -268,6 +269,11 @@ app.use(
 app.use(
   "/api/verification",
   verificationRoutes
+);
+// Professional dashboard: persisted settings, analytics events, saved replies and tool settings.
+app.use(
+  "/api/professional",
+  professionalRoutes
 );
 // ===============================
 // 404 HANDLER
