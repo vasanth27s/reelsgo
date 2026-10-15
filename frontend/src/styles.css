@@ -14142,23 +14142,64 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
 @media(max-width:600px){.rg-pro-dashboard-sheet{padding-top:calc(8px + env(safe-area-inset-top));}.rg-pro-sheet-header{padding-top:2px;padding-bottom:9px;}.rg-pro-dashboard-entry-button{padding:10px 4px;}.rg-pro-dashboard-entry-button .rg-pro-entry-icon{display:none;}.rg-pro-entry-copy b{font-size:14px;}.rg-pro-dashboard-sheet .rg-pro-dashboard-row{min-height:43px;padding-left:16px;padding-right:16px;}}
 
 
-/* Professional dashboard functional backend panels */
-.rg-pro-tool-form{padding:14px 16px 18px;border-top:1px solid rgba(255,255,255,.08);color:#f5f5f5}
-.rg-pro-tool-form>p{font-size:13px;line-height:1.5;color:#aeb4bd;margin:0 0 14px}
-.rg-pro-tool-form form{display:grid;gap:12px}
-.rg-pro-tool-form label{display:grid;gap:7px;font-size:13px;color:#d9dce2}
-.rg-pro-tool-form input:not([type=checkbox]),.rg-pro-tool-form textarea{width:100%;box-sizing:border-box;background:#1d2025;color:#f5f5f5;border:1px solid #353941;border-radius:9px;padding:12px;font:inherit;outline:none}
-.rg-pro-tool-form input:focus,.rg-pro-tool-form textarea:focus{border-color:#7888ff}
-.rg-pro-tool-form textarea{min-height:88px;resize:vertical}
-.rg-pro-tool-toggle{display:flex!important;align-items:center;grid-template-columns:20px 1fr;gap:10px!important}
-.rg-pro-tool-toggle input{accent-color:#5265ff;width:18px;height:18px}
-.rg-pro-saved-replies{display:grid;gap:10px;margin-top:16px}
-.rg-pro-saved-replies article{background:#15181d;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px}
-.rg-pro-saved-replies article b{font-size:13px}
-.rg-pro-saved-replies article p{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;color:#c6cbd3}
-.rg-pro-saved-replies article button{border:0;border-radius:7px;padding:7px 12px;background:#292d33;color:#fff;cursor:pointer}
-.rg-pro-detail-section-title{margin:18px 16px 8px;font-size:14px}
-.rg-pro-daily-list{padding:0 16px;display:grid;gap:0}
-.rg-pro-daily-list>div{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;min-height:38px;border-bottom:1px solid rgba(255,255,255,.07);font-size:11px;color:#c8cdd5}
-.rg-pro-daily-list>div span:first-child{color:#929aa6}
-.rg-pro-detail-note{margin:12px 16px!important}
+/* Final dashboard layout: compact profile card + edge-to-edge dashboard screen. */
+.rg-pro-dashboard-entry{
+  display:block!important;
+  width:calc(100% - 28px)!important;
+  margin:0 14px 18px!important;
+  padding:0!important;
+  order:3;
+}
+.rg-pro-dashboard-entry-button{
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-height:58px;
+  padding:10px 12px!important;
+  border:0!important;
+  border-radius:7px!important;
+  background:#292e34!important;
+  color:#f5f6f7!important;
+  text-align:left;
+}
+.rg-pro-entry-copy{gap:3px!important;}
+.rg-pro-entry-copy b{font-size:12px!important;font-weight:650!important;}
+.rg-pro-entry-copy small{font-size:10px!important;color:#a8afb8!important;line-height:1.35;}
+.rg-pro-entry-trend{color:#36d989;font-weight:800;}
+.rg-pro-dashboard-entry-button>svg{color:#aeb5bd;flex:none;}
+.rg-pro-detail-backdrop{
+  align-items:stretch!important;
+  justify-content:stretch!important;
+  padding:0!important;
+  background:#0b0f12!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.rg-pro-dashboard-sheet{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  padding:calc(8px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom)!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#0b0f12!important;
+  box-shadow:none!important;
+}
+.rg-pro-sheet-header{flex:none!important;}
+.rg-pro-dashboard-sheet .rg-pro-dashboard-scroll{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  width:100%!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  padding-bottom:max(14px,env(safe-area-inset-bottom))!important;
+}
+@media(max-width:700px){
+  .rg-pro-dashboard-entry{width:calc(100% - 16px)!important;margin:0 8px 16px!important;}
+  .rg-pro-dashboard-entry-button{min-height:58px!important;padding:10px 12px!important;}
+}
