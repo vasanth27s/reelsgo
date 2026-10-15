@@ -14782,9 +14782,14 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
    remove the author/song strip between Stories and the post media on mobile. */
 @media (max-width:700px) {
   .mobile-header.mobile-header-home {
-    height: calc(57px + env(safe-area-inset-top, 0px)) !important;
-    min-height: calc(57px + env(safe-area-inset-top, 0px)) !important;
+    height: calc(61px + env(safe-area-inset-top, 0px)) !important;
+    min-height: calc(61px + env(safe-area-inset-top, 0px)) !important;
     box-sizing: border-box !important;
+    padding-bottom: 0 !important;
+  }
+  .mobile-header.mobile-header-home > .mobile-brand-centered,
+  .mobile-header.mobile-header-home > .mobile-header-actions {
+    transform: translateY(3px) !important;
   }
   .main:has(.feed-page) {
     padding-top: calc(57px + env(safe-area-inset-top, 0px)) !important;
@@ -14794,6 +14799,11 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     padding-top: 5px !important;
   }
   .feed-page .post-head {
-    display: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 48px !important;
+    padding: 7px 10px !important;
+    margin: 0 !important;
   }
 }

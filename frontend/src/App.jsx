@@ -969,7 +969,6 @@ function App() {
       <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""}`}>
         {page === "home" ? (
           <>
-            <button className="mobile-home-create" onClick={() => setCreateOpen(true)} aria-label="Create a post"><PlusSquare /></button>
             <button className="mobile-brand mobile-brand-centered" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
             <div className="mobile-header-actions">
               <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
