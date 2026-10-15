@@ -13898,3 +13898,57 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .notification-options-trigger{right:0!important;}
   .notification-followback{margin-left:auto!important;}
 }
+
+
+/* Notification screen: compact Instagram-inspired activity feed */
+.notifications-center-head{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  position:relative!important;min-height:44px!important;margin:0 0 10px!important;
+  padding:0 42px!important;background:transparent!important;border:0!important;
+}
+.notifications-center-head h1{font-size:19px!important;font-weight:750!important;text-align:center!important;margin:0!important;}
+.notifications-center-head .notifications-refresh{position:absolute!important;right:0!important;top:50%!important;transform:translateY(-50%)!important;color:#f5f7fa!important;background:transparent!important;}
+.notifications-back{display:none!important;}
+.notification-follow-request-summary{display:none!important;}
+.notification-tabs{display:flex!important;gap:7px!important;overflow-x:auto!important;white-space:nowrap!important;scrollbar-width:none!important;margin:0 -2px 18px!important;padding:0 2px 2px!important;border:0!important;}
+.notification-tabs::-webkit-scrollbar{display:none!important;}
+.notification-tabs button{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:6px!important;padding:8px 13px!important;min-height:32px!important;border:1px solid #30343a!important;border-radius:9px!important;background:#202329!important;color:#f5f7fa!important;font-size:11px!important;font-weight:600!important;}
+.notification-tabs button.active{background:#f5f6f7!important;color:#101216!important;border-color:#f5f6f7!important;}
+.notification-tabs .notification-tab-count{font-size:10px!important;}
+.notification-time-section{margin:0 0 15px!important;}
+.notification-time-heading{font-size:14px!important;font-weight:750!important;margin:12px 0 8px!important;color:#f5f7fa!important;}
+.notification-feed .notification-swipe-shell{display:flex!important;align-items:center!important;gap:8px!important;position:relative!important;border:0!important;border-radius:0!important;margin:0!important;padding:2px 0!important;min-width:0!important;}
+.notification-feed .notification-card{display:flex!important;align-items:center!important;gap:10px!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;min-height:65px!important;padding:8px 0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;text-align:left!important;}
+.notification-feed .notification-card:hover{background:transparent!important;}
+.notification-feed .notification-card>.avatar{width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;}
+.notification-copy{display:flex!important;flex:1 1 auto!important;min-width:0!important;flex-direction:column!important;gap:3px!important;font-size:12px!important;line-height:1.35!important;color:#f4f5f7!important;overflow-wrap:anywhere!important;}
+.notification-copy>span{display:block!important;}
+.notification-copy .profile-username-link{font-weight:650!important;}
+.notification-copy small{display:block!important;font-size:10px!important;line-height:1.3!important;color:#89919b!important;margin-top:1px!important;}
+.notification-options-trigger{position:static!important;transform:none!important;order:3!important;flex:0 0 25px!important;width:25px!important;height:32px!important;margin-left:0!important;color:#8c939d!important;}
+.notification-swipe-shell .notification-card{padding-right:0!important;}
+.notification-followback{position:static!important;order:2!important;flex:0 0 auto!important;align-self:center!important;min-width:78px!important;height:31px!important;padding:0 10px!important;margin:0!important;border-radius:7px!important;background:#4b5fff!important;color:#fff!important;font-size:10px!important;font-weight:700!important;white-space:nowrap!important;}
+.notification-followback.is-following{background:#24282e!important;color:#c5cad2!important;}
+.notification-inline-actions{position:absolute!important;right:4px!important;top:calc(100% - 2px)!important;z-index:8!important;}
+.notification-request-center .notification-request-row{border:0!important;border-bottom:0!important;}
+@media(max-width:700px){
+  .notifications-page{padding:8px 10px 88px!important;min-height:calc(100dvh - 57px)!important;background:#080b0f!important;color:#f5f7fa!important;}
+  .notifications-center-head{position:relative!important;top:auto!important;height:42px!important;margin:0 0 7px!important;padding:0 38px!important;}
+  .notifications-center-head h1{font-size:17px!important;}
+  .notifications-center-head .notifications-refresh{width:32px!important;height:32px!important;}
+  .notification-tabs{margin-bottom:14px!important;gap:6px!important;}
+  .notification-tabs button{padding:7px 11px!important;min-height:30px!important;font-size:10px!important;}
+  .notification-time-heading{font-size:13px!important;margin:13px 0 7px!important;}
+  .notification-feed .notification-card{min-height:62px!important;gap:9px!important;padding:7px 0!important;}
+  .notification-feed .notification-card>.avatar{width:43px!important;height:43px!important;min-width:43px!important;min-height:43px!important;}
+  .notification-copy{font-size:11px!important;line-height:1.32!important;}
+  .notification-copy small{font-size:9px!important;}
+  .notification-followback{min-width:76px!important;height:29px!important;padding:0 8px!important;font-size:10px!important;}
+  .notification-options-trigger{flex-basis:22px!important;width:22px!important;height:30px!important;}
+  .notification-avatar-stack{flex-basis:43px!important;width:43px!important;}
+}
+@media(max-width:360px){
+  .notification-feed .notification-card>.avatar{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
+  .notification-copy{font-size:10px!important;}
+  .notification-followback{min-width:68px!important;font-size:9px!important;padding:0 6px!important;}
+}

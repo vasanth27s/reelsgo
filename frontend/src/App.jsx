@@ -6118,6 +6118,23 @@ function NotificationsPage({ onBack }) {
     return result;
   }, [filteredItems]);
 
+  const notificationSections = useMemo(() => {
+    const now = new Date();
+    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startYesterday = startToday - 24 * 60 * 60 * 1000;
+    const startWeek = startToday - 6 * 24 * 60 * 60 * 1000;
+    const groups = new Map([["Today", []], ["Yesterday", []], ["Last 7 days", []], ["Earlier", []]]);
+    for (const item of displayNotifications) {
+      const stamp = new Date(item.createdAt || 0).getTime();
+      let label = "Earlier";
+      if (stamp >= startToday) label = "Today";
+      else if (stamp >= startYesterday) label = "Yesterday";
+      else if (stamp >= startWeek) label = "Last 7 days";
+      groups.get(label).push(item);
+    }
+    return [...groups.entries()].filter(([, rows]) => rows.length).map(([title, rows]) => ({ title, rows }));
+  }, [displayNotifications]);
+
   const tabs = [
     { id: "all", label: "All" },
     { id: "people", label: "People you follow" },
@@ -6129,20 +6146,11 @@ function NotificationsPage({ onBack }) {
   return (
     <div className="page notifications-page">
       <div className="notifications-center-head">
-        <button type="button" className="notifications-back" onClick={onBack} aria-label="Back to home"><ArrowLeft /></button>
         <h1>Notifications</h1>
         <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
           <Bell />
         </button>
       </div>
-      {activeTab !== "requests" && requests.length > 0 && (
-        <button type="button" className="notification-follow-request-summary" onClick={() => setActiveTab("requests")}>
-          <span className="notification-request-avatar"><Avatar user={requests[0]?.follower || requests[0]?.requester || requests[0]?.actor || requests[0]?.user || {}} size={48} /></span>
-          <span><b>Follow request{requests.length > 1 ? "s" : ""}</b><small>{requests[0]?.follower?.username || requests[0]?.requester?.username || requests[0]?.actor?.username || requests[0]?.user?.username || "Someone"}{requests.length > 1 ? ` and ${requests.length - 1} more` : ""}</small></span>
-          <i aria-hidden="true" />
-          <ChevronRight />
-        </button>
-      )}
 
       <div className="notification-tabs" role="tablist" aria-label="Notification filters">
         {tabs.map(tab => (
@@ -6213,7 +6221,10 @@ function NotificationsPage({ onBack }) {
           {loading ? (
             <div className="notification-center-state">Loading notifications...</div>
           ) : displayNotifications.length ? (
-            displayNotifications.map(n => {
+            notificationSections.map(section => (
+              <div className="notification-time-section" key={section.title}>
+                <h2 className="notification-time-heading">{section.title}</h2>
+                {section.rows.map(n => {
               const notificationId = String(n._groupKey || n._id);
               const isMenuOpen = notificationMenuId === notificationId;
               const actorId = String(n?.actor?._id || n?.actorId || n?.userId || "");
@@ -6303,7 +6314,9 @@ function NotificationsPage({ onBack }) {
                   )}
                 </div>
               );
-            })
+                })}
+              </div>
+            ))
           ) : (
             <div className="notification-center-state notification-center-empty">
               <Bell />
