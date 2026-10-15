@@ -7584,7 +7584,7 @@ function SaveButton({ onClick, children = "Save changes" }) {
 function TextSetting({ label, value, onChange, placeholder = "", maxLength = 1000 }) {
   return <label className="rg-pro-field">{label}<textarea value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} rows={3} /></label>;
 }
-function Toggle({ checked, onChange, children }) {
+function ProToggle({ checked, onChange, children }) {
   return <label className="rg-pro-toggle"><input type="checkbox" checked={!!checked} onChange={e => onChange(e.target.checked)} /> <span>{children}</span></label>;
 }
 
@@ -7683,7 +7683,7 @@ function ProfessionalPanelDetails({
     const checklist = toolData.checklist || {};
     return <>
       <p className="rg-pro-panel-intro">A practical creator checklist. Your completion choices are saved to your ReelsGo tool settings.</p>
-      <Section title="Account checklist">{checks.map(([key, label]) => <Toggle key={key} checked={checklist[key]} onChange={value => update("checklist", { ...checklist, [key]: value })}>{label}</Toggle>)}</Section>
+      <Section title="Account checklist">{checks.map(([key, label]) => <ProToggle key={key} checked={checklist[key]} onChange={value => update("checklist", { ...checklist, [key]: value })}>{label}</ProToggle>)}</Section>
       <SaveButton onClick={save}>Save checklist</SaveButton>
     </>;
   }
@@ -7709,7 +7709,7 @@ function ProfessionalPanelDetails({
       <p className="rg-pro-panel-intro">Record partnership details for your own workflow. This does not publish a paid-partnership label to external platforms.</p>
       <TextSetting label="Brand / partner name" value={toolData.partnerName} onChange={value => update("partnerName", value)} placeholder="Enter a brand or partner" maxLength={160} />
       <TextSetting label="Campaign notes" value={toolData.campaignNotes} onChange={value => update("campaignNotes", value)} placeholder="Deliverables, dates, disclosure notes…" maxLength={4000} />
-      <Toggle checked={toolData.disclosureReminder} onChange={value => update("disclosureReminder", value)}>Remind me to check sponsorship disclosure before publishing</Toggle>
+      <ProToggle checked={toolData.disclosureReminder} onChange={value => update("disclosureReminder", value)}>Remind me to check sponsorship disclosure before publishing</ProToggle>
       <SaveButton onClick={save} />
     </>;
   }
@@ -7743,7 +7743,7 @@ function ProfessionalPanelDetails({
       <p className="rg-pro-panel-intro">Plan a test Reel here. ReelsGo does not currently distribute trial Reels to a separate non-follower audience automatically.</p>
       <TextSetting label="Test Reel concept" value={toolData.concept} onChange={value => update("concept", value)} placeholder="What are you testing?" maxLength={1000} />
       <TextSetting label="Hypothesis / success criteria" value={toolData.successCriteria} onChange={value => update("successCriteria", value)} placeholder="What would make this test useful?" maxLength={1000} />
-      <Toggle checked={toolData.readyToPublish} onChange={value => update("readyToPublish", value)}>Mark this test plan ready</Toggle>
+      <ProToggle checked={toolData.readyToPublish} onChange={value => update("readyToPublish", value)}>Mark this test plan ready</ProToggle>
       <SaveButton onClick={save} />
     </>;
   }
@@ -7785,7 +7785,7 @@ function ProfessionalPanelDetails({
     return <>
       <p className="rg-pro-panel-intro">These preferences are stored with your ReelsGo professional tool settings.</p>
       <label className="rg-pro-field">Dashboard note / goal<textarea value={toolData.dashboardGoal || ""} onChange={e => update("dashboardGoal", e.target.value)} placeholder="What do you want to focus on this month?" maxLength={1000} rows={3} /></label>
-      <Toggle checked={toolData.showZeroMetrics !== false} onChange={value => update("showZeroMetrics", value)}>Show metrics even when the recorded value is zero</Toggle>
+      <ProToggle checked={toolData.showZeroMetrics !== false} onChange={value => update("showZeroMetrics", value)}>Show metrics even when the recorded value is zero</ProToggle>
       <SaveButton onClick={save} />
     </>;
   }
