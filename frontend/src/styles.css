@@ -14634,3 +14634,47 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     background:#f8fafc !important;
   }
 }
+
+
+/* Targeted wallpaper visibility fix (2026-10-16).
+   Keep the existing UI unchanged; let the selected gallery photo render on the chat
+   shell and keep the header, message list, and composer transparent over it. */
+.chat-layout.instagram-chat-layout {
+  background-image: var(--rg-chat-wallpaper, none) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+.chat-layout.instagram-chat-layout .chat.instagram-chat {
+  background-color: transparent !important;
+  background-image: var(--rg-chat-wallpaper, none) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+.chat-layout.instagram-chat-layout .chat-messages.instagram-chat-messages {
+  background-color: transparent !important;
+  background-image: var(--rg-chat-wallpaper, none) !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+@media (max-width: 700px) {
+  .messages-page.is-mobile-chat .instagram-chat-layout {
+    background-color: #000 !important;
+    background-image: none !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat {
+    background-color: #000 !important;
+    background-image: var(--rg-chat-wallpaper, none) !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+  }
+  .messages-page.is-mobile-chat .instagram-chat-head,
+  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages,
+  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+}
