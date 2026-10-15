@@ -13952,3 +13952,19 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
   .notification-copy{font-size:10px!important;}
   .notification-followback{min-width:68px!important;font-size:9px!important;padding:0 6px!important;}
 }
+
+
+/* ReelsGo chat media attachments: images and videos sent directly in messages. */
+.messages-page .chat-attached-media { display:flex; flex-direction:column; gap:7px; max-width:min(260px, 68vw); margin:2px 0 5px; }
+.messages-page .chat-attached-media img,
+.messages-page .chat-attached-media video { display:block; width:auto; max-width:100%; max-height:360px; border-radius:12px; object-fit:contain; background:#050608; }
+.messages-page .chat-attached-media img { cursor:zoom-in; }
+.messages-page .chat-attached-media a { display:block; max-width:100%; }
+.messages-page .chat-attached-caption { margin:2px 2px 4px; color:inherit; overflow-wrap:anywhere; font-size:inherit; line-height:1.4; }
+.messages-page .chat-attachment-file-input { display:none !important; }
+.messages-page .chat-attach-button:disabled { opacity:.5; cursor:wait; }
+@media (max-width:700px) {
+  .messages-page.is-mobile-chat .chat-attached-media { max-width:min(250px, 72vw); }
+  .messages-page.is-mobile-chat .chat-attached-media img,
+  .messages-page.is-mobile-chat .chat-attached-media video { max-height:42dvh; }
+}

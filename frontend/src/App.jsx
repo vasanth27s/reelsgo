@@ -4981,6 +4981,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const chatAttachmentInput = useRef(null);
   const [mobileChat, setMobileChat] = useState(false);
   const [conversationQuery, setConversationQuery] = useState('');
   const [conversationMenuId, setConversationMenuId] = useState(null);
@@ -5567,7 +5569,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   }
 
   async function sendMessage() {
-    if (!active || !text.trim() || sending) return;
+    if (!active || !text.trim() || sending || uploadingMedia) return;
     setSending(true);
     try {
       const d = await api(`/messages/conversations/${active._id}/messages`, {
@@ -5578,6 +5580,36 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
       await loadConversations(active._id);
     } catch (e) { alert(e.message); }
     finally { setSending(false); }
+  }
+
+  async function sendChatMedia(file) {
+    if (!active || !file || uploadingMedia || sending) return;
+    const allowed = file.type.startsWith('image/') || file.type.startsWith('video/');
+    if (!allowed) { alert('Choose an image or video.'); return; }
+    const maxBytes = 15 * 1024 * 1024;
+    if (file.size > maxBytes) { alert('Choose a file smaller than 15 MB.'); return; }
+    setUploadingMedia(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const uploaded = await api('/media', { method: 'POST', body: form });
+      const media = uploaded?.media;
+      if (!media?._id) throw new Error('The media upload did not return a media ID.');
+      const messageData = await api(`/messages/conversations/${active._id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.trim(), mediaId: media._id, kind: media.kind || (file.type.startsWith('video/') ? 'video' : 'image') })
+      });
+      if (messageData.message) setMessages(current => [...current, messageData.message]);
+      setText('');
+      setEmojiOpen(false);
+      await loadConversations(active._id);
+    } catch (error) {
+      alert(error?.message || 'Could not send that media. Please try again.');
+    } finally {
+      setUploadingMedia(false);
+      if (chatAttachmentInput.current) chatAttachmentInput.current.value = '';
+    }
   }
 
   async function deleteMessage(messageId) {
@@ -5821,7 +5853,20 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                       }}
                       onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
                     >
-                      <SharedMediaMessage text={m.text} />
+                      {m.mediaId && (typeof m.mediaId === 'object' ? m.mediaId._id : m.mediaId) ? (() => {
+                        const media = m.mediaId;
+                        const mediaId = typeof media === 'object' ? media._id : media;
+                        const mediaKind = m.kind || (typeof media === 'object' ? media.kind : 'image');
+                        const mediaUrl = typeof media === 'object' && media.url
+                          ? (/^https?:\/\//i.test(media.url) ? media.url : `${SERVER}${media.url.startsWith('/') ? '' : '/'}${media.url}`)
+                          : `${SERVER}/api/media/${mediaId}`;
+                        return <div className="chat-attached-media" onClick={event => event.stopPropagation()}>
+                          {mediaKind === 'video'
+                            ? <video src={mediaUrl} controls playsInline preload="metadata" />
+                            : <a href={mediaUrl} target="_blank" rel="noreferrer"><img src={mediaUrl} alt="Image attachment" loading="lazy" /></a>}
+                          {m.text?.trim() && <p className="chat-attached-caption"><MessageText text={m.text} /></p>}
+                        </div>;
+                      })() : <SharedMediaMessage text={m.text} />}
                       <div className="message-meta">
                         <small>{time(m.createdAt)}</small>
                         {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
@@ -5839,7 +5884,15 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
               }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><p>@{other(active)?.username}</p><span>Start a conversation with this person.</span></div>}
             </div>
             <div className="chat-input instagram-chat-input" ref={emojiPickerRef}>
-              <button type="button" className="chat-attach-button" aria-label="Attach" title="Attach"><Paperclip /></button>
+              <input
+                ref={chatAttachmentInput}
+                className="chat-attachment-file-input"
+                type="file"
+                accept="image/*,video/*"
+                hidden
+                onChange={event => { const file = event.target.files?.[0]; if (file) sendChatMedia(file); }}
+              />
+              <button type="button" className="chat-attach-button" aria-label="Attach image or video" title={uploadingMedia ? "Uploading media…" : "Attach image or video"} onClick={() => chatAttachmentInput.current?.click()} disabled={uploadingMedia || sending || !active}><Paperclip /></button>
               <div className="chat-message-field">
                 <input
                   value={text}
@@ -5854,8 +5907,8 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                     });
                   }}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Message..."
-                  disabled={sending}
+                  placeholder={uploadingMedia ? "Sending media…" : "Message..."}
+                  disabled={sending || uploadingMedia}
                   aria-label="Message"
                 />
                 <button
