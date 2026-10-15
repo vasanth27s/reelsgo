@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import reelsGoLogo from "../image.png";
 import {
-  Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut,
+  Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
   Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
@@ -944,7 +944,7 @@ function App() {
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
           <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
-          <Nav icon={<Heart />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
+          <Nav icon={<Bell />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
           <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
           <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={openOwnProfile} />
         </div>
@@ -959,7 +959,7 @@ function App() {
       <header className="mobile-header">
         <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
         <div className="mobile-header-actions">
-          <button onClick={() => navigate("notifications")} aria-label="Notifications"><Heart /></button>
+          <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
           <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
         </div>
       </header>
@@ -1007,7 +1007,7 @@ function App() {
         }} />}
         {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
         {page === "messages" && <MessagesPage openConversationId={openConversationId} openConversationData={openConversationData} />}
-        {page === "notifications" && <NotificationsPage />}
+        {page === "notifications" && <NotificationsPage onBack={() => navigate("home")} />}
         {page === "saved" && <SavedPage user={user} />}
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
@@ -4085,7 +4085,7 @@ function ReelsPage({ onCreate }) {
   }
 
   function toggleReelSound(reelId) {
-    const nextEnabled = !soundEnabledById[String(reelId)];
+    const nextEnabled = soundEnabledById[String(reelId)] === false;
     setSoundEnabledById(current => ({ ...current, [String(reelId)]: nextEnabled }));
     const video = scrollRef.current?.querySelector(`[data-reel-id="${String(reelId)}"] video`);
     if (video) {
@@ -4149,7 +4149,7 @@ function ReelsPage({ onCreate }) {
                   <div className="reel-feed-media">
                     <video
                       src={`${SERVER}${r.mediaUrl}`}
-                      muted={!soundEnabledById[String(r._id)]}
+                      muted={soundEnabledById[String(r._id)] === false}
                       playsInline
                       controls={false}
                       onClick={e => {
@@ -4169,7 +4169,7 @@ function ReelsPage({ onCreate }) {
                       <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
                       <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
-                      <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
                     </div>
                     <div className="reel-feed-top">
@@ -4321,7 +4321,7 @@ function ReelsPage({ onCreate }) {
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
                       <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
                       <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
-                      <button type="button" aria-label={soundEnabledById[String(r._id)] ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] ? "Sound on" : "Sound off"}</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
                     </div>
                     <div className="reel-feed-bottom">
                       <button
@@ -5962,7 +5962,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   );
 }
 
-function NotificationsPage() {
+function NotificationsPage({ onBack }) {
   const [items, setItems] = useState([]);
   const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
@@ -6129,11 +6129,20 @@ function NotificationsPage() {
   return (
     <div className="page notifications-page">
       <div className="notifications-center-head">
+        <button type="button" className="notifications-back" onClick={onBack} aria-label="Back to home"><ArrowLeft /></button>
         <h1>Notifications</h1>
         <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
           <Bell />
         </button>
       </div>
+      {activeTab !== "requests" && requests.length > 0 && (
+        <button type="button" className="notification-follow-request-summary" onClick={() => setActiveTab("requests")}>
+          <span className="notification-request-avatar"><Avatar user={requests[0]?.follower || requests[0]?.requester || requests[0]?.actor || requests[0]?.user || {}} size={48} /></span>
+          <span><b>Follow request{requests.length > 1 ? "s" : ""}</b><small>{requests[0]?.follower?.username || requests[0]?.requester?.username || requests[0]?.actor?.username || requests[0]?.user?.username || "Someone"}{requests.length > 1 ? ` and ${requests.length - 1} more` : ""}</small></span>
+          <i aria-hidden="true" />
+          <ChevronRight />
+        </button>
+      )}
 
       <div className="notification-tabs" role="tablist" aria-label="Notification filters">
         {tabs.map(tab => (

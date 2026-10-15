@@ -13867,3 +13867,34 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
 .notification-options-trigger:hover { background:rgba(255,255,255,.08); color:var(--text,#f5f7fa); }
 .notification-swipe-shell .notification-card { padding-right:42px !important; }
 .notification-swipe-shell .notification-copy { min-width:0; }
+
+
+/* ReelsGo notification refresh: Instagram-inspired, clean mobile layout */
+.notifications-page{background:#080b0f!important;color:#f5f7fa!important;}
+.notifications-center-head{display:grid!important;grid-template-columns:40px 1fr 40px!important;align-items:center!important;gap:8px!important;}
+.notifications-center-head h1{text-align:center!important;font-size:20px!important;}
+.notifications-back{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:transparent;color:#f5f7fa;}
+.notifications-back:hover{background:#1b2026;}
+.notification-follow-request-summary{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:18px 0 20px;background:transparent;color:#f5f7fa;border-bottom:1px solid #292d32;margin:8px 0 20px;}
+.notification-follow-request-summary>span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
+.notification-follow-request-summary b{font-size:15px;font-weight:750;}
+.notification-follow-request-summary small{font-size:14px;color:#aeb4bd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.notification-follow-request-summary i{width:10px;height:10px;border-radius:50%;background:#536dff;flex:none;}
+.notification-follow-request-summary>svg{color:#9ca3af;flex:none;}
+.notification-request-avatar{display:flex;flex:none;}
+.notification-request-avatar .avatar{border:1px solid #d946ef;}
+@media(max-width:700px){
+  .notifications-page{min-height:calc(100dvh - 57px)!important;padding:8px 10px 88px!important;background:#080b0f!important;}
+  .notifications-center-head{position:sticky!important;top:57px!important;z-index:15!important;height:48px!important;margin:0 -2px 8px!important;background:#080b0f!important;}
+  .notifications-center-head h1{font-size:18px!important;}
+  .notifications-center-head .notifications-refresh{width:38px!important;height:38px!important;}
+  .notification-tabs{display:none!important;}
+  .notification-follow-request-summary{padding:16px 0 18px!important;margin:0 0 18px!important;gap:12px!important;}
+  .notification-feed .notification-swipe-shell{border:0!important;margin:0!important;}
+  .notification-feed .notification-card{background:transparent!important;border:0!important;border-radius:0!important;min-height:76px!important;padding:10px 38px 10px 0!important;margin:0!important;box-shadow:none!important;}
+  .notification-feed .notification-card:hover{background:transparent!important;}
+  .notification-copy{font-size:14px!important;line-height:1.35!important;}
+  .notification-copy small{font-size:11px!important;color:#8e959f!important;}
+  .notification-options-trigger{right:0!important;}
+  .notification-followback{margin-left:auto!important;}
+}
