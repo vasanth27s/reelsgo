@@ -14125,3 +14125,18 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
 .rg-pro-dashboard-sheet:not(:has(.rg-pro-dashboard-scroll))>h2{padding:0 22px 12px 54px;text-align:left;}
 .rg-pro-dashboard-sheet .rg-pro-detail-primary{flex:none;width:calc(100% - 32px);margin:8px 16px 0;min-height:42px;border-radius:7px;background:#4d5fff;}
 @media(max-width:600px){.rg-pro-dashboard-sheet{width:100%;height:100dvh;max-height:100dvh;border-radius:0;padding-top:calc(16px + env(safe-area-inset-top));}.rg-pro-dashboard-scroll{flex:1;}.rg-pro-dashboard-entry-button{padding:10px 0;}}
+
+
+/* Dashboard navigation/header correction: visible back arrow and profile placement. */
+.rg-pro-dashboard-entry{order:3;position:relative;clear:both;margin:8px 0 14px;width:100%;}
+.rg-profile-action-row{order:2;position:relative;}
+.rg-pro-sheet-header{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:8px;min-height:48px;padding:0 14px 10px;border-bottom:1px solid #202428;flex:none;}
+.rg-pro-sheet-header h2{min-width:0!important;margin:0!important;padding:0!important;text-align:center!important;font-size:14px!important;font-weight:650;letter-spacing:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rg-pro-sheet-back,.rg-pro-sheet-settings{display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:#252a2e;color:#f5f5f5;cursor:pointer;}
+.rg-pro-sheet-back:focus-visible,.rg-pro-sheet-settings:focus-visible{outline:2px solid #d8dce1;outline-offset:2px;}
+.rg-pro-sheet-right-spacer{width:38px;height:38px;display:block;}
+.rg-pro-dashboard-sheet .rg-pro-dashboard-scroll{flex:1;min-height:0;}
+.rg-pro-dashboard-sheet .rg-pro-dashboard-group{padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #202428;}
+.rg-pro-dashboard-sheet .rg-pro-dashboard-row{border-radius:0;}
+.rg-pro-dashboard-sheet .rg-pro-dashboard-row em{background:#4d5fff;}
+@media(max-width:600px){.rg-pro-dashboard-sheet{padding-top:calc(8px + env(safe-area-inset-top));}.rg-pro-sheet-header{padding-top:2px;padding-bottom:9px;}.rg-pro-dashboard-entry-button{padding:10px 4px;}.rg-pro-dashboard-entry-button .rg-pro-entry-icon{display:none;}.rg-pro-entry-copy b{font-size:14px;}.rg-pro-dashboard-sheet .rg-pro-dashboard-row{min-height:43px;padding-left:16px;padding-right:16px;}}

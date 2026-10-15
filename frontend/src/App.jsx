@@ -3370,9 +3370,12 @@ function ProfilePage({ user, setUser }) {
           {professionalPanel && (
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
               <section className="rg-pro-detail-sheet rg-pro-dashboard-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
-                <button type="button" className="rg-pro-detail-close" onClick={() => setProfessionalPanel("")} aria-label="Close">×</button>
+                <div className="rg-pro-sheet-header">
+                  <button type="button" className="rg-pro-sheet-back" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")} aria-label={professionalPanel === "Your dashboard" ? "Back to profile" : "Back to dashboard"}><ArrowLeft size={22} /></button>
+                  <h2>{professionalPanel}</h2>
+                  {professionalPanel === "Your dashboard" ? <button type="button" className="rg-pro-sheet-settings" onClick={() => setProfessionalPanel("Dashboard settings")} aria-label="Dashboard settings"><Settings size={20}/></button> : <span className="rg-pro-sheet-right-spacer" />}
+                </div>
                 {professionalPanel === "Your dashboard" ? <>
-                  <h2>Your dashboard</h2>
                   <div className="rg-pro-dashboard-scroll">
                     <div className="rg-pro-dashboard-group">
                       <h3>Insights <small>15 Sep–14 Oct</small></h3>
@@ -3394,18 +3397,16 @@ function ProfilePage({ user, setUser }) {
                     <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
                   </div>
                 </> : <>
-                  <button type="button" className="rg-pro-detail-back" onClick={() => setProfessionalPanel("Your dashboard")}>‹ <span>Your dashboard</span></button>
-                  <h2>{professionalPanel}</h2>
                   {["Views","Insights","New followers","Content you shared"].includes(professionalPanel) ? <>
                     <p>Performance overview for your ReelsGo account.</p>
                     <div className="rg-pro-detail-stats"><div><b>{posts.length + reels.length}</b><small>Content shared</small></div><div><b>{user?.followersCount || 0}</b><small>Followers</small></div><div><b>{reels.length}</b><small>Reels</small></div></div>
                     <p className="rg-pro-detail-note">Detailed reach, impressions and audience analytics require the corresponding backend analytics data.</p>
                   </> : <>
-                    <p>{({"Monthly recap":"Review a summary of your recent posts, Reels and audience activity.","Best practices":"Explore guidance for creation, engagement, reach and monetization.","Inspiration":"Find content ideas and creative inspiration for your next post.","Branded content":"Manage paid partnership labels and creator approvals. Some features require eligibility.","Affiliate programmes":"Affiliate connections and commissions require a supported partner integration.","Partnership ads":"Review partner permissions and promotion settings. Ad delivery requires an advertising integration.","Ad tools":"Prepare a promotion for a post or Reel. Campaign creation requires an ad-service integration.","Trial reels":"Trial Reels let you test content with non-followers when supported by the app.","Payouts":"Payout details, transactions and tax forms require a configured payout provider.","Gifts":"Gift availability and earnings depend on account eligibility and a payout setup.","Saved replies":"Create reusable answers for common messages. Saved replies are a local interface feature in this version.","Trending audio":"Discover trending audio to inspire your Reels.","Other helpful resources":"Find resources for creators, comment management and account safety.","All tools":"All professional tools available in ReelsGo are listed on the dashboard."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p>
+                    <p>{({"Monthly recap":"Review a summary of your recent posts, Reels and audience activity.","Best practices":"Explore guidance for creation, engagement, reach and monetization.","Inspiration":"Find content ideas and creative inspiration for your next post.","Branded content":"Manage paid partnership labels and creator approvals. Some features require eligibility.","Affiliate programmes":"Affiliate connections and commissions require a supported partner integration.","Partnership ads":"Review partner permissions and promotion settings. Ad delivery requires an advertising integration.","Ad tools":"Prepare a promotion for a post or Reel. Campaign creation requires an ad-service integration.","Trial reels":"Trial Reels let you test content with non-followers when supported by the app.","Payouts":"Payout details, transactions and tax forms require a configured payout provider.","Gifts":"Gift availability and earnings depend on account eligibility and a payout setup.","Saved replies":"Create reusable answers for common messages. Saved replies are a local interface feature in this version.","Trending audio":"Discover trending audio to inspire your Reels.","Other helpful resources":"Find resources for creators, comment management and account safety.","All tools":"All professional tools available in ReelsGo are listed on the dashboard.","Dashboard settings":"Manage professional dashboard preferences and account tools."})[professionalPanel] || "Professional tools for your ReelsGo account."}</p>
                     <div className="rg-pro-detail-note">Your existing posts, Reels, followers and messages remain unchanged. External ad, affiliate, payout and platform-only features need their respective service integrations.</div>
                   </>}
                 </>}
-                <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>
+                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel("")}>Done</button>}
               </section>
             </div>
           )}
