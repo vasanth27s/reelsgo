@@ -15054,3 +15054,45 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     outline-offset: 2px !important;
   }
 }
+
+
+/* Profile options must cover the whole viewport and sit above the mobile nav. */
+.rg-profile-options-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 14px max(12px, env(safe-area-inset-bottom)) !important;
+  background: rgba(0, 0, 0, .62) !important;
+}
+.rg-profile-options-sheet {
+  width: min(100%, 680px) !important;
+  flex: 0 1 auto !important;
+  max-height: min(78dvh, 820px) !important;
+  margin: 0 auto !important;
+}
+.rg-profile-options-cancel {
+  display: block !important;
+  width: min(100%, 680px) !important;
+  flex: 0 0 auto !important;
+  margin: 10px auto 0 !important;
+}
+body:has(.rg-profile-options-backdrop) .bottom-nav,
+body:has(.rg-profile-options-backdrop) .glass-bottom-nav,
+body:has(.rg-profile-options-backdrop) .mobile-bottom-nav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+@media (max-width: 700px) {
+  .rg-profile-options-backdrop { padding: 0 14px max(10px, env(safe-area-inset-bottom)) !important; }
+  .rg-profile-options-sheet { width: 100% !important; max-height: 78dvh !important; border-radius: 25px 25px 18px 18px !important; }
+  .rg-profile-options-sheet button { min-height: 51px !important; font-size: 15px !important; }
+  .rg-profile-options-cancel { min-height: 52px !important; border-radius: 18px !important; }
+}

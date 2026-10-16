@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
@@ -5344,22 +5345,25 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
       {profileActionNotice && <div className="rg-profile-action-toast" role="status">{profileActionNotice}<button type="button" onClick={() => setProfileActionNotice("")} aria-label="Dismiss notice"><X size={15}/></button></div>}
 
-      {profileOptionsOpen && !isSelf && <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
-        <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
-          <div className="rg-profile-options-handle" />
-          <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
-        </section>
-        <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
-      </div>}
+      {profileOptionsOpen && !isSelf && createPortal(
+        <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
+          <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
+            <div className="rg-profile-options-handle" />
+            <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
+          </section>
+          <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
+        </div>,
+        document.body
+      )}
 
       {profileAboutOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="About this account" onMouseDown={e => { if (e.target === e.currentTarget) setProfileAboutOpen(false); }}><section className="rg-profile-info-card"><div className="rg-profile-info-icon"><CircleUser size={30}/></div><h2>About this account</h2><p className="rg-profile-info-username">@{u.username}</p><div className="rg-profile-info-row"><span>Joined ReelsGo</span><b>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date not available"}</b></div><div className="rg-profile-info-row"><span>Account type</span><b>{u.isPrivate ? "Private" : "Public"}</b></div><div className="rg-profile-info-row"><span>Verification</span><b>{verificationStatusCache.get(String(u._id)) ? "Verified" : "Not verified"}</b></div><button type="button" className="rg-profile-info-done" onClick={() => setProfileAboutOpen(false)}>Done</button></section></div>}
 
