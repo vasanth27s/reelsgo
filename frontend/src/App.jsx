@@ -1017,7 +1017,7 @@ function App() {
         </div>
       </aside>
 
-      <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""}`}>
+      <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""} ${page === "user-profile" ? "mobile-header-profile" : ""}`}>
         {page === "home" ? (
           <>
             <button className="mobile-home-create" onClick={() => setCreateOpen(true)} aria-label="Create post"><PlusSquare /></button>
@@ -1054,7 +1054,7 @@ function App() {
         </div>
       )}
 
-      <main className="main">
+      <main className={`main ${page === "user-profile" ? "main-public-profile" : ""}`}>
         {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
         {page === "shared-post" && <SharedPostPage postId={sharedPostId} user={user} onBack={() => navigate("home")} />}
         {page === "shared-reel" && <SharedReelPage reelId={sharedReelId} onBack={() => navigate("home")} />}
@@ -5090,6 +5090,16 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
+  const [profileOptionsOpen, setProfileOptionsOpen] = useState(false);
+  const [profileAboutOpen, setProfileAboutOpen] = useState(false);
+  const [sharedActivityOpen, setSharedActivityOpen] = useState(false);
+  const [profileQrOpen, setProfileQrOpen] = useState(false);
+  const [profileActionBusy, setProfileActionBusy] = useState(false);
+  const [profileActionNotice, setProfileActionNotice] = useState("");
+  const [storyHidden, setStoryHidden] = useState(false);
+  const [profileNotifications, setProfileNotifications] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true; } catch { return false; }
+  });
 
   async function load() {
     setLoading(true);
@@ -5106,7 +5116,20 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
   useEffect(() => {
     setTab("posts");
+    setProfileOptionsOpen(false);
+    try { setProfileNotifications(JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true); } catch { setProfileNotifications(false); }
     load();
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    api("/users/me/settings/story-hidden").then(data => {
+      if (!cancelled) setStoryHidden((data.userIds || []).some(id => String(id) === String(userId)));
+    }).catch(() => {
+      try { setStoryHidden((JSON.parse(localStorage.getItem("reelsgo_hidden_story_users") || "[]")).includes(String(userId))); } catch {}
+    });
+    return () => { cancelled = true; };
   }, [userId]);
 
   async function toggleFollow() {
@@ -5140,10 +5163,96 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const reels = profile.reels || [];
   const tagged = profile.tagged || [];
 
+  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(u._id)}`;
+  async function copyProfileUrl() {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(profileUrl);
+      else window.prompt("Copy profile URL:", profileUrl);
+      setProfileActionNotice("Profile URL copied.");
+    } catch { window.prompt("Copy profile URL:", profileUrl); }
+    setProfileOptionsOpen(false);
+  }
+
+  async function runProfileAction(action) {
+    if (profileActionBusy) return;
+    setProfileActionNotice("");
+    if (action === "about") { setProfileOptionsOpen(false); setProfileAboutOpen(true); return; }
+    if (action === "activity") { setProfileOptionsOpen(false); setSharedActivityOpen(true); return; }
+    if (action === "qr") { setProfileOptionsOpen(false); setProfileQrOpen(true); return; }
+    if (action === "share") {
+      setProfileOptionsOpen(false);
+      try {
+        if (navigator.share) await navigator.share({ title: `@${u.username} on ReelsGo`, text: `Check out @${u.username} on ReelsGo`, url: profileUrl });
+        else await copyProfileUrl();
+      } catch (error) { if (error?.name !== "AbortError") await copyProfileUrl(); }
+      return;
+    }
+    if (action === "copy") { await copyProfileUrl(); return; }
+    if (action === "report") {
+      const reason = window.prompt("Why are you reporting this account?\nEnter a reason such as Spam, Impersonation, or Harassment:", "Spam");
+      if (!reason?.trim()) return;
+      setProfileActionBusy(true);
+      try {
+        await api("/reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetType: "user", targetId: u._id, reason: reason.trim(), details: `Reported profile @${u.username}` }) });
+        setProfileOptionsOpen(false); setProfileActionNotice("Report submitted for review.");
+      } catch (e) { alert(e.message || "Could not submit report."); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "restrict" || action === "block") {
+      const label = action === "block" ? "Block" : "Restrict";
+      if (!window.confirm(`${label} @${u.username}?`)) return;
+      setProfileActionBusy(true);
+      try {
+        await api(`/users/me/settings/people/${action === "block" ? "blocked" : "restricted"}/${encodeURIComponent(u._id)}`, { method: "POST" });
+        setProfileOptionsOpen(false);
+        setProfileActionNotice(`@${u.username} ${action === "block" ? "blocked" : "restricted"}.`);
+        if (action === "block") onBack();
+      } catch (e) { alert(e.message || `Could not ${action} this account.`); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "hideStory") {
+      setProfileActionBusy(true);
+      try {
+        if (storyHidden) await api(`/users/me/settings/story-hidden/${encodeURIComponent(u._id)}`, { method: "DELETE" });
+        else await api(`/users/me/settings/story-hidden/${encodeURIComponent(u._id)}`, { method: "POST" });
+        const next = !storyHidden; setStoryHidden(next);
+        try {
+          const saved = JSON.parse(localStorage.getItem("reelsgo_hidden_story_users") || "[]");
+          const ids = next ? [...new Set([...saved.map(String), String(u._id)])] : saved.filter(id => String(id) !== String(u._id));
+          localStorage.setItem("reelsgo_hidden_story_users", JSON.stringify(ids));
+        } catch {}
+        setProfileOptionsOpen(false); setProfileActionNotice(next ? `Stories from @${u.username} hidden.` : `Stories from @${u.username} unhidden.`);
+      } catch (e) { alert(e.message || "Could not update story visibility."); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "removeFollower") {
+      if (!window.confirm(`Remove @${u.username} from your followers?`)) return;
+      setProfileActionBusy(true);
+      try {
+        const data = await api(`/follows/followers/${encodeURIComponent(u._id)}`, { method: "DELETE" });
+        setProfileOptionsOpen(false);
+        setProfileActionNotice(data?.removed ? `@${u.username} removed from your followers.` : `@${u.username} is not currently following you.`);
+        if (data?.removed) await load();
+      } catch (e) { alert(e.message || "Could not remove follower."); }
+      finally { setProfileActionBusy(false); }
+    }
+  }
+
   return (
     <div className="page profile-page">
-      <div className="profile-back-row">
-        <button className="secondary" onClick={onBack}><ChevronRight style={{ transform: "rotate(180deg)" }} /> Back to search</button>
+      <div className="rg-public-profile-topbar">
+        <button type="button" onClick={onBack} aria-label="Go back"><ArrowLeft size={23}/></button>
+        <strong>@{u.username || "user"}</strong>
+        <span className="rg-public-profile-topbar-spacer" />
+        <button type="button" aria-label={profileNotifications ? "Turn off post notifications" : "Turn on post notifications"} title={profileNotifications ? "Notifications on" : "Notifications off"} onClick={() => {
+          const next = !profileNotifications; setProfileNotifications(next);
+          try { const saved = JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}"); saved[String(u._id)] = next; localStorage.setItem("reelsgo_profile_notifications", JSON.stringify(saved)); } catch {}
+          setProfileActionNotice(next ? `Notifications enabled for @${u.username} on this device.` : `Notifications disabled for @${u.username}.`);
+        }}><Bell size={22} fill={profileNotifications ? "currentColor" : "none"}/></button>
+        {!isSelf && <button type="button" aria-label="More profile options" aria-expanded={profileOptionsOpen} onClick={() => setProfileOptionsOpen(true)}><MoreHorizontal size={23}/></button>}
       </div>
 
       <div className="profile-header">
@@ -5153,27 +5262,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
         <div className="profile-details">
           <div className="profile-line">
-            <h1>{u.username} <VerifiedBadge userId={u?._id} /></h1>
-            {!isSelf && (
-              <>
-                <button
-                  className={profile.followStatus === "accepted" ? "secondary" : "primary"}
-                  onClick={toggleFollow}
-                  disabled={followLoading}
-                >
-                  {followLoading
-                    ? "Please wait..."
-                    : profile.followStatus === "accepted"
-                      ? "Following"
-                      : profile.followStatus === "pending"
-                        ? "Requested"
-                        : "Follow"}
-                </button>
-                <button className="secondary" onClick={() => onMessage(u._id)}>
-                  <MessageCircle /> Message
-                </button>
-              </>
-            )}
+            <h1 className="rg-public-profile-display-name">{u.name || u.username} <VerifiedBadge userId={u?._id} /></h1>
           </div>
 
           <div className="profile-stats">
@@ -5211,6 +5300,14 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
         </div>
       </div>
 
+      {!isSelf && <div className="rg-public-profile-actions">
+        <button type="button" className={profile.followStatus === "accepted" ? "secondary" : "primary"} onClick={toggleFollow} disabled={followLoading}>
+          {followLoading ? "Please wait…" : profile.followStatus === "accepted" ? <>Following <ChevronDown size={16}/></> : profile.followStatus === "pending" ? "Requested" : "Follow"}
+        </button>
+        <button type="button" className="secondary" onClick={() => onMessage(u._id)}><MessageCircle/> Message</button>
+        <button type="button" className="secondary" aria-label="Profile options" onClick={() => setProfileOptionsOpen(true)}><UserPlus/></button>
+      </div>}
+
       <div className="profile-tabs">
         <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
         <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}><Film /> Reels</button>
@@ -5244,6 +5341,31 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
           )}
         </>
       )}
+
+      {profileActionNotice && <div className="rg-profile-action-toast" role="status">{profileActionNotice}<button type="button" onClick={() => setProfileActionNotice("")} aria-label="Dismiss notice"><X size={15}/></button></div>}
+
+      {profileOptionsOpen && !isSelf && <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
+        <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
+          <div className="rg-profile-options-handle" />
+          <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
+          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
+        </section>
+        <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
+      </div>}
+
+      {profileAboutOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="About this account" onMouseDown={e => { if (e.target === e.currentTarget) setProfileAboutOpen(false); }}><section className="rg-profile-info-card"><div className="rg-profile-info-icon"><CircleUser size={30}/></div><h2>About this account</h2><p className="rg-profile-info-username">@{u.username}</p><div className="rg-profile-info-row"><span>Joined ReelsGo</span><b>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date not available"}</b></div><div className="rg-profile-info-row"><span>Account type</span><b>{u.isPrivate ? "Private" : "Public"}</b></div><div className="rg-profile-info-row"><span>Verification</span><b>{verificationStatusCache.get(String(u._id)) ? "Verified" : "Not verified"}</b></div><button type="button" className="rg-profile-info-done" onClick={() => setProfileAboutOpen(false)}>Done</button></section></div>}
+
+      {sharedActivityOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="Shared activity" onMouseDown={e => { if (e.target === e.currentTarget) setSharedActivityOpen(false); }}><section className="rg-profile-info-card rg-shared-activity-card"><div className="rg-profile-info-handle"/><h2>Shared activity</h2><p className="rg-profile-info-username">You and @{u.username}</p><div className="rg-shared-activity-list"><div><b>{profile.followStatus === "accepted" ? "You follow each other’s updates" : profile.followStatus === "pending" ? "Follow request pending" : "You are not following this account"}</b><small>Follow status</small></div><div><b>{posts.length} posts · {reels.length} Reels</b><small>Content visible to you</small></div><div><b>{u.followersCount || 0} followers</b><small>Account activity</small></div></div><button type="button" className="rg-profile-info-done" onClick={() => { setSharedActivityOpen(false); onMessage(u._id); }}>Open conversation</button><button type="button" className="rg-profile-info-secondary" onClick={() => setSharedActivityOpen(false)}>Close</button></section></div>}
+
+      {profileQrOpen && <ProfileQRCodeModal user={u} onClose={() => setProfileQrOpen(false)} />}
 
       {connectionsOpen && (
         <ConnectionsModal

@@ -165,6 +165,29 @@ router.delete("/:userId", auth, async (req, res) => {
 
 /*
 |--------------------------------------------------------------------------
+| REMOVE A FOLLOWER FROM THE SIGNED-IN ACCOUNT
+|--------------------------------------------------------------------------
+*/
+router.delete("/followers/:followerId", auth, async (req, res) => {
+  try {
+    const currentUserId = req.user.id;
+    const followerId = req.params.followerId;
+    if (String(followerId) === String(currentUserId)) return res.status(400).json({ message: "You cannot remove yourself as a follower." });
+    const existing = await Follow.findOneAndDelete({ follower: followerId, following: currentUserId, status: "accepted" });
+    if (!existing) return res.json({ removed: false, message: "This account is not currently following you." });
+    await Promise.all([
+      User.findByIdAndUpdate(currentUserId, { $inc: { followersCount: -1 } }),
+      User.findByIdAndUpdate(followerId, { $inc: { followingCount: -1 } })
+    ]);
+    return res.json({ removed: true, message: "Follower removed." });
+  } catch (error) {
+    console.error("Remove follower error:", error);
+    return res.status(500).json({ message: "Unable to remove follower." });
+  }
+});
+
+/*
+|--------------------------------------------------------------------------
 | GET FOLLOW REQUESTS
 |--------------------------------------------------------------------------
 */

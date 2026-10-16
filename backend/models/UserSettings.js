@@ -5,6 +5,7 @@ const UserSettingsSchema = new mongoose.Schema({
   preferences: { type: mongoose.Schema.Types.Mixed, default: {} },
   blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   restrictedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  hiddenStoryUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true, minimize: false });
 
 export default mongoose.models.UserSettings || mongoose.model("UserSettings", UserSettingsSchema);

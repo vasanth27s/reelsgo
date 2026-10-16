@@ -11,6 +11,7 @@ import Story from "../models/Story.js";
 import User from "../models/User.js";
 import Follow from "../models/Follow.js";
 import StoryView from "../models/StoryView.js";
+import UserSettings from "../models/UserSettings.js";
 
 const router =
   express.Router();
@@ -132,26 +133,15 @@ router.get(
         );
 
       /*
-       * Filter visible stories.
+       * Filter visible stories, including accounts whose stories the viewer hid.
        */
-      const visible =
-        stories.filter(
-          s =>
-            String(
-              s.author?._id
-            ) ===
-              String(
-                req.user.id
-              ) ||
-
-            !s.author?.isPrivate ||
-
-            acceptedPrivateSet.has(
-              String(
-                s.author?._id
-              )
-            )
-        );
+      const viewerSettings = await UserSettings.findOne({ user: req.user.id }).select("hiddenStoryUsers").lean();
+      const hiddenStoryUserIds = new Set((viewerSettings?.hiddenStoryUsers || []).map(id => String(id)));
+      const visible = stories.filter(s => {
+        const authorId = String(s.author?._id || "");
+        if (authorId !== String(req.user.id) && hiddenStoryUserIds.has(authorId)) return false;
+        return authorId === String(req.user.id) || !s.author?.isPrivate || acceptedPrivateSet.has(authorId);
+      });
 
       res.json({
         stories:

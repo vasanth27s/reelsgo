@@ -14911,3 +14911,63 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     line-height: 13px !important;
   }
 }
+
+/* Public profile options sheet and profile actions (Instagram-style dark UI). */
+.rg-public-profile-topbar{display:flex;align-items:center;gap:16px;min-height:52px;margin:-12px -2px 12px;padding:0 2px;color:#f5f5f5;}
+.rg-public-profile-topbar>button{width:38px;height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;background:transparent;color:inherit;border-radius:50%;}
+.rg-public-profile-topbar>button:hover{background:#ffffff12;}
+.rg-public-profile-topbar>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px;font-weight:750;}
+.rg-public-profile-topbar .rg-public-profile-topbar-spacer{flex:1;}
+.rg-public-profile-more{display:flex!important;}
+.rg-public-profile-display-name{font-size:16px!important;margin:0 0 7px;}
+.rg-public-profile-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 48px;gap:8px;margin:10px 0 18px;}
+.rg-public-profile-actions button{min-width:0;min-height:43px;border-radius:10px!important;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:700;}
+.rg-public-profile-actions svg{width:18px;height:18px;}
+.rg-profile-options-backdrop,.rg-profile-info-backdrop{position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.62);display:flex;align-items:flex-end;justify-content:center;padding:0 14px max(12px,env(safe-area-inset-bottom));}
+.rg-profile-options-sheet{width:min(100%,680px);max-height:78dvh;overflow:auto;background:#181b1e;border:1px solid #25292d;border-radius:25px 25px 18px 18px;box-shadow:0 22px 80px #0008;padding:8px 0 0;overscroll-behavior:contain;}
+.rg-profile-options-handle,.rg-profile-info-handle{width:38px;height:4px;border-radius:999px;background:#777e86;margin:0 auto 8px;}
+.rg-profile-options-sheet button{width:100%;min-height:59px;padding:12px 18px;display:flex;align-items:center;justify-content:center;background:transparent;color:#f3f4f6;border-top:1px solid #282c30;text-align:center;font-size:16px;font-weight:450;}
+.rg-profile-options-sheet button:first-of-type{border-top:0;}
+.rg-profile-options-sheet button.danger{color:#ff5b83;}
+.rg-profile-options-sheet button:disabled,.rg-profile-options-cancel:disabled{opacity:.5;}
+.rg-profile-options-sheet button:active,.rg-profile-options-cancel:active{background:#ffffff0c;}
+.rg-profile-options-cancel{width:min(100%,680px);min-height:58px;margin-top:10px;border-radius:18px;background:#181b1e;color:#f4f5f6;font-size:16px;font-weight:600;}
+.rg-profile-info-backdrop{align-items:center;padding:18px;}
+.rg-profile-info-card{width:min(100%,420px);max-height:85dvh;overflow:auto;border:1px solid #2b3035;border-radius:22px;background:#181b1e;color:#f5f6f7;padding:22px;box-shadow:0 22px 80px #0008;}
+.rg-profile-info-icon{display:flex;justify-content:center;color:#d8dde3;margin:4px 0 12px;}
+.rg-profile-info-card h2{text-align:center;font-size:19px;margin-bottom:6px;}
+.rg-profile-info-username{text-align:center;color:#aab1ba;font-size:13px;margin-bottom:20px;}
+.rg-profile-info-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid #2a2f34;font-size:13px;}
+.rg-profile-info-row span{color:#aab1ba;}.rg-profile-info-row b{text-align:right;}
+.rg-profile-info-done,.rg-profile-info-secondary{width:100%;min-height:43px;border-radius:11px;background:#f4f5f6;color:#16191c;font-weight:750;margin-top:16px;}
+.rg-profile-info-secondary{background:#2a2f34;color:#f5f6f7;margin-top:8px;}
+.rg-shared-activity-list{display:grid;gap:0;border-top:1px solid #2a2f34;}
+.rg-shared-activity-list>div{display:flex;flex-direction:column;gap:5px;padding:13px 0;border-bottom:1px solid #2a2f34;font-size:13px;}
+.rg-shared-activity-list small{color:#9ba3ad;}
+.rg-profile-action-toast{position:fixed;z-index:230;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100vw - 30px);display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #30363d;border-radius:999px;background:#1a1d20;color:#f5f5f5;box-shadow:0 8px 28px #0006;font-size:12px;}
+.rg-profile-action-toast button{display:flex;align-items:center;justify-content:center;background:transparent;color:inherit;}
+@media(max-width:700px){
+ .rg-public-profile-topbar{position:relative;margin:-4px -10px 8px;padding:0 10px;min-height:48px;gap:10px;}
+ .rg-public-profile-topbar>button{width:34px;height:34px;flex-basis:34px;}
+ .rg-public-profile-topbar>strong{font-size:16px;}
+ .rg-public-profile-display-name{font-size:14px!important;}
+ .rg-public-profile-actions{gap:6px;margin:10px 0 15px;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;}
+ .rg-public-profile-actions button{min-height:38px;font-size:12px;padding:0 5px;}
+ .rg-profile-options-backdrop{padding:0 12px max(10px,env(safe-area-inset-bottom));}
+ .rg-profile-options-sheet{border-radius:24px 24px 16px 16px;max-height:78dvh;}
+ .rg-profile-options-sheet button{min-height:51px;font-size:15px;padding:10px 14px;}
+ .rg-profile-options-cancel{min-height:52px;margin-top:8px;border-radius:16px;font-size:15px;}
+}
+
+/* Match the reference inbox controls: softly rounded rectangular tabs, not sharp boxes. */
+@media(max-width:700px){
+ .messages-folder-controls{width:100%!important;max-width:none!important;display:flex!important;align-items:center!important;gap:9px!important;margin:0 0 12px!important;padding:0 2px!important;}
+ .messages-filter-trigger{width:54px!important;height:48px!important;flex:0 0 54px!important;border-radius:14px!important;background:#090b0d!important;border:1px solid #292e33!important;}
+ .messages-filter-trigger svg:first-child{width:19px!important;height:19px!important;}
+ .messages-filter-trigger svg:last-child{width:13px!important;height:13px!important;}
+ .messages-folder-controls .messages-inbox-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;}
+ .messages-folder-controls .messages-inbox-tabs button{height:48px!important;min-width:0!important;border-radius:13px!important;padding:0 8px!important;font-size:12px!important;font-weight:550!important;border:1px solid #24282c!important;background:#24282c!important;color:#f0f2f5!important;}
+ .messages-folder-controls .messages-inbox-tabs button.active{background:#f7f8fa!important;color:#151719!important;border-color:#e7e9ec!important;}
+ .messages-folder-controls .messages-inbox-tabs button span{min-width:16px!important;height:16px!important;font-size:9px!important;line-height:16px!important;}
+}
+@media(max-width:700px){.mobile-header.mobile-header-profile{display:none!important}.main.main-public-profile{padding-top:0!important}.main.main-public-profile .page.profile-page{padding-top:calc(env(safe-area-inset-top) + 8px)!important;}}

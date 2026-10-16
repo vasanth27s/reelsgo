@@ -132,6 +132,48 @@ router.delete("/me/settings/people/:type/:userId", auth, async (req, res) => {
   } catch (error) { console.error("Remove settings person:", error); return res.status(500).json({ message: "Unable to remove account." }); }
 });
 
+// Per-account story visibility controls used by the profile action menu.
+router.get("/me/settings/story-hidden", auth, async (req, res) => {
+  try {
+    const doc = await getDoc(req.user.id);
+    return res.json({ userIds: (doc.hiddenStoryUsers || []).map(id => String(id)) });
+  } catch (error) {
+    console.error("GET hidden story users:", error);
+    return res.status(500).json({ message: "Unable to load story visibility settings." });
+  }
+});
+
+router.post("/me/settings/story-hidden/:userId", auth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.isValidObjectId(userId)) return res.status(400).json({ message: "Invalid user id." });
+    if (String(userId) === String(req.user.id)) return res.status(400).json({ message: "You cannot hide your own story from yourself." });
+    const target = await User.findById(userId).select("_id");
+    if (!target) return res.status(404).json({ message: "Account not found." });
+    const doc = await getDoc(req.user.id);
+    await UserSettings.updateOne({ _id: doc._id }, { $addToSet: { hiddenStoryUsers: target._id } });
+    const refreshed = await UserSettings.findById(doc._id).select("hiddenStoryUsers").lean();
+    return res.json({ hidden: true, userIds: (refreshed?.hiddenStoryUsers || []).map(id => String(id)) });
+  } catch (error) {
+    console.error("Hide story user:", error);
+    return res.status(500).json({ message: "Unable to hide this account's stories." });
+  }
+});
+
+router.delete("/me/settings/story-hidden/:userId", auth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.isValidObjectId(userId)) return res.status(400).json({ message: "Invalid user id." });
+    const doc = await getDoc(req.user.id);
+    await UserSettings.updateOne({ _id: doc._id }, { $pull: { hiddenStoryUsers: userId } });
+    const refreshed = await UserSettings.findById(doc._id).select("hiddenStoryUsers").lean();
+    return res.json({ hidden: false, userIds: (refreshed?.hiddenStoryUsers || []).map(id => String(id)) });
+  } catch (error) {
+    console.error("Unhide story user:", error);
+    return res.status(500).json({ message: "Unable to unhide this account's stories." });
+  }
+});
+
 router.get("/me/settings/:section", auth, async (req, res) => {
   try {
     const section = String(req.params.section || "");
