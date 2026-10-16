@@ -14849,3 +14849,65 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
 .messages-filter-footer button{padding:9px 13px;border-radius:9px;background:transparent;color:#f1f3f5;font-size:12px;font-weight:700;}
 .messages-filter-footer button:last-child{background:#f5f6f7;color:#16191c;min-width:84px;}
 @media(max-width:700px){.messages-folder-controls{gap:7px;margin:0 0 7px!important}.messages-filter-trigger{height:30px;width:37px;flex-basis:37px;border-radius:8px;background:#101316}.messages-folder-controls .messages-inbox-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.messages-folder-controls .messages-inbox-tabs button{height:30px!important;font-size:10px!important}.messages-filter-sheet{max-height:min(60dvh,430px);padding:8px 16px calc(12px + env(safe-area-inset-bottom));}.messages-filter-option{min-height:37px;padding:4px 0;}.messages-filter-footer{position:sticky;bottom:0;background:#181b1e;}}
+
+
+/* Final compact pill-style inbox tabs: keep the controls to 75% of the mobile screen. */
+@media (max-width: 700px) {
+  .messages-folder-controls {
+    width: 75vw !important;
+    max-width: 310px !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin: 0 0 7px !important;
+  }
+  .messages-filter-trigger {
+    width: 29px !important;
+    height: 26px !important;
+    flex: 0 0 29px !important;
+    gap: 2px !important;
+    border: 1px solid #30343a !important;
+    border-radius: 999px !important;
+    background: #111417 !important;
+    padding: 0 !important;
+  }
+  .messages-filter-trigger svg:first-child { width: 13px !important; height: 13px !important; }
+  .messages-filter-trigger svg:last-child { width: 10px !important; height: 10px !important; }
+  .messages-folder-controls .messages-inbox-tabs {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .messages-folder-controls .messages-inbox-tabs button {
+    min-width: 0 !important;
+    width: 100% !important;
+    height: 26px !important;
+    padding: 0 5px !important;
+    border: 1px solid #292e33 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #d8dce1 !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    gap: 3px !important;
+  }
+  .messages-folder-controls .messages-inbox-tabs button.active {
+    background: #292e33 !important;
+    border-color: #292e33 !important;
+    color: #fff !important;
+  }
+  .messages-folder-controls .messages-inbox-tabs button span {
+    min-width: 13px !important;
+    height: 13px !important;
+    padding: 0 3px !important;
+    font-size: 8px !important;
+    line-height: 13px !important;
+  }
+}
