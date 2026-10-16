@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import reelsGoLogo from "../image.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
@@ -7,7 +8,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, Sparkles, Bot, Video, History, Globe, ShieldCheck, Box, WalletCards
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -614,180 +615,6 @@ function ReelsGoAdvancedHub({ user }) {
     </div>
   );
 }
-
-function ReelsGoAdvanced2050({ user, onClose }) {
-  const modules = [
-    { id: "twin", title: "AI Twin", subtitle: "Personal intelligence", icon: Bot, accent: "violet" },
-    { id: "living", title: "Living Posts", subtitle: "Interactive 3D", icon: Box, accent: "cyan" },
-    { id: "timeline", title: "Life Timeline", subtitle: "Searchable memories", icon: History, accent: "pink" },
-    { id: "language", title: "Universal Language", subtitle: "Translate anything", icon: Globe, accent: "blue" },
-    { id: "studio", title: "Creator Studio 2050", subtitle: "AI ideas + video maker", icon: Video, accent: "orange" },
-    { id: "privacy", title: "Privacy Passport", subtitle: "Content controls", icon: Lock, accent: "green" },
-    { id: "trust", title: "Trust Shield", subtitle: "Scam-risk assistant", icon: ShieldCheck, accent: "cyan" },
-    { id: "worlds", title: "ReelsGo Worlds", subtitle: "Interactive spaces", icon: Users, accent: "violet" },
-    { id: "discovery", title: "Intent Discovery", subtitle: "Find what matters", icon: Compass, accent: "blue" },
-    { id: "economy", title: "Creator Economy", subtitle: "Offers + partnerships", icon: WalletCards, accent: "pink" }
-  ];
-  const [active, setActive] = useState("twin");
-  const [aiTask, setAiTask] = useState("Ask ReelsGo anything");
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiResult, setAiResult] = useState("");
-  const [aiBusy, setAiBusy] = useState(false);
-  const [aiError, setAiError] = useState("");
-  const [rotateX, setRotateX] = useState(-8);
-  const [rotateY, setRotateY] = useState(14);
-  const [memoryText, setMemoryText] = useState("");
-  const [memoryDate, setMemoryDate] = useState(new Date().toISOString().slice(0, 10));
-  const [memories, setMemories] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo2050_memories") || "[]"); } catch { return []; } });
-  const [targetLanguage, setTargetLanguage] = useState("English");
-  const [translateText, setTranslateText] = useState("");
-  const [studioPrompt, setStudioPrompt] = useState("");
-  const [storyboard, setStoryboard] = useState("");
-  const [videoImages, setVideoImages] = useState([]);
-  const [videoBusy, setVideoBusy] = useState(false);
-  const [videoTitle, setVideoTitle] = useState("My ReelsGo creation");
-  const [privacyPrefs, setPrivacyPrefs] = useState(() => { try { return { audience: "Followers", allowRemix: false, allowDownload: false, expire: "Never", ...JSON.parse(localStorage.getItem("reelsgo2050_privacy") || "{}") }; } catch { return { audience: "Followers", allowRemix: false, allowDownload: false, expire: "Never" }; } });
-  const [trustText, setTrustText] = useState("");
-  const [roomName, setRoomName] = useState("");
-  const [rooms, setRooms] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo2050_worlds") || "[]"); } catch { return []; } });
-  const [discoveryGoal, setDiscoveryGoal] = useState("");
-  const [offerTitle, setOfferTitle] = useState("");
-  const [offerDescription, setOfferDescription] = useState("");
-  const [offers, setOffers] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo2050_offers") || "[]"); } catch { return []; } });
-  const [notice, setNotice] = useState("");
-  const selected = modules.find(item => item.id === active) || modules[0];
-
-  useEffect(() => { localStorage.setItem("reelsgo2050_memories", JSON.stringify(memories)); }, [memories]);
-  useEffect(() => { localStorage.setItem("reelsgo2050_privacy", JSON.stringify(privacyPrefs)); }, [privacyPrefs]);
-  useEffect(() => { localStorage.setItem("reelsgo2050_worlds", JSON.stringify(rooms)); }, [rooms]);
-  useEffect(() => { localStorage.setItem("reelsgo2050_offers", JSON.stringify(offers)); }, [offers]);
-  useEffect(() => {
-    const onKey = event => { if (event.key === "Escape") onClose?.(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  function flash(message) {
-    setNotice(message);
-    window.setTimeout(() => setNotice(""), 3200);
-  }
-  async function askAI(task, prompt, extra = {}) {
-    if (!String(prompt || "").trim()) { setAiError("Enter a prompt first."); return ""; }
-    setAiBusy(true); setAiError(""); setAiResult("");
-    try {
-      const data = await api("/advanced/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task, prompt: String(prompt).slice(0, 12000), context: { username: user?.username || "creator", ...extra } })
-      });
-      const result = String(data?.result || data?.answer || data?.text || "").trim();
-      if (!result) throw new Error("The AI provider returned an empty response.");
-      setAiResult(result); return result;
-    } catch (error) {
-      const message = error?.message || "AI request failed.";
-      setAiError(message.includes("AI provider is not configured") ? "AI is not connected yet. Add AI_API_KEY and AI_MODEL to your backend environment, then redeploy the backend." : message);
-      return "";
-    } finally { setAiBusy(false); }
-  }
-  function addMemory(event) {
-    event.preventDefault();
-    if (!memoryText.trim()) return;
-    setMemories(items => [{ id: `${Date.now()}`, text: memoryText.trim(), date: memoryDate || new Date().toISOString().slice(0, 10) }, ...items]);
-    setMemoryText(""); flash("Memory added to your private timeline on this device.");
-  }
-  async function createVideo() {
-    if (!videoImages.length) { flash("Choose at least one photo to create a slideshow video."); return; }
-    if (!window.MediaRecorder || !document.createElement("canvas").captureStream) { flash("Video export is not supported by this browser. Try a current Chrome or Edge browser."); return; }
-    setVideoBusy(true);
-    let stream;
-    try {
-      const canvas = document.createElement("canvas"); canvas.width = 720; canvas.height = 1280;
-      const ctx = canvas.getContext("2d");
-      stream = canvas.captureStream(24);
-      const mimeType = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(type => MediaRecorder.isTypeSupported(type)) || "";
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      const chunks = [];
-      const stopped = new Promise((resolve, reject) => {
-        recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
-        recorder.onerror = () => reject(new Error("Browser video export failed."));
-        recorder.onstop = () => resolve(new Blob(chunks, { type: recorder.mimeType || "video/webm" }));
-      });
-      const drawFrame = (img, label) => {
-        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const width = img.width * scale, height = img.height * scale;
-        ctx.fillStyle = "#05070c"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
-        const gradient = ctx.createLinearGradient(0, 850, 0, 1280); gradient.addColorStop(0, "rgba(0,0,0,0)"); gradient.addColorStop(1, "rgba(0,0,0,.82)");
-        ctx.fillStyle = gradient; ctx.fillRect(0, 760, canvas.width, 520);
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 36px Arial"; ctx.fillText(String(label).slice(0, 30), 42, 1180);
-        ctx.font = "22px Arial"; ctx.fillStyle = "#b7c6ff"; ctx.fillText("Created with ReelsGo 2050", 42, 1222);
-      };
-      recorder.start(250);
-      for (let index = 0; index < videoImages.length; index += 1) {
-        const url = URL.createObjectURL(videoImages[index]);
-        try {
-          const img = await new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = url; });
-          const endAt = performance.now() + 2200;
-          await new Promise(resolve => { const frame = () => { drawFrame(img, videoTitle || `Scene ${index + 1}`); if (performance.now() < endAt) requestAnimationFrame(frame); else resolve(); }; frame(); });
-        } finally { URL.revokeObjectURL(url); }
-      }
-      recorder.stop();
-      const blob = await stopped;
-      const downloadUrl = URL.createObjectURL(blob);
-      const anchor = document.createElement("a"); anchor.href = downloadUrl; anchor.download = `${(videoTitle || "reelsgo-video").replace(/[^a-z0-9-_]+/gi, "-").slice(0, 50)}.webm`;
-      document.body.appendChild(anchor); anchor.click(); anchor.remove(); window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 30000);
-      flash("Your slideshow video is ready and downloaded.");
-    } catch (error) { flash(error?.message || "Unable to export this video."); }
-    finally { stream?.getTracks?.().forEach(track => track.stop()); setVideoBusy(false); }
-  }
-
-  return (
-    <div className="rg2050-overlay" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose?.(); }}>
-      <section className="rg2050-shell" role="dialog" aria-modal="true" aria-label="Advanced ReelsGo 2050">
-        <header className="rg2050-header">
-          <button type="button" className="rg2050-back" onClick={onClose} aria-label="Close Advanced ReelsGo"><ArrowLeft size={21}/></button>
-          <div className="rg2050-brand"><span className="rg2050-brand-orb"><Sparkles size={19}/></span><span><b>REELSGO <em>2050</em></b><small>ADVANCED INTELLIGENCE SYSTEM</small></span></div>
-          <button type="button" className="rg2050-close" onClick={onClose} aria-label="Close"><X size={21}/></button>
-        </header>
-        <div className="rg2050-scroll">
-          <section className="rg2050-hero">
-            <div className="rg2050-hero-orb"><span/><span/><span/><Sparkles size={34}/></div>
-            <div><div className="rg2050-eyebrow">PERSONAL • CREATOR • WORLD</div><h1>Advanced ReelsGo</h1><p>Your next-generation social intelligence workspace. Ten systems. One creator universe.</p><div className="rg2050-hero-meta"><span><i/> {user?.username ? `Connected as @${user.username}` : "Personal workspace"}</span><span>10 systems online</span></div></div>
-          </section>
-          {notice && <div className="rg2050-notice" role="status">{notice}</div>}
-          <div className="rg2050-feature-grid" aria-label="Advanced features">
-            {modules.map(item => { const Icon = item.icon; return <button type="button" key={item.id} className={`rg2050-feature ${item.accent} ${active === item.id ? "active" : ""}`} onClick={() => { setActive(item.id); setAiError(""); setAiResult(""); }}><span className="rg2050-feature-icon"><Icon size={20}/></span><span><b>{item.title}</b><small>{item.subtitle}</small></span><ChevronRight size={16}/></button>; })}
-          </div>
-          <section className="rg2050-workspace">
-            <div className="rg2050-workspace-heading"><div><span>ACTIVE MODULE</span><h2>{selected.title}</h2></div><span className="rg2050-live"><i/> READY</span></div>
-
-            {active === "twin" && <div className="rg2050-module"><p>Your AI Twin can answer questions, draft messages, summarize content, plan projects, and help you create. It only drafts; it never sends a message or publishes without your action.</p><label>What should your AI Twin do?</label><select value={aiTask} onChange={event => setAiTask(event.target.value)}><option>Ask ReelsGo anything</option><option>Write a caption</option><option>Summarize text</option><option>Plan a project</option><option>Draft a reply</option><option>Generate ideas</option></select><textarea value={aiPrompt} onChange={event => setAiPrompt(event.target.value)} placeholder="Ask a question or describe what you want to create…" rows={4}/><button className="rg2050-primary" disabled={aiBusy} onClick={() => askAI(aiTask, aiPrompt)}><Sparkles size={17}/>{aiBusy ? "Thinking…" : "Ask AI Twin"}</button>{aiError && <p className="rg2050-error">{aiError}</p>}{aiResult && <div className="rg2050-result"><b>AI response</b><p>{aiResult}</p><button onClick={() => { navigator.clipboard?.writeText(aiResult); flash("Copied result."); }}>Copy response</button></div>}</div>}
-
-            {active === "living" && <div className="rg2050-module"><p>Explore a futuristic interactive card. This is a working 3D-style preview; real AR placement requires device AR support and a 3D asset.</p><div className="rg2050-3d-stage"><div className="rg2050-3d-object" style={{ transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)` }}><div className="rg2050-3d-face"><Sparkles size={38}/><b>YOUR WORLD</b><span>Interactive post</span></div></div></div><label>Rotate X <input type="range" min="-35" max="35" value={rotateX} onChange={event => setRotateX(Number(event.target.value))}/></label><label>Rotate Y <input type="range" min="-45" max="45" value={rotateY} onChange={event => setRotateY(Number(event.target.value))}/></label><button className="rg2050-secondary" onClick={() => { setRotateX(-8); setRotateY(14); }}>Reset 3D view</button></div>}
-
-            {active === "timeline" && <div className="rg2050-module"><p>Save moments privately and search them later. Timeline entries stay in this browser unless you export them.</p><form onSubmit={addMemory}><label>Memory</label><textarea value={memoryText} onChange={event => setMemoryText(event.target.value)} placeholder="A trip, achievement, moment, or idea…" required rows={2}/><label>Date</label><input type="date" value={memoryDate} onChange={event => setMemoryDate(event.target.value)}/><button className="rg2050-primary" type="submit">Add to timeline</button></form><div className="rg2050-list">{memories.length ? memories.map(memory => <article key={memory.id}><span>{memory.date}</span><p>{memory.text}</p><button onClick={() => setMemories(items => items.filter(item => item.id !== memory.id))}>Delete</button></article>) : <div className="rg2050-empty"><History/><b>Your timeline starts here</b><span>Add a memory above.</span></div>}</div></div>}
-
-            {active === "language" && <div className="rg2050-module"><p>Translate messages, captions, or scripts with the connected AI provider. Review the result before sharing it.</p><label>Translate to</label><select value={targetLanguage} onChange={event => setTargetLanguage(event.target.value)}>{["English","Telugu","Hindi","Tamil","Kannada","Malayalam","Japanese","Korean","Spanish","French","German","Portuguese","Arabic","Chinese"].map(language => <option key={language}>{language}</option>)}</select><textarea value={translateText} onChange={event => setTranslateText(event.target.value)} rows={4} placeholder="Paste text to translate…"/><button className="rg2050-primary" disabled={aiBusy} onClick={() => askAI(`Translate to ${targetLanguage}`, translateText, { targetLanguage })}><Globe size={17}/>{aiBusy ? "Translating…" : `Translate to ${targetLanguage}`}</button>{aiError && <p className="rg2050-error">{aiError}</p>}{aiResult && <div className="rg2050-result"><b>Translation</b><p>{aiResult}</p><button onClick={() => { navigator.clipboard?.writeText(aiResult); flash("Translation copied."); }}>Copy translation</button></div>}</div>}
-
-            {active === "studio" && <div className="rg2050-module"><p>Generate a storyboard with AI, then turn your selected photos into a downloadable vertical slideshow video. This local exporter creates a WebM file; a third-party text-to-video provider is needed for synthetic footage.</p><label>Video idea</label><textarea value={studioPrompt} onChange={event => setStudioPrompt(event.target.value)} rows={3} placeholder="Describe your Reel: theme, mood, audience, and story…"/><button className="rg2050-primary" disabled={aiBusy} onClick={async () => { const result = await askAI("Create a 6-scene vertical video storyboard with shot descriptions, on-screen text, transitions, and a caption", studioPrompt); if (result) setStoryboard(result); }}><Sparkles size={17}/>{aiBusy ? "Building storyboard…" : "Generate AI storyboard"}</button>{storyboard && <div className="rg2050-result"><b>Storyboard</b><pre>{storyboard}</pre><button onClick={() => { navigator.clipboard?.writeText(storyboard); flash("Storyboard copied."); }}>Copy storyboard</button></div>}<label>Video title</label><input value={videoTitle} onChange={event => setVideoTitle(event.target.value)} placeholder="My ReelsGo creation"/><label>Select photos for the video</label><input type="file" accept="image/*" multiple onChange={event => setVideoImages(Array.from(event.target.files || []).slice(0, 20))}/>{videoImages.length > 0 && <p className="rg2050-muted">{videoImages.length} photo(s) selected · about {Math.round(videoImages.length * 2.2)} seconds</p>}<button className="rg2050-primary" disabled={videoBusy} onClick={createVideo}><Video size={17}/>{videoBusy ? "Rendering video…" : "Create & download video"}</button></div>}
-
-            {active === "privacy" && <div className="rg2050-module"><p>Choose defaults for your next posts. These preferences are saved on this device; actual access restrictions must also be enforced by the post/feed backend.</p><label>Default audience</label><select value={privacyPrefs.audience} onChange={event => setPrivacyPrefs(value => ({...value, audience:event.target.value}))}><option>Everyone</option><option>Followers</option><option>Close friends</option><option>Only me</option></select><label>Content expiry</label><select value={privacyPrefs.expire} onChange={event => setPrivacyPrefs(value => ({...value, expire:event.target.value}))}><option>Never</option><option>24 hours</option><option>7 days</option><option>30 days</option></select><label className="rg2050-check"><input type="checkbox" checked={privacyPrefs.allowRemix} onChange={event => setPrivacyPrefs(value => ({...value,allowRemix:event.target.checked}))}/> Allow remixing</label><label className="rg2050-check"><input type="checkbox" checked={privacyPrefs.allowDownload} onChange={event => setPrivacyPrefs(value => ({...value,allowDownload:event.target.checked}))}/> Allow downloads</label><button className="rg2050-primary" onClick={() => flash("Privacy defaults saved on this device. Server-side enforcement must be connected to apply them to published posts.")}>Save privacy defaults</button></div>}
-
-            {active === "trust" && <div className="rg2050-module"><p>Review suspicious messages, links, or captions. AI can identify risk signals but cannot guarantee a message is safe or determine authenticity with certainty.</p><label>Text or URL to review</label><textarea value={trustText} onChange={event => setTrustText(event.target.value)} rows={4} placeholder="Paste a suspicious DM, link, or offer…"/><button className="rg2050-primary" disabled={aiBusy} onClick={() => askAI("Analyze this for scam, phishing, impersonation, manipulation, and unsafe-link indicators. Return risk level, evidence, and safe next steps. Do not claim certainty.", trustText)}><ShieldCheck size={17}/>{aiBusy ? "Reviewing…" : "Analyze with Trust Shield"}</button>{aiError && <p className="rg2050-error">{aiError}</p>}{aiResult && <div className="rg2050-result"><b>Risk review</b><p>{aiResult}</p></div>}</div>}
-
-            {active === "worlds" && <div className="rg2050-module"><p>Create and manage your own virtual-room concepts. These are saved as drafts on this device; live multi-user rooms need realtime server infrastructure.</p><form onSubmit={event => { event.preventDefault(); if (!roomName.trim()) return; setRooms(items => [{ id: `${Date.now()}`, name: roomName.trim(), createdAt: new Date().toISOString() }, ...items]); setRoomName(""); flash("World draft created."); }}><label>World / room name</label><input value={roomName} onChange={event => setRoomName(event.target.value)} placeholder="Music lounge, Creator Lab…" required/><button className="rg2050-primary" type="submit"><Users size={17}/> Create world</button></form><div className="rg2050-list">{rooms.length ? rooms.map(room => <article key={room.id}><span>WORLD DRAFT</span><p>{room.name}</p><button onClick={() => setRooms(items => items.filter(item => item.id !== room.id))}>Delete</button></article>) : <div className="rg2050-empty"><Users/><b>No worlds yet</b><span>Create your first space above.</span></div>}</div></div>}
-
-            {active === "discovery" && <div className="rg2050-module"><p>Describe an outcome instead of scrolling endlessly. The AI suggests a focused discovery plan you can use to find creators, topics, or learning resources.</p><label>What do you want to discover?</label><textarea value={discoveryGoal} onChange={event => setDiscoveryGoal(event.target.value)} rows={3} placeholder="e.g. Learn video editing from beginner to advanced…"/><button className="rg2050-primary" disabled={aiBusy} onClick={() => askAI("Create an intent-based discovery plan. Give search phrases, creator types, a 7-day learning path, and ways to evaluate trustworthy sources.", discoveryGoal)}><Compass size={17}/>{aiBusy ? "Finding a path…" : "Build discovery plan"}</button>{aiError && <p className="rg2050-error">{aiError}</p>}{aiResult && <div className="rg2050-result"><b>Your discovery plan</b><p>{aiResult}</p><button onClick={() => { navigator.clipboard?.writeText(aiResult); flash("Discovery plan copied."); }}>Copy plan</button></div>}</div>}
-
-            {active === "economy" && <div className="rg2050-module"><p>Draft products, lessons, memberships, or collaboration offers. Publishing, payments, and payouts require a connected commerce provider and eligibility checks.</p><form onSubmit={event => { event.preventDefault(); if (!offerTitle.trim()) return; setOffers(items => [{ id: `${Date.now()}`, title: offerTitle.trim(), description: offerDescription.trim(), createdAt: new Date().toISOString() }, ...items]); setOfferTitle(""); setOfferDescription(""); flash("Creator offer draft saved."); }}><label>Offer title</label><input value={offerTitle} onChange={event => setOfferTitle(event.target.value)} placeholder="Video editing mini-course" required/><label>Description</label><textarea value={offerDescription} onChange={event => setOfferDescription(event.target.value)} rows={3} placeholder="What will supporters receive?"/><button className="rg2050-primary" type="submit"><WalletCards size={17}/> Save offer draft</button></form><div className="rg2050-list">{offers.length ? offers.map(offer => <article key={offer.id}><span>OFFER DRAFT</span><p><b>{offer.title}</b></p>{offer.description && <p>{offer.description}</p>}<button onClick={() => setOffers(items => items.filter(item => item.id !== offer.id))}>Delete</button></article>) : <div className="rg2050-empty"><WalletCards/><b>Your creator economy starts here</b><span>Save an offer idea above.</span></div>}</div></div>}
-          </section>
-          <p className="rg2050-disclaimer">AI tools require an API key configured on your ReelsGo backend. Local memories, drafts, privacy defaults, and world/offer ideas are stored in this browser. Never put AI provider secrets in frontend code.</p>
-        </div>
-      </section>
-    </div>
-  );
-}
-
 
 function CalendarDaysFallback() {
   return <Clock3 />;
@@ -3458,7 +3285,6 @@ function ProfilePage({ user, setUser }) {
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [professionalPanel, setProfessionalPanel] = useState("");
-  const [advanced2050Open, setAdvanced2050Open] = useState(false);
   const [professionalAnalytics, setProfessionalAnalytics] = useState(null);
   const [professionalReplies, setProfessionalReplies] = useState([]);
   const [professionalToolData, setProfessionalToolData] = useState({});
@@ -3717,12 +3543,6 @@ function ProfilePage({ user, setUser }) {
         </section>
       )}
 
-      <button type="button" className="rg2050-entry-card" onClick={() => setAdvanced2050Open(true)} aria-label="Open Advanced ReelsGo 2050">
-        <span className="rg2050-entry-orb"><Sparkles size={21}/></span>
-        <span className="rg2050-entry-copy"><small>REELSGO FUTURE SYSTEM</small><b>Activate Advanced ReelsGo</b><em>10 AI-powered creator and social systems</em></span>
-        <span className="rg2050-entry-arrow"><ChevronRight size={20}/></span>
-      </button>
-      {advanced2050Open && <ReelsGoAdvanced2050 user={user} onClose={() => setAdvanced2050Open(false)} />}
 
       <div className="profile-tabs">
         <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>
@@ -5525,22 +5345,25 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
 
       {profileActionNotice && <div className="rg-profile-action-toast" role="status">{profileActionNotice}<button type="button" onClick={() => setProfileActionNotice("")} aria-label="Dismiss notice"><X size={15}/></button></div>}
 
-      {profileOptionsOpen && !isSelf && <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
-        <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
-          <div className="rg-profile-options-handle" />
-          <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
-          <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
-        </section>
-        <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
-      </div>}
+      {profileOptionsOpen && !isSelf && createPortal(
+        <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
+          <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
+            <div className="rg-profile-options-handle" />
+            <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
+          </section>
+          <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
+        </div>,
+        document.body
+      )}
 
       {profileAboutOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="About this account" onMouseDown={e => { if (e.target === e.currentTarget) setProfileAboutOpen(false); }}><section className="rg-profile-info-card"><div className="rg-profile-info-icon"><CircleUser size={30}/></div><h2>About this account</h2><p className="rg-profile-info-username">@{u.username}</p><div className="rg-profile-info-row"><span>Joined ReelsGo</span><b>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date not available"}</b></div><div className="rg-profile-info-row"><span>Account type</span><b>{u.isPrivate ? "Private" : "Public"}</b></div><div className="rg-profile-info-row"><span>Verification</span><b>{verificationStatusCache.get(String(u._id)) ? "Verified" : "Not verified"}</b></div><button type="button" className="rg-profile-info-done" onClick={() => setProfileAboutOpen(false)}>Done</button></section></div>}
 
