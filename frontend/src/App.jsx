@@ -5386,8 +5386,14 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [messageFiltersMore, setMessageFiltersMore] = useState(false);
   const [messageFoldersExpanded, setMessageFoldersExpanded] = useState(false);
   const [messageFilters, setMessageFilters] = useState(() => {
-    try { return { unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false, ...JSON.parse(localStorage.getItem("reelsgo_message_filters") || "{}") }; }
-    catch { return { unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false }; }
+    try {
+      const saved = JSON.parse(localStorage.getItem("reelsgo_message_filters") || "{}");
+      // Ignore the retired 10K+ followers filter if it exists in older browser storage.
+      const { tenK: _legacyTenK, ...savedFilters } = saved || {};
+      return { unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false, ...savedFilters };
+    } catch {
+      return { unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false };
+    }
   });
   const [conversationMenuId, setConversationMenuId] = useState(null);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
@@ -6119,7 +6125,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     if (messageFilters.unanswered && (!senderId || senderId === String(me?._id))) return false;
     if (messageFilters.storyReplies && !(/story|replied to your story/i.test(String(last.text || last.caption || "")) || last.storyReply === true || last.kind === "story_reply")) return false;
     if (messageFilters.verified && !(u.verified || u.isVerified || u.blueTick || verificationStatusCache.get(String(u._id)) === true)) return false;
-    if (messageFilters.tenK && Number(u.followersCount || 0) < 10000) return false;
     if (messageFilters.pinned && !pinnedConversationIds.includes(String(c._id))) return false;
     if (messageFilters.muted && !mutedConversationIds.includes(String(c._id))) return false;
     return true;
@@ -6247,8 +6252,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
             ["unread", "Unread", <Mail size={20}/>],
             ["unanswered", "Unanswered", <CircleHelp size={20}/>],
             ["storyReplies", "Story replies", <CircleDashed size={20}/>],
-            ["verified", "Verified profiles", <BadgeCheck size={20}/>],
-            ["tenK", "10K+ followers", <Users size={20}/>]
+            ["verified", "Verified profiles", <BadgeCheck size={20}/>]
           ].map(([key, label, icon]) => <button type="button" className="messages-filter-option" key={key} onClick={() => setMessageFilters(v => ({ ...v, [key]: !v[key] }))}>
             <span className="messages-filter-option-icon">{icon}</span><span>{label}</span><i className={messageFilters[key] ? "checked" : ""}>{messageFilters[key] ? <Check size={14}/> : null}</i>
           </button>)}
@@ -6260,7 +6264,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           <div className="messages-filter-divider"/>
           <button type="button" className="messages-filter-folders-heading" onClick={() => setMessageFoldersExpanded(v => !v)}><b>Folders</b><ChevronRight className={messageFoldersExpanded ? "expanded" : ""}/></button>
           {messageFoldersExpanded && <div className="messages-filter-folders">{["Primary", "General", "Requests"].map(folder => <button type="button" key={folder} onClick={() => { setInboxTab(folder); setMessageFiltersOpen(false); }}>{folder}<span>{folder === "Requests" ? requests.length : conversations.filter(c => (conversationFolders[String(c._id)] || "Primary") === folder).length}</span></button>)}</div>}
-          <div className="messages-filter-footer"><button type="button" onClick={() => setMessageFilters({ unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false })}>Clear all</button><button type="button" onClick={() => setMessageFiltersOpen(false)}>Done</button></div>
+          <div className="messages-filter-footer"><button type="button" onClick={() => setMessageFilters({ unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false })}>Clear all</button><button type="button" onClick={() => setMessageFiltersOpen(false)}>Done</button></div>
         </section>
       </div>}
 
