@@ -14971,3 +14971,86 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
  .messages-folder-controls .messages-inbox-tabs button span{min-width:16px!important;height:16px!important;font-size:9px!important;line-height:16px!important;}
 }
 @media(max-width:700px){.mobile-header.mobile-header-profile{display:none!important}.main.main-public-profile{padding-top:0!important}.main.main-public-profile .page.profile-page{padding-top:calc(env(safe-area-inset-top) + 8px)!important;}}
+
+/* Final screenshot match: compact Instagram-style inbox controls, not large cards. */
+@media (max-width: 700px) {
+  .messages-page:not(.is-mobile-chat) .messages-folder-controls {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 75vw !important;
+    max-width: 260px !important;
+    min-width: 0 !important;
+    gap: 6px !important;
+    margin: 0 0 10px 0 !important;
+    padding: 0 2px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-filter-trigger {
+    width: 43px !important;
+    height: 28px !important;
+    min-width: 43px !important;
+    flex: 0 0 43px !important;
+    padding: 0 !important;
+    gap: 2px !important;
+    border: 1px solid #30353b !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #e8ebef !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-filter-trigger svg:first-child {
+    width: 13px !important;
+    height: 13px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-filter-trigger svg:last-child {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button {
+    display: inline-flex !important;
+    flex: 0 1 auto !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 27px !important;
+    padding: 0 9px !important;
+    border: 1px solid #292e33 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: #e4e7eb !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    gap: 3px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button.active {
+    background: #292e33 !important;
+    border-color: #292e33 !important;
+    color: #fff !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button span {
+    min-width: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    font-size: 8px !important;
+    line-height: 13px !important;
+  }
+  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button:focus-visible,
+  .messages-page:not(.is-mobile-chat) .messages-filter-trigger:focus-visible {
+    outline: 2px solid #aab4ff !important;
+    outline-offset: 2px !important;
+  }
+}
