@@ -7,7 +7,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -847,21 +847,72 @@ function App() {
   }, [token]);
 
   useEffect(() => {
+    if (!token) return undefined;
+    let running = false;
+    const refreshCurrentAccount = async () => {
+      if (running || document.visibilityState === "hidden") return;
+      running = true;
+      try {
+        const data = await api("/users/me");
+        const local = getUser() || {};
+        const nextUser = { ...data.user, accountType: local.accountType || localStorage.getItem("vk_account_type") || "personal", professionalProfile: local.professionalProfile || {} };
+        setUser(nextUser);
+        localStorage.setItem("vk_user", JSON.stringify(nextUser));
+        setFeedRefresh(value => value + 1);
+      } catch (error) {
+        if (/user not found/i.test(String(error?.message || ""))) {
+          localStorage.removeItem("vk_token");
+          localStorage.removeItem("vk_user");
+          localStorage.removeItem("vk_account_type");
+          setToken(null);
+          setUser(null);
+          setPage("home");
+        }
+      } finally { running = false; }
+    };
+    const timer = window.setInterval(refreshCurrentAccount, 60000);
+    window.addEventListener("focus", refreshCurrentAccount);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refreshCurrentAccount); };
+  }, [token]);
+
+  useEffect(() => {
     if (!token) return;
     api("/users/me")
-      .then(d => {
-        // Professional-account mode is persisted locally until a server endpoint exists.
-        // Merge it into the API user so a normal refresh doesn't hide the dashboard.
+      .then(async d => {
+        // Professional account status is server-persisted so it survives a new
+        // browser/device and is not dependent on stale localStorage values.
         let savedProfessional = null;
         try { savedProfessional = JSON.parse(localStorage.getItem("vk_professional_profile") || "null"); } catch {}
         const localUser = getUser();
-        const accountType = localUser?._id === d.user?._id ? (localUser.accountType || localStorage.getItem("vk_account_type") || "personal") : "personal";
-        const mergedUser = accountType === "professional"
-          ? { ...d.user, accountType, professionalProfile: savedProfessional || localUser?.professionalProfile || {} }
-          : { ...d.user, accountType: "personal" };
+        let serverProfessional = null;
+        try {
+          const professionalResponse = await api("/professional/settings");
+          serverProfessional = professionalResponse?.configured === false ? null : (professionalResponse?.settings || null);
+        } catch (error) {
+          console.warn("Professional settings unavailable; using saved profile fallback.", error);
+        }
+        const sameLocalUser = String(localUser?._id || "") === String(d.user?._id || "");
+        const accountType = serverProfessional?.accountType
+          || d.user?.settings?.professionalAccount?.accountType
+          || (sameLocalUser ? (localUser?.accountType || localStorage.getItem("vk_account_type")) : null)
+          || "personal";
+        const professionalProfile = {
+          ...(sameLocalUser ? (localUser?.professionalProfile || {}) : {}),
+          ...(savedProfessional || {}),
+          ...(serverProfessional ? {
+            type: serverProfessional.accountType === "business" ? "Business" : "Creator",
+            category: serverProfessional.category || "Digital creator",
+            contact: serverProfessional.contact || {},
+            goals: savedProfessional?.goals || []
+          } : {})
+        };
+        const mergedUser = { ...d.user, accountType, professionalProfile };
         setUser(mergedUser);
         localStorage.setItem("vk_user", JSON.stringify(mergedUser));
         localStorage.setItem("vk_account_type", mergedUser.accountType);
+        if (accountType === "professional" || accountType === "creator" || accountType === "business") {
+          localStorage.setItem("vk_professional_profile", JSON.stringify(professionalProfile));
+        }
       })
       .catch(() => {});
   }, [token]);
@@ -3240,7 +3291,7 @@ function ProfilePage({ user, setUser }) {
   const [professionalActionMessage, setProfessionalActionMessage] = useState("");
   const [savedReplyShortcut, setSavedReplyShortcut] = useState("");
   const [savedReplyMessage, setSavedReplyMessage] = useState("");
-  const isProfessional = user?.accountType === "professional";
+  const isProfessional = ["professional", "creator", "business"].includes(user?.accountType);
 
   useEffect(() => {
     if (!professionalPanel || !token) return;
@@ -3814,7 +3865,7 @@ function EditProfilePage({
               </button>
             </div>
 
-            {accountType === "professional" ? (
+            {["professional", "creator", "business"].includes(accountType) ? (
               <button type="button" className="edit-profile-professional" onClick={() => {
                 if (window.confirm("Switch back to a personal account? Your posts, Reels, followers, and messages will stay unchanged.")) {
                   onSwitchPersonal?.();
@@ -5331,6 +5382,13 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const chatAttachmentInput = useRef(null);
   const [mobileChat, setMobileChat] = useState(false);
   const [conversationQuery, setConversationQuery] = useState('');
+  const [messageFiltersOpen, setMessageFiltersOpen] = useState(false);
+  const [messageFiltersMore, setMessageFiltersMore] = useState(false);
+  const [messageFoldersExpanded, setMessageFoldersExpanded] = useState(false);
+  const [messageFilters, setMessageFilters] = useState(() => {
+    try { return { unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false, ...JSON.parse(localStorage.getItem("reelsgo_message_filters") || "{}") }; }
+    catch { return { unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false }; }
+  });
   const [conversationMenuId, setConversationMenuId] = useState(null);
   const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
   const [deletingConversationId, setDeletingConversationId] = useState(null);
@@ -5450,6 +5508,21 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
   useEffect(() => { try { localStorage.setItem("reelsgo_conversation_folders", JSON.stringify(conversationFolders)); } catch {} }, [conversationFolders]);
   useEffect(() => { try { localStorage.setItem("reelsgo_inbox_tab", inboxTab); } catch {} }, [inboxTab]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_message_filters", JSON.stringify(messageFilters)); } catch {} }, [messageFilters]);
+  const [, setVerifiedFilterRefresh] = useState(0);
+  useEffect(() => {
+    if (!messageFilters.verified) return undefined;
+    let cancelled = false;
+    const ids = [...new Set(conversations.map(c => other(c)?._id).filter(Boolean).map(String))];
+    Promise.all(ids.map(async id => {
+      if (verificationStatusCache.has(id)) return;
+      try {
+        const status = await api(`/verification/status/${id}`);
+        verificationStatusCache.set(id, Boolean(status?.verified));
+      } catch { verificationStatusCache.set(id, false); }
+    })).then(() => { if (!cancelled) setVerifiedFilterRefresh(v => v + 1); });
+    return () => { cancelled = true; };
+  }, [messageFilters.verified, conversations]);
 
   function cancelConversationLongPress() {
     if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
@@ -5721,7 +5794,16 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     }
   }
 
-  useEffect(() => { loadConversations(); loadNotes(); }, []);
+  useEffect(() => {
+    loadConversations();
+    loadNotes();
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState !== "hidden") { loadConversations(); loadNotes(); }
+    }, 60000);
+    const refreshOnFocus = () => { loadConversations(); loadNotes(); };
+    window.addEventListener("focus", refreshOnFocus);
+    return () => { window.clearInterval(refreshTimer); window.removeEventListener("focus", refreshOnFocus); };
+  }, []);
 
   // Refresh unread state and the active conversation periodically.
   // This also picks up the exact seenAt time from the server so the
@@ -6024,14 +6106,24 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const myNote = notes.find(n => String(n.author?._id) === String(me?._id));
   const otherNotes = notes.filter(n => String(n.author?._id) !== String(me?._id));
   const filteredConversations = conversations.filter(c => {
+    const u = other(c);
+    // Do not render orphaned conversations whose other account was deleted in MongoDB.
+    if (!u?._id) return false;
     const q = conversationQuery.trim().toLowerCase();
-    if (q) {
-      const u = other(c);
-      if (!String(u?.username || '').toLowerCase().includes(q) && !String(u?.name || '').toLowerCase().includes(q)) return false;
-    }
+    if (q && !String(u?.username || '').toLowerCase().includes(q) && !String(u?.name || '').toLowerCase().includes(q)) return false;
     const folder = conversationFolders[String(c._id)] || "Primary";
-    return inboxTab === "Requests" ? false : folder === inboxTab;
-  }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))));
+    if (inboxTab === "Requests" || folder !== inboxTab) return false;
+    const last = c.lastMessage || {};
+    const senderId = String(last.sender?._id || last.sender || "");
+    if (messageFilters.unread && !(Number(c.unreadCount || 0) > 0 || c.isUnread)) return false;
+    if (messageFilters.unanswered && (!senderId || senderId === String(me?._id))) return false;
+    if (messageFilters.storyReplies && !(/story|replied to your story/i.test(String(last.text || last.caption || "")) || last.storyReply === true || last.kind === "story_reply")) return false;
+    if (messageFilters.verified && !(u.verified || u.isVerified || u.blueTick || verificationStatusCache.get(String(u._id)) === true)) return false;
+    if (messageFilters.tenK && Number(u.followersCount || 0) < 10000) return false;
+    if (messageFilters.pinned && !pinnedConversationIds.includes(String(c._id))) return false;
+    if (messageFilters.muted && !mutedConversationIds.includes(String(c._id))) return false;
+    return true;
+  }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))) || new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
 
   return (
     <div className={`page messages-page ${active && (mobileChat || (typeof window !== "undefined" && window.innerWidth <= 700)) ? "is-mobile-chat" : ""}`}>
@@ -6139,8 +6231,37 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         )}
       </div></div>}
 
-      {!active && <div className="messages-inbox-tabs" role="tablist" aria-label="Message folders">
-        {["Primary", "General", "Requests"].map(tab => <button type="button" key={tab} role="tab" aria-selected={inboxTab === tab} className={inboxTab === tab ? "active" : ""} onClick={() => setInboxTab(tab)}>{tab}{tab === "Requests" && requests.length > 0 ? <span>{requests.length}</span> : null}</button>)}
+      {!active && <div className="messages-folder-controls">
+        <button type="button" className={`messages-filter-trigger ${Object.values(messageFilters).some(Boolean) ? "has-active-filters" : ""}`} onClick={() => setMessageFiltersOpen(true)} aria-label="Open message filters">
+          <SlidersHorizontal size={17}/><ChevronDown size={13}/>
+        </button>
+        <div className="messages-inbox-tabs" role="tablist" aria-label="Message folders">
+          {["Primary", "Requests", "General"].map(tab => <button type="button" key={tab} role="tab" aria-selected={inboxTab === tab} className={inboxTab === tab ? "active" : ""} onClick={() => setInboxTab(tab)}>{tab}{tab === "Requests" && requests.length > 0 ? <span>{requests.length}</span> : null}</button>)}
+        </div>
+      </div>}
+
+      {messageFiltersOpen && !active && <div className="messages-filter-overlay" onMouseDown={e => { if (e.target === e.currentTarget) setMessageFiltersOpen(false); }}>
+        <section className="messages-filter-sheet" role="dialog" aria-modal="true" aria-label="Message filters">
+          <div className="messages-filter-grabber"/><h2>Filters</h2>
+          {[
+            ["unread", "Unread", <Mail size={20}/>],
+            ["unanswered", "Unanswered", <CircleHelp size={20}/>],
+            ["storyReplies", "Story replies", <CircleDashed size={20}/>],
+            ["verified", "Verified profiles", <BadgeCheck size={20}/>],
+            ["tenK", "10K+ followers", <Users size={20}/>]
+          ].map(([key, label, icon]) => <button type="button" className="messages-filter-option" key={key} onClick={() => setMessageFilters(v => ({ ...v, [key]: !v[key] }))}>
+            <span className="messages-filter-option-icon">{icon}</span><span>{label}</span><i className={messageFilters[key] ? "checked" : ""}>{messageFilters[key] ? <Check size={14}/> : null}</i>
+          </button>)}
+          <button type="button" className="messages-filter-see-more" onClick={() => setMessageFiltersMore(v => !v)}>{messageFiltersMore ? "See less" : "See more"}</button>
+          {messageFiltersMore && <>
+            <button type="button" className="messages-filter-option" onClick={() => setMessageFilters(v => ({ ...v, pinned: !v.pinned }))}><span className="messages-filter-option-icon"><PinOff size={20}/></span><span>Pinned conversations</span><i className={messageFilters.pinned ? "checked" : ""}>{messageFilters.pinned ? <Check size={14}/> : null}</i></button>
+            <button type="button" className="messages-filter-option" onClick={() => setMessageFilters(v => ({ ...v, muted: !v.muted }))}><span className="messages-filter-option-icon"><Bell size={20}/></span><span>Muted conversations</span><i className={messageFilters.muted ? "checked" : ""}>{messageFilters.muted ? <Check size={14}/> : null}</i></button>
+          </>}
+          <div className="messages-filter-divider"/>
+          <button type="button" className="messages-filter-folders-heading" onClick={() => setMessageFoldersExpanded(v => !v)}><b>Folders</b><ChevronRight className={messageFoldersExpanded ? "expanded" : ""}/></button>
+          {messageFoldersExpanded && <div className="messages-filter-folders">{["Primary", "General", "Requests"].map(folder => <button type="button" key={folder} onClick={() => { setInboxTab(folder); setMessageFiltersOpen(false); }}>{folder}<span>{folder === "Requests" ? requests.length : conversations.filter(c => (conversationFolders[String(c._id)] || "Primary") === folder).length}</span></button>)}</div>}
+          <div className="messages-filter-footer"><button type="button" onClick={() => setMessageFilters({ unread: false, unanswered: false, storyReplies: false, verified: false, tenK: false, pinned: false, muted: false })}>Clear all</button><button type="button" onClick={() => setMessageFiltersOpen(false)}>Done</button></div>
+        </section>
       </div>}
 
       <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`} style={{ "--rg-chat-accent": chatTheme.accent, "--rg-chat-wallpaper": chatTheme.background ? `url("${chatTheme.background}")` : "none" }}>

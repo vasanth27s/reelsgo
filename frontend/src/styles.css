@@ -14821,3 +14821,31 @@ body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !importan
     margin: 0 !important;
   }
 }
+
+
+/* Instagram-like message inbox filters bottom sheet */
+.messages-folder-controls{display:flex;align-items:center;gap:8px;margin:0 0 10px;}
+.messages-filter-trigger{width:43px;height:38px;flex:0 0 43px;display:flex;align-items:center;justify-content:center;gap:3px;border:1px solid #2c3137;border-radius:11px;background:#101316;color:#f2f4f7;}
+.messages-filter-trigger.has-active-filters{border-color:#e1306c;color:#ff5c91;}
+.messages-folder-controls .messages-inbox-tabs{flex:1;min-width:0;margin:0!important;}
+.messages-filter-overlay{position:fixed;inset:0;z-index:12000;background:rgba(0,0,0,.62);display:flex;align-items:flex-end;justify-content:center;}
+.messages-filter-sheet{width:100%;max-width:560px;max-height:min(78dvh,680px);overflow:auto;background:#181b1e;color:#f5f6f7;border-radius:26px 26px 0 0;padding:9px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -12px 44px #0005;}
+.messages-filter-grabber{width:28px;height:3px;border-radius:99px;background:#aeb4bc;margin:0 auto 18px;}
+.messages-filter-sheet h2{font-size:13px;font-weight:750;margin:0 0 12px;}
+.messages-filter-option{display:flex;align-items:center;gap:12px;width:100%;min-height:40px;padding:6px 0;background:transparent;color:#f1f3f5;text-align:left;}
+.messages-filter-option-icon{width:19px;height:22px;display:flex;align-items:center;justify-content:center;color:#f1f3f5;flex:none;}
+.messages-filter-option>span:nth-child(2){flex:1;font-size:13px;}
+.messages-filter-option i{width:20px;height:20px;border:1.5px solid #9aa1a9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;flex:none;}
+.messages-filter-option i.checked{background:#fff;border-color:#fff;color:#17191c;}
+.messages-filter-see-more{padding:8px 0 13px;background:transparent;color:#b6bec8;font-size:11px;}
+.messages-filter-divider{height:1px;background:#272b30;margin:4px -16px 0;}
+.messages-filter-folders-heading{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 0;background:transparent;color:#f4f5f6;text-align:left;font-size:13px;}
+.messages-filter-folders-heading svg{width:17px;height:17px;transition:transform .15s;}
+.messages-filter-folders-heading svg.expanded{transform:rotate(90deg);}
+.messages-filter-folders{display:grid;gap:2px;padding:0 0 10px;}
+.messages-filter-folders button{display:flex;justify-content:space-between;align-items:center;padding:9px 0;background:transparent;color:#d8dde3;text-align:left;font-size:12px;}
+.messages-filter-folders button span{color:#9ba3ad;}
+.messages-filter-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #272b30;}
+.messages-filter-footer button{padding:9px 13px;border-radius:9px;background:transparent;color:#f1f3f5;font-size:12px;font-weight:700;}
+.messages-filter-footer button:last-child{background:#f5f6f7;color:#16191c;min-width:84px;}
+@media(max-width:700px){.messages-folder-controls{gap:7px;margin:0 0 7px!important}.messages-filter-trigger{height:30px;width:37px;flex-basis:37px;border-radius:8px;background:#101316}.messages-folder-controls .messages-inbox-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.messages-folder-controls .messages-inbox-tabs button{height:30px!important;font-size:10px!important}.messages-filter-sheet{max-height:72dvh;padding-left:16px;padding-right:16px}.messages-filter-option{min-height:40px;}.messages-filter-footer{position:sticky;bottom:0;background:#181b1e;}}

@@ -9,7 +9,6 @@ import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 
 import User from "../models/User.js";
-import Media from "../models/Media.js";
 
 const router = express.Router();
 
@@ -134,11 +133,17 @@ router.get(
 
        */
 
+      const liveConversations = conversations.filter(conversation =>
+        Array.isArray(conversation.members) &&
+        conversation.members.every(Boolean) &&
+        conversation.members.some(member => String(member._id || member) === String(req.user.id))
+      );
+
       const conversationsWithUnread =
 
         await Promise.all(
 
-          conversations.map(
+          liveConversations.map(
 
             async conversation => {
 
@@ -552,7 +557,6 @@ router.get(
             "-password -avatar.data"
 
           )
-          .populate("mediaId", "kind contentType fileName size")
 
           .sort({
 
@@ -614,23 +618,30 @@ router.post(
 
       } = req.params;
 
-      const text = String(req.body.text || "").trim();
-      const mediaId = req.body.mediaId || null;
-      const requestedKind = String(req.body.kind || "text");
-      let media = null;
+      const text =
 
-      if (mediaId) {
-        if (!mongoose.Types.ObjectId.isValid(String(mediaId))) {
-          return res.status(400).json({ message: "Invalid media ID" });
-        }
-        media = await Media.findOne({ _id: mediaId, owner: req.user.id }).select("_id kind owner");
-        if (!media) return res.status(404).json({ message: "Uploaded media was not found for this account" });
-        if (!["image", "video"].includes(requestedKind) || requestedKind !== media.kind) {
-          return res.status(400).json({ message: "Media type does not match the uploaded file" });
-        }
-      }
-      if (!text && !mediaId) {
-        return res.status(400).json({ message: "Write a message or attach an image/video" });
+        String(
+
+          req.body.text || ""
+
+        ).trim();
+
+      /*
+
+       \* Message cannot be empty.
+
+       */
+
+      if (!text) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Message cannot be empty"
+
+        });
+
       }
 
       /*
@@ -744,8 +755,6 @@ router.post(
             req.user.id,
 
           text,
-          mediaId: media?._id || null,
-          kind: media?.kind || "text",
 
           seenBy: [
 
@@ -777,8 +786,13 @@ router.post(
 
        */
 
-      await message.populate("sender", "-password -avatar.data");
-      if (message.mediaId) await message.populate("mediaId", "kind contentType fileName size");
+      await message.populate(
+
+        "sender",
+
+        "-password -avatar.data"
+
+      );
 
       res.status(201).json({
 
@@ -1300,7 +1314,6 @@ router.delete(
 
 );
 
-
 /* =========================================================
    CONVERSATION ACTIONS (per-user state)
    ========================================================= */
@@ -1396,6 +1409,5 @@ router.delete("/conversations/:conversationId", auth, async (req, res) => {
     return res.status(500).json({ message: "Unable to delete conversation" });
   }
 });
-
 
 export default router;
