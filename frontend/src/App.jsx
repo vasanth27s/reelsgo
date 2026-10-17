@@ -1482,6 +1482,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
   const [viewersOpen, setViewersOpen] = useState(false);
+  const [storyControlsVisible, setStoryControlsVisible] = useState(true);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -1560,7 +1561,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
   const visibleViewers = viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
 
   return (
-    <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""}`} onClick={onClose}>
+    <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""} ${storyControlsVisible ? "story-controls-visible" : "story-controls-hidden"}`} onClick={onClose}>
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
@@ -1575,10 +1576,10 @@ function StoryViewer({ story, onClose, onDeleted }) {
           <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
         </div>
       </div>
-      <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
+      <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
       </div>
-      {isOwner && !viewersOpen && (
+      {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
           <span className="story-viewers-grabber" />
           <span>{story.views?.length || 0} views · Viewers</span>
