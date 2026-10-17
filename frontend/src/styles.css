@@ -15126,3 +15126,23 @@ body:has(.rg-profile-options-backdrop) .mobile-bottom-nav {
 .story-viewer-notice{position:absolute;z-index:45;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:max-content;max-width:90%;padding:10px 14px;border-radius:12px;background:#252a30;color:#f7f8fa;font-size:12px;text-align:center;box-shadow:0 8px 30px #0006;}
 @keyframes storyViewerMenuIn{from{opacity:.6;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:700px){.story-viewers-screen-top{height:40%;min-height:285px;max-height:380px;padding:0 14px}.story-viewers-settings,.story-viewers-close{top:calc(16px + env(safe-area-inset-top));}.story-viewers-settings{left:12px}.story-viewers-close{right:12px}.story-viewer-thumbnails{margin-top:calc(55px + env(safe-area-inset-top));height:min(31vh,235px);}.story-thumb-card{width:min(36vw,134px);height:min(31vh,235px);}.story-thumb-add{width:min(28vw,104px);height:min(25vh,185px)}.story-viewers-tabs{padding:0 24px}.story-viewers-screen-list{padding:8px 18px calc(12px + env(safe-area-inset-bottom))!important}.story-viewers-screen .story-viewer-row{min-height:78px}.story-viewer-action-sheet{bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px)}.story-viewer-action-sheet>button{min-height:66px}.story-viewers-cancel{margin-bottom:calc(10px + env(safe-area-inset-bottom));}}
+
+
+/* Story controls appear on open and can be toggled by tapping the story media. */
+.story-viewer .story-viewer-top,
+.story-viewer .story-progress,
+.story-viewer .story-viewers-button {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+.story-viewer.story-controls-hidden .story-viewer-top,
+.story-viewer.story-controls-hidden .story-progress,
+.story-viewer.story-controls-hidden .story-viewers-button {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.story-viewer.story-controls-hidden .story-viewer-content {
+  cursor: pointer;
+}
