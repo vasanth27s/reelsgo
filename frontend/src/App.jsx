@@ -1485,12 +1485,17 @@ function StoryViewer({ story, onClose, onDeleted }) {
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeViewerMenu, setActiveViewerMenu] = useState(null);
+  const [viewerActionBusy, setViewerActionBusy] = useState(false);
+  const [hiddenViewerIds, setHiddenViewerIds] = useState([]);
+  const [restrictedViewerIds, setRestrictedViewerIds] = useState([]);
+  const [blockedViewerIds, setBlockedViewerIds] = useState([]);
+  const [viewerNotice, setViewerNotice] = useState("");
 
   async function deleteStory() {
     if (!isOwner || deleting) return;
     const confirmed = window.confirm("Delete this story? This action cannot be undone.");
     if (!confirmed) return;
-
     setDeleting(true);
     try {
       await api(`/stories/${story._id}`, { method: "DELETE" });
@@ -1517,14 +1522,45 @@ function StoryViewer({ story, onClose, onDeleted }) {
     }
   }
 
+  function viewerId(viewer) {
+    return String(viewer?._id || viewer?.id || "");
+  }
+
+  function runViewerAction(action, viewer) {
+    const id = viewerId(viewer);
+    const username = viewer?.username || viewer?.name || "this viewer";
+    setActiveViewerMenu(null);
+    if (action === "profile") {
+      openUserProfile(id);
+      return;
+    }
+    if (action === "hide") {
+      setHiddenViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewerNotice(`Story hidden from ${username} on this screen.`);
+    } else if (action === "restrict") {
+      setRestrictedViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewerNotice(`${username} marked as restricted on this screen.`);
+    } else if (action === "remove") {
+      setViewers(items => items.filter(item => viewerId(item) !== id));
+      setViewerNotice(`${username} removed from this viewer list.`);
+    } else if (action === "block") {
+      setBlockedViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewers(items => items.filter(item => viewerId(item) !== id));
+      setViewerNotice(`${username} blocked on this screen.`);
+    }
+    window.setTimeout(() => setViewerNotice(""), 2600);
+  }
+
   useEffect(() => {
     if (!isOwner && story?._id) {
       api(`/stories/${story._id}/view`, { method: 'POST' }).catch(() => {});
     }
   }, [story?._id, isOwner]);
 
+  const visibleViewers = viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
+
   return (
-    <div className="story-viewer" onClick={onClose}>
+    <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""}`} onClick={onClose}>
       <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
@@ -1534,65 +1570,73 @@ function StoryViewer({ story, onClose, onDeleted }) {
             <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
-        <div
-          className="story-viewer-top-actions"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8
-          }}
-        >
-          {isOwner && (
-            <button
-              type="button"
-              title="Delete story"
-              aria-label="Delete story"
-              disabled={deleting}
-              onClick={e => { e.stopPropagation(); deleteStory(); }}
-              style={{ color: "#ff5c70" }}
-            >
-              <Trash2 />
-            </button>
-          )}
-          <button type="button" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+        <div className="story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {isOwner && <button type="button" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={e => { e.stopPropagation(); deleteStory(); }} style={{ color: "#ff5c70" }}><Trash2 /></button>}
+          <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
         </div>
       </div>
       <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
-        {mediaUrl && story.kind === 'video' ? (
-          <video src={mediaUrl} autoPlay controls playsInline />
-        ) : mediaUrl ? (
-          <img src={mediaUrl} alt="Story" />
-        ) : (
-          <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>
-        )}
+        {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
       </div>
-      {isOwner && (
+      {isOwner && !viewersOpen && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
-          <Eye /> <span>{viewers.length || story.views?.length || 0} views</span>
+          <span className="story-viewers-grabber" />
+          <span>{story.views?.length || 0} views · Viewers</span>
         </button>
       )}
       {viewersOpen && (
-        <div className="story-viewers-sheet" onClick={e => e.stopPropagation()}>
-          <div className="story-viewers-head">
-            <div><b>Story views</b><span>{viewers.length} {viewers.length === 1 ? 'viewer' : 'viewers'}</span></div>
-            <button onClick={() => setViewersOpen(false)}><X /></button>
+        <section className="story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
+          <div className="story-viewers-screen-top">
+            <button type="button" className="story-viewers-settings" aria-label="Story settings" onClick={() => setViewerNotice("Story settings are available from your account settings.")}><Settings /></button>
+            <div className="story-viewer-thumbnails">
+              <button type="button" className="story-thumb-card selected" aria-label="Current story">
+                {mediaUrl && story.kind === "video" ? <video src={mediaUrl} muted playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Current story" /> : <span style={{ background: story.background || "linear-gradient(135deg,#111827,#4f46e5)" }}>{story.text || "Story"}</span>}
+                <small><Users size={15} /> {visibleViewers.length || story.views?.length || 0}</small>
+              </button>
+              <button type="button" className="story-thumb-add" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><Camera /></button>
+            </div>
+            <button type="button" className="story-viewers-close" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><X /></button>
           </div>
+          <div className="story-viewers-tabs">
+            <div className="story-viewers-tab-active"><Users /><b>{visibleViewers.length || story.views?.length || 0}</b></div>
+            <button type="button" className="story-viewers-delete" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={deleteStory}><Trash2 /></button>
+          </div>
+          {viewerNotice && <div className="story-viewer-notice" role="status">{viewerNotice}</div>}
           {loadingViewers ? (
             <div className="story-viewers-empty"><div className="viewer-loader" /><b>Loading viewers...</b></div>
-          ) : viewers.length ? (
-            <div className="story-viewers-list">
-              {viewers.map(v => (
-                <div className="story-viewer-row" key={v._id}>
-                  <Avatar user={v} size={50} />
-                  <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || 'ReelsGo user'}</span></div>
-                  {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
-                </div>
-              ))}
+          ) : visibleViewers.length ? (
+            <div className="story-viewers-list story-viewers-screen-list">
+              {visibleViewers.map(v => {
+                const id = viewerId(v);
+                const menuOpen = activeViewerMenu === id;
+                const username = v.username || v.name || "ReelsGo user";
+                return (
+                  <div className="story-viewer-row story-viewer-row-menu" key={id || username}>
+                    <Avatar user={v} size={50} />
+                    <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || username}{restrictedViewerIds.includes(id) ? " · Restricted" : ""}</span></div>
+                    {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
+                    <button type="button" className="story-viewer-more" aria-label={`Options for ${username}`} onClick={() => setActiveViewerMenu(menuOpen ? null : id)}><MoreHorizontal /></button>
+                    <button type="button" className="story-viewer-message" aria-label={`Message ${username}`} onClick={() => { setActiveViewerMenu(null); openUserProfile(id); }}><Send /></button>
+                    {menuOpen && <>
+                      <button type="button" className="story-viewer-menu-backdrop" aria-label="Close viewer options" onClick={() => setActiveViewerMenu(null)} />
+                      <div className="story-viewer-action-sheet" role="menu">
+                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{username}</b></div>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("profile", v)}>View Profile</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("hide", v)}>Hide your story</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("restrict", v)}>{restrictedViewerIds.includes(id) ? "Unrestrict" : "Restrict"}</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("remove", v)}>Remove follower</button>
+                        <button type="button" role="menuitem" className="danger" onClick={() => runViewerAction("block", v)}>Block</button>
+                      </div>
+                    </>}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="story-viewers-empty"><Eye /><b>No views yet</b><span>When someone watches your story, their profile will appear here.</span></div>
           )}
-        </div>
+          <button type="button" className="story-viewers-cancel" onClick={() => { setActiveViewerMenu(null); setViewersOpen(false); }}>Cancel</button>
+        </section>
       )}
     </div>
   );
