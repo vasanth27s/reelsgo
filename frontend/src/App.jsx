@@ -540,6 +540,7 @@ function App() {
   const [sharedReelId, setSharedReelId] = useState(() => getSharedReelIdFromPath());
   const [createOpen, setCreateOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [storyAutoPick, setStoryAutoPick] = useState(false);
   const [reelOpen, setReelOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -580,7 +581,7 @@ function App() {
 
   useEffect(() => {
     if (!token) return;
-    const openStoryComposer = () => setStoryOpen(true);
+    const openStoryComposer = (event) => { setStoryAutoPick(Boolean(event?.detail?.openPicker)); setStoryOpen(true); };
     window.addEventListener("reelsgo-open-story-composer", openStoryComposer);
     return () => window.removeEventListener("reelsgo-open-story-composer", openStoryComposer);
   }, [token]);
@@ -862,7 +863,7 @@ function App() {
       </nav>
 
       {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
-      {storyOpen && <StoryComposer onClose={() => setStoryOpen(false)} onDone={() => { setStoryOpen(false); setFeedRefresh(v => v + 1); }} />}
+      {storyOpen && <StoryComposer autoPick={storyAutoPick} onClose={() => { setStoryOpen(false); setStoryAutoPick(false); }} onDone={() => { setStoryOpen(false); setStoryAutoPick(false); setFeedRefresh(v => v + 1); }} />}
       {reelOpen && <ReelComposer onClose={() => setReelOpen(false)} onDone={() => setReelOpen(false)} />}
       {settingsOpen && (
         <SettingsModal
@@ -1330,8 +1331,8 @@ function StoryViewer({ story, onClose, onDeleted }) {
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
           <div>
-            <b className="story-viewer-display-name">{isOwner ? "Your story" : (story.author?.name || story.author?.fullName || story.author?.username || "Story")}</b>
-            <span>{isOwner ? "Your story" : "Story"}</span>
+            <UserLink user={story.author} />
+            <span>{isOwner ? 'Your story' : 'Story'}</span>
           </div>
         </div>
         <div className="story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1342,15 +1343,6 @@ function StoryViewer({ story, onClose, onDeleted }) {
       <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
       </div>
-      {isOwner && !viewersOpen && storyControlsVisible && (
-        <div className="story-owner-actions" onClick={e => e.stopPropagation()}>
-          <button type="button" onClick={openViewers}><Users /><span>Activity</span></button>
-          <button type="button" onClick={async () => { try { if (navigator.share) await navigator.share({ title: "My ReelsGo story", url: window.location.href }); else { await navigator.clipboard.writeText(window.location.href); setViewerNotice("Story link copied"); } } catch {} }}><Share2 /><span>Share on...</span></button>
-          <button type="button" onClick={() => setViewerNotice("Mention someone by sharing this story with them.")}><AtSign /><span>Mention</span></button>
-          <button type="button" onClick={() => setViewerNotice("Choose a person from your messages to send this story.")}><Send /><span>Send</span></button>
-          <button type="button" onClick={() => setViewerNotice("More story options are available from the story menu.")}><MoreHorizontal /><span>More</span></button>
-        </div>
-      )}
       {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
           <span className="story-viewers-grabber" />
@@ -1366,7 +1358,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
                 {mediaUrl && story.kind === "video" ? <video src={mediaUrl} muted playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Current story" /> : <span style={{ background: story.background || "linear-gradient(135deg,#111827,#4f46e5)" }}>{story.text || "Story"}</span>}
                 <small><Users size={15} /> {visibleViewers.length || story.views?.length || 0}</small>
               </button>
-              <button type="button" className="story-thumb-add" aria-label="Create another story" title="Create another story" onClick={() => { setViewersOpen(false); setActiveViewerMenu(null); window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { source: "story-viewers", createNew: true } })); }}><Camera /></button>
+              <button type="button" className="story-thumb-add" aria-label="Create another story" title="Add another story" onClick={() => { setViewersOpen(false); onClose(); window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { openPicker: true } })); }}><Camera /></button>
             </div>
             <button type="button" className="story-viewers-close" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><X /></button>
           </div>
@@ -1386,14 +1378,14 @@ function StoryViewer({ story, onClose, onDeleted }) {
                 return (
                   <div className="story-viewer-row story-viewer-row-menu" key={id || username}>
                     <Avatar user={v} size={50} />
-                    <div className="story-viewer-user-info"><b>{v.name || v.fullName || username}</b>{restrictedViewerIds.includes(id) && <span>Restricted</span>}</div>
+                    <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || username}{restrictedViewerIds.includes(id) ? " · Restricted" : ""}</span></div>
                     {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
                     <button type="button" className="story-viewer-more" aria-label={`Options for ${username}`} onClick={() => setActiveViewerMenu(menuOpen ? null : id)}><MoreHorizontal /></button>
                     <button type="button" className="story-viewer-message" aria-label={`Message ${username}`} onClick={() => { setActiveViewerMenu(null); openUserProfile(id); }}><Send /></button>
                     {menuOpen && <>
                       <button type="button" className="story-viewer-menu-backdrop" aria-label="Close viewer options" onClick={() => setActiveViewerMenu(null)} />
                       <div className="story-viewer-action-sheet" role="menu">
-                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{v.name || v.fullName || username}</b></div>
+                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{username}</b></div>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("profile", v)}>View Profile</button>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("hide", v)}>Hide your story</button>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("restrict", v)}>{restrictedViewerIds.includes(id) ? "Unrestrict" : "Restrict"}</button>
@@ -2067,8 +2059,7 @@ function ShareSheet({ post, onClose, kind = "post" }) {
                   <Avatar user={person} size={64} />
                   {active && <span className="share-selected-check"><Check /></span>}
                 </div>
-                <b>@{person.username || person.name || "user"}</b>
-                <span>{person.name || "ReelsGo user"}</span>
+                <b>{person.name || person.username || "ReelsGo user"}</b>
               </button>
             );
           }) : <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>}
@@ -2079,25 +2070,6 @@ function ShareSheet({ post, onClose, kind = "post" }) {
             <Send />{sending ? "Sending..." : `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}`}
           </button>
         )}
-
-        <div className="rg-social-share" aria-label="Share to social media" style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.12)" }}>
-          <div style={{ fontWeight: 750, marginBottom: 12 }}>Share to other apps</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 8 }}>
-            {[
-              { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
-              { name: "WhatsApp", mark: "◉", bg: "#25D366" },
-              { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
-              { name: "Facebook", mark: "f", bg: "#1877F2" },
-              { name: "Telegram", mark: "➤", bg: "#229ED9" }
-            ].map(app => (
-              <button key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}
-                style={{ minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, background: "transparent", color: "inherit", padding: "4px 1px" }}>
-                <span style={{ width: 48, height: 48, borderRadius: 15, display: "grid", placeItems: "center", color: "#fff", fontSize: 27, fontWeight: 800, background: app.bg, boxShadow: "0 5px 16px rgba(0,0,0,.18)" }}>{app.mark}</span>
-                <span style={{ fontSize: 10, textAlign: "center", lineHeight: 1.15, overflowWrap: "anywhere" }}>{app.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
 
         <div className="share-shortcuts" aria-label="More sharing options">
           <button type="button" onClick={addToStory}>
@@ -2116,11 +2088,31 @@ function ShareSheet({ post, onClose, kind = "post" }) {
             <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
           </button>
         </div>
+                <div className="rg-social-share" aria-label="Share to social media" style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.12)" }}>
+          <div style={{ fontWeight: 750, marginBottom: 12 }}>Share to other apps</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 8 }}>
+            {[
+              { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
+              { name: "WhatsApp", mark: "◉", bg: "#25D366" },
+              { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
+              { name: "Facebook", mark: "f", bg: "#1877F2" },
+              { name: "Telegram", mark: "➤", bg: "#229ED9" }
+            ].map(app => (
+              <button key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}
+                style={{ minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, background: "transparent", color: "inherit", padding: "4px 1px" }}>
+                <span style={{ width: 48, height: 48, borderRadius: 15, display: "grid", placeItems: "center", color: "#fff", fontSize: 27, fontWeight: 800, background: app.bg, boxShadow: "0 5px 16px rgba(0,0,0,.18)" }}>{app.mark}</span>
+                <span style={{ fontSize: 10, textAlign: "center", lineHeight: 1.15, overflowWrap: "anywhere" }}>{app.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
         {notice && <div className="share-notice" role="status">{notice}</div>}
       </div>
     </div>
   );
 }
+
+function MessageCircleOffFallback() { return <span aria-hidden="true" style={{ width: 19, display: "inline-flex", justifyContent: "center" }}>◉̸</span>; }
 
 function CirclePlusFallback() {
   return <span className="share-circle-plus">＋</span>;
@@ -2288,7 +2280,6 @@ function PostComposer({ user, onClose, onDone }) {
   const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTool, setActiveTool] = useState("");
-
   async function publish() {
     if (!files.length && !caption.trim()) {
       alert("Add a photo/video or caption");
@@ -2497,7 +2488,7 @@ function PostComposer({ user, onClose, onDone }) {
   );
 }
 
-function StoryComposer({ onClose, onDone }) {
+function StoryComposer({ onClose, onDone, autoPick = false }) {
   const input = useRef(null);
   const currentUser = getUser();
   const [file, setFile] = useState(null);
@@ -2505,6 +2496,28 @@ function StoryComposer({ onClose, onDone }) {
   const [audience, setAudience] = useState("everyone");
   const [loading, setLoading] = useState(false);
   const [activeTool, setActiveTool] = useState("");
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [commentsOff, setCommentsOff] = useState(false);
+
+  useEffect(() => {
+    if (autoPick) {
+      const timer = window.setTimeout(() => input.current?.click(), 180);
+      return () => window.clearTimeout(timer);
+    }
+  }, [autoPick]);
+
+  function downloadSelectedMedia() {
+    if (!file) { alert("Choose a photo or video first."); return; }
+    const url = URL.createObjectURL(file);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = file.name || "reelsgo-story";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setMoreMenuOpen(false);
+  }
 
   async function publish() {
     if (!file && !text.trim()) {
@@ -2517,6 +2530,7 @@ function StoryComposer({ onClose, onDone }) {
       if (file) fd.append("media", file);
       fd.append("text", text);
       fd.append("audience", audience);
+      fd.append("commentsDisabled", String(commentsOff));
       await api("/stories", { method: "POST", body: fd });
       onDone();
       alert("Story shared");
@@ -2543,6 +2557,15 @@ function StoryComposer({ onClose, onDone }) {
           <div className="publish-header-spacer" />
         </header>
 
+        <button type="button" className="story-editor-more" aria-label="More story options" onClick={() => setMoreMenuOpen(v => !v)}><MoreHorizontal /></button>
+        {moreMenuOpen && <div className="story-editor-more-menu" role="menu">
+          <button type="button" role="menuitem" onClick={downloadSelectedMedia}><Download size={19}/> Download</button>
+          <button type="button" role="menuitem" onClick={() => { setCommentsOff(v => !v); setMoreMenuOpen(false); }}><MessageCircleOffFallback /> {commentsOff ? "Turn on commenting" : "Turn off commenting"}</button>
+        </div>}
+        <div className="story-editor-toolbar" aria-label="Story editing tools">
+          {[["Text", "Aa", "text"], ["Stickers", "☻", "stickers"], ["Audio", "♫", "audio"], ["Partnerships & ads", "♙", "partnerships"], ["Sound", "◖", "sound"], ["Effects", "✧", "effects"], ["Mention", "@", "mention"], ["Draw", "〰", "draw"], ["Label AI", "✧", "label-ai"]].map(([label, mark, key]) => <button type="button" key={key} onClick={() => { setActiveTool(key); if (key === "text") document.querySelector(".story-publish-caption")?.focus(); else if (key === "audio") alert("Audio selection depends on available audio assets."); else if (key === "stickers") setText(v => v + (v ? " " : "") + "😊"); }}><span>{mark}</span><b>{label}</b></button>)}
+          <button type="button" onClick={() => setMoreMenuOpen(v => !v)}><span>•••</span><b>More</b></button>
+        </div>
         <div className="publish-scroll-area">
           <section className="publish-media-section">
             {file ? (
@@ -6161,7 +6184,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         <div className="new-message-results">
           {peopleLoading ? <div className="new-message-status">Searching people…</div> : null}
           {!peopleLoading && !peopleResults.length && !peopleError ? <div className="new-message-status">Search for someone to start a conversation.</div> : null}
-          {peopleResults.map(user => <button className="new-message-user-row" type="button" key={user._id} disabled={!!startingConversationId} onClick={() => startConversationWith(user)}><Avatar user={user} size={46}/><span><b>{user.name || user.username || "User"}</b><small>@{user.username || "user"}</small></span><span className="new-message-start-label">{String(startingConversationId) === String(user._id) ? "Opening…" : "Message"}</span></button>)}
+          {peopleResults.map(user => <button className="new-message-user-row" type="button" key={user._id} disabled={!!startingConversationId} onClick={() => startConversationWith(user)}><Avatar user={user} size={46}/><span><b>{user.name || user.username || "User"}</b></span><span className="new-message-start-label">{String(startingConversationId) === String(user._id) ? "Opening…" : "Message"}</span></button>)}
           {peopleError ? <div className="new-message-error" role="alert">{peopleError}</div> : null}
         </div>
       </section></div>}
@@ -6278,7 +6301,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                     {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
                   </div>
                   <div className="conversation-copy">
-                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.name || u?.fullName || u?.username || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
+                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.username || u?.name || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
                     <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
@@ -6348,7 +6371,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                     )}
                   </div>
                 </div>;
-              }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><p>@{other(active)?.username}</p><span>Start a conversation with this person.</span></div>}
+              }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><span>Start a conversation with this person.</span></div>}
             </div>
             <div className="chat-input instagram-chat-input" ref={emojiPickerRef}>
               <input
@@ -6432,7 +6455,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
           <div className="rg-chat-details-profile">
             <Avatar user={other(active)} size={92} />
             <h2>{chatDetailsProfile?.user?.name || other(active)?.name || other(active)?.username || "User"}</h2>
-            <p>@{other(active)?.username || "user"}</p>
             <div className="rg-chat-details-actions">
               <button type="button" onClick={() => { setChatDetailsOpen(false); setChatCustomizeOpen(true); }}><Palette /><span>Customise</span></button>
               <button type="button" onClick={() => { setChatDetailsOpen(false); openUserProfile(other(active)?._id); }}><User /><span>Profile</span></button>
