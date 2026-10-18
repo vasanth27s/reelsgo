@@ -1007,7 +1007,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeStoryGroup, setActiveStoryGroup] = useState(null);
+  const [activeStories, setActiveStories] = useState([]);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
 
   async function load() {
@@ -1024,33 +1024,24 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   }
   useEffect(() => { load(); }, [refreshKey]);
 
-  const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
-  const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
-  const storyGroups = useMemo(() => {
-    const groups = new Map();
-    for (const item of otherStories) {
-      const authorId = String(item.author?._id || item.author || item.userId || "unknown");
-      if (!groups.has(authorId)) groups.set(authorId, []);
-      groups.get(authorId).push(item);
-    }
-    return [...groups.entries()].map(([authorId, items]) => ({ authorId, stories: items }));
-  }, [stories, user?._id]);
+  const authorId = story => String(story?.author?._id || story?.author || "");
+  const myStories = stories.filter(s => authorId(s) === String(user?._id)).sort((a,b) => new Date(a.createdAt || a.updatedAt || 0)-new Date(b.createdAt || b.updatedAt || 0));
+  const otherStoryGroups = Object.values(stories.filter(s => authorId(s) !== String(user?._id)).reduce((groups, story) => {
+    const id = authorId(story); if (!id) return groups;
+    if (!groups[id]) groups[id] = []; groups[id].push(story); return groups;
+  }, {})).map(group => group.sort((a,b) => new Date(a.createdAt || a.updatedAt || 0)-new Date(b.createdAt || b.updatedAt || 0)));
 
-  async function openStoryGroup(items, index = 0) {
-    const safeItems = (items || []).filter(Boolean);
-    if (!safeItems.length) return;
-    const start = Math.max(0, Math.min(index, safeItems.length - 1));
-    setActiveStoryGroup(safeItems);
-    setActiveStoryIndex(start);
-    try { await api(`/stories/${safeItems[start]._id}/view`, { method: "POST" }); } catch {}
+  async function openStoryGroup(group, index = 0) {
+    const ordered = [...group].sort((a,b) => new Date(a.createdAt || a.updatedAt || 0)-new Date(b.createdAt || b.updatedAt || 0));
+    setActiveStories(ordered); setActiveStoryIndex(Math.max(0, Math.min(index, ordered.length - 1)));
+    const selected = ordered[index];
+    if (selected?._id && authorId(selected) !== String(user?._id)) {
+      try { await api(`/stories/${selected._id}/view`, { method: "POST" }); } catch {}
+    }
   }
-  async function moveStory(nextIndex) {
-    if (!activeStoryGroup) return;
-    if (nextIndex < 0) { setActiveStoryIndex(0); return; }
-    if (nextIndex >= activeStoryGroup.length) { setActiveStoryGroup(null); setActiveStoryIndex(0); return; }
-    setActiveStoryIndex(nextIndex);
-    const next = activeStoryGroup[nextIndex];
-    try { await api(`/stories/${next._id}/view`, { method: "POST" }); } catch {}
+  async function openStory(story) {
+    const group = stories.filter(item => authorId(item) === authorId(story));
+    await openStoryGroup(group, Math.max(0, group.findIndex(item => String(item._id) === String(story._id))));
   }
 
   return (
@@ -1062,22 +1053,17 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
           </div>
 
           <div className="stories-card">
-        <button className="story own" onClick={() => myStories.length ? openStoryGroup(myStories, myStories.length - 1) : onStory()}>
+        <button className="story own" onClick={() => myStories.length ? openStory(myStories[myStories.length - 1]) : onStory()}>
           <div className="story-ring">{myStories.length && myStories[myStories.length - 1].mediaUrl ? (myStories[myStories.length - 1].kind === "video" ? <video src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />} {!myStories.length && <i>+</i>}</div><span>{myStories.length ? "Your story" : "Your story"}</span>
         </button>
-        {storyGroups.map(group => {
-          const firstStory = group.stories[group.stories.length - 1];
-          return (
-            <button className="story" key={group.authorId} onClick={() => openStoryGroup(group.stories, 0)}>
-              <div className="story-ring story-ring-group">
-                {firstStory?.mediaUrl ? (
-                  firstStory.kind === "video" ? <video src={`${SERVER}${firstStory.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${firstStory.mediaUrl}`} alt="" />
-                ) : <div className="story-text-thumb">Aa</div>}
-                {group.stories.length > 1 && <span className="story-group-count">{group.stories.length}</span>}
-              </div>
-              <UserLink user={firstStory?.author} className="story-username" />
-            </button>
-          );
+        {otherStoryGroups.map(group => {
+          const s = group[group.length - 1];
+          return <button className="story" key={String(s.author?._id || s.author)} onClick={() => openStoryGroup(group, 0)}>
+            <div className="story-ring">
+              {s.mediaUrl ? (s.kind === "video" ? <video src={`${SERVER}${s.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${s.mediaUrl}`} alt="" />) : <div className="story-text-thumb">Aa</div>}
+            </div>
+            <UserLink user={s.author} className="story-username" />
+          </button>;
         })}
       </div>
 
@@ -1098,19 +1084,15 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         )) :
         <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
-          {activeStoryGroup?.[activeStoryIndex] && (
+          {activeStories[activeStoryIndex] && (
             <StoryViewer
-              story={activeStoryGroup[activeStoryIndex]}
+              story={activeStories[activeStoryIndex]}
               storyIndex={activeStoryIndex}
-              storyCount={activeStoryGroup.length}
-              onNext={() => moveStory(activeStoryIndex + 1)}
-              onPrevious={() => moveStory(activeStoryIndex - 1)}
-              onClose={() => { setActiveStoryGroup(null); setActiveStoryIndex(0); }}
-              onDeleted={() => {
-                setActiveStoryGroup(null);
-                setActiveStoryIndex(0);
-                load();
-              }}
+              storyCount={activeStories.length}
+              onPrevious={() => setActiveStoryIndex(i => Math.max(0, i - 1))}
+              onNext={() => setActiveStoryIndex(i => { if (i >= activeStories.length - 1) { setActiveStories([]); return 0; } return i + 1; })}
+              onClose={() => setActiveStories([])}
+              onDeleted={() => { setActiveStories([]); load(); }}
             />
           )}
         </section>
@@ -1272,11 +1254,15 @@ function SuggestionsRail({ user, posts }) {
   );
 }
 
-function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious, onClose, onDeleted }) {
+function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1, onPrevious, onNext }) {
   const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
   const [viewersOpen, setViewersOpen] = useState(false);
+  const [storySettingsOpen, setStorySettingsOpen] = useState(false);
+  const [replyAudience, setReplyAudience] = useState(() => localStorage.getItem("reelsgo_story_reply_audience") || "followers");
+  const [storyPrefs, setStoryPrefs] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_story_settings") || "{}"); } catch { return {}; } });
+  const saveStoryPref = (key, value) => setStoryPrefs(prev => { const next = { ...prev, [key]: value }; localStorage.setItem("reelsgo_story_settings", JSON.stringify(next)); return next; });
   const [storyControlsVisible, setStoryControlsVisible] = useState(true);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
@@ -1310,7 +1296,7 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
     setLoadingViewers(true);
     try {
       const d = await api(`/stories/${story._id}/viewers`);
-      setViewers(Array.from(new Map((d.viewers || []).map(v => [String(v?._id || v?.id || v?.username || v?.name || ""), v])).values()));
+      setViewers(d.viewers || []);
     } catch (e) {
       alert(e.message);
     } finally {
@@ -1353,14 +1339,11 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
     }
   }, [story?._id, isOwner]);
 
-  const uniqueViewers = Array.from(new Map(viewers.map(v => [viewerId(v) || String(v?.username || v?.name || ""), v])).values());
-  const visibleViewers = uniqueViewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
+  const visibleViewers = Array.from(new Map(viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v))).map(v => [viewerId(v) || String(v.username || v.name || Math.random()), v])).values());
 
   return (
     <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""} ${storyControlsVisible ? "story-controls-visible" : "story-controls-hidden"}`} onClick={onClose}>
-      <div className="story-progress story-progress-segments" aria-label={`Story ${storyIndex + 1} of ${storyCount}`}>
-        {Array.from({ length: storyCount }, (_, i) => <span key={i} className={i < storyIndex ? "is-complete" : i === storyIndex ? "is-current" : ""}><i /></span>)}
-      </div>
+      <div className="story-progress" aria-label={`Story ${storyIndex + 1} of ${storyCount}`}>{Array.from({ length: Math.max(storyCount, 1) }, (_, i) => <span key={i} className={i < storyIndex ? "complete" : i === storyIndex ? "current" : "upcoming"} />)}</div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
@@ -1376,9 +1359,9 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
       </div>
       <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
-        <button type="button" className="story-tap-zone story-tap-previous" aria-label="Previous story" onClick={e => { e.stopPropagation(); onPrevious?.(); }} />
-        <button type="button" className="story-tap-zone story-tap-next" aria-label="Next story" onClick={e => { e.stopPropagation(); onNext?.(); }} />
       </div>
+      <button type="button" className="story-tap-zone story-tap-left" aria-label="Previous story" onClick={e => { e.stopPropagation(); if (storyIndex > 0) onPrevious?.(); }} />
+      <button type="button" className="story-tap-zone story-tap-right" aria-label="Next story" onClick={e => { e.stopPropagation(); onNext?.(); }} />
       {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
           <span className="story-viewers-grabber" />
@@ -1388,7 +1371,7 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
       {viewersOpen && (
         <section className="story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
           <div className="story-viewers-screen-top">
-            <button type="button" className="story-viewers-settings" aria-label="Story settings" onClick={() => setViewerNotice("Story settings are available from your account settings.")}><Settings /></button>
+            <button type="button" className="story-viewers-settings" aria-label="Story settings" onClick={() => setStorySettingsOpen(true)}><Settings /></button>
             <div className="story-viewer-thumbnails">
               <button type="button" className="story-thumb-card selected" aria-label="Current story">
                 {mediaUrl && story.kind === "video" ? <video src={mediaUrl} muted playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Current story" /> : <span style={{ background: story.background || "linear-gradient(135deg,#111827,#4f46e5)" }}>{story.text || "Story"}</span>}
@@ -1399,7 +1382,7 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
             <button type="button" className="story-viewers-close" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><X /></button>
           </div>
           <div className="story-viewers-tabs">
-            <div className="story-viewers-tab-active"><Users /><b>{visibleViewers.length || story.views?.length || 0}</b></div>
+            <div className="story-viewers-tab-active"><Users /><b>{loadingViewers ? "…" : visibleViewers.length}</b></div>
             <button type="button" className="story-viewers-delete" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={deleteStory}><Trash2 /></button>
           </div>
           {viewerNotice && <div className="story-viewer-notice" role="status">{viewerNotice}</div>}
@@ -1417,7 +1400,7 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
                     <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || username}{restrictedViewerIds.includes(id) ? " · Restricted" : ""}</span></div>
                     {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
                     <button type="button" className="story-viewer-more" aria-label={`Options for ${username}`} onClick={() => setActiveViewerMenu(menuOpen ? null : id)}><MoreHorizontal /></button>
-                    <button type="button" className="story-viewer-message" aria-label={`Message ${username}`} onClick={() => { setActiveViewerMenu(null); openUserProfile(id); }}><Send /></button>
+
                     {menuOpen && <>
                       <button type="button" className="story-viewer-menu-backdrop" aria-label="Close viewer options" onClick={() => setActiveViewerMenu(null)} />
                       <div className="story-viewer-action-sheet" role="menu">
@@ -1437,6 +1420,14 @@ function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious
             <div className="story-viewers-empty"><Eye /><b>No views yet</b><span>When someone watches your story, their profile will appear here.</span></div>
           )}
           <button type="button" className="story-viewers-cancel" onClick={() => { setActiveViewerMenu(null); setViewersOpen(false); }}>Cancel</button>
+          {storySettingsOpen && <div className="story-settings-overlay" onClick={() => setStorySettingsOpen(false)}><section className="story-settings-page" onClick={e => e.stopPropagation()} aria-label="Story settings">
+            <header><button type="button" aria-label="Save and close settings" onClick={() => setStorySettingsOpen(false)}><Check /></button><b>Story</b></header>
+            <section><h3>Viewing</h3><button className="story-setting-row" onClick={() => saveStoryPref("hideStoryFrom", !(storyPrefs.hideStoryFrom || false))}><span><b>Hide story from</b><small>Hide your story and live videos from specific people.</small></span><em>{storyPrefs.hideStoryFrom ? "Selected" : "0 people"}　›</em></button><button className="story-setting-row" onClick={() => saveStoryPref("closeFriends", !(storyPrefs.closeFriends || false))}><span><b>Close friends</b><small>Share your story only with specific people.</small></span><em>{storyPrefs.closeFriends ? "Selected" : "0 people"}　›</em></button></section>
+            <section><h3>Replying</h3><div className="story-setting-description">Allow message replies<small>Choose who can reply to your story.</small></div>{[["followers","Your followers"],["mutuals","Followers you follow back"],["off","Off"]].map(([value,label])=><button key={value} className="story-setting-choice" onClick={() => { setReplyAudience(value); localStorage.setItem("reelsgo_story_reply_audience", value); }}><span>{label}</span><i className={replyAudience === value ? "selected" : ""}/></button>)}</section>
+            <section><h3>Commenting</h3><button className="story-setting-row" onClick={() => saveStoryPref("allowComments", storyPrefs.allowComments === false)}><span><b>Allow comments</b><small>Choose who can leave comments on your story.</small></span><em>{storyPrefs.allowComments === false ? "Off" : "Everyone"}　›</em></button></section>
+            <section><h3>Saving</h3>{[["saveCameraRoll","Save story to Camera Roll","Automatically save photos and videos to your phone's camera roll."],["saveArchive","Save story to archive","Automatically save your stories to your archive."]].map(([key,label,desc])=><button key={key} className="story-setting-toggle-row" onClick={() => saveStoryPref(key, !(storyPrefs[key] ?? (key === "saveArchive")))}><span>{label}<small>{desc}</small></span><i className={(storyPrefs[key] ?? (key === "saveArchive")) ? "on" : ""}/></button>)}</section>
+            <section><h3>Sharing</h3>{[["allowReshare","Allow others to share your story","Let people you mention share your story."],["allowMessageShare","Allow sharing to messages","Let your followers share your story in a message."],["shareFacebook","Share your story to Facebook","Automatically share your story as your Facebook story."]].map(([key,label,desc])=><button key={key} className="story-setting-toggle-row" onClick={() => saveStoryPref(key, !(storyPrefs[key] ?? (key !== "shareFacebook")))}><span>{label}<small>{desc}</small></span><i className={(storyPrefs[key] ?? (key !== "shareFacebook")) ? "on" : ""}/></button>)}</section>
+          </section></div>}
         </section>
       )}
     </div>
