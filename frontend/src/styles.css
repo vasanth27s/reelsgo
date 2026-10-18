@@ -15044,3 +15044,11 @@ body:has(.rg-profile-options-backdrop) .mobile-bottom-nav {
 body.reelsgo-story-open{overflow:hidden!important;}
 body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.reelsgo-story-open .sidebar{visibility:hidden!important;pointer-events:none!important;}
 @media(max-width:700px){.story-viewer{align-items:center!important;padding:0!important}.story-viewer-content{width:100vw!important;height:100dvh!important;max-height:100dvh!important}.story-viewer-top{top:calc(12px + env(safe-area-inset-top))!important}.story-tap-zone{top:14%;bottom:12%;width:35%;}.story-viewers-button{bottom:calc(16px + env(safe-area-inset-bottom))!important;}}
+
+/* Story owner actions matching the supplied Instagram-style story video. */
+.story-owner-actions{position:absolute;z-index:9;left:0;right:0;bottom:calc(78px + env(safe-area-inset-bottom));display:flex;align-items:flex-start;justify-content:space-around;gap:4px;padding:12px 8px 10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.68));color:#fff;}
+.story-owner-actions button{display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:7px;background:transparent;color:#fff;padding:5px 2px;font-size:11px;white-space:nowrap;}
+.story-owner-actions button svg{width:26px;height:26px;stroke-width:1.9;}
+.story-viewer-display-name{font-size:14px;font-weight:700;color:#fff;}
+.story-viewers-screen .story-viewer-user-info>b{font-size:14px;color:#f7f8fa;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:700px){.story-owner-actions{bottom:calc(84px + env(safe-area-inset-bottom));padding-left:5px;padding-right:5px;}.story-owner-actions button{font-size:10px;gap:6px}.story-owner-actions button svg{width:24px;height:24px}}
