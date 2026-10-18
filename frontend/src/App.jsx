@@ -1023,26 +1023,13 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   }
   useEffect(() => { load(); }, [refreshKey]);
 
-  const authorId = (item) => String(item?.author?._id || item?.author || "");
-  const myStories = stories.filter(s => authorId(s) === String(user?._id));
-  const otherStories = stories.filter(s => authorId(s) !== String(user?._id));
-  const groupedOtherStories = Array.from(otherStories.reduce((groups, item) => {
-    const id = authorId(item);
-    if (!id) return groups;
-    if (!groups.has(id)) groups.set(id, []);
-    groups.get(id).push(item);
-    return groups;
-  }, new Map()).values());
+  const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
+  const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
 
-  async function openStory(story, group = [story]) {
-    const safeGroup = Array.from(new Map((group || [story]).filter(Boolean).map(item => [String(item._id), item])).values());
-    const selectedIndex = Math.max(0, safeGroup.findIndex(item => String(item._id) === String(story?._id)));
-    setActiveStory({ story, stories: safeGroup, initialIndex: selectedIndex });
+  async function openStory(story) {
+    setActiveStory(story);
     try { await api(`/stories/${story._id}/view`, { method: "POST" }); } catch {}
   }
-
-  const ownStoryGroup = myStories;
-  const ownStoryLatest = ownStoryGroup[ownStoryGroup.length - 1];
 
   return (
     <div className="page feed-page">
@@ -1053,48 +1040,41 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
           </div>
 
           <div className="stories-card">
-            <button className="story own" onClick={() => ownStoryGroup.length ? openStory(ownStoryLatest, ownStoryGroup) : onStory()}>
-              <div className="story-ring">{ownStoryLatest?.mediaUrl ? (ownStoryLatest.kind === "video" ? <video src={`${SERVER}${ownStoryLatest.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${ownStoryLatest.mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />}{!ownStoryGroup.length && <i>+</i>}</div>
-              <span>Your story</span>
-            </button>
-            {groupedOtherStories.map(group => {
-              const latest = group[group.length - 1];
-              const author = latest?.author || group[0]?.author;
-              const key = authorId(latest);
-              return (
-                <button className="story" key={key} onClick={() => openStory(latest, group)}>
-                  <div className="story-ring">
-                    {latest?.mediaUrl ? (latest.kind === "video" ? <video src={`${SERVER}${latest.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${latest.mediaUrl}`} alt="" />) : <div className="story-text-thumb">Aa</div>}
-                  </div>
-                  <UserLink user={author} className="story-username" />
-                </button>
-              );
-            })}
-          </div>
+        <button className="story own" onClick={() => myStories.length ? openStory(myStories[myStories.length - 1]) : onStory()}>
+          <div className="story-ring">{myStories.length && myStories[myStories.length - 1].mediaUrl ? (myStories[myStories.length - 1].kind === "video" ? <video src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />} {!myStories.length && <i>+</i>}</div><span>{myStories.length ? "Your story" : "Your story"}</span>
+        </button>
+        {otherStories.map(s => (
+          <button className="story" key={s._id} onClick={() => openStory(s)}>
+            <div className="story-ring">
+              {s.mediaUrl ? (
+                s.kind === "video" ? <video src={`${SERVER}${s.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${s.mediaUrl}`} alt="" />
+              ) : <div className="story-text-thumb">Aa</div>}
+            </div>
+            <UserLink user={s.author} className="story-username" />
+          </button>
+        ))}
+      </div>
 
-          <div className="quick-create">
-            <Avatar user={user} size={42} />
-            <button onClick={onCreate}>What's on your mind?</button>
-            <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
-          </div>
+      <div className="quick-create">
+        <Avatar user={user} size={42} />
+        <button onClick={onCreate}>What's on your mind?</button>
+        <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
+      </div>
 
-          {loading ? <div className="empty">Loading feed...</div> :
-            posts.length ? posts.map(p => (
-              <Post
-                key={p._id}
-                post={p}
-                user={user}
-                onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
-              />
-            )) :
-            <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+      {loading ? <div className="empty">Loading feed...</div> :
+        posts.length ? posts.map(p => (
+          <Post
+            key={p._id}
+            post={p}
+            user={user}
+            onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+          />
+        )) :
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
           {activeStory && (
             <StoryViewer
-              key={`${authorId(activeStory.story)}-${activeStory.story?._id}`}
-              story={activeStory.story}
-              stories={activeStory.stories}
-              initialIndex={activeStory.initialIndex}
+              story={activeStory}
               onClose={() => setActiveStory(null)}
               onDeleted={() => {
                 setActiveStory(null);
@@ -1109,6 +1089,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
     </div>
   );
 }
+
 
 function SuggestionsRail({ user, posts }) {
   const [people, setPeople] = useState([]);
@@ -1260,14 +1241,8 @@ function SuggestionsRail({ user, posts }) {
   );
 }
 
-function StoryViewer({ story: initialStory, stories: storiesProp, initialIndex = 0, onClose, onDeleted }) {
-  const storyList = useMemo(() => {
-    const source = Array.isArray(storiesProp) && storiesProp.length ? storiesProp : [initialStory];
-    return Array.from(new Map(source.filter(Boolean).map(item => [String(item._id), item])).values());
-  }, [storiesProp, initialStory]);
-  const [storyIndex, setStoryIndex] = useState(() => Math.max(0, Math.min(initialIndex, storyList.length - 1)));
-  const story = storyList[storyIndex] || initialStory;
-  const mediaUrl = story?.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
+function StoryViewer({ story, onClose, onDeleted }) {
+  const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
   const [viewersOpen, setViewersOpen] = useState(false);
@@ -1281,29 +1256,6 @@ function StoryViewer({ story: initialStory, stories: storiesProp, initialIndex =
   const [restrictedViewerIds, setRestrictedViewerIds] = useState([]);
   const [blockedViewerIds, setBlockedViewerIds] = useState([]);
   const [viewerNotice, setViewerNotice] = useState("");
-
-  function goToStory(nextIndex) {
-    if (viewersOpen) return;
-    if (nextIndex < 0) return;
-    if (nextIndex >= storyList.length) { onClose(); return; }
-    setStoryIndex(nextIndex);
-    setStoryControlsVisible(true);
-    setActiveViewerMenu(null);
-    const nextStory = storyList[nextIndex];
-    if (nextStory?._id && String(nextStory.author?._id || nextStory.author) !== String(me?._id)) {
-      api(`/stories/${nextStory._id}/view`, { method: "POST" }).catch(() => {});
-    }
-  }
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "ArrowRight") { event.preventDefault(); goToStory(storyIndex + 1); }
-      else if (event.key === "ArrowLeft") { event.preventDefault(); goToStory(storyIndex - 1); }
-      else if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [storyIndex, storyList, viewersOpen, onClose]);
 
   async function deleteStory() {
     if (!isOwner || deleting) return;
@@ -1370,21 +1322,11 @@ function StoryViewer({ story: initialStory, stories: storiesProp, initialIndex =
     }
   }, [story?._id, isOwner]);
 
-  const visibleViewers = Array.from(new Map(
-    viewers
-      .filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)))
-      .map((viewer, index) => [viewerId(viewer) || `viewer-${index}`, viewer])
-  ).values());
+  const visibleViewers = viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
 
   return (
     <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""} ${storyControlsVisible ? "story-controls-visible" : "story-controls-hidden"}`} onClick={onClose}>
-      <div className="story-progress story-progress-segments" aria-label={`Story ${storyIndex + 1} of ${storyList.length}`}>
-        {storyList.map((item, index) => <span key={item._id || index} className={index < storyIndex ? "completed" : index === storyIndex ? "current" : "upcoming"} />)}
-      </div>
-      {!viewersOpen && <>
-        <button type="button" className="story-tap-zone story-tap-zone-left" aria-label="Previous story" onClick={e => { e.stopPropagation(); goToStory(storyIndex - 1); }} />
-        <button type="button" className="story-tap-zone story-tap-zone-right" aria-label="Next story" onClick={e => { e.stopPropagation(); goToStory(storyIndex + 1); }} />
-      </>}
+      <div className="story-progress"><span /></div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
@@ -1398,7 +1340,7 @@ function StoryViewer({ story: initialStory, stories: storiesProp, initialIndex =
           <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
         </div>
       </div>
-      <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
+      <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
       </div>
       {isOwner && !viewersOpen && storyControlsVisible && (
@@ -2547,8 +2489,6 @@ function StoryComposer({ onClose, onDone, autoPick = false }) {
   const [audience, setAudience] = useState("everyone");
   const [loading, setLoading] = useState(false);
   const [activeTool, setActiveTool] = useState("");
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const [commentsOff, setCommentsOff] = useState(false);
 
   useEffect(() => {
     if (autoPick) {
@@ -2557,18 +2497,6 @@ function StoryComposer({ onClose, onDone, autoPick = false }) {
     }
   }, [autoPick]);
 
-  function downloadSelectedMedia() {
-    if (!file) { alert("Choose a photo or video first."); return; }
-    const url = URL.createObjectURL(file);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = file.name || "reelsgo-story";
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setMoreMenuOpen(false);
-  }
 
   async function publish() {
     if (!file && !text.trim()) {
@@ -2581,7 +2509,7 @@ function StoryComposer({ onClose, onDone, autoPick = false }) {
       if (file) fd.append("media", file);
       fd.append("text", text);
       fd.append("audience", audience);
-      fd.append("commentsDisabled", String(commentsOff));
+      fd.append("commentsDisabled", "false");
       await api("/stories", { method: "POST", body: fd });
       onDone();
       alert("Story shared");
@@ -2608,15 +2536,6 @@ function StoryComposer({ onClose, onDone, autoPick = false }) {
           <div className="publish-header-spacer" />
         </header>
 
-        <button type="button" className="story-editor-more" aria-label="More story options" onClick={() => setMoreMenuOpen(v => !v)}><MoreHorizontal /></button>
-        {moreMenuOpen && <div className="story-editor-more-menu" role="menu">
-          <button type="button" role="menuitem" onClick={downloadSelectedMedia}><Download size={19}/> Download</button>
-          <button type="button" role="menuitem" onClick={() => { setCommentsOff(v => !v); setMoreMenuOpen(false); }}><MessageCircleOffFallback /> {commentsOff ? "Turn on commenting" : "Turn off commenting"}</button>
-        </div>}
-        <div className="story-editor-toolbar" aria-label="Story editing tools">
-          {[["Text", "Aa", "text"], ["Stickers", "☻", "stickers"], ["Audio", "♫", "audio"], ["Partnerships & ads", "♙", "partnerships"], ["Sound", "◖", "sound"], ["Effects", "✧", "effects"], ["Mention", "@", "mention"], ["Draw", "〰", "draw"], ["Label AI", "✧", "label-ai"]].map(([label, mark, key]) => <button type="button" key={key} onClick={() => { setActiveTool(key); if (key === "text") document.querySelector(".story-publish-caption")?.focus(); else if (key === "audio") alert("Audio selection depends on available audio assets."); else if (key === "stickers") setText(v => v + (v ? " " : "") + "😊"); }}><span>{mark}</span><b>{label}</b></button>)}
-          <button type="button" onClick={() => setMoreMenuOpen(v => !v)}><span>•••</span><b>More</b></button>
-        </div>
         <div className="publish-scroll-area">
           <section className="publish-media-section">
             {file ? (
