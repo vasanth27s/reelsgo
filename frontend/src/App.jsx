@@ -2071,7 +2071,7 @@ function ShareSheet({ post, onClose, kind = "post" }) {
           </button>
         )}
 
-        <div className="share-shortcuts" aria-label="More sharing options">
+        <div className="share-shortcuts share-shortcuts-all" aria-label="Sharing options">
           <button type="button" onClick={addToStory}>
             <span className="share-shortcut-icon"><CirclePlusFallback /></span><b>Add to story</b>
           </button>
@@ -2087,24 +2087,17 @@ function ShareSheet({ post, onClose, kind = "post" }) {
           <button type="button" onClick={copyPostLink}>
             <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
           </button>
-        </div>
-                <div className="rg-social-share" aria-label="Share to social media" style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.12)" }}>
-          <div style={{ fontWeight: 750, marginBottom: 12 }}>Share to other apps</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 8 }}>
-            {[
-              { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
-              { name: "WhatsApp", mark: "◉", bg: "#25D366" },
-              { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
-              { name: "Facebook", mark: "f", bg: "#1877F2" },
-              { name: "Telegram", mark: "➤", bg: "#229ED9" }
-            ].map(app => (
-              <button key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}
-                style={{ minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 7, background: "transparent", color: "inherit", padding: "4px 1px" }}>
-                <span style={{ width: 48, height: 48, borderRadius: 15, display: "grid", placeItems: "center", color: "#fff", fontSize: 27, fontWeight: 800, background: app.bg, boxShadow: "0 5px 16px rgba(0,0,0,.18)" }}>{app.mark}</span>
-                <span style={{ fontSize: 10, textAlign: "center", lineHeight: 1.15, overflowWrap: "anywhere" }}>{app.name}</span>
-              </button>
-            ))}
-          </div>
+          {[
+            { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
+            { name: "WhatsApp", mark: "◉", bg: "#25D366" },
+            { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
+            { name: "Facebook", mark: "f", bg: "#1877F2" },
+            { name: "Telegram", mark: "➤", bg: "#229ED9" }
+          ].map(app => (
+            <button className="share-social-app-button" key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}>
+              <span className="share-shortcut-icon share-social-app-icon" style={{ background: app.bg }}>{app.mark}</span><b>{app.name}</b>
+            </button>
+          ))}
         </div>
         {notice && <div className="share-notice" role="status">{notice}</div>}
       </div>
