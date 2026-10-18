@@ -1007,7 +1007,8 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeStory, setActiveStory] = useState(null);
+  const [activeStoryGroup, setActiveStoryGroup] = useState(null);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
 
   async function load() {
     setLoading(true);
@@ -1025,10 +1026,31 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
+  const storyGroups = useMemo(() => {
+    const groups = new Map();
+    for (const item of otherStories) {
+      const authorId = String(item.author?._id || item.author || item.userId || "unknown");
+      if (!groups.has(authorId)) groups.set(authorId, []);
+      groups.get(authorId).push(item);
+    }
+    return [...groups.entries()].map(([authorId, items]) => ({ authorId, stories: items }));
+  }, [stories, user?._id]);
 
-  async function openStory(story) {
-    setActiveStory(story);
-    try { await api(`/stories/${story._id}/view`, { method: "POST" }); } catch {}
+  async function openStoryGroup(items, index = 0) {
+    const safeItems = (items || []).filter(Boolean);
+    if (!safeItems.length) return;
+    const start = Math.max(0, Math.min(index, safeItems.length - 1));
+    setActiveStoryGroup(safeItems);
+    setActiveStoryIndex(start);
+    try { await api(`/stories/${safeItems[start]._id}/view`, { method: "POST" }); } catch {}
+  }
+  async function moveStory(nextIndex) {
+    if (!activeStoryGroup) return;
+    if (nextIndex < 0) { setActiveStoryIndex(0); return; }
+    if (nextIndex >= activeStoryGroup.length) { setActiveStoryGroup(null); setActiveStoryIndex(0); return; }
+    setActiveStoryIndex(nextIndex);
+    const next = activeStoryGroup[nextIndex];
+    try { await api(`/stories/${next._id}/view`, { method: "POST" }); } catch {}
   }
 
   return (
@@ -1040,19 +1062,23 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
           </div>
 
           <div className="stories-card">
-        <button className="story own" onClick={() => myStories.length ? openStory(myStories[myStories.length - 1]) : onStory()}>
+        <button className="story own" onClick={() => myStories.length ? openStoryGroup(myStories, myStories.length - 1) : onStory()}>
           <div className="story-ring">{myStories.length && myStories[myStories.length - 1].mediaUrl ? (myStories[myStories.length - 1].kind === "video" ? <video src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${myStories[myStories.length - 1].mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />} {!myStories.length && <i>+</i>}</div><span>{myStories.length ? "Your story" : "Your story"}</span>
         </button>
-        {otherStories.map(s => (
-          <button className="story" key={s._id} onClick={() => openStory(s)}>
-            <div className="story-ring">
-              {s.mediaUrl ? (
-                s.kind === "video" ? <video src={`${SERVER}${s.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${s.mediaUrl}`} alt="" />
-              ) : <div className="story-text-thumb">Aa</div>}
-            </div>
-            <UserLink user={s.author} className="story-username" />
-          </button>
-        ))}
+        {storyGroups.map(group => {
+          const firstStory = group.stories[group.stories.length - 1];
+          return (
+            <button className="story" key={group.authorId} onClick={() => openStoryGroup(group.stories, 0)}>
+              <div className="story-ring story-ring-group">
+                {firstStory?.mediaUrl ? (
+                  firstStory.kind === "video" ? <video src={`${SERVER}${firstStory.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${firstStory.mediaUrl}`} alt="" />
+                ) : <div className="story-text-thumb">Aa</div>}
+                {group.stories.length > 1 && <span className="story-group-count">{group.stories.length}</span>}
+              </div>
+              <UserLink user={firstStory?.author} className="story-username" />
+            </button>
+          );
+        })}
       </div>
 
       <div className="quick-create">
@@ -1072,12 +1098,17 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         )) :
         <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
-          {activeStory && (
+          {activeStoryGroup?.[activeStoryIndex] && (
             <StoryViewer
-              story={activeStory}
-              onClose={() => setActiveStory(null)}
+              story={activeStoryGroup[activeStoryIndex]}
+              storyIndex={activeStoryIndex}
+              storyCount={activeStoryGroup.length}
+              onNext={() => moveStory(activeStoryIndex + 1)}
+              onPrevious={() => moveStory(activeStoryIndex - 1)}
+              onClose={() => { setActiveStoryGroup(null); setActiveStoryIndex(0); }}
               onDeleted={() => {
-                setActiveStory(null);
+                setActiveStoryGroup(null);
+                setActiveStoryIndex(0);
                 load();
               }}
             />
@@ -1241,7 +1272,7 @@ function SuggestionsRail({ user, posts }) {
   );
 }
 
-function StoryViewer({ story, onClose, onDeleted }) {
+function StoryViewer({ story, storyIndex = 0, storyCount = 1, onNext, onPrevious, onClose, onDeleted }) {
   const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
@@ -1279,7 +1310,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
     setLoadingViewers(true);
     try {
       const d = await api(`/stories/${story._id}/viewers`);
-      setViewers(d.viewers || []);
+      setViewers(Array.from(new Map((d.viewers || []).map(v => [String(v?._id || v?.id || v?.username || v?.name || ""), v])).values()));
     } catch (e) {
       alert(e.message);
     } finally {
@@ -1322,11 +1353,14 @@ function StoryViewer({ story, onClose, onDeleted }) {
     }
   }, [story?._id, isOwner]);
 
-  const visibleViewers = viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
+  const uniqueViewers = Array.from(new Map(viewers.map(v => [viewerId(v) || String(v?.username || v?.name || ""), v])).values());
+  const visibleViewers = uniqueViewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
 
   return (
     <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""} ${storyControlsVisible ? "story-controls-visible" : "story-controls-hidden"}`} onClick={onClose}>
-      <div className="story-progress"><span /></div>
+      <div className="story-progress story-progress-segments" aria-label={`Story ${storyIndex + 1} of ${storyCount}`}>
+        {Array.from({ length: storyCount }, (_, i) => <span key={i} className={i < storyIndex ? "is-complete" : i === storyIndex ? "is-current" : ""}><i /></span>)}
+      </div>
       <div className="story-viewer-top">
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
@@ -1340,8 +1374,10 @@ function StoryViewer({ story, onClose, onDeleted }) {
           <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
         </div>
       </div>
-      <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
+      <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
+        <button type="button" className="story-tap-zone story-tap-previous" aria-label="Previous story" onClick={e => { e.stopPropagation(); onPrevious?.(); }} />
+        <button type="button" className="story-tap-zone story-tap-next" aria-label="Next story" onClick={e => { e.stopPropagation(); onNext?.(); }} />
       </div>
       {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
