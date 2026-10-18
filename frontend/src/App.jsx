@@ -1243,7 +1243,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [posts, setPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeStory, setActiveStory] = useState(null);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(-1);
 
   async function load() {
     setLoading(true);
@@ -1261,9 +1261,24 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
 
   const myStories = stories.filter(s => String(s.author?._id || s.author) === String(user?._id));
   const otherStories = stories.filter(s => String(s.author?._id || s.author) !== String(user?._id));
+  // Keep each account's stories together, then let the viewer move through
+  // every story with left/right taps just like Instagram.
+  const storyGroups = useMemo(() => {
+    const groups = [];
+    const source = [...myStories, ...otherStories];
+    for (const item of source) {
+      const authorId = String(item.author?._id || item.author || "unknown");
+      let group = groups.find(g => g.authorId === authorId);
+      if (!group) { group = { authorId, stories: [] }; groups.push(group); }
+      group.stories.push(item);
+    }
+    return groups;
+  }, [stories, user?._id]);
+  const storySequence = useMemo(() => storyGroups.flatMap(g => g.stories), [storyGroups]);
 
   async function openStory(story) {
-    setActiveStory(story);
+    const index = storySequence.findIndex(item => String(item._id) === String(story._id));
+    if (index >= 0) setActiveStoryIndex(index);
     try { await api(`/stories/${story._id}/view`, { method: "POST" }); } catch {}
   }
 
@@ -1308,12 +1323,15 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         )) :
         <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
-          {activeStory && (
+          {activeStoryIndex >= 0 && storySequence[activeStoryIndex] && (
             <StoryViewer
-              story={activeStory}
-              onClose={() => setActiveStory(null)}
-              onDeleted={() => {
-                setActiveStory(null);
+              story={storySequence[activeStoryIndex]}
+              storySequence={storySequence}
+              onNavigate={(index) => setActiveStoryIndex(index)}
+              onClose={() => setActiveStoryIndex(-1)}
+              onDeleted={(deletedId) => {
+                setActiveStoryIndex(-1);
+                setStories(current => current.filter(item => String(item._id) !== String(deletedId)));
                 load();
               }}
             />
@@ -1477,12 +1495,12 @@ function SuggestionsRail({ user, posts }) {
   );
 }
 
-function StoryViewer({ story, onClose, onDeleted }) {
+function StoryViewer({ story, storySequence = [], onNavigate, onClose, onDeleted }) {
   const mediaUrl = story.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
   const me = getUser();
   const isOwner = String(story.author?._id || story.author) === String(me?._id);
   const [viewersOpen, setViewersOpen] = useState(false);
-  const [storyControlsVisible, setStoryControlsVisible] = useState(true);
+  const [storyControlsVisible, setStoryControlsVisible] = useState(false);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -1558,6 +1576,25 @@ function StoryViewer({ story, onClose, onDeleted }) {
     }
   }, [story?._id, isOwner]);
 
+  useEffect(() => {
+    // Lock the page underneath the story and prevent the app's bottom
+    // navigation from appearing over the story viewer.
+    document.body.classList.add("reelsgo-story-open");
+    return () => document.body.classList.remove("reelsgo-story-open");
+  }, []);
+
+  function navigateStory(direction) {
+    if (!storySequence.length || !onNavigate) return;
+    const current = storySequence.findIndex(item => String(item._id) === String(story._id));
+    const next = current + direction;
+    if (next < 0) return;
+    if (next >= storySequence.length) { onClose(); return; }
+    setViewersOpen(false);
+    setActiveViewerMenu(null);
+    setStoryControlsVisible(false);
+    onNavigate(next);
+  }
+
   const visibleViewers = viewers.filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)));
 
   return (
@@ -1577,7 +1614,9 @@ function StoryViewer({ story, onClose, onDeleted }) {
         </div>
       </div>
       <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
-        {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
+        {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
+        <button type="button" className="story-tap-zone story-tap-left" aria-label="Previous story" onClick={e => { e.stopPropagation(); navigateStory(-1); }} />
+        <button type="button" className="story-tap-zone story-tap-right" aria-label="Next story" onClick={e => { e.stopPropagation(); navigateStory(1); }} />
       </div>
       {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
