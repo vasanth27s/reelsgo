@@ -1,15171 +1,8102 @@
-:root{
-  --bg:#f7f7f9;--card:#fff;--text:#111318;--muted:#737985;--line:#e6e7eb;
-  --accent:#4f46e5;--accent2:#7c3aed;--danger:#dc2626;--soft:#f1f2f5;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-button,input,textarea{font:inherit}
-button{border:0;cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
-input,textarea{outline:none}
-img,video{display:block;max-width:100%}
-a{text-decoration:none;color:var(--accent)}
-svg{stroke-width:1.9}
-
-.app{min-height:100vh}
-.sidebar{
- position:fixed;left:0;top:0;bottom:0;width:250px;background:#fff;border-right:1px solid var(--line);
- padding:18px 12px;z-index:60;display:flex;flex-direction:column
-}
-.brand{height:64px;display:flex;align-items:center;gap:11px;padding:0 10px;border-bottom:1px solid #eee;margin-bottom:12px}
-.brand b,.auth-logo,.auth-showcase-logo{
- width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#111827,#4f46e5);
- color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900
-}
-.brand span{font-size:20px;font-weight:800}
-.nav{width:100%;min-height:48px;background:transparent;border-radius:12px;display:flex;align-items:center;gap:14px;padding:10px 13px;color:#555d6b;text-align:left;margin:2px 0}
-.nav span{display:flex;align-items:center;justify-content:center}
-.nav svg{width:21px;height:21px}
-.nav:hover,.nav.active{background:#f0efff;color:#4f46e5}
-.nav-bottom{margin-top:auto}
-
-.main{margin-left:250px;min-height:100vh;padding-bottom:40px}
-.page{width:min(100%,920px);margin:auto;padding:34px 24px}
-.page-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.page-heading h1{font-size:28px;letter-spacing:-.5px}
-.page-heading p{color:var(--muted);font-size:13px;margin-top:4px}
-.desktop-create,.primary{
- background:#111827;color:#fff;border-radius:10px;padding:10px 15px;font-weight:750;
- display:inline-flex;align-items:center;justify-content:center;gap:8px
-}
-.desktop-create svg{width:18px}
-
-.avatar{
- width:42px;height:42px;min-width:42px;min-height:42px;
- aspect-ratio:1 / 1;
- border-radius:50% !important;
- overflow:hidden !important;
- background:linear-gradient(135deg,#111827,#4f46e5);
- display:flex;align-items:center;justify-content:center;
- flex:0 0 auto;color:#fff;font-weight:850;
- position:relative;
-}
-.avatar img{
- width:100% !important;height:100% !important;
- min-width:100% !important;min-height:100% !important;
- max-width:none !important;max-height:none !important;
- aspect-ratio:1 / 1 !important;
- object-fit:cover !important;object-position:center !important;
- border-radius:50% !important;display:block;
-}
-.avatar span{font-size:42%;line-height:1}
-
-.mobile-header,.bottom-nav{display:none}
-
-/* feed */
-.stories-card{
- background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px;
- display:flex;gap:17px;overflow-x:auto;margin-bottom:14px
-}
-.stories-card::-webkit-scrollbar{display:none}
-.story{background:transparent;min-width:70px;color:#5f6570;font-size:11px}
-.story>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.story-ring,.story-placeholder{
- width:70px;height:70px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#ff9d00,#e1306c,#833ab4);
- position:relative;margin-bottom:6px;overflow:hidden;isolation:isolate
-}
-.story-ring .avatar,.story-ring img{width:100%;height:100%;border-radius:50%;border:0 !important;object-fit:cover}
-.story-ring i{position:absolute;right:-1px;bottom:0;width:23px;height:23px;border-radius:50%;background:#4f46e5;color:#fff;border:0 !important;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:17px}
-.story-placeholder{display:flex;align-items:center;justify-content:center;color:#fff;background:#111827;border:0 !important;font-size:22px;font-weight:800}
-.quick-create{
- display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:11px;margin-bottom:14px
-}
-.quick-create>button:nth-child(2){flex:1;text-align:left;background:#f3f4f6;color:#8b919c;border-radius:11px;height:42px;padding:0 13px}
-.quick-icon{width:42px;height:42px;border-radius:11px;background:#eef0ff;color:#4f46e5;display:flex;align-items:center;justify-content:center}
-
-.post-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px}
-.post-head{display:flex;justify-content:space-between;align-items:center;padding:12px 13px}
-.post-user{display:flex;gap:10px;align-items:center}
-.post-user>div{display:flex;flex-direction:column}
-.post-user span{font-size:11px;color:#8a909a;margin-top:2px}
-.icon-button{width:36px;height:36px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}
-.icon-button:hover{background:var(--soft)}
-.post-media{width:100%;max-height:720px;object-fit:cover;background:#eee}
-.actions{display:flex;justify-content:space-between;padding:7px 10px 3px}
-.actions>div{display:flex}
-.actions button{width:40px;height:40px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}
-.actions button:hover{background:#f4f4f5}
-.actions svg{width:21px}
-.actions .liked{color:#e11d48}
-.actions .saved{color:#4f46e5}
-.post-body{padding:4px 13px 15px;font-size:13px}
-.post-body>p{margin-top:6px;line-height:1.5}
-.comments-link{background:none;color:#858b96;margin-top:8px;font-size:12px}
-.comments{margin-top:9px;border-top:1px solid #eee;padding-top:9px}
-.comment{display:flex;gap:8px;margin:8px 0}
-.comment>div{display:flex;flex-direction:column}
-.comment span{color:#444}
-.comment-input{display:flex;gap:6px;margin-top:9px}
-.comment-input input{flex:1;border:1px solid #ddd;border-radius:10px;padding:10px}
-.comment-input button{color:#4f46e5;background:none;font-weight:700}
-
-.empty{
- background:#fff;border:1px solid var(--line);border-radius:16px;padding:55px 20px;text-align:center;color:#777
-}
-.empty svg{width:40px;height:40px;margin-bottom:10px}
-.empty h2{color:#222;margin-bottom:6px}
-.empty p{line-height:1.5}
-.small{display:inline-flex;margin-top:12px}
-.small-empty{margin-top:15px;padding:35px}
-
-/* auth */
-.auth-page{
- min-height:100vh;display:grid;grid-template-columns:1fr 460px;gap:70px;align-items:center;
- padding:40px max(24px,8vw);background:radial-gradient(circle at 20% 20%,#e9e7ff,transparent 34%),#f8f8fb
-}
-.auth-showcase{max-width:620px}
-.auth-showcase-logo{width:70px;height:70px;font-size:24px;border-radius:20px;margin-bottom:24px}
-.auth-showcase h1{font-size:clamp(44px,6vw,74px);line-height:.98;letter-spacing:-4px;max-width:600px}
-.auth-showcase p{font-size:19px;line-height:1.6;color:#606773;max-width:540px;margin-top:20px}
-.auth-pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:25px}
-.auth-pills span{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:13px}
-.auth-card{
- width:100%;background:#fff;border:1px solid var(--line);border-radius:24px;padding:32px;
- box-shadow:0 25px 80px #11182712;display:flex;flex-direction:column;gap:12px
-}
-.auth-logo{width:58px;height:58px;margin:0 auto 4px;font-size:21px}
-.auth-card h2{text-align:center;font-size:24px}
-.auth-subtitle{text-align:center;color:#7a808b;font-size:13px;margin-bottom:8px}
-.field-wrap{height:49px;border:1px solid #dfe1e5;border-radius:11px;display:flex;align-items:center;gap:9px;padding:0 12px;background:#fff}
-.field-wrap:focus-within{border-color:#8b82ff;box-shadow:0 0 0 3px #4f46e514}
-.field-wrap>span{display:flex;color:#8a9099}
-.field-wrap svg{width:18px}
-.field-wrap input{border:0;flex:1;min-width:0}
-.password-field{position:relative}
-.password-field>.field-wrap{padding-right:46px}
-.password-field>button{position:absolute;right:6px;top:5px;width:38px;height:38px;border-radius:8px;background:transparent;color:#666}
-.forgot{align-self:flex-end;background:none;color:#4f46e5;font-size:12px;font-weight:700}
-.auth-submit{width:100%;height:47px;margin-top:3px}
-.auth-divider{height:30px;display:flex;align-items:center;gap:10px;color:#9aa0aa;font-size:11px}
-.auth-divider:before,.auth-divider:after{content:"";height:1px;background:#eee;flex:1}
-.auth-switch{width:100%;justify-content:center;height:45px}
-.error{background:#fef2f2;color:#dc2626;padding:10px;border-radius:9px;font-size:13px}
-
-/* modals */
-.overlay{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{width:min(100%,600px);max-height:92vh;overflow:auto;background:#fff;border-radius:20px}
-.modal-head{height:62px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}
-.modal-head h2{font-size:18px}
-.modal-head button{width:35px;height:35px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}
-.modal-body{padding:18px}
-.composer-user{display:flex;align-items:center;gap:10px;margin-bottom:13px}
-.composer-user>div{display:flex;flex-direction:column}
-.composer-user span{font-size:12px;color:#888;margin-top:2px}
-.composer-text{width:100%;min-height:140px;border:0;resize:vertical;font-size:16px}
-.file-preview{padding:10px;background:#f5f6f8;border-radius:10px;margin-bottom:10px}
-.file-preview>div{display:flex;gap:7px;align-items:center;padding:4px 0;font-size:13px}
-.form-row{display:flex;gap:8px;margin:10px 0}
-.form-row input,.normal-input,.search-box input{border:1px solid #ddd;border-radius:10px;padding:10px}
-.form-row input{flex:1}
-.secondary{background:#eef0f3;color:#222;border-radius:10px;padding:10px 13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px}
-.full{width:100%;margin-top:10px}
-.story-editor{border:1px solid #ddd;border-radius:15px;padding:12px}
-.story-editor-placeholder{height:220px;background:#f5f6f8;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#777;gap:7px}
-.story-editor-placeholder svg{width:42px;height:42px}
-.story-editor textarea{width:100%;border:0;min-height:80px;margin-top:10px;resize:vertical}
-.selected-file{display:flex;align-items:center;gap:7px;background:#eef0ff;color:#4f46e5;border-radius:9px;padding:9px;font-size:13px}
-.reel-editor{text-align:center;border:2px dashed #d8dae0;border-radius:15px;padding:35px;margin-bottom:10px}
-.reel-editor>svg{width:44px;height:44px;margin:auto auto 10px}
-.reel-editor p{color:#777;font-size:12px;margin:6px 0 12px}
-.normal-input{width:100%;margin-top:10px}
-
-/* profile */
-.profile-page{max-width:900px}
-.profile-header{display:flex;gap:48px;padding:10px 14px 28px;align-items:center}
-.profile-avatar-wrap{position:relative;flex:none}
-.profile-avatar{border:4px solid #fff;box-shadow:0 0 0 1px #dfe1e5}
-.avatar-camera{
- position:absolute;right:3px;bottom:5px;width:37px;height:37px;border-radius:50%;
- background:#111827;color:#fff;border:3px solid #fff;display:flex;align-items:center;justify-content:center
-}
-.profile-details{flex:1;min-width:0}
-.profile-line{display:flex;align-items:center;gap:10px;margin-bottom:20px}
-.profile-line h1{font-size:24px}
-.profile-more{margin-left:auto}
-.profile-stats{display:flex;gap:38px;margin-bottom:18px}
-.profile-stats span{display:flex;gap:5px;align-items:baseline}
-.profile-stats b{font-size:16px}.profile-stats small{color:#555;font-size:13px}
-.profile-details>p{color:#606671;margin-top:5px;line-height:1.5}
-.profile-details>a{display:flex;align-items:center;gap:5px;margin-top:7px;font-size:13px}
-.profile-details>a svg{width:15px}
-.profile-tabs{display:flex;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin-bottom:20px}
-.profile-tabs button{flex:1;background:transparent;padding:14px 7px;color:#777;display:flex;align-items:center;justify-content:center;gap:7px}
-.profile-tabs button svg{width:17px}
-.profile-tabs button.active{color:#111;font-weight:750;border-bottom:2px solid #111}
-.edit-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px}
-.card-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.card-title-row button{background:transparent}
-.edit-card label{display:block;font-size:13px;font-weight:700;margin:13px 0 6px}
-.edit-card input,.edit-card textarea{width:100%;border:1px solid #ddd;border-radius:10px;padding:11px}
-.edit-card textarea{min-height:90px;resize:vertical}
-.edit-card>small{display:block;text-align:right;color:#888}
-.switch-line{display:flex!important;align-items:center;justify-content:space-between}
-.switch-line span{display:flex;align-items:center;gap:7px}
-.switch-line input,.setting-switch input{width:19px;height:19px;accent-color:#4f46e5}
-
-.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
-.grid-media,.grid-reel{aspect-ratio:1/1;overflow:hidden;background:#e9e9ec}
-.grid-media img,.grid-media video,.grid-reel video{width:100%;height:100%;object-fit:cover}
-.tab-empty{margin-top:10px}
-.embedded-saved{margin-top:0}
-
-/* search / explore */
-.search-box{height:50px;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #ddd;border-radius:12px;padding:0 12px}
-.search-box svg{color:#777}.search-box input{border:0;background:transparent;flex:1}
-.user-list{margin-top:12px}
-.user-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);padding:11px;border-radius:13px;margin-top:8px}
-.user-row>div{flex:1;display:flex;flex-direction:column}
-.user-row span{color:#777;font-size:12px}.user-row button{white-space:nowrap}
-.explore-feature{background:#fff;border:1px solid var(--line);border-radius:18px;min-height:360px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px;color:#777}
-.explore-feature svg{width:45px;height:45px;color:#4f46e5;margin-bottom:12px}
-.explore-feature h2{color:#222;margin-bottom:6px}
-
-/* reels */
-.reels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.reel-card{background:#111;color:#fff;border-radius:14px;overflow:hidden}
-.reel-card video{width:100%;aspect-ratio:9/16;object-fit:cover;background:#000}
-.reel-card div{padding:10px}.reel-card p{color:#ddd;margin-top:4px;font-size:12px}
-.reels-profile-grid{gap:3px}
-
-/* messages */
-.chat-layout{display:grid;grid-template-columns:270px 1fr;min-height:560px;background:#fff;border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.conversation-list{border-right:1px solid #eee}
-.conversation-list button{width:100%;padding:14px;text-align:left;background:transparent;border-bottom:1px solid #eee}
-.chat-empty-list{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#888;gap:8px}
-.chat{display:flex;flex-direction:column}
-.chat-messages{flex:1;padding:15px;overflow:auto}
-.bubble{width:max-content;max-width:75%;background:#eef0f3;border-radius:15px;padding:9px 12px;margin-bottom:7px}
-.bubble.mine{margin-left:auto;background:#4f46e5;color:#fff}
-.chat-input{display:flex;gap:7px;border-top:1px solid #eee;padding:10px}
-.chat-input input{flex:1;border:1px solid #ddd;border-radius:10px;padding:10px}
-.chat-input button{background:transparent;width:38px}
-
-/* notifications */
-.notification{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:7px}
-.notification>div{display:flex;flex-direction:column}.notification small{color:#888;margin-top:3px}
-
-/* mobile menu */
-.mobile-menu{position:absolute;right:10px;top:66px;width:min(360px,calc(100% - 20px));background:#fff;border-radius:18px;padding:10px;box-shadow:0 20px 60px #0003}
-.menu-user{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #eee;margin-bottom:7px}
-.menu-user>div{flex:1;display:flex;flex-direction:column}.menu-user span{font-size:12px;color:#777}
-.menu-user button{background:#f1f2f4;width:34px;height:34px;border-radius:50%}
-.mobile-menu>button{width:100%;background:transparent;text-align:left;padding:12px;display:flex;align-items:center;gap:10px;border-radius:10px}
-.mobile-menu>button:hover{background:#f3f4f6}
-
-/* settings */
-.settings-overlay{padding:0;background:#fff}
-.settings-modal.instagram-settings{width:100%;height:100%;max-height:100vh;border-radius:0;display:flex;flex-direction:column;background:#fff}
-.settings-topbar{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative}
-.settings-topbar h2{font-size:19px}
-.settings-back{position:absolute;left:20px;background:transparent;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.settings-back:hover{background:#f1f2f4}
-.settings-search{height:52px;width:min(900px,calc(100% - 40px));margin:16px auto 0;background:#f1f2f4;border-radius:11px;display:flex;align-items:center;gap:9px;padding:0 12px}
-.settings-search input{border:0;background:transparent;flex:1}
-.settings-layout{display:grid;grid-template-columns:330px 1fr;flex:1;min-height:0;width:min(1200px,100%);margin:16px auto 0}
-.settings-sidebar{border-right:1px solid var(--line);overflow:auto;padding:0 14px 30px}
-.settings-sidebar button{width:100%;display:flex;align-items:center;gap:12px;padding:13px 12px;background:transparent;border-radius:10px;text-align:left;color:#30343b}
-.settings-sidebar button svg:first-child{width:19px}.settings-sidebar button svg:last-child{margin-left:auto;width:17px;color:#aaa}
-.settings-sidebar button.active{background:#f0efff;color:#4f46e5;font-weight:700}
-.settings-logout{margin-top:20px;color:#dc2626!important}
-.settings-content{overflow:auto;padding:5px 40px 50px}
-.settings-section-title{padding:0 0 18px;border-bottom:1px solid #eee;margin-bottom:8px}
-.settings-section-title h1{font-size:25px}.settings-section-title p{color:#777;margin-top:4px;font-size:13px}
-.settings-panel{max-width:700px}
-.settings-profile-row{display:flex;align-items:center;gap:13px;padding:16px 0;border-bottom:1px solid #eee}
-.settings-profile-row>div{flex:1;display:flex;flex-direction:column}.settings-profile-row span{font-size:12px;color:#777;margin-top:3px}
-.setting-row{width:100%;display:flex;align-items:center;gap:13px;background:#fff;padding:16px 0;border-bottom:1px solid #eee;text-align:left}
-.setting-row:hover{background:#fafafa}
-.setting-row-icon{width:37px;height:37px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center;flex:none}
-.setting-row-text{flex:1;display:flex;flex-direction:column;gap:3px}.setting-row-text small{color:#777;font-size:12px}
-.setting-row>svg{color:#999;width:18px}.setting-row em{font-style:normal;color:#4f46e5;font-size:13px;font-weight:700}
-.danger-row .setting-row-icon{color:#dc2626;background:#fef2f2}.danger-row .setting-row-text b{color:#dc2626}
-.settings-card-highlight{display:flex;gap:12px;background:#f6f5ff;padding:15px;border-radius:13px;margin:12px 0}
-.settings-card-highlight>svg{color:#4f46e5}.settings-card-highlight p{font-size:12px;color:#777;margin-top:4px;line-height:1.5}
-.setting-switch{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:15px 0;border-bottom:1px solid #eee}
-.setting-switch span{display:flex;flex-direction:column;gap:4px}.setting-switch small{color:#777;font-size:12px}
-.panel-heading{font-size:18px;margin:14px 0}
-.setting-detail{background:#f7f7f8;border-radius:12px;padding:14px;margin-top:15px;color:#555}.setting-detail p{font-size:12px;margin-top:5px}
-
-@media(max-width:1050px){
- .sidebar{width:78px}.brand{justify-content:center}.brand span,.nav{font-size:0}.nav{justify-content:center}.nav svg{width:22px;height:22px}.main{margin-left:78px}
- .auth-page{grid-template-columns:1fr 430px;gap:30px;padding:30px}
-}
-@media(max-width:700px){
- body{padding-bottom:68px}
- .sidebar{display:none}
- .main{margin-left:0;padding-top:57px;padding-bottom:82px}
- .mobile-header{display:flex;position:fixed;left:0;right:0;top:0;height:57px;background:#ffffffeF;backdrop-filter:blur(16px);border-bottom:1px solid #eee;z-index:80;align-items:center;justify-content:space-between;padding:0 12px}
- .mobile-brand{background:transparent;font-size:19px;font-weight:850}
- .mobile-header-actions{display:flex}.mobile-header button{width:40px;height:40px;background:transparent;display:flex;align-items:center;justify-content:center}
- .page{padding:18px 10px}.page-heading h1{font-size:24px}.desktop-create{display:none}
- .stories-card{border-radius:14px;padding:12px;gap:14px}.post-card{border-radius:12px}
- .post-media{max-height:none}
- .bottom-nav{position:fixed;left:0;right:0;bottom:0;height:68px;display:grid;grid-template-columns:repeat(5,1fr);background:#fffffff2;backdrop-filter:blur(18px);border-top:1px solid #e5e7eb;z-index:90;padding-bottom:env(safe-area-inset-bottom)}
- .nav-mobile{background:transparent;color:#777;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px}
- .nav-mobile svg{width:22px}.nav-mobile.active{color:#111827}
- .create-bottom{width:45px;height:45px;align-self:center;justify-self:center;border-radius:14px;background:linear-gradient(135deg,#111827,#4f46e5);color:#fff;display:flex;align-items:center;justify-content:center}
- .mobile-profile{background:transparent;color:#777;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px}
- .mobile-profile.active{color:#111827}.mobile-profile .avatar{border:2px solid transparent}.mobile-profile.active .avatar{border-color:#111827}
- .profile-header{gap:16px;padding:6px 4px 20px;align-items:flex-start}.profile-avatar,.profile-avatar-wrap .avatar{width:88px!important;height:88px!important}
- .avatar-camera{width:30px;height:30px;right:-1px;bottom:0}.avatar-camera svg{width:16px}
- .profile-line{gap:7px;margin-bottom:14px;flex-wrap:wrap}.profile-line h1{font-size:18px}.profile-line .secondary{padding:7px 9px;font-size:11px}.profile-more{display:none}
- .profile-stats{gap:15px;margin-bottom:12px}.profile-stats b{font-size:14px}.profile-stats small{font-size:10px}
- .profile-details>p{font-size:11px}.profile-details>a{font-size:11px}
- .profile-tabs button{font-size:10px;padding:12px 2px;gap:4px}.profile-tabs button svg{width:16px}
- .profile-grid{gap:2px}.edit-card{border-radius:13px;padding:15px}
- .reels-grid{grid-template-columns:repeat(2,1fr);gap:8px}
- .reel-card{border-radius:10px}.reel-card div{padding:8px}
- .chat-layout{grid-template-columns:1fr;min-height:520px}.conversation-list{display:none}
- .overlay{align-items:flex-end;padding:0}.modal{width:100%;max-height:94vh;border-radius:20px 20px 0 0}
- .form-row{flex-direction:column}
- .auth-page{display:flex;min-height:100vh;padding:20px 14px;align-items:center;justify-content:center}
- .auth-showcase{display:none}.auth-card{padding:25px 19px;border-radius:20px}
- .auth-card h2{font-size:21px}
- .settings-modal.instagram-settings{height:100%;max-height:100vh}
- .settings-topbar{height:58px}.settings-topbar h2{font-size:17px}
- .settings-search{width:calc(100% - 24px);margin:10px auto}
- .settings-layout{display:block;margin-top:8px}.settings-sidebar{display:none}
- .settings-content{padding:8px 15px 35px}.settings-section-title{padding-bottom:12px}.settings-section-title h1{font-size:22px}
- .settings-overlay{align-items:stretch}
- .settings-profile-row .secondary{font-size:11px;padding:8px}
-}
-@media(max-width:390px){
- .bottom-nav{height:62px}.nav-mobile span,.mobile-profile span{display:none}.create-bottom{width:42px;height:42px}
- .profile-header{gap:10px}.profile-stats{gap:10px}
-}
-
-/* Instagram-style private account switch */
-.privacy-toggle-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  padding:15px 0;
-  margin:8px 0 12px;
-  border-bottom:1px solid #eee;
-}
-.privacy-toggle-row>div:first-child{display:flex;flex-direction:column;gap:4px}
-.privacy-toggle-row b{font-size:14px}
-.privacy-toggle-row span:not(.toggle-knob){font-size:12px;color:#777;line-height:1.45}
-.toggle{
-  width:52px;
-  height:31px;
-  border-radius:999px;
-  padding:3px;
-  flex:none;
-  position:relative;
-  background:#d8dbe1;
-  transition:.2s ease;
-}
-.toggle.on{background:#111827}
-.toggle.off{background:#d8dbe1}
-.toggle:disabled{opacity:.5;cursor:not-allowed}
-.toggle-knob{
-  display:block;
-  width:25px;
-  height:25px;
-  border-radius:50%;
-  background:#fff;
-  box-shadow:0 1px 4px #0003;
-  transition:transform .2s ease;
-}
-.toggle.on .toggle-knob{transform:translateX(21px)}
-
-/* Story circles: media is clipped inside the ring, never outside it. */
-.story-ring{overflow:hidden;flex:none;isolation:isolate}
-.story-ring>img,.story-ring>video,.story-ring>.story-text-thumb{
-  position:absolute;
-  inset:3px;
-  width:calc(100% - 6px);
-  height:calc(100% - 6px);
-  border:0 !important;
-  border-radius:50%;
-  object-fit:cover;
-  overflow:hidden;
-  background:#111827;
-}
-.story-ring .avatar{position:absolute;inset:3px;width:calc(100% - 6px)!important;height:calc(100% - 6px)!important;border:0 !important}
-.story-text-thumb{display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:800}
-
-/* Full story viewer */
-.story-viewer{position:fixed;inset:0;background:rgba(8,8,12,.96);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px}
-.story-viewer-top{position:absolute;top:18px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;z-index:2;color:#fff}
-.story-viewer-user{display:flex;align-items:center;gap:10px}
-.story-viewer-user>div{display:flex;flex-direction:column;gap:2px}
-.story-viewer-user span{font-size:11px;color:#c8c8cf}
-.story-viewer-top>button{width:42px;height:42px;border-radius:50%;background:#ffffff18;color:#fff;display:flex;align-items:center;justify-content:center}
-.story-viewer-content{height:min(88vh,850px);width:min(92vw,480px);display:flex;align-items:center;justify-content:center;border-radius:18px;overflow:hidden;background:#111}
-.story-viewer-content img,.story-viewer-content video{width:100%;height:100%;object-fit:contain;background:#000}
-.story-text-view{width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;padding:40px;font-size:30px;font-weight:800;word-break:break-word}
-
-@media(max-width:700px){
-  .privacy-toggle-row{padding:14px 0}
-  .story-ring,.story-placeholder{width:68px;height:68px}
-  .story-viewer{padding:0}
-  .story-viewer-content{height:100%;width:100%;border-radius:0}
-  .story-viewer-top{top:12px;left:12px;right:12px}
-}
-
-
-/* UNIVERSAL AVATAR FIX - use the same circular profile image everywhere */
-.settings-profile-row > .avatar,
-.profile-avatar-wrap > .avatar,
-.post-user > .avatar,
-.user-row > .avatar,
-.comment > .avatar,
-.mobile-profile > .avatar,
-.nav > span > .avatar {
-  flex: 0 0 auto !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  aspect-ratio: 1 / 1 !important;
-}
-
-.settings-profile-row > .avatar img,
-.profile-avatar-wrap > .avatar img,
-.post-user > .avatar img,
-.user-row > .avatar img,
-.comment > .avatar img,
-.mobile-profile > .avatar img,
-.nav > span > .avatar img {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  object-fit: cover !important;
-  object-position: center !important;
-  border-radius: 50% !important;
-}
-
-.settings-profile-row{
-  min-width:0;
-}
-.settings-profile-row > .avatar{
-  width:72px !important;
-  height:72px !important;
-  min-width:72px !important;
-  min-height:72px !important;
-}
-
-@media(max-width:700px){
-  .settings-profile-row > .avatar{
-    width:64px !important;
-    height:64px !important;
-    min-width:64px !important;
-    min-height:64px !important;
-  }
-}
-
-
-/* Search result rows are buttons but look like normal Instagram rows. */
-.user-row {
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  color: inherit;
-}
-
-.user-row > svg {
-  width: 18px;
-  color: #999;
-  flex: 0 0 auto;
-}
-
-.profile-back-row {
-  margin-bottom: 14px;
-}
-
-.profile-back-row .secondary {
-  padding: 8px 11px;
-}
-
-.profile-back-row svg {
-  width: 16px;
-}
-
-.private-profile-note {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
-  margin-top: 14px;
-  padding: 11px 13px;
-  background: #f5f4ff;
-  border-radius: 12px;
-  color: #4f46e5;
-  max-width: 520px;
-}
-
-.private-profile-note svg {
-  width: 20px;
-  flex: 0 0 auto;
-}
-
-.private-profile-note div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.private-profile-note span {
-  color: #6f7280;
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.private-profile-lock {
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.private-lock-icon {
-  width: 62px;
-  height: 62px;
-  border: 2px solid #111827;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
-}
-
-.private-lock-icon svg {
-  width: 27px;
-  height: 27px;
-}
-
-.private-profile-lock h2 {
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.private-profile-lock p {
-  color: #777;
-  font-size: 13px;
-  max-width: 330px;
-  line-height: 1.5;
-}
-
-@media (max-width: 700px) {
-  .profile-back-row {
-    margin-bottom: 8px;
-  }
-
-  .profile-back-row .secondary {
-    font-size: 11px;
-  }
-
-  .private-profile-note {
-    font-size: 11px;
-  }
-}
-
-/* ============================================================
-   INSTAGRAM STYLE MESSAGES + STORY VIEWERS
-============================================================ */
-.messages-page{max-width:1050px}.messages-instagram-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.messages-instagram-head h1{font-size:28px;font-weight:800}.messages-instagram-head p{margin-top:4px;color:#8b919b;font-size:13px}.messages-requests-button{border:0;background:transparent;font-weight:700;color:#111827;display:flex;align-items:center;gap:7px;cursor:pointer}.messages-requests-button span{min-width:21px;height:21px;border-radius:50%;background:#ed4956;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px}.messages-notes-section{background:#fff;border:1px solid #e8e9ed;border-radius:18px;padding:14px;margin-bottom:14px}.messages-notes-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.messages-notes-header button{background:transparent;border:0;color:#737985;font-size:12px;cursor:pointer}.messages-notes-scroll{display:flex;gap:19px;overflow-x:auto;padding:4px 2px 5px;scrollbar-width:none}.messages-notes-scroll::-webkit-scrollbar{display:none}.message-note-card{position:relative;min-width:82px;width:82px;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;color:#222;cursor:pointer;padding:0}.message-note-card>b{margin-top:7px;font-size:11px;max-width:82px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.message-note-card>span{margin-top:3px;font-size:10px;color:#858b96;max-width:82px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.message-note-avatar-wrap{position:relative}.message-note-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center}.note-add{position:absolute;right:0;bottom:0;width:21px;height:21px;border-radius:50%;background:#0095f6;color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}.message-note-bubble{position:absolute;top:-7px;left:50%;transform:translateX(-50%);max-width:105px;background:#fff;border:1px solid #dfe1e6;box-shadow:0 3px 12px #0001;border-radius:12px;padding:5px 8px;font-size:9px;line-height:1.2;z-index:2}.notes-empty{min-width:230px;height:70px;display:flex;align-items:center;justify-content:center;color:#9297a1;font-size:12px;text-align:center}.instagram-chat-layout{min-height:610px;border-radius:18px}.instagram-conversation-list{min-width:320px}.conversation-list-title{height:58px;padding:0 17px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between}.conversation-list-title span{color:#9297a1;font-size:12px}.conversation-scroll{overflow-y:auto;max-height:552px}.conversation-item{width:100%;display:flex;align-items:center;gap:11px;padding:12px 13px;border:0;border-bottom:1px solid #f0f0f0;background:transparent;text-align:left;cursor:pointer}.conversation-item:hover{background:#f7f7f8}.conversation-item.active{background:#f0efff}.conversation-copy{min-width:0;flex:1;display:flex;flex-direction:column}.conversation-copy b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-copy span{margin-top:3px;color:#7c818b;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conversation-copy small{color:#a0a4ab;font-size:9px;margin-top:3px}.instagram-chat-placeholder{height:100%;min-height:610px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.message-placeholder-icon{width:76px;height:76px;border:1px solid #222;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:15px}.message-placeholder-icon svg{width:35px;height:35px}.instagram-chat-placeholder h2{font-size:20px;margin-bottom:7px}.instagram-chat-placeholder p{color:#777;font-size:13px;margin-bottom:4px}.instagram-chat-placeholder span{color:#999;font-size:11px}.instagram-chat-head{height:66px;border-bottom:1px solid #eee;padding:0 14px;gap:10px}.instagram-chat-head>div{display:flex;flex-direction:column}.instagram-chat-head b{font-size:14px}.instagram-chat-head span{margin-top:3px;color:#4caf50;font-size:10px}.chat-back-button{display:none;width:35px;height:35px;background:transparent;align-items:center;justify-content:center}.instagram-chat-messages{padding:20px;background:#fff}.message-line{display:flex;align-items:flex-end;gap:7px;margin-bottom:9px}.message-line.mine{justify-content:flex-end}.message-line.received{justify-content:flex-start}.message-line .bubble{max-width:68%;margin:0;border-radius:20px;padding:9px 13px;background:#efeff1;color:#111}.message-line .bubble.mine{background:#3797f0;color:#fff}.message-meta{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:4px}.message-meta small{font-size:8px;opacity:.68}.chat-first-message-avatar{margin-bottom:9px}.chat-no-messages{height:100%;min-height:430px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}.chat-no-messages h2{font-size:17px;margin:4px 0}.chat-no-messages p{color:#777;font-size:12px}.chat-no-messages span{color:#999;font-size:11px}.instagram-chat-input{height:58px;border-top:1px solid #eee;padding:9px 12px}.instagram-chat-input input{border:1px solid #ddd;border-radius:22px;padding:10px 14px;background:#fff}.chat-attach-button,.chat-smile-button,.chat-send-button{width:36px;height:36px;flex:0 0 36px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center}.chat-send-button{color:#0095f6}.chat-send-button:disabled{opacity:.4}.messages-requests-overlay{position:fixed;inset:0;z-index:500;background:#0007;display:flex;align-items:center;justify-content:center;padding:20px}.messages-requests-modal{width:min(100%,480px);max-height:75vh;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 20px 70px #0005}.messages-requests-head{height:60px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}.messages-requests-head button{width:34px;height:34px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}.requests-list{overflow-y:auto;max-height:calc(75vh - 60px)}.request-row{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid #eee}.request-row>div{display:flex;flex-direction:column}.request-row span{color:#888;font-size:11px;margin-top:3px}.requests-empty{min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#777;gap:7px}.requests-empty svg{width:35px;height:35px}.requests-empty b{color:#222}.requests-empty span{font-size:11px}.story-viewers-sheet{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,540px);max-height:70vh;background:#fff;color:#111;border-radius:22px 22px 0 0;z-index:30;overflow:hidden;box-shadow:0 -20px 60px #0009}.story-viewers-head{height:66px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee}.story-viewers-head>div{display:flex;flex-direction:column}.story-viewers-head span{color:#888;font-size:10px;margin-top:3px}.story-viewers-head button{width:35px;height:35px;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center}.story-viewers-list{max-height:calc(70vh - 66px);overflow-y:auto;padding:7px 12px 15px}.story-viewer-row{display:flex;align-items:center;gap:11px;padding:10px 6px;border-bottom:1px solid #f0f0f0}.story-viewer-user-info{min-width:0;flex:1;display:flex;flex-direction:column}.story-viewer-user-info b{font-size:13px}.story-viewer-user-info span{color:#888;font-size:11px;margin-top:2px}.story-viewer-row>small{color:#999;font-size:10px}.story-viewers-empty{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#777;gap:8px;padding:25px}.story-viewers-empty svg{width:40px;height:40px}.story-viewers-empty b{color:#222}.story-viewers-empty span{max-width:290px;font-size:11px;line-height:1.5}.viewer-loader{width:25px;height:25px;border:3px solid #ddd;border-top-color:#111;border-radius:50%;animation:viewerSpin .8s linear infinite}@keyframes viewerSpin{to{transform:rotate(360deg)}}
-@media(max-width:700px){.messages-page{width:100%;padding:15px 10px 90px}.messages-instagram-head{padding:4px 6px}.messages-instagram-head h1{font-size:21px}.messages-instagram-head p{display:none}.messages-requests-button{font-size:13px}.messages-notes-section{border:0;border-radius:0;background:transparent;padding:5px 0 12px}.messages-notes-header{padding:0 5px}.messages-notes-scroll{gap:15px}.message-note-card{min-width:72px;width:72px}.message-note-avatar{width:58px;height:58px}.message-note-card>b{font-size:10px}.message-note-card>span{font-size:9px}.message-note-bubble{max-width:90px;font-size:8px}.instagram-chat-layout{min-height:calc(100vh - 230px);border-radius:15px;overflow:hidden}.instagram-chat-layout:not(.has-active) .instagram-chat{display:none}.instagram-chat-layout.has-active .instagram-conversation-list{display:none}.instagram-conversation-list{min-width:100%;width:100%;border-right:0}.conversation-scroll{max-height:calc(100vh - 290px)}.conversation-item{padding:13px 9px}.instagram-chat{width:100%;min-width:0}.instagram-chat-head{height:62px;padding:0 10px}.chat-back-button{display:flex}.instagram-chat-messages{min-height:calc(100vh - 355px);padding:14px 10px}.message-line .bubble{max-width:78%}.instagram-chat-input{height:56px;padding:8px}.instagram-chat-input input{min-width:0}.instagram-chat-placeholder{min-height:calc(100vh - 250px)}.messages-requests-overlay{align-items:flex-end;padding:0}.messages-requests-modal{width:100%;max-height:80vh;border-radius:22px 22px 0 0}.story-viewers-sheet{width:100%;max-height:70vh;border-radius:22px 22px 0 0}.story-viewers-list{max-height:calc(70vh - 66px)}}
-.story-progress{position:absolute;top:10px;left:18px;right:18px;height:3px;background:#ffffff55;border-radius:99px;z-index:5;overflow:hidden}.story-progress span{display:block;width:35%;height:100%;background:#fff;border-radius:99px}.story-viewers-button{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:25;border:0;border-radius:22px;background:#ffffffee;color:#111;padding:10px 18px;display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;box-shadow:0 8px 30px #0006}.story-viewers-button svg{width:18px;height:18px}.story-viewers-button:hover{background:#fff}@media(max-width:700px){.story-progress{left:10px;right:10px}.story-viewers-button{bottom:20px}}
-
-/* ============================================================
-   GLASS MOBILE NAV + MEDIA VIEWERS + SHARE + PROFILE EDIT
-   ============================================================ */
-@media (max-width:700px) {
-  body{background:radial-gradient(circle at 15% 0%,#4c3934 0%,transparent 34%),radial-gradient(circle at 90% 85%,#3d2630 0%,transparent 40%),#08090d;color:#f7f7f8}
-  .main{background:transparent}
-  .mobile-header{background:rgba(8,9,13,.58);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
-  .mobile-brand,.mobile-header button{color:#fff}
-  .page{padding-bottom:105px}
-  .bottom-nav.glass-bottom-nav{left:5%;right:5%;bottom:12px;width:90%;height:72px;padding:6px 8px;border:1px solid rgba(255,255,255,.2);border-radius:38px;background:linear-gradient(120deg,rgba(255,255,255,.18),rgba(255,255,255,.07));box-shadow:0 18px 45px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.18);backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%);display:grid;grid-template-columns:repeat(5,1fr);z-index:120}
-  .glass-bottom-nav .nav-mobile,.glass-bottom-nav .mobile-profile{position:relative;height:58px;min-width:0;border-radius:30px;color:#f5f5f6;background:transparent;transition:.2s ease}
-  .glass-bottom-nav .nav-mobile svg{width:31px;height:31px;stroke-width:1.75}
-  .glass-bottom-nav .nav-mobile span,.glass-bottom-nav .mobile-profile span{display:none}
-  .glass-bottom-nav .nav-mobile.active,.glass-bottom-nav .mobile-profile.active{color:#fff;background:rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 5px 20px rgba(0,0,0,.15)}
-  .glass-bottom-nav .mobile-profile .avatar{width:34px!important;height:34px!important;border:2px solid transparent}
-  .glass-bottom-nav .mobile-profile.active .avatar{border-color:#fff}
-  .post-media-button,.grid-media-button,.reel-card-button{position:relative;width:100%;padding:0;border:0;overflow:hidden;background:transparent;display:block;cursor:pointer}
-  .post-media-button .post-media{pointer-events:none}
-  .media-play-overlay,.reel-play,.grid-video-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;pointer-events:none;backdrop-filter:blur(8px)}
-  .media-play-overlay svg,.reel-play svg,.grid-video-icon svg{width:27px;height:27px}
-  .media-viewer-overlay,.reel-viewer-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-  .media-viewer-close{position:fixed;right:22px;top:22px;z-index:20;width:44px;height:44px;border-radius:50%;color:#fff;background:rgba(255,255,255,.13);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16)}
-  .media-viewer-card{width:min(92vw,760px);max-height:92vh;overflow:hidden;border-radius:24px;background:#090a0d;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 100px #000}
-  .media-viewer-head{display:flex;align-items:center;gap:10px;padding:13px;color:#fff}
-  .media-viewer-head>div{display:flex;flex-direction:column}.media-viewer-head span{color:#999da7;font-size:10px;margin-top:3px}
-  .media-viewer-card>img,.media-viewer-card>video{width:100%;max-height:74vh;object-fit:contain;background:#000}.media-viewer-caption{padding:12px 14px 15px;color:#ddd;font-size:13px;line-height:1.5}
-  .reel-viewer-card{height:min(88vh,820px);width:min(94vw,460px);border-radius:26px;overflow:hidden;position:relative;background:#050507;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 100px #000}
-  .reel-viewer-card>video{width:100%;height:100%;object-fit:contain;background:#000}.reel-viewer-user{position:absolute;z-index:4;left:13px;right:13px;top:13px;display:flex;align-items:center;gap:9px;color:#fff;text-shadow:0 1px 5px #000}.reel-viewer-user>div{display:flex;flex-direction:column}.reel-viewer-user span{font-size:10px;color:#ddd;margin-top:2px}
-  .grid-media-button img,.grid-media-button video{width:100%;height:100%;object-fit:cover}.reel-thumb{position:relative;aspect-ratio:9/13;overflow:hidden;background:#000}.reel-thumb video{width:100%;height:100%;object-fit:cover}
-  .share-sheet-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-  .share-sheet{width:min(100%,760px);max-height:82vh;border-radius:30px 30px 0 0;padding:13px 18px 20px;color:#fff;border:1px solid rgba(255,255,255,.17);background:linear-gradient(145deg,rgba(38,39,48,.96),rgba(15,16,21,.96));box-shadow:0 -20px 80px #0009}
-  .share-sheet-handle{width:42px;height:4px;border-radius:99px;background:#777b84;margin:0 auto 12px}.share-sheet-head{display:flex;justify-content:space-between;align-items:center}.share-sheet-head h2{font-size:20px}.share-sheet-head p{color:#9fa3ac;font-size:10px;margin-top:3px}
-  .share-search{height:44px;margin:15px 0;border-radius:14px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09)}.share-search svg{width:18px;color:#9ca0aa}.share-search input{flex:1;min-width:0;border:0;background:transparent;color:#fff}.share-search input::placeholder{color:#8b8f98}
-  .share-people{min-height:160px;max-height:48vh;overflow-x:hidden;overflow-y:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;justify-items:center;column-gap:10px;row-gap:18px;padding:12px 5px 18px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}.share-people::-webkit-scrollbar{width:5px}.share-people::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:10px}.share-person{width:100%;min-width:0;max-width:none;color:#fff;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 2px;border-radius:12px}.share-person-avatar{position:relative;padding:3px;border-radius:50%}.share-person.selected .share-person-avatar{background:linear-gradient(135deg,#ffb800,#ff316b,#7c3aed)}.share-person b{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;text-align:center}.share-person>span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#9296a0;font-size:9px;text-align:center}.share-selected-check{position:absolute;right:-2px;bottom:1px;width:23px;height:23px;border-radius:50%;background:#0095f6;border:2px solid #17181d;display:flex;align-items:center;justify-content:center}.share-selected-check svg{width:13px;height:13px}.share-loading,.share-empty{width:100%;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#9b9fa8;text-align:center}.share-empty svg{width:34px;height:34px}.share-empty b{color:#fff}.share-empty span{font-size:10px;max-width:240px}.share-send-button{width:100%;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#111;font-weight:800}.share-send-button:disabled{opacity:.38}
-  .edit-card{border-radius:28px!important;padding:22px!important;color:#fff;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.07))!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 30px 100px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.15);backdrop-filter:blur(30px) saturate(130%);-webkit-backdrop-filter:blur(30px) saturate(130%)}
-  .edit-card input,.edit-card textarea{background:rgba(0,0,0,.2)!important;color:#fff!important;border-color:rgba(255,255,255,.13)!important}.edit-card label{color:#c7c9d0}.edit-card .privacy-toggle-row{background:rgba(0,0,0,.14);border-color:rgba(255,255,255,.1)}
-}
-@media(max-width:700px){.edit-profile-overlay{padding:10px}.edit-profile-glass{width:100%;max-height:92vh;border-radius:27px;padding:18px}.media-viewer-overlay,.reel-viewer-overlay{padding:0}.media-viewer-card{width:100%;max-height:100%;border-radius:0}.media-viewer-card>img,.media-viewer-card>video{max-height:78vh}.media-viewer-close{right:12px;top:12px}.reel-viewer-card{width:100%;height:100%;border-radius:0}.share-sheet{width:100%;max-height:84vh}}
-
-
-/* ============================================================
-   FULL SCREEN POST / IMAGE / VIDEO VIEWER
-   Opens exactly like the story viewer: no side panel/card.
-   ============================================================ */
-.media-screen-viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  overflow: hidden;
-  background: #000;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-}
-
-.media-screen-backdrop {
-  position: absolute;
-  inset: 0;
-  background: #000;
-  z-index: 0;
-}
-
-.media-screen-topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 76px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 18px;
-  background: linear-gradient(to bottom, rgba(0,0,0,.62), transparent);
-}
-
-.media-screen-back,
-.media-screen-more {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  border: 0;
-  border-radius: 50%;
-  color: #fff;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.media-screen-back svg,
-.media-screen-more svg {
-  width: 23px;
-  height: 23px;
-}
-
-.media-screen-user {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.media-screen-user > div {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.media-screen-user b {
-  color: #fff;
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.media-screen-user span {
-  color: #c7c7c7;
-  font-size: 10px;
-  margin-top: 2px;
-}
-
-.media-screen-content {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 76px 0 130px;
-  pointer-events: none;
-}
-
-.media-screen-media {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-  pointer-events: auto;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.media-screen-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 6;
-  padding: 16px 20px 28px;
-  background: linear-gradient(to top, rgba(0,0,0,.75), transparent);
-}
-
-.media-screen-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.media-screen-action-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.media-screen-actions button {
-  width: 46px;
-  height: 46px;
-  border: 0;
-  border-radius: 50%;
-  color: #fff;
-  background: rgba(255,255,255,.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.media-screen-actions button svg {
-  width: 24px;
-  height: 24px;
-}
-
-.media-screen-actions button.active:first-child {
-  color: #ff3040;
-}
-
-.media-screen-caption {
-  max-width: 900px;
-  margin: 11px auto 0;
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.45;
-  text-shadow: 0 1px 4px #000;
-}
-
-.media-screen-caption b {
-  margin-right: 4px;
-}
-
-/* Desktop: make the media feel like a separate screen, not a card. */
-@media (min-width: 701px) {
-  .media-screen-content {
-    padding-left: 80px;
-    padding-right: 80px;
-    padding-bottom: 120px;
-  }
-
-  .media-screen-media {
-    max-width: 1100px;
-    max-height: calc(100vh - 150px);
-  }
-}
-
-/* Mobile: exactly full-screen like Story. */
-@media (max-width: 700px) {
-  .media-screen-viewer {
-    position: fixed;
-    width: 100vw;
-    height: 100dvh;
-    min-height: 100vh;
-  }
-
-  .media-screen-topbar {
-    height: 72px;
-    padding: 10px 12px;
-  }
-
-  .media-screen-back,
-  .media-screen-more {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-  }
-
-  .media-screen-content {
-    padding: 0;
-  }
-
-  .media-screen-media {
-    width: 100vw;
-    height: 100dvh;
-    object-fit: contain;
-  }
-
-  .media-screen-bottom {
-    padding: 12px 14px 94px;
-  }
-
-  .media-screen-actions button {
-    width: 44px;
-    height: 44px;
-  }
-
-  .media-screen-caption {
-    font-size: 12px;
-    max-width: 100%;
-  }
-}
-
-/* ============================================================
-   VK SOCIAL — INSTAGRAM-STYLE DESKTOP INTERFACE
-   Desktop target: dark canvas, slim icon rail, centered feed,
-   stories row, right suggestions panel, profile grid.
-============================================================ */
-@media (min-width: 701px) {
-  :root {
-    --bg: #0b0e12;
-    --card: #101318;
-    --text: #f5f5f5;
-    --muted: #9a9da5;
-    --line: #262a31;
-    --soft: #1b1f25;
-    --accent: #4f8cff;
-  }
-
-  html, body, #root {
-    min-height: 100%;
-    background: #0b0e12 !important;
-    color: #f5f5f5 !important;
-  }
-
-  body {
-    overflow-x: hidden;
-  }
-
-  .app {
-    min-height: 100vh;
-    background: #0b0e12;
-  }
-
-  /* LEFT INSTAGRAM-LIKE RAIL */
-  .sidebar {
-    width: 74px;
-    padding: 18px 9px 20px;
-    background: #0b0e12;
-    border-right: 1px solid #242830;
-    align-items: center;
-    z-index: 100;
-  }
-
-  .brand {
-    width: 52px;
-    height: 54px;
-    padding: 0;
-    margin: 0 0 27px;
-    border: 0;
-    background: transparent;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  .brand b {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(145deg, #171b22, #35405d);
-    border: 1px solid #4a5262;
-    font-size: 13px;
-    box-shadow: 0 8px 22px rgba(0,0,0,.28);
-  }
-
-  .brand span {
-    display: none;
-  }
-
-  .sidebar-main-nav {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .sidebar .nav,
-  .sidebar .nav-bottom .nav {
-    width: 54px;
-    min-height: 54px;
-    height: 54px;
-    margin: 0 auto;
-    padding: 0;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: #f0f1f4;
-    gap: 0;
-  }
-
-  .sidebar .nav span {
-    width: 54px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sidebar .nav svg {
-    width: 25px;
-    height: 25px;
-    stroke-width: 1.8;
-  }
-
-  .sidebar .nav:hover,
-  .sidebar .nav.active {
-    background: #191d23;
-    color: #fff;
-  }
-
-  .sidebar .nav.active svg {
-    stroke-width: 2.35;
-  }
-
-  .sidebar .nav .avatar {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-    border: 2px solid #f2f2f2;
-  }
-
-  .nav-bottom {
-    margin-top: auto;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  /* MAIN CANVAS */
-  .main {
-    margin-left: 74px;
-    min-height: 100vh;
-    background: #0b0e12;
-    padding-bottom: 0;
-  }
-
-  .page {
-    width: 100%;
-    max-width: 1160px;
-    min-height: 100vh;
-    margin: 0 auto;
-    padding: 38px 32px 70px;
-  }
-
-  .page-heading {
-    margin-bottom: 22px;
-  }
-
-  .page-heading h1 {
-    font-size: 24px;
-    color: #fff;
-  }
-
-  .page-heading p {
-    color: #8e929a;
-  }
-
-  .desktop-create,
-  .primary {
-    background: #f2f3f5;
-    color: #111318;
-    border-radius: 9px;
-    font-size: 13px;
-  }
-
-  .desktop-create:hover,
-  .primary:hover {
-    background: #fff;
-  }
-
-  /* HOME TWO-COLUMN LAYOUT */
-  .feed-page {
-    max-width: 1190px;
-  }
-
-  .home-layout {
-    display: grid;
-    grid-template-columns: minmax(500px, 610px) 310px;
-    gap: 72px;
-    align-items: start;
-    justify-content: center;
-  }
-
-  .home-feed-column {
-    min-width: 0;
-  }
-
-  .home-feed-column > .page-heading {
-    display: none;
-  }
-
-  .home-feed-column .stories-card {
-    margin-top: 6px;
-  }
-
-  /* STORIES */
-  .stories-card {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: 7px 0 22px;
-    margin-bottom: 5px;
-    gap: 16px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .stories-card::-webkit-scrollbar {
-    display: none;
-  }
-
-  .story {
-    min-width: 66px;
-    color: #d9dbe0;
-    font-size: 11px;
-  }
-
-  .story-ring,
-  .story-placeholder {
-    width: 66px;
-    height: 66px;
-    padding: 3px;
-    margin-bottom: 7px;
-    background: linear-gradient(135deg, #ffb900, #ff2472 55%, #8a39e8);
-  }
-
-  .story-ring .avatar,
-  .story-ring img,
-  .story-ring video {
-    width: 100% !important;
-    height: 100% !important;
-    border: 3px solid #0b0e12;
-    object-fit: cover;
-  }
-
-  .story-ring i {
-    right: 0;
-    bottom: 0;
-    width: 21px;
-    height: 21px;
-    border: 2px solid #0b0e12;
-    background: #1677ff;
-  }
-
-  .story > span {
-    color: #c9cbd1;
-  }
-
-  /* CREATE BAR */
-  .quick-create {
-    background: transparent;
-    border: 0;
-    border-top: 1px solid #242830;
-    border-bottom: 1px solid #242830;
-    border-radius: 0;
-    padding: 13px 0;
-    margin-bottom: 17px;
-  }
-
-  .quick-create > button:nth-child(2) {
-    background: #171b21;
-    color: #858991;
-    border: 1px solid #252a32;
-  }
-
-  .quick-icon {
-    background: transparent;
-    color: #dfe2e8;
-  }
-
-  /* FEED POST */
-  .post-card {
-    background: transparent;
-    border: 0;
-    border-bottom: 1px solid #292d34;
-    border-radius: 0;
-    overflow: visible;
-    margin-bottom: 18px;
-    padding-bottom: 18px;
-  }
-
-  .post-head {
-    padding: 8px 0 11px;
-  }
-
-  .post-user,
-  .post-user-button {
-    color: #fff;
-  }
-
-  .post-user b {
-    font-size: 13px;
-  }
-
-  .post-user span {
-    color: #8e929b;
-  }
-
-  .post-head .icon-button {
-    color: #e6e7ea;
-  }
-
-  .post-media-button {
-    width: 100%;
-    border-radius: 4px;
-    overflow: hidden;
-    background: #050607;
-    border: 1px solid #242830;
-  }
-
-  .post-media {
-    width: 100%;
-    max-height: 760px;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    background: #050607;
-  }
-
-  .post-media-button:has(video) .post-media {
-    aspect-ratio: 4 / 5;
-  }
-
-  .media-play-overlay {
-    width: 58px;
-    height: 58px;
-    background: rgba(0,0,0,.48);
-    backdrop-filter: blur(6px);
-  }
-
-  .actions {
-    padding: 7px 0 1px;
-  }
-
-  .actions button {
-    color: #f4f5f6;
-    width: 42px;
-    height: 42px;
-  }
-
-  .actions button:hover {
-    background: transparent;
-  }
-
-  .post-body {
-    color: #dddfe3;
-    font-size: 13px;
-  }
-
-  .post-body > b {
-    color: #fff;
-  }
-
-  .post-body p {
-    color: #e0e1e5;
-  }
-
-  .comments-link {
-    color: #858a94;
-    background: transparent;
-  }
-
-  /* RIGHT SUGGESTIONS */
-  .suggestions-rail {
-    position: sticky;
-    top: 34px;
-    width: 310px;
-    padding-top: 18px;
-  }
-
-  .rail-account {
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    gap: 11px;
-    align-items: center;
-    margin-bottom: 29px;
-  }
-
-  .rail-account-info {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .rail-account-info b {
-    color: #f5f5f6;
-    font-size: 13px;
-  }
-
-  .rail-account-info span {
-    color: #8d919a;
-    font-size: 12px;
-    margin-top: 3px;
-  }
-
-  .rail-account > button,
-  .suggestions-title button,
-  .suggestion-row .follow,
-  .suggestion-row .following {
-    color: #5794ff;
-    background: transparent;
-    font-weight: 700;
-    font-size: 11px;
-  }
-
-  .suggestions-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .suggestions-title b {
-    color: #858a93;
-    font-size: 13px;
-  }
-
-  .suggestions-title button {
-    color: #eee;
-  }
-
-  .suggestion-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .suggestion-row {
-    display: grid;
-    grid-template-columns: 42px 1fr auto;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .suggestion-copy {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  .suggestion-copy b {
-    color: #f1f2f4;
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .suggestion-copy span {
-    color: #777c85;
-    font-size: 10px;
-    margin-top: 3px;
-  }
-
-  .suggestion-row .following {
-    color: #858a92;
-  }
-
-  .rail-footer {
-    color: #666b74;
-    font-size: 10px;
-    line-height: 1.7;
-    margin-top: 38px;
-  }
-
-  .floating-messages {
-    position: fixed;
-    right: 34px;
-    bottom: 30px;
-    min-width: 210px;
-    height: 58px;
-    padding: 0 14px;
-    border-radius: 30px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #20242a;
-    color: #fff;
-    border: 1px solid #333840;
-    box-shadow: 0 18px 45px rgba(0,0,0,.34);
-    z-index: 80;
-  }
-
-  .floating-messages > svg {
-    width: 23px;
-    height: 23px;
-  }
-
-  .floating-messages b {
-    font-size: 13px;
-  }
-
-  .floating-avatars {
-    display: flex;
-    margin-left: auto;
-  }
-
-  .floating-avatars .avatar {
-    margin-left: -7px;
-    border: 2px solid #20242a;
-  }
-
-  /* PROFILE */
-  .profile-page {
-    max-width: 1040px;
-    padding-top: 50px;
-  }
-
-  .profile-header {
-    max-width: 900px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 50px;
-    align-items: start;
-    padding-bottom: 40px;
-  }
-
-  .profile-avatar-wrap {
-    justify-self: center;
-  }
-
-  .profile-avatar-wrap .avatar {
-    border: 1px solid #343942;
-    box-shadow: 0 8px 28px rgba(0,0,0,.25);
-  }
-
-  .profile-line {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 21px;
-  }
-
-  .profile-line h1 {
-    font-size: 24px;
-    color: #fff;
-    margin-right: 4px;
-  }
-
-  .profile-line .secondary {
-    background: #25292f;
-    color: #fff;
-    border: 1px solid #30353d;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-weight: 700;
-  }
-
-  .profile-stats {
-    display: flex;
-    gap: 28px;
-    margin-bottom: 19px;
-  }
-
-  .profile-stats span {
-    color: #f0f1f3;
-  }
-
-  .profile-stats small {
-    color: #a1a5ad;
-    margin-left: 4px;
-  }
-
-  .profile-details > b {
-    color: #fff;
-  }
-
-  .profile-details > p {
-    color: #d4d6da;
-    margin-top: 8px;
-    white-space: pre-line;
-    line-height: 1.4;
-    max-width: 620px;
-  }
-
-  .profile-details > a {
-    display: inline-flex;
-    gap: 5px;
-    align-items: center;
-    margin-top: 8px;
-    color: #dce7ff;
-    font-size: 12px;
-  }
-
-  .profile-tabs {
-    max-width: 900px;
-    margin: 0 auto;
-    height: 56px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid #2a2e35;
-  }
-
-  .profile-tabs button {
-    color: #858a92;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    position: relative;
-  }
-
-  .profile-tabs button svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .profile-tabs button.active {
-    color: #fff;
-  }
-
-  .profile-tabs button.active::before {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: 28%;
-    right: 28%;
-    height: 1px;
-    background: #fff;
-  }
-
-  .profile-grid {
-    max-width: 900px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-  }
-
-  .grid-media,
-  .grid-reel {
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    background: #15181d;
-    border: 0;
-    position: relative;
-  }
-
-  .grid-media img,
-  .grid-media video,
-  .grid-reel video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .grid-media-button:hover img,
-  .grid-media-button:hover video {
-    transform: scale(1.025);
-    transition: transform .18s ease;
-  }
-
-  .grid-video-icon {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    color: #fff;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(0,0,0,.38);
-  }
-
-  .grid-video-icon svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .edit-card {
-    max-width: 900px;
-    margin: 0 auto 20px;
-    padding: 22px;
-    background: #15191f;
-    border: 1px solid #2a2f37;
-    border-radius: 16px;
-    color: #fff;
-  }
-
-  .edit-card input,
-  .edit-card textarea {
-    background: #0f1216;
-    color: #fff;
-    border: 1px solid #30353e;
-    border-radius: 9px;
-    padding: 10px 12px;
-  }
-
-  .privacy-toggle-row {
-    background: #11151a;
-    border: 1px solid #2c3139;
-    color: #fff;
-  }
-
-  /* OTHER PAGES */
-  .messages-layout,
-  .search-box,
-  .user-list,
-  .settings-card,
-  .notification-list,
-  .saved-grid {
-    background: #101318;
-    border-color: #282d35;
-    color: #fff;
-  }
-
-  .messages-layout {
-    border-radius: 15px;
-    overflow: hidden;
-  }
-
-  .empty {
-    color: #b4b8c0;
-    background: transparent;
-  }
-
-  .empty h2 {
-    color: #fff;
-  }
-
-  .empty p {
-    color: #858a93;
-  }
-
-  .mobile-header,
-  .bottom-nav {
-    display: none !important;
-  }
-}
-
-/* Desktop small screens: keep the rail, reduce right column. */
-@media (min-width: 701px) and (max-width: 1100px) {
-  .home-layout {
-    grid-template-columns: minmax(480px, 600px);
-  }
-
-  .suggestions-rail {
-    display: none;
-  }
-
-  .page {
-    max-width: 720px;
-  }
-
-  .profile-header,
-  .profile-tabs,
-  .profile-grid {
-    max-width: 680px;
-  }
-}
-
-/* ============================================================
-   MOBILE KEEPS THE GLASS NAVIGATION
-============================================================ */
-@media (max-width: 700px) {
-  body, #root {
-    background: #08090d !important;
-  }
-
-  .sidebar {
-    display: none !important;
-  }
-
-  .main {
-    margin-left: 0;
-    background: #08090d;
-  }
-
-  .suggestions-rail {
-    display: none;
-  }
-
-  .home-layout {
-    display: block;
-  }
-
-  .home-feed-column {
-    width: 100%;
-  }
-
-  .floating-messages {
-    display: none;
-  }
-}
-
-
-/* ============================================================
-   FINAL DESKTOP ALIGNMENT — INSTAGRAM STYLE
-   Keep all existing functions; only restore desktop geometry.
-============================================================ */
-@media (min-width: 1101px) {
-  html, body, #root { background:#0b0e12 !important; color:#f5f5f5 !important; }
-  body { overflow-x:hidden; }
-
-  .app { min-height:100vh; background:#0b0e12; }
-
-  /* slim Instagram-style icon rail */
-  .sidebar {
-    width:74px !important;
-    padding:18px 9px 20px !important;
-    background:#0b0e12 !important;
-    border-right:1px solid #242830 !important;
-    overflow:hidden;
-  }
-  .brand {
-    width:54px !important;
-    height:54px !important;
-    padding:0 !important;
-    margin:0 auto 27px !important;
-    border:0 !important;
-    background:transparent !important;
-    justify-content:center !important;
-  }
-  .brand span { display:none !important; }
-  .brand b {
-    width:34px !important;
-    height:34px !important;
-    border-radius:10px !important;
-    background:linear-gradient(145deg,#171b22,#35405d) !important;
-    border:1px solid #4a5262 !important;
-    font-size:13px !important;
-  }
-  .sidebar-main-nav { width:100%; gap:8px !important; }
-  .sidebar .nav,
-  .sidebar .nav-bottom .nav {
-    width:54px !important;
-    min-width:54px !important;
-    height:54px !important;
-    min-height:54px !important;
-    margin:0 auto !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:0 !important;
-    color:#f0f1f4 !important;
-    font-size:0 !important;
-    overflow:hidden !important;
-  }
-  .sidebar .nav span {
-    width:54px !important;
-    height:54px !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 54px !important;
-  }
-  .sidebar .nav svg { width:25px !important; height:25px !important; }
-  .sidebar .nav:hover,
-  .sidebar .nav.active { background:#191d23 !important; color:#fff !important; }
-  .sidebar .nav .avatar { width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; border:2px solid #f2f2f2 !important; }
-  .nav-bottom { width:100%; gap:8px !important; }
-
-  /* full desktop canvas */
-  .main {
-    margin-left:74px !important;
-    width:calc(100% - 74px) !important;
-    min-height:100vh !important;
-    padding-bottom:0 !important;
-    background:#0b0e12 !important;
-  }
-
-  .page.feed-page {
-    width:100% !important;
-    max-width:1160px !important;
-    padding:30px 0 80px !important;
-    margin:0 auto !important;
-  }
-
-  .home-layout {
-    width:100% !important;
-    display:grid !important;
-    grid-template-columns:minmax(0,610px) 310px !important;
-    gap:72px !important;
-    align-items:start !important;
-    justify-content:center !important;
-  }
-  .home-feed-column { min-width:0 !important; width:610px !important; }
-  .home-feed-column > .page-heading { display:none !important; }
-
-  .stories-card {
-    width:100% !important;
-    display:flex !important;
-    gap:17px !important;
-    padding:7px 0 22px !important;
-    margin:0 0 5px !important;
-    background:transparent !important;
-    border:0 !important;
-    border-radius:0 !important;
-    overflow-x:auto !important;
-    scrollbar-width:none !important;
-  }
-  .stories-card::-webkit-scrollbar { display:none !important; }
-  .story { min-width:66px !important; width:66px !important; }
-  .story-ring,.story-placeholder { width:66px !important; height:66px !important; }
-
-  .quick-create {
-    width:100% !important;
-    background:transparent !important;
-    border-top:1px solid #242830 !important;
-    border-bottom:1px solid #242830 !important;
-    border-left:0 !important;
-    border-right:0 !important;
-    border-radius:0 !important;
-    padding:13px 0 !important;
-    margin-bottom:17px !important;
-  }
-  .quick-create > button:nth-child(2) { background:#171b21 !important; border:1px solid #252a32 !important; }
-
-  .post-card {
-    width:100% !important;
-    background:transparent !important;
-    border:0 !important;
-    border-bottom:1px solid #292d34 !important;
-    border-radius:0 !important;
-    margin-bottom:18px !important;
-    padding-bottom:18px !important;
-  }
-  .post-head { padding:8px 0 11px !important; }
-  .post-media-button { width:100% !important; border-radius:4px !important; border:1px solid #242830 !important; }
-  .post-media { width:100% !important; max-height:760px !important; aspect-ratio:4/5 !important; object-fit:cover !important; }
-
-  /* right Instagram rail */
-  .suggestions-rail {
-    display:block !important;
-    width:310px !important;
-    min-width:310px !important;
-    position:sticky !important;
-    top:30px !important;
-    padding-top:18px !important;
-  }
-
-  .rail-account { margin-bottom:29px !important; }
-  .suggestions-title { margin-bottom:16px !important; }
-  .suggestion-list { gap:16px !important; }
-
-  .floating-messages {
-    right:34px !important;
-    bottom:30px !important;
-  }
-
-  /* desktop profile remains centered and spacious */
-  .profile-page { width:min(935px,calc(100% - 80px)) !important; max-width:935px !important; margin:0 auto !important; }
-
-  /* other pages get a useful desktop width */
-  .main > .page:not(.feed-page) { max-width:1100px !important; }
-
-  .bottom-nav { display:none !important; }
-  .mobile-header { display:none !important; }
-}
-
-/* Between tablet and desktop: keep all navigation and use one centered feed. */
-@media (min-width:701px) and (max-width:1100px) {
-  .sidebar { width:74px !important; padding-left:9px !important; padding-right:9px !important; }
-  .sidebar .nav { width:54px !important; min-width:54px !important; padding:0 !important; font-size:0 !important; justify-content:center !important; }
-  .sidebar .nav span { width:54px !important; flex:0 0 54px !important; }
-  .brand span { display:none !important; }
-  .main { margin-left:74px !important; width:calc(100% - 74px) !important; }
-  .page.feed-page { max-width:700px !important; margin:0 auto !important; }
-  .home-layout { display:block !important; }
-  .home-feed-column { width:100% !important; }
-  .suggestions-rail { display:none !important; }
-}
-
-/* ============================================================
-   FINAL POLISH — SHARE + SETTINGS
-   Keeps every existing function and only improves presentation.
-============================================================ */
-
-/* ---------------- SHARE SHEET: ALL SCREEN SIZES ---------------- */
-.share-sheet-overlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:1000 !important;
-  display:flex !important;
-  align-items:flex-end !important;
-  justify-content:center !important;
-  padding:24px !important;
-  background:rgba(0,0,0,.70) !important;
-  backdrop-filter:blur(18px) saturate(120%) !important;
-  -webkit-backdrop-filter:blur(18px) saturate(120%) !important;
-}
-
-.share-sheet{
-  width:min(680px,100%) !important;
-  max-height:min(620px,88vh) !important;
-  overflow:hidden !important;
-  padding:18px 22px 22px !important;
-  border-radius:28px !important;
-  color:#f7f7f8 !important;
-  background:linear-gradient(145deg,#1b2027,#101318) !important;
-  border:1px solid rgba(255,255,255,.13) !important;
-  box-shadow:0 30px 100px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08) !important;
-  backdrop-filter:blur(28px) saturate(135%) !important;
-  -webkit-backdrop-filter:blur(28px) saturate(135%) !important;
-}
-
-.share-sheet-handle{
-  width:42px !important;
-  height:4px !important;
-  margin:0 auto 16px !important;
-  border-radius:99px !important;
-  background:#707781 !important;
-}
-
-.share-sheet-head{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  gap:15px !important;
-  margin-bottom:4px !important;
-}
-
-.share-sheet-head h2{
-  color:#fff !important;
-  font-size:22px !important;
-  line-height:1.15 !important;
-}
-
-.share-sheet-head p{
-  margin-top:5px !important;
-  color:#a5abb4 !important;
-  font-size:12px !important;
-}
-
-.share-sheet-head .icon-button{
-  width:38px !important;
-  height:38px !important;
-  min-width:38px !important;
-  border-radius:50% !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  color:#fff !important;
-  background:rgba(255,255,255,.08) !important;
-  border:1px solid rgba(255,255,255,.08) !important;
-}
-
-.share-sheet-head .icon-button svg{width:19px !important;height:19px !important}
-
-.share-search{
-  width:100% !important;
-  height:46px !important;
-  margin:17px 0 16px !important;
-  padding:0 14px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  border-radius:15px !important;
-  background:#252b33 !important;
-  border:1px solid rgba(255,255,255,.08) !important;
-}
-
-.share-search svg{
-  width:19px !important;
-  height:19px !important;
-  flex:0 0 auto !important;
-  color:#aeb4be !important;
-}
-
-.share-search input{
-  width:100% !important;
-  min-width:0 !important;
-  border:0 !important;
-  outline:0 !important;
-  background:transparent !important;
-  color:#fff !important;
-  font-size:14px !important;
-}
-
-.share-search input::placeholder{color:#9097a2 !important}
-
-.share-people{
-  min-height:155px !important;
-  max-height:280px !important;
-  width:100% !important;
-  display:flex !important;
-  align-items:flex-start !important;
-  gap:22px !important;
-  padding:8px 5px 20px !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  scrollbar-width:none !important;
-}
-
-.share-people::-webkit-scrollbar{display:none !important}
-
-.share-person{
-  position:relative !important;
-  flex:0 0 82px !important;
-  width:82px !important;
-  min-width:82px !important;
-  max-width:82px !important;
-  min-height:122px !important;
-  padding:5px 0 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-  gap:7px !important;
-  color:#fff !important;
-  background:transparent !important;
-  border:0 !important;
-  border-radius:16px !important;
-}
-
-.share-person:hover{background:rgba(255,255,255,.06) !important}
-
-.share-person-avatar{
-  position:relative !important;
-  width:70px !important;
-  height:70px !important;
-  padding:3px !important;
-  border-radius:50% !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-.share-person-avatar .avatar{
-  width:64px !important;
-  height:64px !important;
-  min-width:64px !important;
-  min-height:64px !important;
-  border-radius:50% !important;
-}
-
-.share-person.selected .share-person-avatar{
-  background:linear-gradient(135deg,#ffbf00,#ff2d74,#7c3aed) !important;
-}
-
-.share-person b{
-  width:82px !important;
-  color:#fff !important;
-  font-size:11px !important;
-  font-weight:700 !important;
-  text-align:center !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  white-space:nowrap !important;
-}
-
-.share-person>span{
-  width:82px !important;
-  color:#9299a4 !important;
-  font-size:10px !important;
-  text-align:center !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  white-space:nowrap !important;
-}
-
-.share-selected-check{
-  position:absolute !important;
-  right:-1px !important;
-  bottom:0 !important;
-  width:23px !important;
-  height:23px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:50% !important;
-  background:#168cff !important;
-  color:#fff !important;
-  border:2px solid #171b21 !important;
-}
-
-.share-selected-check svg{width:13px !important;height:13px !important}
-
-.share-loading,.share-empty{
-  width:100% !important;
-  min-height:140px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:8px !important;
-  color:#a2a8b1 !important;
-  text-align:center !important;
-}
-
-.share-empty svg{width:32px !important;height:32px !important;color:#89919c !important}
-.share-empty b{color:#fff !important;font-size:13px !important}
-.share-empty span{max-width:260px !important;font-size:11px !important;line-height:1.4 !important}
-
-.share-send-button{
-  width:100% !important;
-  height:48px !important;
-  margin-top:3px !important;
-  border-radius:15px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:8px !important;
-  background:#fff !important;
-  color:#111318 !important;
-  font-size:14px !important;
-  font-weight:800 !important;
-}
-
-.share-send-button svg{width:18px !important;height:18px !important}
-.share-send-button:disabled{opacity:.35 !important}
-
-/* ---------------- SETTINGS: DESKTOP ---------------- */
-.settings-overlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:950 !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:stretch !important;
-  justify-content:center !important;
-  background:#080b0f !important;
-}
-
-.settings-modal.instagram-settings{
-  width:100% !important;
-  height:100% !important;
-  max-height:none !important;
-  border-radius:0 !important;
-  overflow:hidden !important;
-  display:flex !important;
-  flex-direction:column !important;
-  background:#0b0f13 !important;
-  color:#f4f5f7 !important;
-}
-
-.settings-topbar{
-  position:relative !important;
-  height:70px !important;
-  flex:0 0 70px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-bottom:1px solid #242a31 !important;
-  background:rgba(11,15,19,.96) !important;
-}
-
-.settings-topbar h2{
-  color:#fff !important;
-  font-size:18px !important;
-  font-weight:750 !important;
-}
-
-.settings-back{
-  position:absolute !important;
-  left:22px !important;
-  top:15px !important;
-  width:40px !important;
-  height:40px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:50% !important;
-  color:#fff !important;
-  background:#1b2027 !important;
-  border:1px solid #2a3038 !important;
-}
-
-.settings-back:hover{background:#252b33 !important}
-.settings-back svg{width:19px !important;height:19px !important}
-
-.settings-search{
-  width:min(760px,calc(100% - 40px)) !important;
-  height:48px !important;
-  margin:18px auto 16px !important;
-  flex:0 0 48px !important;
-  padding:0 14px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  border-radius:14px !important;
-  background:#1b2026 !important;
-  border:1px solid #282e36 !important;
-}
-
-.settings-search svg{width:18px !important;height:18px !important;color:#9199a5 !important}
-.settings-search input{color:#fff !important;background:transparent !important;border:0 !important}
-.settings-search input::placeholder{color:#7e8792 !important}
-
-.settings-layout{
-  width:min(1120px,calc(100% - 48px)) !important;
-  margin:0 auto !important;
-  flex:1 !important;
-  min-height:0 !important;
-  display:grid !important;
-  grid-template-columns:300px minmax(0,1fr) !important;
-  border:1px solid #252b33 !important;
-  border-radius:18px 18px 0 0 !important;
-  overflow:hidden !important;
-  background:#0d1116 !important;
-}
-
-.settings-sidebar{
-  min-width:0 !important;
-  padding:16px 12px 24px !important;
-  overflow:auto !important;
-  background:#0d1116 !important;
-  border-right:1px solid #252b33 !important;
-}
-
-.settings-sidebar button{
-  width:100% !important;
-  min-height:48px !important;
-  margin-bottom:4px !important;
-  padding:0 12px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:11px !important;
-  color:#d9dde3 !important;
-  background:transparent !important;
-  border-radius:11px !important;
-  text-align:left !important;
-}
-
-.settings-sidebar button:hover{background:#171c22 !important}
-.settings-sidebar button.active{background:#202638 !important;color:#8d83ff !important}
-.settings-sidebar button svg:first-child{width:19px !important;height:19px !important;flex:0 0 19px !important}
-.settings-sidebar button svg:last-child{width:16px !important;height:16px !important;margin-left:auto !important;color:#68717c !important}
-.settings-sidebar button.active svg:last-child{color:#8d83ff !important}
-.settings-logout{margin-top:18px !important;color:#ff6464 !important;border-top:1px solid #252b33 !important;border-radius:0 !important;padding-top:15px !important}
-.settings-logout svg:last-child{display:none !important}
-
-.settings-content{
-  min-width:0 !important;
-  overflow:auto !important;
-  padding:28px 44px 60px !important;
-  background:#0b0f13 !important;
-}
-
-.settings-section-title{
-  padding:0 0 20px !important;
-  margin:0 0 7px !important;
-  border-bottom:1px solid #252b33 !important;
-}
-
-.settings-section-title h1{font-size:25px !important;color:#fff !important}
-.settings-section-title p{margin-top:5px !important;color:#8d96a1 !important;font-size:12px !important}
-.settings-panel{max-width:720px !important}
-
-.settings-profile-row{
-  min-height:92px !important;
-  padding:17px 0 !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:14px !important;
-  border-bottom:1px solid #252b33 !important;
-}
-
-.settings-profile-row>div{min-width:0 !important;display:flex !important;flex-direction:column !important}
-.settings-profile-row b{color:#fff !important}
-.settings-profile-row span{color:#8e96a1 !important;font-size:12px !important;margin-top:4px !important}
-.settings-profile-row .secondary{background:#20262d !important;color:#fff !important;border:1px solid #303741 !important;border-radius:10px !important}
-
-.setting-row{
-  min-height:67px !important;
-  padding:10px 0 !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:13px !important;
-  border-bottom:1px solid #222830 !important;
-  color:#fff !important;
-  background:transparent !important;
-}
-
-.setting-row:hover{background:#10151a !important}
-.setting-row>svg:first-child{width:20px !important;height:20px !important;color:#b3bac4 !important;flex:0 0 20px !important}
-.setting-row>div{min-width:0 !important;flex:1 !important;display:flex !important;flex-direction:column !important}
-.setting-row b{font-size:14px !important;color:#f3f4f6 !important}
-.setting-row span{font-size:11px !important;color:#828b96 !important;margin-top:3px !important}
-.setting-row>svg:last-child{width:17px !important;height:17px !important;color:#65707c !important}
-
-.settings-card-highlight{
-  display:flex !important;
-  gap:12px !important;
-  padding:15px !important;
-  margin:14px 0 !important;
-  border-radius:14px !important;
-  background:#171b2a !important;
-  border:1px solid #292f48 !important;
-}
-.settings-card-highlight>svg{color:#8d83ff !important;flex:0 0 auto !important}
-.settings-card-highlight b{color:#fff !important}
-.settings-card-highlight p{color:#8e97a3 !important}
-
-.privacy-toggle-row{
-  border-color:#252b33 !important;
-  color:#fff !important;
-}
-.privacy-toggle-row b{color:#fff !important}
-.privacy-toggle-row span:not(.toggle-knob){color:#8d96a1 !important}
-
-.setting-detail{
-  margin-top:18px !important;
-  padding:17px !important;
-  border-radius:14px !important;
-  background:#171c22 !important;
-  border:1px solid #2a3038 !important;
-  color:#fff !important;
-}
-.setting-detail p{margin-top:6px !important;color:#8d96a1 !important;font-size:12px !important;line-height:1.5 !important}
-
-/* toggle polish */
-.toggle{
-  flex:0 0 auto !important;
-}
-
-/* ---------------- SHARE + SETTINGS MOBILE ---------------- */
-@media(max-width:700px){
-  .share-sheet-overlay{padding:0 !important;align-items:flex-end !important}
-  .share-sheet{width:100% !important;max-height:84vh !important;border-radius:28px 28px 0 0 !important;padding:14px 16px 18px !important}
-  .share-people{gap:17px !important}
-
-  .settings-overlay{align-items:stretch !important}
-  .settings-modal.instagram-settings{height:100% !important}
-  .settings-topbar{height:58px !important;flex-basis:58px !important}
-  .settings-topbar h2{font-size:17px !important}
-  .settings-back{left:10px !important;top:9px !important}
-  .settings-search{width:calc(100% - 24px) !important;margin:10px auto !important;height:44px !important;flex-basis:44px !important}
-  .settings-layout{width:100% !important;margin:0 !important;border:0 !important;border-radius:0 !important;display:block !important}
-  .settings-sidebar{display:none !important}
-  .settings-content{padding:15px 16px 80px !important}
-  .settings-section-title h1{font-size:21px !important}
-}
-
-/* ============================================================
-   VK SOCIAL — INSTAGRAM STYLE VERTICAL REELS FEED
-   Desktop + mobile scroll up/down
-   ============================================================ */
-.reels-page {
-  max-width: 1180px !important;
-}
-
-.reels-heading {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  padding-top: 18px;
-  padding-bottom: 18px;
-  background: linear-gradient(180deg, #0b0f12 75%, rgba(11,15,18,0));
-}
-
-.reels-stage {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  min-height: calc(100vh - 150px);
-}
-
-.reels-scroll {
-  width: min(430px, 92vw);
-  height: calc(100vh - 165px);
-  min-height: 560px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  overscroll-behavior-y: contain;
-  padding: 0 0 70px;
-}
-
-.reels-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.reel-feed-card {
-  width: 100%;
-  min-height: calc(100vh - 205px);
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 0;
-  opacity: .72;
-  transform: scale(.96);
-  transition: opacity .25s ease, transform .25s ease;
-}
-
-.reel-feed-card.active {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.reel-feed-media {
-  position: relative;
-  width: 100%;
-  height: min(78vh, 720px);
-  min-height: 520px;
-  overflow: hidden;
-  border-radius: 22px;
-  background: #050507;
-  border: 1px solid rgba(255,255,255,.10);
-  box-shadow: 0 28px 80px rgba(0,0,0,.45);
-}
-
-.reel-feed-media > video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #000;
-}
-
-.reel-feed-top {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  pointer-events: none;
-  text-shadow: 0 2px 8px #000;
-}
-
-.reel-feed-top > div {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.reel-feed-top b {
-  font-size: 13px;
-}
-
-.reel-feed-top span {
-  margin-top: 3px;
-  max-width: 300px;
-  color: #ddd;
-  font-size: 10px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.reel-feed-bottom {
-  position: absolute;
-  right: 14px;
-  bottom: 20px;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.reel-feed-bottom button,
-.reels-side-controls button {
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(20,21,25,.78);
-  color: #fff;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  cursor: pointer;
-}
-
-.reel-feed-bottom button:hover,
-.reels-side-controls button:hover:not(:disabled) {
-  background: rgba(255,255,255,.18);
-}
-
-.reel-feed-bottom button:disabled,
-.reels-side-controls button:disabled {
-  opacity: .25;
-  cursor: not-allowed;
-}
-
-.reel-feed-bottom svg,
-.reels-side-controls svg {
-  width: 21px;
-  height: 21px;
-}
-
-.reels-side-controls {
-  position: absolute;
-  left: calc(50% + 245px);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.reels-side-controls span {
-  color: #9297a1;
-  font-size: 11px;
-  min-width: 55px;
-  text-align: center;
-}
-
-@media (max-width: 1000px) and (min-width: 701px) {
-  .reels-side-controls {
-    left: calc(50% + 235px);
-  }
-}
-
-@media (max-width: 700px) {
-  .reels-page {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    padding-bottom: 100px !important;
-  }
-
-  .reels-heading {
-    padding: 10px 8px 14px;
-  }
-
-  .reels-stage {
-    min-height: calc(100vh - 135px);
-  }
-
-  .reels-scroll {
-    width: 100%;
-    height: calc(100vh - 145px);
-    min-height: 520px;
-    padding-bottom: 50px;
-  }
-
-  .reel-feed-card {
-    min-height: calc(100vh - 175px);
-    padding: 5px 0;
-  }
-
-  .reel-feed-media {
-    width: 100%;
-    height: calc(100vh - 190px);
-    min-height: 500px;
-    border-radius: 18px;
-  }
-
-  .reel-feed-top {
-    top: 13px;
-    left: 13px;
-    right: 13px;
-  }
-
-  .reel-feed-bottom {
-    right: 10px;
-    bottom: 14px;
-  }
-
-  .reel-feed-bottom button {
-    width: 38px;
-    height: 38px;
-  }
-
-  .reels-side-controls {
-    right: 8px;
-    left: auto;
-    top: auto;
-    bottom: 120px;
-    transform: none;
-  }
-
-  .reels-side-controls span {
-    display: none;
-  }
-}
-
-/* =========================================================
-   VK SOCIAL — MESSAGES DARK GLASS THEME
-   Keep the same dark theme as the rest of the application.
-   Functional classes are unchanged.
-========================================================= */
-
-.messages-page {
-  color: #f5f7fb !important;
-}
-
-.messages-page .messages-instagram-head h1 {
-  color: #f8fafc !important;
-}
-
-.messages-page .messages-instagram-head p {
-  color: #8f98a7 !important;
-}
-
-.messages-page .messages-requests-button {
-  color: #c8d0dc !important;
-}
-
-/* Notes */
-.messages-page .messages-notes-section {
-  background: linear-gradient(145deg, rgba(28,33,40,.94), rgba(16,20,25,.94)) !important;
-  border: 1px solid rgba(255,255,255,.08) !important;
-  color: #f5f7fb !important;
-  box-shadow: 0 18px 50px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.025) !important;
-}
-
-.messages-page .messages-notes-header b {
-  color: #f5f7fb !important;
-}
-
-.messages-page .messages-notes-header button {
-  color: #9da7b5 !important;
-}
-
-.messages-page .message-note-card {
-  color: #f5f7fb !important;
-}
-
-.messages-page .message-note-card > b {
-  color: #f5f7fb !important;
-}
-
-.messages-page .message-note-card > span {
-  color: #8e98a6 !important;
-}
-
-.messages-page .message-note-bubble {
-  color: #f5f7fb !important;
-  background: #20262f !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.35) !important;
-}
-
-.messages-page .note-add {
-  border-color: #15191f !important;
-}
-
-.messages-page .notes-empty {
-  color: #8e98a6 !important;
-}
-
-/* Main chat shell */
-.messages-page .instagram-chat-layout,
-.messages-page .chat-layout {
-  background: #11161c !important;
-  border: 1px solid rgba(255,255,255,.08) !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.02) !important;
-}
-
-/* Conversation list */
-.messages-page .instagram-conversation-list,
-.messages-page .conversation-list {
-  background: rgba(17,22,28,.96) !important;
-  border-right: 1px solid rgba(255,255,255,.08) !important;
-  color: #f5f7fb !important;
-}
-
-.messages-page .conversation-list-title {
-  background: rgba(17,22,28,.96) !important;
-  border-bottom: 1px solid rgba(255,255,255,.07) !important;
-}
-
-.messages-page .conversation-list-title b {
-  color: #f5f7fb !important;
-}
-
-.messages-page .conversation-list-title span {
-  color: #7f8998 !important;
-}
-
-.messages-page .conversation-scroll {
-  background: #11161c !important;
-}
-
-.messages-page .conversation-item {
-  color: #f5f7fb !important;
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,.045) !important;
-}
-
-.messages-page .conversation-item:hover {
-  background: rgba(255,255,255,.045) !important;
-}
-
-.messages-page .conversation-item.active {
-  background: linear-gradient(90deg, rgba(124,58,237,.24), rgba(124,58,237,.09)) !important;
-}
-
-.messages-page .conversation-copy b {
-  color: #f7f8fa !important;
-}
-
-.messages-page .conversation-copy span {
-  color: #9aa3b0 !important;
-}
-
-.messages-page .conversation-copy small {
-  color: #697382 !important;
-}
-
-/* Empty conversation list */
-.messages-page .chat-empty-list {
-  color: #a4adba !important;
-  background: #11161c !important;
-}
-
-.messages-page .chat-empty-list b {
-  color: #eef2f7 !important;
-}
-
-.messages-page .chat-empty-list span,
-.messages-page .chat-empty-list small {
-  color: #87919f !important;
-}
-
-/* Chat window */
-.messages-page .instagram-chat,
-.messages-page .chat-panel,
-.messages-page .conversation-panel,
-.messages-page .chat-window {
-  background:
-    radial-gradient(circle at 72% 0%, rgba(99,102,241,.10), transparent 34%),
-    #0d1218 !important;
-  color: #f5f7fb !important;
-}
-
-/* Empty chat placeholder */
-.messages-page .instagram-chat-placeholder {
-  background:
-    radial-gradient(circle at 50% 38%, rgba(124,58,237,.09), transparent 30%),
-    #0d1218 !important;
-  color: #f5f7fb !important;
-}
-
-.messages-page .message-placeholder-icon {
-  border: 1px solid rgba(255,255,255,.28) !important;
-  background: rgba(255,255,255,.025) !important;
-}
-
-.messages-page .message-placeholder-icon svg {
-  color: #e7ebf0 !important;
-}
-
-.messages-page .instagram-chat-placeholder h2 {
-  color: #f5f7fb !important;
-}
-
-.messages-page .instagram-chat-placeholder p {
-  color: #9aa3b0 !important;
-}
-
-.messages-page .instagram-chat-placeholder span {
-  color: #687383 !important;
-}
-
-/* Chat header */
-.messages-page .instagram-chat-head {
-  background: rgba(13,18,24,.90) !important;
-  border-bottom: 1px solid rgba(255,255,255,.08) !important;
-  color: #f5f7fb !important;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.messages-page .instagram-chat-head b {
-  color: #f5f7fb !important;
-}
-
-.messages-page .instagram-chat-head span {
-  color: #62d394 !important;
-}
-
-.messages-page .chat-back-button {
-  color: #f5f7fb !important;
-}
-
-/* Messages */
-.messages-page .instagram-chat-messages,
-.messages-page .chat-messages {
-  background: transparent !important;
-  color: #f5f7fb !important;
-}
-
-.messages-page .message-line .bubble {
-  background: #20262f !important;
-  color: #f4f7fa !important;
-  border: 1px solid rgba(255,255,255,.055) !important;
-  box-shadow: 0 4px 14px rgba(0,0,0,.16) !important;
-}
-
-.messages-page .message-line .bubble.mine {
-  background: linear-gradient(135deg, #6d45e8, #8b5cf6) !important;
-  color: #ffffff !important;
-  border: 0 !important;
-  box-shadow: 0 7px 20px rgba(109,69,232,.22) !important;
-}
-
-.messages-page .message-meta small {
-  color: #9ca6b4 !important;
-}
-
-.messages-page .message-line .bubble.mine + .message-meta small,
-.messages-page .message-line.mine .message-meta small {
-  color: #cfc4ff !important;
-}
-
-.messages-page .chat-no-messages {
-  color: #f5f7fb !important;
-}
-
-.messages-page .chat-no-messages h2 {
-  color: #f5f7fb !important;
-}
-
-.messages-page .chat-no-messages p {
-  color: #a0a9b6 !important;
-}
-
-.messages-page .chat-no-messages span {
-  color: #707b89 !important;
-}
-
-/* Composer */
-.messages-page .instagram-chat-input,
-.messages-page .chat-input {
-  background: rgba(13,18,24,.96) !important;
-  border-top: 1px solid rgba(255,255,255,.08) !important;
-}
-
-.messages-page .instagram-chat-input input,
-.messages-page .chat-input input,
-.messages-page .message-composer input,
-.messages-page .message-composer textarea {
-  background: #1a2028 !important;
-  color: #f7f9fb !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.025) !important;
-}
-
-.messages-page .instagram-chat-input input::placeholder,
-.messages-page .chat-input input::placeholder,
-.messages-page .message-composer input::placeholder,
-.messages-page .message-composer textarea::placeholder {
-  color: #77818f !important;
-}
-
-.messages-page .instagram-chat-input input:focus,
-.messages-page .chat-input input:focus,
-.messages-page .message-composer input:focus,
-.messages-page .message-composer textarea:focus {
-  border-color: rgba(139,92,246,.65) !important;
-  box-shadow: 0 0 0 3px rgba(139,92,246,.10) !important;
-  outline: none !important;
-}
-
-.messages-page .chat-attach-button,
-.messages-page .chat-smile-button,
-.messages-page .chat-send-button {
-  color: #dbe1e8 !important;
-  background: transparent !important;
-}
-
-.messages-page .chat-send-button {
-  color: #8b5cf6 !important;
-}
-
-.messages-page .chat-attach-button:hover,
-.messages-page .chat-smile-button:hover,
-.messages-page .chat-send-button:hover {
-  background: rgba(255,255,255,.06) !important;
-}
-
-/* Requests modal also follows the dark theme */
-.messages-page .messages-requests-modal {
-  background: #151a21 !important;
-  color: #f5f7fb !important;
-  border: 1px solid rgba(255,255,255,.09) !important;
-}
-
-.messages-page .messages-requests-head {
-  border-bottom: 1px solid rgba(255,255,255,.08) !important;
-}
-
-.messages-page .messages-requests-head b {
-  color: #f5f7fb !important;
-}
-
-.messages-page .messages-requests-head button {
-  background: #252b34 !important;
-  color: #f5f7fb !important;
-}
-
-.messages-page .request-row {
-  border-bottom: 1px solid rgba(255,255,255,.055) !important;
-}
-
-.messages-page .request-row span {
-  color: #929cab !important;
-}
-
-.messages-page .requests-empty {
-  color: #929cab !important;
-}
-
-.messages-page .requests-empty b {
-  color: #f5f7fb !important;
-}
-
-/* Scrollbars */
-.messages-page *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.messages-page *::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.messages-page *::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.13);
-  border-radius: 20px;
-}
-
-.messages-page *::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,.22);
-}
-
-/* Mobile */
-@media (max-width: 700px) {
-  .messages-page .messages-notes-section {
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-  }
-
-  .messages-page .instagram-chat-layout {
-    background: #11161c !important;
-    border: 1px solid rgba(255,255,255,.08) !important;
-  }
-
-  .messages-page .instagram-conversation-list {
-    background: #11161c !important;
-  }
-
-  .messages-page .instagram-chat-messages {
-    background: #0d1218 !important;
-  }
-}
-
-
-/* ============================================================
-   VK SOCIAL — DARK THEME OVERRIDE
-   Added at the end so the existing UI/functions are preserved.
-   ============================================================ */
-
-:root{
-  color-scheme:dark;
-  --bg:#0b0d10;
-  --card:#14171c;
-  --text:#f5f7fa;
-  --muted:#9aa3af;
-  --line:#292e36;
-  --accent:#8b7cff;
-  --accent2:#a78bfa;
-  --danger:#ff5c70;
-  --soft:#1b1f26;
-}
-
-html,body{
-  background:#0b0d10 !important;
-  color:#f5f7fa !important;
-}
-
-body{
-  color-scheme:dark;
-}
-
-.app,.main,.page{
-  background:#0b0d10 !important;
-  color:#f5f7fa !important;
-}
-
-.sidebar{
-  background:#101318 !important;
-  border-right-color:#292e36 !important;
-}
-
-.brand{
-  border-bottom-color:#292e36 !important;
-}
-
-.brand span,
-.page-heading h1,
-.profile-line h1,
-.profile-stats b,
-.profile-details>b,
-.auth-showcase h1,
-.auth-card h2,
-.modal-head h2,
-.settings-topbar h2,
-.settings-section-title h1,
-.panel-heading,
-.explore-feature h2,
-.empty h2,
-.private-profile-lock h2{
-  color:#f5f7fa !important;
-}
-
-.nav{
-  color:#a8b0bc !important;
-  background:transparent !important;
-}
-
-.nav:hover,.nav.active{
-  background:#1c2028 !important;
-  color:#ffffff !important;
-}
-
-.nav-bottom{
-  border-color:#292e36 !important;
-}
-
-.stories-card,
-.quick-create,
-.post-card,
-.empty,
-.search-box,
-.user-row,
-.explore-feature,
-.chat-layout,
-.notification,
-.edit-card,
-.auth-card,
-.modal,
-.mobile-menu,
-.settings-modal.instagram-settings,
-.settings-card-highlight,
-.setting-row,
-.rail-account,
-.suggestions-rail{
-  background:#14171c !important;
-  color:#f5f7fa !important;
-  border-color:#292e36 !important;
-}
-
-.stories-card{
-  box-shadow:none !important;
-}
-
-.story{
-  color:#a8b0bc !important;
-}
-
-.story-ring .avatar,
-.story-ring img{
-  border-color:#14171c !important;
-}
-
-.story-ring i{
-  border-color:#14171c !important;
-}
-
-.quick-create>button:nth-child(2){
-  background:#1d222a !important;
-  color:#9ca5b2 !important;
-}
-
-.quick-icon{
-  background:#211f3b !important;
-  color:#9b8cff !important;
-}
-
-.post-head,
-.post-body,
-.actions{
-  color:#f5f7fa !important;
-}
-
-.post-user span,
-.post-body .comments-link,
-.comments-link{
-  color:#929aa7 !important;
-}
-
-.icon-button:hover,
-.actions button:hover{
-  background:#20242c !important;
-}
-
-.post-media{
-  background:#090b0e !important;
-}
-
-.comments{
-  border-top-color:#292e36 !important;
-}
-
-.comment span{
-  color:#d4d8de !important;
-}
-
-.comment-input input,
-.search-box input,
-.form-row input,
-.normal-input,
-.chat-input input,
-.edit-card input,
-.edit-card textarea,
-.settings-search input,
-.field-wrap input,
-.composer-text,
-.story-editor textarea{
-  background:#101318 !important;
-  color:#f5f7fa !important;
-  border-color:#343a44 !important;
-}
-
-.comment-input input::placeholder,
-.search-box input::placeholder,
-.form-row input::placeholder,
-.normal-input::placeholder,
-.chat-input input::placeholder,
-.edit-card input::placeholder,
-.edit-card textarea::placeholder,
-.settings-search input::placeholder,
-.field-wrap input::placeholder,
-.composer-text::placeholder,
-.story-editor textarea::placeholder{
-  color:#747d89 !important;
-}
-
-.field-wrap{
-  background:#101318 !important;
-  border-color:#343a44 !important;
-}
-
-.field-wrap>span{
-  color:#9aa3af !important;
-}
-
-.secondary{
-  background:#242932 !important;
-  color:#f3f4f6 !important;
-  border:1px solid #343a44 !important;
-}
-
-.secondary:hover{
-  background:#2d333d !important;
-}
-
-.primary,
-.desktop-create{
-  background:#6d5ce7 !important;
-  color:#ffffff !important;
-}
-
-.primary:hover,
-.desktop-create:hover{
-  background:#7b6aee !important;
-}
-
-.forgot,
-.comment-input button{
-  color:#9b8cff !important;
-}
-
-.error{
-  background:#351a20 !important;
-  color:#ff9aaa !important;
-  border:1px solid #5a2732 !important;
-}
-
-.auth-page{
-  background:
-    radial-gradient(circle at 20% 20%,#1d2040,transparent 34%),
-    radial-gradient(circle at 80% 80%,#171b31,transparent 35%),
-    #090b0f !important;
-}
-
-.auth-showcase p,
-.auth-subtitle{
-  color:#a6aebb !important;
-}
-
-.auth-pills span{
-  background:#151920 !important;
-  color:#d8dce3 !important;
-  border-color:#303641 !important;
-}
-
-.auth-card{
-  box-shadow:0 25px 80px rgba(0,0,0,.45) !important;
-}
-
-.auth-divider{
-  color:#7f8793 !important;
-}
-
-.auth-divider:before,
-.auth-divider:after{
-  background:#303641 !important;
-}
-
-.password-field>button{
-  color:#aab2bd !important;
-}
-
-.file-preview,
-.story-editor-placeholder,
-.reel-editor{
-  background:#101318 !important;
-  color:#aeb5c0 !important;
-  border-color:#343a44 !important;
-}
-
-.selected-file{
-  background:#211f3b !important;
-  color:#a99dff !important;
-}
-
-.story-editor{
-  border-color:#343a44 !important;
-}
-
-.profile-avatar{
-  border-color:#14171c !important;
-  box-shadow:0 0 0 1px #343a44 !important;
-}
-
-.profile-tabs{
-  border-top-color:#292e36 !important;
-  border-bottom-color:#292e36 !important;
-}
-
-.profile-tabs button{
-  color:#8f98a5 !important;
-}
-
-.profile-tabs button.active{
-  color:#ffffff !important;
-  border-bottom-color:#ffffff !important;
-}
-
-.profile-stats small{
-  color:#a0a8b4 !important;
-}
-
-.profile-details>p{
-  color:#a7afba !important;
-}
-
-.private-profile-note{
-  background:#1d1b35 !important;
-  color:#b8afff !important;
-}
-
-.private-profile-note span{
-  color:#a2a9b4 !important;
-}
-
-.private-profile-lock{
-  color:#f5f7fa !important;
-}
-
-.private-lock-icon{
-  border-color:#f5f7fa !important;
-}
-
-.grid-media,.grid-reel{
-  background:#101318 !important;
-}
-
-.search-box{
-  background:#14171c !important;
-}
-
-.search-box svg{
-  color:#9ba3af !important;
-}
-
-.user-row{
-  background:#14171c !important;
-}
-
-.user-row span{
-  color:#929aa7 !important;
-}
-
-.explore-feature svg{
-  color:#8b7cff !important;
-}
-
-.reel-card{
-  background:#090b0e !important;
-}
-
-.reel-card p{
-  color:#aeb5c0 !important;
-}
-
-.conversation-list{
-  border-right-color:#292e36 !important;
-}
-
-.conversation-list button{
-  color:#f5f7fa !important;
-  border-bottom-color:#292e36 !important;
-}
-
-.chat-input{
-  border-top-color:#292e36 !important;
-}
-
-.bubble{
-  background:#252a32 !important;
-  color:#f2f4f7 !important;
-}
-
-.bubble.mine{
-  background:#6252d9 !important;
-  color:#ffffff !important;
-}
-
-.notification{
-  color:#f5f7fa !important;
-}
-
-.notification small{
-  color:#8e97a4 !important;
-}
-
-.mobile-menu{
-  box-shadow:0 20px 60px rgba(0,0,0,.65) !important;
-}
-
-.menu-user{
-  border-bottom-color:#292e36 !important;
-}
-
-.menu-user span{
-  color:#929aa7 !important;
-}
-
-.menu-user button{
-  background:#252a32 !important;
-  color:#f5f7fa !important;
-}
-
-.mobile-menu>button{
-  color:#f0f2f5 !important;
-}
-
-.mobile-menu>button:hover{
-  background:#20242c !important;
-}
-
-.mobile-header{
-  background:rgba(14,17,22,.94) !important;
-  border-bottom-color:#292e36 !important;
-  color:#f5f7fa !important;
-}
-
-.mobile-brand{
-  color:#f5f7fa !important;
-}
-
-.mobile-header button{
-  color:#f0f2f5 !important;
-}
-
-.bottom-nav{
-  background:rgba(14,17,22,.97) !important;
-  border-top-color:#292e36 !important;
-  box-shadow:0 -10px 35px rgba(0,0,0,.35) !important;
-}
-
-.nav-mobile{
-  background:transparent !important;
-  color:#929aa7 !important;
-}
-
-.nav-mobile.active{
-  color:#ffffff !important;
-}
-
-.mobile-profile{
-  background:transparent !important;
-  color:#929aa7 !important;
-}
-
-.mobile-profile.active{
-  color:#ffffff !important;
-}
-
-.mobile-profile.active .avatar{
-  border-color:#ffffff !important;
-}
-
-.create-bottom{
-  background:linear-gradient(135deg,#312e81,#6d5ce7) !important;
-}
-
-.settings-overlay{
-  background:#090b0f !important;
-}
-
-.settings-modal.instagram-settings{
-  background:#0e1116 !important;
-}
-
-.settings-topbar{
-  background:#0e1116 !important;
-  border-bottom-color:#292e36 !important;
-}
-
-.settings-back:hover{
-  background:#20242c !important;
-}
-
-.settings-search{
-  background:#1b1f26 !important;
-}
-
-.settings-layout{
-  background:#0e1116 !important;
-}
-
-.settings-sidebar{
-  border-right-color:#292e36 !important;
-}
-
-.settings-sidebar button{
-  color:#dce0e6 !important;
-}
-
-.settings-sidebar button.active{
-  background:#211f3b !important;
-  color:#a99dff !important;
-}
-
-.settings-sidebar button svg:last-child{
-  color:#747d89 !important;
-}
-
-.settings-content{
-  color:#f5f7fa !important;
-}
-
-.settings-section-title{
-  border-bottom-color:#292e36 !important;
-}
-
-.settings-section-title p{
-  color:#929aa7 !important;
-}
-
-.settings-profile-row,
-.setting-row,
-.setting-switch{
-  border-bottom-color:#292e36 !important;
-}
-
-.setting-row{
-  background:#0e1116 !important;
-}
-
-.setting-row:hover{
-  background:#171b21 !important;
-}
-
-.setting-row-icon{
-  background:#20242c !important;
-  color:#dce1e8 !important;
-}
-
-.setting-row-text small,
-.setting-detail p,
-.setting-switch small{
-  color:#929aa7 !important;
-}
-
-.settings-card-highlight{
-  background:#1d1b35 !important;
-}
-
-.setting-detail{
-  background:#191d24 !important;
-  color:#c3c9d2 !important;
-}
-
-.privacy-toggle-row{
-  border-bottom-color:#292e36 !important;
-}
-
-.setting-switch input,
-.switch-line input{
-  accent-color:#8b7cff !important;
-}
-
-/* Generic remaining light surfaces */
-[style*="background:#fff"],
-[style*="background: #fff"],
-[style*="background:#ffffff"],
-[style*="background: #ffffff"]{
-  background:#14171c !important;
-}
-
-input,
-textarea,
-select{
-  color-scheme:dark;
-}
-
-input,
-textarea,
-select{
-  color:#f5f7fa;
-}
-
-::selection{
-  background:#6d5ce7;
-  color:#ffffff;
-}
-
-/* Force the mobile navigation to stay dark even when earlier rules exist. */
-@media(max-width:700px){
-  .mobile-header{
-    background:rgba(14,17,22,.96) !important;
-    border-bottom-color:#292e36 !important;
-  }
-
-  .bottom-nav{
-    background:#0e1116 !important;
-    border-top:1px solid #292e36 !important;
-  }
-
-  .nav-mobile,
-  .mobile-profile{
-    background:transparent !important;
-    color:#929aa7 !important;
-  }
-
-  .nav-mobile.active,
-  .mobile-profile.active{
-    color:#ffffff !important;
-  }
-
-  .page,
-  .main{
-    background:#0b0d10 !important;
-  }
-
-  .auth-page{
-    background:#090b0f !important;
-  }
-}
-
-@media(max-width:390px){
-  .bottom-nav{
-    background:#0e1116 !important;
-  }
-}
-
-/* ============================================================
-   VK SOCIAL — INSTAGRAM DARK MESSAGES LAYOUT
-   Matches the supplied Instagram desktop reference:
-   compact left message rail + large dark conversation area.
-   ============================================================ */
-
-.messages-page{
-  width:100% !important;
-  max-width:none !important;
-  margin:0 !important;
-  min-height:100vh !important;
-  padding:28px 0 40px 34px !important;
-  background:#080a0d !important;
-}
-
-.messages-instagram-head{
-  width:430px !important;
-  height:52px !important;
-  margin:0 !important;
-  padding:0 2px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-}
-
-.messages-account-title{
-  display:flex !important;
-  align-items:center !important;
-  gap:5px !important;
-  min-width:0 !important;
-}
-
-.messages-account-title b{
-  color:#f5f7fb !important;
-  font-size:20px !important;
-  font-weight:800 !important;
-  letter-spacing:-.35px !important;
-}
-
-.messages-account-chevron{
-  width:17px !important;
-  height:17px !important;
-  color:#a8afb9 !important;
-}
-
-.messages-compose-button{
-  width:38px !important;
-  height:38px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:10px !important;
-  background:transparent !important;
-  color:#f5f7fb !important;
-}
-
-.messages-compose-button svg{
-  width:23px !important;
-  height:23px !important;
-}
-
-.messages-compose-button:hover{
-  background:#1c2027 !important;
-}
-
-.messages-search-bar{
-  width:430px !important;
-  height:42px !important;
-  margin:7px 0 14px !important;
-  border-radius:12px !important;
-  background:#20242a !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  padding:0 13px !important;
-  color:#8e96a1 !important;
-}
-
-.messages-search-bar > svg{
-  width:17px !important;
-  height:17px !important;
-  flex:0 0 auto !important;
-}
-
-.messages-search-bar input{
-  width:100% !important;
-  min-width:0 !important;
-  border:0 !important;
-  outline:0 !important;
-  background:transparent !important;
-  color:#f5f7fb !important;
-  font-size:14px !important;
-}
-
-.messages-search-bar input::placeholder{
-  color:#9299a4 !important;
-}
-
-.messages-search-bar button{
-  width:25px !important;
-  height:25px !important;
-  flex:0 0 auto !important;
-  border-radius:50% !important;
-  background:#383d45 !important;
-  color:#cbd0d7 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-}
-
-.messages-search-bar button svg{
-  width:14px !important;
-}
-
-.messages-page .messages-notes-section{
-  width:430px !important;
-  min-height:122px !important;
-  margin:0 0 8px !important;
-  padding:8px 0 10px !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-}
-
-.messages-page .messages-notes-header{
-  display:none !important;
-}
-
-.messages-page .messages-notes-scroll{
-  gap:12px !important;
-  padding:2px 0 7px !important;
-}
-
-.messages-page .message-note-card{
-  min-width:76px !important;
-  width:76px !important;
-}
-
-.messages-page .message-note-avatar-wrap,
-.messages-page .message-note-avatar{
-  width:66px !important;
-  height:66px !important;
-}
-
-.messages-page .message-note-card > b{
-  margin-top:6px !important;
-  font-size:11px !important;
-  color:#f0f2f5 !important;
-}
-
-.messages-page .message-note-card > span{
-  color:#858d99 !important;
-  font-size:9px !important;
-}
-
-.messages-page .message-note-bubble{
-  top:-5px !important;
-  max-width:105px !important;
-  background:#242930 !important;
-  color:#f1f3f5 !important;
-}
-
-.messages-page .instagram-chat-layout{
-  width:calc(100vw - 58px - 34px) !important;
-  min-height:calc(100vh - 235px) !important;
-  height:calc(100vh - 235px) !important;
-  margin:0 !important;
-  display:grid !important;
-  grid-template-columns:420px minmax(0,1fr) !important;
-  border-radius:0 !important;
-  border:1px solid #262b32 !important;
-  overflow:hidden !important;
-  background:#0c1014 !important;
-  box-shadow:none !important;
-}
-
-.messages-page .instagram-conversation-list{
-  min-width:420px !important;
-  width:420px !important;
-  background:#0d1115 !important;
-  border-right:1px solid #282d34 !important;
-}
-
-.messages-page .conversation-list-title{
-  height:55px !important;
-  padding:0 15px !important;
-  background:#0d1115 !important;
-  border-bottom:1px solid #242930 !important;
-}
-
-.messages-page .conversation-list-title > b{
-  font-size:16px !important;
-  color:#f5f7fa !important;
-}
-
-.messages-page .conversation-list-title .messages-requests-button{
-  font-size:12px !important;
-  color:#8d96a3 !important;
-}
-
-.messages-page .conversation-list-title .messages-requests-button:hover{
-  color:#fff !important;
-}
-
-.messages-page .conversation-item{
-  min-height:82px !important;
-  padding:11px 14px !important;
-  border-bottom:0 !important;
-  background:transparent !important;
-}
-
-.messages-page .conversation-item:hover{
-  background:#151a20 !important;
-}
-
-.messages-page .conversation-item.active{
-  background:#1b2027 !important;
-}
-
-.messages-page .conversation-item .avatar{
-  width:58px !important;
-  height:58px !important;
-}
-
-.messages-page .conversation-copy b{
-  font-size:14px !important;
-  color:#f4f6f8 !important;
-}
-
-.messages-page .conversation-copy span{
-  font-size:12px !important;
-  color:#9aa2ad !important;
-  margin-top:4px !important;
-}
-
-.messages-page .conversation-copy small{
-  font-size:10px !important;
-  color:#707986 !important;
-  margin-top:3px !important;
-}
-
-.messages-page .instagram-chat{
-  min-width:0 !important;
-  width:100% !important;
-  background:#0b0f13 !important;
-}
-
-.messages-page .instagram-chat-placeholder{
-  min-height:100% !important;
-  height:100% !important;
-  background:#0b0f13 !important;
-}
-
-.messages-page .message-placeholder-icon{
-  width:92px !important;
-  height:92px !important;
-  border:2px solid #e5e8ec !important;
-  background:transparent !important;
-  margin-bottom:20px !important;
-}
-
-.messages-page .message-placeholder-icon svg{
-  width:42px !important;
-  height:42px !important;
-  color:#eef1f4 !important;
-  stroke-width:1.6 !important;
-}
-
-.messages-page .instagram-chat-placeholder h2{
-  font-size:21px !important;
-  font-weight:600 !important;
-  color:#f3f5f7 !important;
-}
-
-.messages-page .instagram-chat-placeholder p{
-  font-size:13px !important;
-  color:#929aa5 !important;
-  margin-bottom:5px !important;
-}
-
-.messages-page .instagram-chat-placeholder span{
-  color:#6f7884 !important;
-  font-size:11px !important;
-}
-
-.messages-page .instagram-chat-head{
-  height:66px !important;
-  background:#0d1115 !important;
-  border-bottom:1px solid #282d34 !important;
-}
-
-.messages-page .instagram-chat-messages{
-  min-height:0 !important;
-  background:#0b0f13 !important;
-}
-
-.messages-page .instagram-chat-input{
-  background:#0d1115 !important;
-  border-top:1px solid #282d34 !important;
-}
-
-.messages-page .instagram-chat-input input{
-  background:#1b2026 !important;
-  border:1px solid #313741 !important;
-  color:#f5f7fa !important;
-}
-
-@media(max-width:1050px) and (min-width:701px){
-  .messages-page{
-    padding-left:22px !important;
-  }
-  .messages-page .instagram-chat-layout{
-    width:calc(100vw - 78px - 22px) !important;
-    grid-template-columns:340px minmax(0,1fr) !important;
-  }
-  .messages-page .instagram-conversation-list{
-    min-width:340px !important;
-    width:340px !important;
-  }
-}
-
-@media(max-width:700px){
-  .messages-page{
-    width:100% !important;
-    min-height:calc(100vh - 57px) !important;
-    padding:9px 0 82px !important;
-  }
-
-  .messages-instagram-head{
-    width:100% !important;
-    height:48px !important;
-    padding:0 12px !important;
-  }
-
-  .messages-account-title b{
-    font-size:18px !important;
-  }
-
-  .messages-search-bar{
-    width:calc(100% - 20px) !important;
-    margin:5px 10px 7px !important;
-  }
-
-  .messages-page .messages-notes-section{
-    width:100% !important;
-    padding-left:10px !important;
-    padding-right:10px !important;
-    min-height:112px !important;
-  }
-
-  .messages-page .instagram-chat-layout{
-    width:calc(100% - 20px) !important;
-    margin:0 10px !important;
-    min-height:calc(100vh - 250px) !important;
-    height:calc(100vh - 250px) !important;
-    grid-template-columns:1fr !important;
-    border-radius:14px !important;
-  }
-
-  .messages-page .instagram-conversation-list{
-    min-width:100% !important;
-    width:100% !important;
-  }
-
-  .messages-page .conversation-list-title{
-    padding:0 12px !important;
-  }
-
-  .messages-page .instagram-chat-layout.has-active .instagram-conversation-list{
-    display:none !important;
-  }
-
-  .messages-page .instagram-chat-layout.has-active .instagram-chat{
-    display:flex !important;
-  }
-
-  .messages-page .instagram-chat-placeholder{
-    min-height:calc(100vh - 250px) !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO BRANDING — USE EXISTING frontend/image.png EVERYWHERE
-   ============================================================ */
-.brand-logo-img,
-.auth-logo-img,
-.mobile-brand-logo {
-  display: block;
-  object-fit: contain;
-}
-
-.brand-logo-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  object-fit: cover;
-}
-
-.auth-showcase-logo {
-  overflow: hidden;
-}
-
-.auth-showcase-logo .auth-logo-img {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-}
-
-.auth-logo {
-  overflow: hidden;
-}
-
-.auth-logo .auth-logo-img {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-}
-
-.mobile-brand {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 9px;
-}
-
-.mobile-brand-logo {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.mobile-brand span {
-  font-weight: 850;
-}
-
-/* Desktop compact Instagram-style rail */
-@media (min-width: 701px) {
-  .brand-logo-img {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-  }
-}
-
-/* Keep the ReelsGo logo visible on mobile */
-@media (max-width: 700px) {
-  .mobile-brand-logo {
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 8px !important;
-  }
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import reelsGoLogo from "../image.png";
+import {
+  Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
+  Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
+  Send, Grid3X3, Users, Lock, Shield, Trash2, Archive, Edit3, Check, UserPlus,
+  UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
+  SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
+  Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette
+} from "lucide-react";
+
+const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
+const SERVER = API.replace(/\/api\/?$/, "");
+
+
+// Built-in emoji picker: no external package required, so it works on desktop,
+// Android, iPhone/iPad and small-screen browsers without extra dependencies.
+const REELSGO_EMOJI_CATEGORIES = {
+  Smileys: [
+    "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑"
+  ],
+  People: [
+    "👋","🤚","🖐️","✋","🖖","👌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🙏","💪","🫶","❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","✨","💫","⭐","🌟","🔥","💯","🎉","🎊","🥳"
+  ],
+  Animals: [
+    "🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈","🙉","🙊","🐒","🐔","🐧","🐦","🐤","🐣","🐥","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🪲","🦋","🐌","🐞","🐜","🕷️","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦀","🐠","🐟","🐡","🐬","🐳","🦈","🐊","🐘","🦏","🦛","🐪","🐫","🦒","🦘","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌"
+  ],
+  Food: [
+    "🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🌽","🥕","🧄","🧅","🥔","🍠","🥐","🥯","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🥪","🥙","🌮","🌯","🥗","🍿","🍣","🍤","🍜","🍝","🍚","🍙","🍱","🥟","🍦","🍧","🍨","🍩","🍪","🎂","🍰","🧁","🍫","🍭","🍬","🍮","☕","🧋","🥤","🍹","🍺","🍻","🍷","🥂"
+  ],
+  Travel: [
+    "🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🛵","🏍️","🚲","✈️","🛫","🛬","🚁","🚀","🛸","🚢","⛵","🚤","🗺️","🗽","🗼","🏰","🏯","🏝️","🏖️","🏜️","🌋","⛰️","🏔️","🌅","🌄","🌇","🌃","🌌","🌠","🌍","🌎","🌏","🏕️","⛺","🎡","🎢","🎠","🎭","🎨","🎬","🎤","🎧","🎮","🎲","⚽","🏀","🏈","⚾","🎾","🏆"
+  ],
+  Objects: [
+    "📱","💻","🖥️","⌨️","🖱️","🖨️","📷","📸","📹","🎥","☎️","📞","📺","📻","⏰","⌚","💡","🔦","🕯️","📚","📖","✏️","📝","📌","📎","🔒","🔓","🔑","🔨","🛠️","⚙️","🔧","🔗","💎","💰","💵","💳","🎁","🎈","🎀","🧸","🪄","🎯","🚨","⚡","☀️","🌙","☁️","☔","❄️","☃️","🌈","💥","💦","💨"
+  ],
+  Symbols: [
+    "❤️","🩷","🧡","💛","💚","💙","🩵","💜","🤎","🖤","🩶","🤍","💔","❤️‍🔥","❤️‍🩹","💋","💯","💢","💥","💫","💦","💨","🕳️","💣","💬","👁️‍🗨️","💤","✔️","☑️","❌","❗","❓","‼️","⁉️","⭕","🚫","⚠️","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔶","🔷","🔸","🔹","⭐","🌟","✨","⚡","🔥","🎉","🎊","💖","💘","💝"
+  ],
+  Flags: [
+    "🏳️","🏴","🏁","🚩","🏳️‍🌈","🏳️‍⚧️","🇮🇳","🇺🇸","🇬🇧","🇨🇦","🇦🇺","🇯🇵","🇰🇷","🇸🇬","🇦🇪","🇩🇪","🇫🇷","🇮🇹","🇪🇸","🇧🇷","🇲🇽","🇿🇦","🇳🇿","🇵🇭","🇮🇩","🇹🇭","🇻🇳","🇸🇦","🇹🇷","🇨🇭","🇳🇱","🇸🇪","🇳🇴","🇩🇰","🇫🇮","🇮🇪","🇵🇹","🇬🇷","🇷🇺","🇺🇦","🇵🇱","🇦🇹","🇧🇪","🇦🇷","🇨🇱","🇨🇴","🇵🇪","🇪🇬","🇳🇬","🇰🇪"
+  ]
+};
+
+const REELSGO_EMOJI_TABS = Object.keys(REELSGO_EMOJI_CATEGORIES);
+
+const getToken = () => localStorage.getItem("vk_token");
+const getUser = () => {
+  try { return JSON.parse(localStorage.getItem("vk_user") || "null"); } catch { return null; }
+};
+
+function authHeaders(extra = {}) {
+  return { ...extra, ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}) };
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(`${API}${path}`, {
+    ...options,
+    headers: authHeaders(options.headers || {})
+  });
+  const type = response.headers.get("content-type") || "";
+  const raw = await response.text();
+  let data;
+  try {
+    data = type.includes("application/json") ? JSON.parse(raw) : { message: raw };
+  } catch {
+    data = { message: raw || `HTTP ${response.status}` };
+  }
+  if (!response.ok) throw new Error(data?.message || `Request failed (${response.status})`);
+  return data;
+}
+
+function avatarUrl(user) {
+  return user?._id ? `${SERVER}/api/users/${user._id}/avatar?v=${user.updatedAt || ""}` : "";
 }
 
 
 /* =========================================================
-   REELSGO UNIVERSAL RESPONSIVE / MOBILE / TABLET / DESKTOP
-   Overrides the original light theme and prevents viewport
-   overflow on iPhone, Android, tablets, laptops and PCs.
-   ========================================================= */
-
-:root{
-  --bg:#000;
-  --card:#0b0d10;
-  --card2:#111418;
-  --surface:#171a1f;
-  --surface2:#20242b;
-  --text:#f5f5f5;
-  --muted:#9b9da3;
-  --line:#262a31;
-  --accent:#4f46e5;
-  --accent2:#7c3aed;
-  --danger:#ff4d67;
-  --soft:#1a1d22;
-}
-
-html{
-  width:100%;
-  min-height:100%;
-  background:#000;
-  overflow-x:hidden;
-  -webkit-text-size-adjust:100%;
-  text-size-adjust:100%;
-  scroll-behavior:smooth;
-}
-
-body{
-  width:100%;
-  min-width:0;
-  min-height:100dvh;
-  margin:0;
-  padding:0;
-  overflow-x:hidden;
-  background:#000 !important;
-  color:#f5f5f5 !important;
-  overscroll-behavior-x:none;
-  -webkit-font-smoothing:antialiased;
-}
-
-#root{
-  width:100%;
-  min-height:100dvh;
-  overflow-x:hidden;
-  background:#000;
-}
-
-*,
-*::before,
-*::after{
-  box-sizing:border-box;
-}
-
-button,
-input,
-textarea,
-select{
-  min-width:0;
-  max-width:100%;
-}
-
-img,
-video,
-canvas,
-svg{
-  max-width:100%;
-}
-
-button{
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
-
-input,
-textarea{
-  font-size:16px;
-}
-
-.app{
-  width:100%;
-  min-height:100dvh;
-  background:#000;
-}
-
-/* ---------- desktop ---------- */
-
-.sidebar{
-  background:#000 !important;
-  border-right:1px solid #24262b !important;
-}
-
-.brand{
-  border-bottom-color:#24262b !important;
-  color:#fff !important;
-  background:#000 !important;
-}
-
-.brand-logo-img{
-  width:40px;
-  height:40px;
-  object-fit:contain;
-  flex:0 0 40px;
-  border-radius:10px;
-}
-
-.brand span{
-  color:#fff !important;
-}
-
-.nav{
-  color:#b8bbc2 !important;
-}
-
-.nav:hover,
-.nav.active{
-  background:#17191d !important;
-  color:#fff !important;
-}
-
-.main{
-  width:calc(100% - 250px);
-  min-height:100dvh;
-  background:#000;
-  overflow-x:hidden;
-}
-
-.page{
-  width:min(100%,960px);
-  min-width:0;
-  margin:0 auto;
-}
-
-/* ---------- all common surfaces dark ---------- */
-
-.stories-card,
-.quick-create,
-.post-card,
-.empty,
-.edit-card,
-.user-row,
-.explore-feature,
-.notification,
-.chat-layout,
-.modal,
-.mobile-menu,
-.auth-card,
-.settings-modal.instagram-settings,
-.settings-card-highlight,
-.story-editor,
-.reel-editor{
-  background:#0b0d10 !important;
-  color:#f5f5f5 !important;
-  border-color:#262a31 !important;
-}
-
-.stories-card{
-  scrollbar-width:none;
-}
-
-.quick-create>button:nth-child(2),
-.search-box,
-.field-wrap,
-.normal-input,
-.form-row input,
-.comment-input input,
-.chat-input input,
-.settings-search{
-  background:#171a1f !important;
-  color:#fff !important;
-  border-color:#2a2e36 !important;
-}
-
-.quick-create>button:nth-child(2)::placeholder,
-input::placeholder,
-textarea::placeholder{
-  color:#777b84 !important;
-}
-
-.post-user span,
-.post-body,
-.profile-details>p,
-.profile-stats small,
-.comments-link,
-.comment span,
-.empty,
-.explore-feature,
-.notification small,
-.rail-account-info span,
-.suggestion-copy span,
-.settings-section-title p,
-.setting-row-text small,
-.setting-detail,
-.story-viewers-empty,
-.auth-subtitle{
-  color:#9b9da3 !important;
-}
-
-.post-card,
-.quick-create,
-.stories-card,
-.user-row,
-.notification{
-  box-shadow:none !important;
-}
-
-.icon-button:hover,
-.actions button:hover,
-.mobile-menu>button:hover{
-  background:#1a1d22 !important;
-}
-
-.actions button{
-  color:#e8e8ea;
-}
-
-.post-media{
-  background:#050505 !important;
-}
-
-.comment{
-  color:#eee;
-}
-
-.comments{
-  border-top-color:#262a31 !important;
-}
-
-.comment-input{
-  border-color:#262a31;
-}
-
-.empty h2,
-.explore-feature h2,
-.page-heading h1,
-.profile-line h1,
-.auth-card h2,
-.modal-head h2,
-.settings-section-title h1,
-.panel-heading{
-  color:#fff !important;
-}
-
-/* ---------- authentication ---------- */
-
-.auth-page{
-  width:100%;
-  min-height:100dvh;
-  min-height:100svh;
-  background:#000 !important;
-  padding:
-    max(24px,env(safe-area-inset-top))
-    max(18px,env(safe-area-inset-right))
-    max(24px,env(safe-area-inset-bottom))
-    max(18px,env(safe-area-inset-left));
-}
-
-.auth-showcase p{
-  color:#a5a7ad !important;
-}
-
-.auth-pills span{
-  background:#111418 !important;
-  border-color:#292d34 !important;
-  color:#ddd !important;
-}
-
-.auth-card{
-  box-shadow:0 20px 70px rgba(0,0,0,.45) !important;
-}
-
-.field-wrap{
-  color:#fff;
-}
-
-.field-wrap input,
-.settings-search input,
-.search-box input,
-.normal-input,
-.form-row input,
-.comment-input input,
-.chat-input input,
-.composer-text,
-.story-editor textarea,
-.edit-card input,
-.edit-card textarea{
-  color:#fff !important;
-  background:transparent !important;
-}
-
-.error{
-  background:#32161b !important;
-  color:#ff7182 !important;
-}
-
-/* ---------- modals / sheets ---------- */
-
-.overlay{
-  background:rgba(0,0,0,.78) !important;
-  padding:
-    max(12px,env(safe-area-inset-top))
-    max(12px,env(safe-area-inset-right))
-    max(12px,env(safe-area-inset-bottom))
-    max(12px,env(safe-area-inset-left));
-}
-
-.modal{
-  max-width:600px;
-  max-height:calc(100dvh - 24px);
-  background:#0b0d10 !important;
-}
-
-.modal-head{
-  border-bottom-color:#262a31 !important;
-}
-
-.modal-head button,
-.secondary{
-  background:#1b1e24 !important;
-  color:#fff !important;
-}
-
-.file-preview,
-.story-editor-placeholder,
-.selected-file{
-  background:#171a1f !important;
-  color:#ddd !important;
-}
-
-.reel-editor{
-  border-color:#343942 !important;
-}
-
-.story-editor,
-.reel-editor{
-  color:#fff;
-}
-
-/* ---------- profile ---------- */
-
-.profile-avatar{
-  border-color:#000 !important;
-  box-shadow:0 0 0 1px #343840 !important;
-}
-
-.avatar-camera{
-  border-color:#000 !important;
-}
-
-.profile-tabs{
-  border-color:#262a31 !important;
-}
-
-.profile-tabs button{
-  color:#999da6 !important;
-}
-
-.profile-tabs button.active{
-  color:#fff !important;
-  border-bottom-color:#fff !important;
-}
-
-.edit-card label{
-  color:#ddd;
-}
-
-.edit-card input,
-.edit-card textarea{
-  border-color:#2a2e36 !important;
-  background:#171a1f !important;
-}
-
-.grid-media,
-.grid-reel{
-  background:#111 !important;
-}
-
-/* ---------- search / explore ---------- */
-
-.search-box{
-  color:#aaa;
-}
-
-.user-row{
-  background:#0b0d10 !important;
-}
-
-.user-row span{
-  color:#9b9da3 !important;
-}
-
-.explore-feature{
-  background:#0b0d10 !important;
-}
-
-.reels-grid{
-  width:100%;
-}
-
-.reel-card{
-  background:#0b0d10 !important;
-}
-
-/* ---------- messages ---------- */
-
-.chat-layout{
-  background:#0b0d10 !important;
-}
-
-.conversation-list{
-  border-right-color:#262a31 !important;
-  background:#0b0d10 !important;
-}
-
-.conversation-list button{
-  color:#fff;
-  border-bottom-color:#20242a !important;
-}
-
-.bubble{
-  background:#20242a !important;
-  color:#fff !important;
-}
-
-.bubble.mine{
-  background:#4f46e5 !important;
-  color:#fff !important;
-}
-
-.chat-input{
-  border-top-color:#262a31 !important;
-  background:#0b0d10;
-}
-
-/* ---------- mobile header ---------- */
-
-.mobile-header{
-  background:rgba(0,0,0,.88) !important;
-  border-bottom-color:#24262b !important;
-  padding-left:max(10px,env(safe-area-inset-left));
-  padding-right:max(10px,env(safe-area-inset-right));
-}
-
-.mobile-brand{
-  color:#fff !important;
-  display:flex !important;
-  align-items:center;
-  gap:8px;
-  min-width:0;
-}
-
-.mobile-brand-logo{
-  width:30px;
-  height:30px;
-  object-fit:contain;
-  border-radius:8px;
-  flex:0 0 30px;
-}
-
-.mobile-brand span{
-  white-space:nowrap;
-}
-
-.mobile-header-actions button{
-  color:#fff !important;
-}
-
-/* ---------- bottom navigation ---------- */
-
-.bottom-nav{
-  background:rgba(0,0,0,.94) !important;
-  border-top-color:#24262b !important;
-  padding-left:max(0px,env(safe-area-inset-left));
-  padding-right:max(0px,env(safe-area-inset-right));
-  padding-bottom:env(safe-area-inset-bottom);
-  height:calc(68px + env(safe-area-inset-bottom)) !important;
-}
-
-.nav-mobile,
-.mobile-profile{
-  color:#9699a1 !important;
-}
-
-.nav-mobile.active,
-.mobile-profile.active{
-  color:#fff !important;
-}
-
-.mobile-profile.active .avatar{
-  border-color:#fff !important;
-}
-
-/* ---------- reels vertical feed ---------- */
-
-.reels-page,
-.reels-feed{
-  width:100%;
-  min-width:0;
-}
-
-.reels-feed{
-  height:calc(100dvh - 20px);
-  overflow-y:auto;
-  overflow-x:hidden;
-  scroll-snap-type:y mandatory;
-  overscroll-behavior-y:contain;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-
-.reels-feed::-webkit-scrollbar{
-  display:none;
-}
-
-.reels-feed > *{
-  scroll-snap-align:start;
-}
-
-.reel-viewer,
-.reel-item{
-  min-height:min(820px,calc(100dvh - 30px));
-  max-height:calc(100dvh - 30px);
-}
-
-/* ---------- touch / safe areas ---------- */
-
-@supports (height:100svh){
-  .auth-page{
-    min-height:100svh;
-  }
-
-  .reels-feed{
-    height:calc(100svh - 10px);
-  }
-}
-
-@supports (height:100dvh){
-  .auth-page{
-    min-height:100dvh;
-  }
-
-  .reels-feed{
-    height:calc(100dvh - 10px);
-  }
-}
-
-/* ---------- tablets ---------- */
-
-@media (min-width:701px) and (max-width:1199px){
-  .sidebar{
-    width:88px !important;
-    padding-left:10px;
-    padding-right:10px;
-  }
-
-  .brand{
-    justify-content:center;
-    padding-left:0;
-    padding-right:0;
-  }
-
-  .brand span,
-  .nav:not(.active){
-    font-size:0;
-  }
-
-  .nav{
-    justify-content:center;
-    padding-left:10px;
-    padding-right:10px;
-  }
-
-  .main{
-    margin-left:88px !important;
-    width:calc(100% - 88px);
-  }
-
-  .page{
-    width:min(100%,900px);
-    padding-left:18px;
-    padding-right:18px;
-  }
-
-  .suggestions-rail{
-    display:none;
-  }
-
-  .home-layout{
-    display:block !important;
-  }
-
-  .chat-layout{
-    grid-template-columns:300px minmax(0,1fr);
-  }
-}
-
-/* ---------- phones ---------- */
-
-@media (max-width:700px){
-  html,
-  body,
-  #root{
-    width:100%;
-    min-width:0;
-    max-width:100%;
-  }
-
-  body{
-    padding:0 !important;
-    overflow-x:hidden !important;
-  }
-
-  .app{
-    width:100%;
-    min-height:100dvh;
-  }
-
-  .sidebar{
-    display:none !important;
-  }
-
-  .main{
-    width:100% !important;
-    margin-left:0 !important;
-    padding-top:57px !important;
-    padding-bottom:calc(78px + env(safe-area-inset-bottom)) !important;
-    min-height:100dvh;
-  }
-
-  .page{
-    width:100% !important;
-    max-width:none !important;
-    padding:
-      14px
-      max(10px,env(safe-area-inset-right))
-      14px
-      max(10px,env(safe-area-inset-left));
-  }
-
-  .page-heading{
-    gap:10px;
-  }
-
-  .page-heading h1{
-    font-size:23px;
-  }
-
-  .stories-card{
-    width:100%;
-    max-width:100%;
-    border-radius:14px;
-    padding:11px;
-    gap:12px;
-  }
-
-  .quick-create{
-    width:100%;
-  }
-
-  .post-card{
-    width:100%;
-    max-width:100%;
-    border-left:0 !important;
-    border-right:0 !important;
-    border-radius:0 !important;
-    margin-left:-10px;
-    margin-right:-10px;
-    width:calc(100% + 20px);
-  }
-
-  .post-media{
-    width:100%;
-    height:auto;
-    max-height:none;
-    object-fit:cover;
-  }
-
-  .suggestions-rail{
-    display:none !important;
-  }
-
-  .home-layout{
-    display:block !important;
-  }
-
-  .reels-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:3px !important;
-  }
-
-  .chat-layout{
-    width:100%;
-    min-height:calc(100dvh - 145px);
-    height:calc(100dvh - 145px);
-    grid-template-columns:1fr !important;
-    border-radius:0 !important;
-    border-left:0 !important;
-    border-right:0 !important;
-  }
-
-  .conversation-list{
-    display:none !important;
-  }
-
-  .chat{
-    min-width:0;
-    min-height:0;
-  }
-
-  .chat-messages{
-    min-height:0;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-  }
-
-  .bubble{
-    max-width:82%;
-    overflow-wrap:anywhere;
-  }
-
-  .chat-input{
-    padding-bottom:max(10px,env(safe-area-inset-bottom));
-  }
-
-  .overlay{
-    align-items:flex-end !important;
-    padding:0 !important;
-  }
-
-  .modal{
-    width:100% !important;
-    max-width:none !important;
-    max-height:94dvh !important;
-    border-radius:20px 20px 0 0 !important;
-    padding-bottom:env(safe-area-inset-bottom);
-  }
-
-  .modal-body{
-    overflow-x:hidden;
-  }
-
-  .form-row{
-    flex-direction:column;
-  }
-
-  .auth-page{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    width:100%;
-    min-height:100dvh !important;
-    min-height:100svh !important;
-    padding:
-      max(20px,env(safe-area-inset-top))
-      max(14px,env(safe-area-inset-right))
-      max(20px,env(safe-area-inset-bottom))
-      max(14px,env(safe-area-inset-left));
-  }
-
-  .auth-showcase{
-    display:none !important;
-  }
-
-  .auth-card{
-    width:100% !important;
-    max-width:430px;
-    padding:24px 18px;
-    border-radius:20px;
-  }
-
-  .auth-logo-img{
-    max-width:58px;
-    max-height:58px;
-    object-fit:contain;
-  }
-
-  .profile-header{
-    width:100%;
-    gap:14px;
-    padding:6px 0 20px;
-    align-items:flex-start;
-  }
-
-  .profile-details{
-    min-width:0;
-  }
-
-  .profile-line{
-    min-width:0;
-  }
-
-  .profile-line h1{
-    max-width:100%;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .profile-stats{
-    flex-wrap:wrap;
-  }
-
-  .profile-details>p,
-  .profile-details>a{
-    overflow-wrap:anywhere;
-  }
-
-  .profile-grid{
-    width:100%;
-  }
-
-  .settings-overlay{
-    align-items:stretch !important;
-  }
-
-  .settings-modal.instagram-settings{
-    width:100% !important;
-    height:100dvh !important;
-    max-height:none !important;
-    border-radius:0 !important;
-  }
-
-  .settings-layout{
-    width:100% !important;
-    min-height:0;
-  }
-
-  .settings-content{
-    min-width:0;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:calc(30px + env(safe-area-inset-bottom));
-  }
-
-  .settings-search{
-    width:calc(100% - 24px) !important;
-  }
-
-  .settings-sidebar{
-    display:none !important;
-  }
-
-  .mobile-menu{
-    top:max(62px,calc(57px + env(safe-area-inset-top)));
-    right:10px;
-    max-height:calc(100dvh - 80px);
-    overflow:auto;
-  }
-
-  .story-viewer{
-    width:100vw !important;
-    height:100dvh !important;
-    height:100svh !important;
-  }
-
-  .story-viewer-content{
-    max-width:100vw;
-    max-height:calc(100dvh - 100px);
-  }
-
-  .story-viewer-content img,
-  .story-viewer-content video{
-    max-width:100%;
-    max-height:calc(100dvh - 100px);
-    object-fit:contain;
-  }
-}
-
-/* ---------- small Android / iPhone ---------- */
-
-@media (max-width:430px){
-  .mobile-brand-logo{
-    width:28px;
-    height:28px;
-    flex-basis:28px;
-  }
-
-  .mobile-brand{
-    font-size:18px;
-  }
-
-  .page{
-    padding-left:8px;
-    padding-right:8px;
-  }
-
-  .post-card{
-    margin-left:-8px;
-    margin-right:-8px;
-    width:calc(100% + 16px);
-  }
-
-  .stories-card{
-    padding:10px 8px;
-  }
-
-  .story{
-    min-width:66px;
-  }
-
-  .story-ring,
-  .story-placeholder{
-    width:66px;
-    height:66px;
-  }
-
-  .auth-card{
-    padding:21px 15px;
-  }
-
-  .profile-header{
-    gap:10px;
-  }
-
-  .profile-avatar,
-  .profile-avatar-wrap .avatar{
-    width:82px !important;
-    height:82px !important;
-    min-width:82px !important;
-  }
-
-  .profile-stats{
-    gap:9px;
-  }
-
-  .profile-stats span{
-    flex-direction:column;
-    gap:1px;
-  }
-
-  .bottom-nav{
-    height:calc(62px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .nav-mobile span,
-  .mobile-profile span{
-    font-size:9px;
-  }
-}
-
-/* ---------- very small phones ---------- */
-
-@media (max-width:360px){
-  .mobile-brand span{
-    font-size:16px;
-  }
-
-  .page-heading h1{
-    font-size:20px;
-  }
-
-  .stories-card{
-    gap:9px;
-  }
-
-  .story{
-    min-width:61px;
-  }
-
-  .story-ring,
-  .story-placeholder{
-    width:61px;
-    height:61px;
-  }
-
-  .auth-card{
-    padding:18px 12px;
-  }
-
-  .profile-avatar,
-  .profile-avatar-wrap .avatar{
-    width:74px !important;
-    height:74px !important;
-    min-width:74px !important;
-  }
-}
-
-/* ---------- landscape phones ---------- */
-
-@media (max-width:900px) and (orientation:landscape){
-  .mobile-header{
-    height:50px;
-  }
-
-  .main{
-    padding-top:50px !important;
-  }
-
-  .bottom-nav{
-    height:52px !important;
-  }
-
-  .main{
-    padding-bottom:60px !important;
-  }
-
-  .auth-page{
-    align-items:flex-start !important;
-    overflow-y:auto;
-  }
-
-  .auth-card{
-    margin:20px 0;
-  }
-}
-
-/* ---------- devices with a notch / Dynamic Island ---------- */
-
-@supports (padding:env(safe-area-inset-top)){
-  .mobile-header{
-    padding-top:env(safe-area-inset-top);
-    height:calc(57px + env(safe-area-inset-top));
-  }
-
-  .main{
-    padding-top:calc(57px + env(safe-area-inset-top)) !important;
-  }
-}
-
-/* ---------- prevent accidental horizontal scrolling ---------- */
-
-.home-layout,
-.home-feed-column,
-.profile-page,
-.settings-content,
-.chat,
-.chat-layout,
-.page-heading,
-.profile-header,
-.profile-details,
-.post-card,
-.quick-create,
-.stories-card,
-.search-box,
-.user-list,
-.notification,
-.reels-grid{
-  min-width:0;
-  max-width:100%;
-}
-
-video,
-img{
-  height:auto;
-}
-
-textarea{
-  max-width:100%;
-}
-
-/* ---------- accessibility / touch ---------- */
-
-@media (pointer:coarse){
-  button,
-  .nav,
-  .story,
-  .nav-mobile,
-  .mobile-profile{
-    min-height:42px;
-  }
-
-  .actions button{
-    width:44px;
-    height:44px;
-  }
-}
-
-/* ---------- desktop wide screens ---------- */
-
-@media (min-width:1400px){
-  .main{
-    width:calc(100% - 250px);
-  }
-
-  .page{
-    width:min(100%,1100px);
-  }
-}
-
-/* ---------- remove browser tap/selection artifacts ---------- */
-
-button,
-a{
-  -webkit-tap-highlight-color:transparent;
-}
-
-input,
-textarea{
-  -webkit-appearance:none;
-  appearance:none;
-  border-radius:10px;
-}
-
-/* ---------- dark scrollbars ---------- */
-
-*{
-  scrollbar-width:thin;
-  scrollbar-color:#3a3e46 transparent;
-}
-
-*::-webkit-scrollbar{
-  width:6px;
-  height:6px;
-}
-
-*::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-*::-webkit-scrollbar-thumb{
-  background:#3a3e46;
-  border-radius:999px;
-}
-
-/* ReelsGo mobile messages redesign */
-@media (max-width:700px){
-  .messages-page{width:100%;max-width:100%;min-height:calc(100dvh - 72px);padding:8px 12px calc(92px + env(safe-area-inset-bottom));margin:0;overflow:hidden}
-  .messages-page *{box-sizing:border-box}
-  .messages-instagram-head{width:100%;min-height:44px;padding:2px 2px 8px;display:flex;align-items:center;justify-content:space-between}
-  .messages-account-title{min-width:0;display:flex;align-items:center;gap:4px}
-  .messages-account-title b{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:20px;color:#f5f5f7}
-  .messages-compose-button{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#f5f5f7}
-  .messages-search-bar{width:100%;height:44px;margin:0 0 10px;border-radius:14px;display:flex;align-items:center;gap:9px;padding:0 13px;background:#202328;border:1px solid #292d34}
-  .messages-search-bar svg{width:21px;height:21px;flex:none;color:#9da3ae}
-  .messages-search-bar input{min-width:0;width:100%;height:100%;padding:0;border:0;outline:0;background:transparent;color:#fff;font-size:16px}
-  .messages-notes-section{width:100%;padding:2px 0 12px;margin:0;border:0;background:transparent}
-  .messages-notes-header{min-height:28px;padding:0 2px 7px;display:flex;align-items:center;justify-content:space-between}
-  .messages-notes-header b{color:#f5f5f7;font-size:15px}
-  .messages-notes-scroll{width:100%;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .messages-notes-scroll::-webkit-scrollbar{display:none}
-  .message-note-card{position:relative;flex:0 0 72px;width:72px;min-width:72px;border:0;background:transparent;color:#f5f5f7;padding:0;text-align:center}
-  .message-note-avatar-wrap,.message-note-avatar{width:60px;height:60px;margin:0 auto 5px;position:relative;border-radius:50%}
-  .message-note-card b{display:block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f5f5f7;font-size:10px}
-  .message-note-card>span{display:block;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8f95a0;font-size:9px;margin-top:2px}
-  .message-note-bubble{position:absolute;top:-4px;left:50%;transform:translateX(-50%);max-width:86px;padding:5px 7px;border-radius:11px;background:#30343b;color:#f5f5f7;font-size:8px;line-height:1.15;z-index:2}
-  .note-add{position:absolute;right:-2px;bottom:0;width:23px;height:23px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#368cff;color:#fff;border:2px solid #08090b;font-size:20px}
-  .notes-empty{min-width:240px;align-self:center;padding:16px 4px;color:#9298a3;font-size:13px;white-space:nowrap}
-
-  /* Default mobile view = conversation list, not an empty chat pane */
-  .instagram-chat-layout{width:100%;min-width:0;height:calc(100dvh - 235px);min-height:360px;display:block!important;overflow:hidden;border:0;border-radius:0;background:transparent}
-  .instagram-conversation-list{display:flex!important;width:100%!important;min-width:0!important;height:100%;min-height:0;flex-direction:column;border:0!important;background:transparent;overflow:hidden}
-  .conversation-list-title{min-height:44px;padding:0 2px 7px;display:flex;align-items:center;justify-content:space-between;border:0}
-  .conversation-list-title>b{color:#f5f5f7;font-size:18px}
-  .messages-requests-button{min-height:32px;border:1px solid #30343b;border-radius:12px;padding:6px 10px;background:#17191d;color:#d8dbe1}
-  .conversation-scroll{flex:1;min-height:0;height:auto!important;max-height:none!important;overflow-y:auto;overflow-x:hidden;padding:0 0 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .conversation-scroll::-webkit-scrollbar{display:none}
-  .conversation-item{width:100%;min-height:74px;padding:10px 3px;display:flex;align-items:center;gap:12px;border:0;border-bottom:1px solid #191c21;border-radius:0;background:transparent;color:#f5f5f7;text-align:left}
-  .conversation-item:active{background:#17191d}
-  .conversation-copy{min-width:0;flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:8px;align-items:center}
-  .conversation-copy b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f5f5f7;font-size:15px}
-  .conversation-copy span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8f96a2;font-size:13px;grid-column:1}
-  .conversation-copy small{grid-column:2;grid-row:1/span 2;align-self:center;color:#777e89;font-size:10px;white-space:nowrap}
-  .chat-empty-list{flex:1;min-height:220px;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#858c97}
-  .chat-empty-list svg{width:42px;height:42px;margin-bottom:12px}
-  .chat-empty-list b{color:#e9ebef;font-size:17px}
-
-  /* hard switch: list without active, chat with active */
-  .instagram-chat-layout:not(.has-active) .instagram-chat{display:none!important}
-  .instagram-chat-layout.has-active .instagram-conversation-list{display:none!important}
-
-  /* active mobile chat */
-  .messages-page.is-mobile-chat{height:calc(100dvh - 72px);min-height:0;padding:0 0 env(safe-area-inset-bottom);overflow:hidden}
-  .messages-page.is-mobile-chat .messages-instagram-head,.messages-page.is-mobile-chat .messages-search-bar,.messages-page.is-mobile-chat .messages-notes-section{display:none}
-  .messages-page.is-mobile-chat .instagram-chat-layout{height:calc(100dvh - 72px);min-height:0;display:block!important}
-  .messages-page.is-mobile-chat .instagram-chat{width:100%;height:100%;min-width:0;display:flex!important;flex-direction:column;background:#08090b}
-  .instagram-chat-head{flex:0 0 62px;width:100%;height:62px;min-height:62px;padding:0 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #202329;background:rgba(8,9,11,.97);z-index:3}
-  .chat-back-button{width:38px;height:38px;flex:0 0 38px;display:flex!important;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:#fff}
-  .instagram-chat-head>div{min-width:0;display:flex;flex-direction:column}
-  .instagram-chat-head>div>b{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:15px}
-  .instagram-chat-head>div>span{color:#777f8b;font-size:11px;margin-top:2px}
-  .instagram-chat-messages{flex:1!important;min-height:0!important;height:auto!important;overflow-y:auto;overflow-x:hidden;padding:18px 12px 12px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#08090b}
-  .message-line{width:100%;display:flex;align-items:flex-end;gap:7px;margin:5px 0}
-  .message-line.mine{justify-content:flex-end}.message-line.received{justify-content:flex-start}
-  .message-line .bubble{width:fit-content;max-width:min(78%,310px);min-width:0;box-sizing:border-box;padding:9px 12px 7px;border-radius:18px;margin:0;overflow:hidden;overflow-wrap:anywhere;word-break:break-word;background:#25282e;color:#f4f5f7}
-  .message-line .bubble.mine{background:linear-gradient(135deg,#6d45e8 0%,#8b5cf6 100%);color:#fff;border-bottom-right-radius:6px;box-shadow:0 7px 20px rgba(109,69,232,.22)}
-  .message-line.received .bubble{border-bottom-left-radius:6px}
-  .message-line .bubble>span{display:block;min-width:0;font-size:14px;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
-  .message-meta{width:100%;min-width:0;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-top:4px;opacity:.7;overflow:hidden}
-  .message-meta small{display:block;min-width:0;max-width:100%;font-size:8px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .message-line .bubble.mine .message-meta{justify-content:flex-end}
-  .message-line .bubble.mine .message-meta small{color:#d9ceff!important}
-  .chat-no-messages{min-height:100%;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#8f96a1}
-  .chat-no-messages h2{margin:0;color:#f4f5f7;font-size:20px}
-  .chat-no-messages p{margin:4px 0;color:#9ba1ab;font-size:13px}
-  .instagram-chat-input{flex:0 0 auto;width:100%;min-height:60px;height:auto;padding:8px 9px calc(8px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:7px;border-top:1px solid #202329;background:rgba(8,9,11,.98)}
-  .instagram-chat-input input{min-width:0;flex:1;height:42px;border-radius:22px;border:1px solid #30343b;background:#191c21;color:#fff;padding:0 15px;outline:none;font-size:14px}
-  .chat-attach-button,.chat-smile-button,.chat-send-button{width:42px;height:42px;min-width:42px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:#dce0e6}
-  .chat-send-button{background:#356dff;color:#fff}
-  .messages-page.is-mobile-chat .bottom-nav{display:none}
-  @media(max-width:380px){
-    .messages-page{padding-left:9px;padding-right:9px}.messages-account-title b{font-size:18px;max-width:190px}
-    .conversation-item{min-height:70px;gap:10px}.conversation-copy b{font-size:14px}.conversation-copy span{font-size:12px}.message-line .bubble{max-width:82%}
-  }
-  @media(orientation:landscape) and (max-height:500px){
-    .messages-page:not(.is-mobile-chat) .messages-notes-section{display:none}
-    .messages-page:not(.is-mobile-chat) .instagram-chat-layout{height:calc(100dvh - 155px);min-height:220px}
-    .messages-page.is-mobile-chat,.messages-page.is-mobile-chat .instagram-chat-layout{height:100dvh}
-  }
-}
-@media (min-width:701px) and (max-width:1100px){
-  .instagram-chat-layout{grid-template-columns:minmax(260px,34%) minmax(0,1fr)}
-  .conversation-copy{min-width:0}.message-line .bubble{max-width:72%}
-}
-
-
-/* ============================================================
-   REELSGO FINAL MOBILE PROFILE AVATAR
-   Instagram-style compact circular profile header
-   ============================================================ */
-@media (max-width: 700px) {
-  .profile-page {
-    width: 100%;
-    max-width: 100%;
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-    padding-top: 8px !important;
-    padding-bottom: 105px !important;
-    overflow-x: hidden;
-  }
-
-  .profile-header {
-    width: 100%;
-    display: grid !important;
-    grid-template-columns: 96px minmax(0, 1fr) !important;
-    column-gap: 16px !important;
-    align-items: start !important;
-    padding: 12px 2px 18px !important;
-    margin: 0 !important;
-    min-width: 0;
-  }
-
-  .profile-avatar-wrap {
-    position: relative !important;
-    width: 96px !important;
-    height: 96px !important;
-    min-width: 96px !important;
-    min-height: 96px !important;
-    max-width: 96px !important;
-    max-height: 96px !important;
-    border-radius: 50% !important;
-    overflow: visible !important;
-    flex: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-  }
-
-  .profile-avatar-wrap::before,
-  .profile-avatar-wrap::after {
-    content: none !important;
-    display: none !important;
-  }
-
-  .profile-avatar-wrap .profile-avatar,
-  .profile-avatar-wrap > .avatar.profile-avatar {
-    width: 96px !important;
-    height: 96px !important;
-    min-width: 96px !important;
-    min-height: 96px !important;
-    max-width: 96px !important;
-    max-height: 96px !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 50% !important;
-    overflow: hidden !important;
-    display: block !important;
-    border: 2px solid #2c3038 !important;
-    box-shadow: 0 0 0 1px #0b0d10 !important;
-    background: #111318 !important;
-    outline: none !important;
-  }
-
-  .profile-avatar-wrap .profile-avatar img,
-  .profile-avatar-wrap > .avatar.profile-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 100% !important;
-    min-height: 100% !important;
-    max-width: none !important;
-    max-height: none !important;
-    aspect-ratio: 1 / 1 !important;
-    object-fit: cover !important;
-    object-position: center center !important;
-    border-radius: 50% !important;
-    display: block !important;
-  }
-
-  .profile-avatar-wrap .avatar-camera {
-    width: 29px !important;
-    height: 29px !important;
-    min-width: 29px !important;
-    min-height: 29px !important;
-    right: -3px !important;
-    bottom: -2px !important;
-    padding: 0 !important;
-    border-radius: 50% !important;
-    border: 2px solid #08090d !important;
-    background: #171a20 !important;
-    color: #fff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.45) !important;
-  }
-
-  .profile-avatar-wrap .avatar-camera svg {
-    width: 15px !important;
-    height: 15px !important;
-    stroke-width: 2.2 !important;
-  }
-
-  .profile-details {
-    min-width: 0 !important;
-    width: 100% !important;
-    overflow: hidden !important;
-  }
-
-  .profile-line {
-    width: 100% !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin: 0 0 13px !important;
-    flex-wrap: nowrap !important;
-    min-width: 0;
-  }
-
-  .profile-line h1 {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    font-size: 19px !important;
-    line-height: 1.2 !important;
-    font-weight: 750 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .profile-line .secondary {
-    flex: 0 0 auto !important;
-    min-height: 38px !important;
-    padding: 8px 11px !important;
-    border-radius: 11px !important;
-    font-size: 11px !important;
-    white-space: nowrap !important;
-  }
-
-  .profile-stats {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 7px !important;
-    margin: 0 0 12px !important;
-  }
-
-  .profile-stats span {
-    min-width: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 2px !important;
-  }
-
-  .profile-stats b {
-    font-size: 15px !important;
-    line-height: 1.1 !important;
-    color: #fff !important;
-  }
-
-  .profile-stats small {
-    font-size: 10px !important;
-    line-height: 1.15 !important;
-    color: #969aa3 !important;
-  }
-
-  .profile-details > b {
-    display: block !important;
-    font-size: 13px !important;
-    line-height: 1.25 !important;
-    margin-bottom: 3px !important;
-  }
-
-  .profile-details > p {
-    font-size: 11px !important;
-    line-height: 1.35 !important;
-    margin: 0 !important;
-    color: #a0a4ad !important;
-  }
-
-  .profile-tabs {
-    width: 100% !important;
-    margin: 0 0 10px !important;
-    border-top: 1px solid #252932 !important;
-    border-bottom: 1px solid #252932 !important;
-  }
-
-  .profile-tabs button {
-    min-height: 48px !important;
-    padding: 10px 3px !important;
-    font-size: 10px !important;
-    gap: 4px !important;
-  }
-
-  .profile-tabs button svg {
-    width: 17px !important;
-    height: 17px !important;
-  }
-
-  .profile-grid {
-    width: 100% !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 2px !important;
-  }
-}
-
-@media (max-width: 390px) {
-  .profile-header {
-    grid-template-columns: 84px minmax(0, 1fr) !important;
-    column-gap: 13px !important;
-  }
-
-  .profile-avatar-wrap,
-  .profile-avatar-wrap .profile-avatar,
-  .profile-avatar-wrap > .avatar.profile-avatar {
-    width: 84px !important;
-    height: 84px !important;
-    min-width: 84px !important;
-    min-height: 84px !important;
-    max-width: 84px !important;
-    max-height: 84px !important;
-  }
-
-  .profile-avatar-wrap .avatar-camera {
-    width: 27px !important;
-    height: 27px !important;
-    min-width: 27px !important;
-    min-height: 27px !important;
-  }
-
-  .profile-avatar-wrap .avatar-camera svg {
-    width: 14px !important;
-    height: 14px !important;
-  }
-
-  .profile-line h1 {
-    font-size: 17px !important;
-  }
-}
-
-@media (min-width: 701px) {
-  .profile-avatar-wrap .profile-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-}
-
-
-/* ============================================================
-   FINAL REELSGO SETTINGS FIX
-   Mobile gets a real settings category screen + detail screen.
-   Desktop keeps the two-column settings layout.
-   ============================================================ */
-
-.settings-topbar {
-  position: relative !important;
-  flex: 0 0 64px !important;
-  background: #0b0d10 !important;
-  color: #fff !important;
-  border-bottom: 1px solid #252932 !important;
-  z-index: 20 !important;
-}
-
-.settings-topbar h2 {
-  color: #fff !important;
-}
-
-.settings-back {
-  left: 14px !important;
-  color: #fff !important;
-  z-index: 3 !important;
-}
-
-.settings-back-icon {
-  width: 25px !important;
-  height: 25px !important;
-  stroke-width: 2.2 !important;
-}
-
-.settings-close-desktop {
-  position: absolute !important;
-  right: 14px !important;
-  width: 38px !important;
-  height: 38px !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  color: #fff !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.settings-close-desktop svg {
-  width: 22px !important;
-  height: 22px !important;
-}
-
-.settings-search {
-  flex: 0 0 52px !important;
-  color: #aeb4bf !important;
-  background: #171a20 !important;
-  border: 1px solid #2a2f38 !important;
-  box-sizing: border-box !important;
-}
-
-.settings-search input {
-  color: #fff !important;
-  outline: none !important;
-}
-
-.settings-search input::placeholder {
-  color: #8f96a3 !important;
-}
-
-.settings-search > svg {
-  color: #aeb4bf !important;
-  flex: 0 0 auto !important;
-}
-
-.settings-search-clear {
-  width: 30px !important;
-  height: 30px !important;
-  border-radius: 50% !important;
-  background: #2a2f38 !important;
-  color: #fff !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 30px !important;
-}
-
-.settings-search-clear svg {
-  width: 16px !important;
-  height: 16px !important;
-}
-
-.settings-layout {
-  min-height: 0 !important;
-}
-
-.settings-mobile {
-  display: none;
-}
-
-.setting-detail {
-  color: #fff !important;
-  background: #181c23 !important;
-  border: 1px solid #2c323c !important;
-}
-
-.setting-detail-back {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  margin-bottom: 14px !important;
-  color: #b9c0cb !important;
-  background: transparent !important;
-  font-size: 13px !important;
-}
-
-@media (max-width: 700px) {
-  .settings-overlay {
-    position: fixed !important;
-    inset: 0 !important;
-    padding: 0 !important;
-    background: #080a0d !important;
-    align-items: stretch !important;
-    justify-content: stretch !important;
-    z-index: 1000 !important;
-    overflow: hidden !important;
-  }
-
-  .settings-modal.instagram-settings {
-    width: 100vw !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-    max-height: none !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    background: #080a0d !important;
-    color: #fff !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    padding-top: env(safe-area-inset-top) !important;
-    box-sizing: border-box !important;
-  }
-
-  .settings-topbar {
-    flex: 0 0 56px !important;
-    height: 56px !important;
-    min-height: 56px !important;
-    padding: 0 52px !important;
-    background: #080a0d !important;
-    border-bottom: 1px solid #242932 !important;
-  }
-
-  .settings-topbar h2 {
-    max-width: calc(100vw - 120px) !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    font-size: 17px !important;
-  }
-
-  .settings-back {
-    left: 9px !important;
-    width: 42px !important;
-    height: 42px !important;
-    color: #fff !important;
-    background: transparent !important;
-  }
-
-  .settings-back:active {
-    background: #1a1e25 !important;
-  }
-
-  .settings-back-icon {
-    width: 27px !important;
-    height: 27px !important;
-  }
-
-  .settings-close-desktop {
-    display: none !important;
-  }
-
-  .settings-search {
-    flex: 0 0 50px !important;
-    width: calc(100% - 28px) !important;
-    height: 50px !important;
-    min-height: 50px !important;
-    margin: 12px auto !important;
-    border-radius: 14px !important;
-    background: #171a20 !important;
-    border: 1px solid #2c323b !important;
-  }
-
-  .settings-search input {
-    min-width: 0 !important;
-    font-size: 16px !important;
-  }
-
-  .settings-layout {
-    display: block !important;
-    width: 100% !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .settings-sidebar,
-  .settings-content {
-    display: none !important;
-  }
-
-  .settings-mobile {
-    display: block !important;
-    width: 100% !important;
-    height: calc(100% - 0px) !important;
-    overflow: hidden !important;
-    background: #080a0d !important;
-  }
-
-  .settings-mobile-list {
-    width: 100% !important;
-    height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 8px 14px calc(32px + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .settings-mobile-heading {
-    padding: 8px 4px 16px !important;
-  }
-
-  .settings-mobile-heading h1 {
-    margin: 0 !important;
-    color: #fff !important;
-    font-size: 26px !important;
-    line-height: 1.15 !important;
-  }
-
-  .settings-mobile-heading p {
-    margin: 6px 0 0 !important;
-    color: #9299a5 !important;
-    font-size: 13px !important;
-  }
-
-  .settings-mobile-categories {
-    width: 100% !important;
-    border-top: 1px solid #242932 !important;
-  }
-
-  .settings-mobile-category {
-    width: 100% !important;
-    min-height: 72px !important;
-    padding: 10px 2px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    background: transparent !important;
-    color: #fff !important;
-    border: 0 !important;
-    border-bottom: 1px solid #242932 !important;
-    text-align: left !important;
-  }
-
-  .settings-mobile-category:active {
-    background: #11151a !important;
-  }
-
-  .settings-mobile-category-icon {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    border-radius: 50% !important;
-    background: #1b2028 !important;
-    color: #aeb6c3 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  .settings-mobile-category-icon svg {
-    width: 22px !important;
-    height: 22px !important;
-  }
-
-  .settings-mobile-category-copy {
-    min-width: 0 !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-  }
-
-  .settings-mobile-category-copy b {
-    color: #fff !important;
-    font-size: 15px !important;
-    line-height: 1.2 !important;
-  }
-
-  .settings-mobile-category-copy small {
-    color: #8e96a3 !important;
-    font-size: 11px !important;
-  }
-
-  .settings-mobile-category > svg {
-    width: 19px !important;
-    height: 19px !important;
-    color: #7d8693 !important;
-    flex: 0 0 auto !important;
-  }
-
-  .settings-mobile-logout {
-    width: 100% !important;
-    min-height: 52px !important;
-    margin-top: 18px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 0 8px !important;
-    background: #171116 !important;
-    color: #ff5f6d !important;
-    border: 1px solid #3b252d !important;
-    border-radius: 13px !important;
-    font-weight: 700 !important;
-  }
-
-  .settings-mobile-logout svg {
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  .settings-mobile-detail {
-    width: 100% !important;
-    height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 0 14px calc(32px + env(safe-area-inset-bottom)) !important;
-    box-sizing: border-box !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  .settings-mobile-detail-head {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 10 !important;
-    min-height: 62px !important;
-    margin: 0 -14px 10px !important;
-    padding: 8px 14px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    background: rgba(8,10,13,.96) !important;
-    border-bottom: 1px solid #242932 !important;
-    backdrop-filter: blur(18px) !important;
-    -webkit-backdrop-filter: blur(18px) !important;
-  }
-
-  .settings-mobile-detail-head > button {
-    width: 40px !important;
-    height: 40px !important;
-    flex: 0 0 40px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: transparent !important;
-    color: #fff !important;
-  }
-
-  .settings-mobile-detail-head > button svg {
-    width: 25px !important;
-    height: 25px !important;
-  }
-
-  .settings-mobile-detail-head h1 {
-    margin: 0 !important;
-    color: #fff !important;
-    font-size: 19px !important;
-  }
-
-  .settings-mobile-detail-head p {
-    margin: 3px 0 0 !important;
-    color: #8f97a4 !important;
-    font-size: 11px !important;
-  }
-
-  .settings-mobile-detail .settings-panel {
-    width: 100% !important;
-    max-width: none !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row {
-    padding: 15px 0 !important;
-    gap: 11px !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row .avatar {
-    width: 58px !important;
-    height: 58px !important;
-    flex: 0 0 58px !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row > div {
-    min-width: 0 !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row b {
-    color: #fff !important;
-    font-size: 14px !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row span {
-    color: #9098a5 !important;
-    font-size: 11px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  .settings-mobile-detail .settings-profile-row .secondary {
-    padding: 8px 10px !important;
-    font-size: 11px !important;
-    flex: 0 0 auto !important;
-  }
-
-  .settings-mobile-detail .setting-row {
-    min-height: 70px !important;
-    padding: 12px 0 !important;
-    background: transparent !important;
-    color: #fff !important;
-    border-bottom-color: #242932 !important;
-  }
-
-  .settings-mobile-detail .setting-row-icon {
-    width: 40px !important;
-    height: 40px !important;
-    background: #1b2028 !important;
-    color: #aeb6c3 !important;
-  }
-
-  .settings-mobile-detail .setting-row-text b {
-    color: #fff !important;
-    font-size: 14px !important;
-  }
-
-  .settings-mobile-detail .setting-row-text small {
-    color: #8e96a3 !important;
-    font-size: 11px !important;
-  }
-
-  .settings-mobile-detail .setting-row > svg {
-    color: #747e8b !important;
-  }
-
-  .settings-mobile-detail .settings-card-highlight {
-    background: #151920 !important;
-    border: 1px solid #2b313b !important;
-    color: #fff !important;
-  }
-
-  .settings-mobile-detail .settings-card-highlight p {
-    color: #8f97a4 !important;
-  }
-
-  .settings-mobile-detail .privacy-toggle-row,
-  .settings-mobile-detail .setting-switch {
-    border-bottom-color: #242932 !important;
-  }
-
-  .settings-mobile-detail .privacy-toggle-row b,
-  .settings-mobile-detail .setting-switch b,
-  .settings-mobile-detail .setting-switch span {
-    color: #fff !important;
-  }
-
-  .settings-mobile-detail .privacy-toggle-row span:not(.toggle-knob),
-  .settings-mobile-detail .setting-switch small {
-    color: #8f97a4 !important;
-  }
-
-  .settings-mobile-detail .setting-detail {
-    margin-top: 14px !important;
-    padding: 16px !important;
-    border-radius: 14px !important;
-    background: #171b22 !important;
-    border-color: #2b313b !important;
-  }
-
-  .settings-mobile-detail .setting-detail b {
-    display: block !important;
-    margin-bottom: 7px !important;
-    color: #fff !important;
-  }
-
-  .settings-mobile-detail .setting-detail p {
-    color: #9ca4b1 !important;
-    line-height: 1.5 !important;
-  }
-
-  .settings-mobile-detail .setting-detail-back {
-    color: #b9c1cd !important;
-  }
-}
-
-@media (max-width: 390px) {
-  .settings-mobile-category {
-    min-height: 66px !important;
-  }
-
-  .settings-mobile-category-icon {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-  }
-
-  .settings-mobile-category-copy b {
-    font-size: 14px !important;
-  }
-
-  .settings-mobile-category-copy small {
-    font-size: 10px !important;
-  }
-}
-
-/* ==========================================================
-   REELSGO PROFILE USERNAME LINKS + MESSAGE DELETE
-   ========================================================== */
-.profile-username-link{
-  display:inline-flex;
-  align-items:center;
-  width:max-content;
-  max-width:100%;
-  color:#f5f7fa !important;
-  font-weight:800;
-  cursor:pointer;
-  text-decoration:none;
-  transition:opacity .15s ease, text-decoration-color .15s ease;
-}
-.profile-username-link:hover{
-  opacity:.78;
-  text-decoration:underline;
-  text-underline-offset:3px;
-}
-.profile-username-link:focus-visible{
-  outline:2px solid #8b7cff;
-  outline-offset:3px;
-  border-radius:4px;
-}
-.story-username{
-  display:block;
-  max-width:100px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  color:#b7bdc7 !important;
-  font-size:12px;
-  font-weight:650;
-}
-.rail-username{
-  display:block;
-  max-width:150px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.conversation-username{
-  display:block;
-  max-width:180px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:14px;
-}
-.message-bubble-wrap{
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  max-width:min(78%, 520px);
-}
-.message-bubble-wrap.mine{
-  align-items:flex-end;
-}
-.message-action-menu{
-  position:absolute;
-  right:0;
-  top:calc(100% + 7px);
-  z-index:50;
-  min-width:165px;
-  padding:5px;
-  border:1px solid #343a44;
-  border-radius:12px;
-  background:#171b21;
-  box-shadow:0 12px 32px rgba(0,0,0,.45);
-}
-.message-action-menu button{
-  width:100%;
-  min-height:40px;
-  display:flex;
-  align-items:center;
-  gap:9px;
-  border:0;
-  border-radius:9px;
-  padding:0 11px;
-  background:transparent;
-  color:#ff6479;
-  font-size:13px;
-  font-weight:700;
-  cursor:pointer;
-}
-.message-action-menu button:hover{
-  background:#252a31;
-}
-.message-action-menu button:disabled{
-  opacity:.55;
-  cursor:wait;
-}
-.message-action-menu svg{
-  width:17px;
-  height:17px;
-  flex:0 0 17px;
-}
-.message-bubble-wrap .bubble{
-  cursor:pointer;
-}
-
-@media(max-width:700px){
-  .profile-username-link{
-    -webkit-tap-highlight-color:transparent;
-  }
-  .message-bubble-wrap{
-    max-width:82%;
-  }
-  .message-action-menu{
-    right:0;
-    min-width:155px;
-  }
-  .message-action-menu button{
-    min-height:44px;
-    font-size:14px;
-  }
-}
-
-
-/* Final mobile DM bubble fix: keep timestamp/status INSIDE the bubble. */
-@media (max-width:700px){
-  .messages-page .message-line .bubble{
-    width:fit-content!important;
-    max-width:min(82%,310px)!important;
-    min-width:0!important;
-    box-sizing:border-box!important;
-    overflow:hidden!important;
-  }
-  .messages-page .message-line .bubble .message-meta{
-    width:100%!important;
-    max-width:100%!important;
-    min-width:0!important;
-    box-sizing:border-box!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:flex-end!important;
-    gap:5px!important;
-    margin:4px 0 0!important;
-    padding:0!important;
-    overflow:hidden!important;
-  }
-  .messages-page .message-line .bubble .message-meta small{
-    min-width:0!important;
-    max-width:100%!important;
-    flex:0 1 auto!important;
-    white-space:nowrap!important;
-    overflow:hidden!important;
-    text-overflow:ellipsis!important;
-    line-height:1.1!important;
-  }
-  .messages-page .message-line .bubble.mine .message-meta small{
-    color:#d9ceff!important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO UNIVERSAL EMOJI PICKER
-   Works on desktop, tablet, Android and iPhone/iPad.
-   ============================================================ */
-.chat-message-field{
-  position:relative;
-  min-width:0;
-  flex:1 1 auto;
-  display:flex;
-  align-items:center;
-}
-.chat-message-field>input{
-  width:100%;
-  min-width:0;
-  padding-right:48px!important;
-}
-.chat-smile-button{
-  position:absolute;
-  right:4px;
-  top:50%;
-  transform:translateY(-50%);
-  width:36px!important;
-  height:36px!important;
-  min-width:36px!important;
-  flex:0 0 36px!important;
-  color:#aeb5c0!important;
-  z-index:2;
-  cursor:pointer;
-}
-.chat-smile-button:hover,
-.chat-smile-button.active{
-  color:#8b5cf6!important;
-  background:rgba(139,92,246,.12)!important;
-}
-.chat-smile-button svg{width:20px;height:20px}
-.reelsgo-emoji-picker{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:calc(100% + 10px);
-  width:min(360px, calc(100vw - 24px));
-  max-height:min(420px, 58dvh);
-  background:#17191e;
-  color:#fff;
-  border:1px solid #30343d;
-  border-radius:18px;
-  box-shadow:0 18px 50px rgba(0,0,0,.45);
-  overflow:hidden;
-  z-index:1000;
-  display:flex;
-  flex-direction:column;
-}
-.reelsgo-emoji-picker-head{
-  height:46px;
-  flex:0 0 46px;
-  padding:0 10px 0 14px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid #292d35;
-}
-.reelsgo-emoji-picker-head b{font-size:14px;color:#f4f5f7}
-.reelsgo-emoji-picker-head button{
-  width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:#aeb5c0;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.reelsgo-emoji-picker-head button:hover{background:#242830;color:#fff}
-.reelsgo-emoji-picker-head svg{width:17px;height:17px}
-.reelsgo-emoji-tabs{
-  flex:0 0 46px;
-  display:flex;
-  align-items:center;
-  gap:2px;
-  padding:5px 7px;
-  overflow-x:auto;
-  scrollbar-width:none;
-  border-bottom:1px solid #292d35;
-}
-.reelsgo-emoji-tabs::-webkit-scrollbar{display:none}
-.reelsgo-emoji-tabs button{
-  width:38px;height:36px;min-width:38px;border:0;border-radius:9px;background:transparent;
-  font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.reelsgo-emoji-tabs button:hover{background:#242830}
-.reelsgo-emoji-tabs button.active{background:#6d45e8}
-.reelsgo-emoji-grid{
-  flex:1 1 auto;
-  min-height:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  display:grid;
-  grid-template-columns:repeat(8,minmax(0,1fr));
-  gap:2px;
-  padding:8px;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
-}
-.reelsgo-emoji-grid button{
-  width:100%;
-  aspect-ratio:1;
-  min-width:0;
-  border:0;
-  border-radius:9px;
-  background:transparent;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:25px;
-  line-height:1;
-  padding:0;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-}
-.reelsgo-emoji-grid button:hover{background:#292d35;transform:scale(1.05)}
-.reelsgo-emoji-grid button:active{background:#383d48;transform:scale(.94)}
-@media(max-width:700px){
-  .chat-message-field{flex:1 1 auto;min-width:0}
-  .reelsgo-emoji-picker{
-    position:fixed;
-    left:8px;
-    right:8px;
-    bottom:calc(68px + env(safe-area-inset-bottom));
-    width:auto;
-    max-width:none;
-    max-height:min(52dvh,390px);
-    border-radius:18px;
-  }
-  .reelsgo-emoji-grid{grid-template-columns:repeat(8,minmax(0,1fr));padding:7px;gap:1px}
-  .reelsgo-emoji-grid button{font-size:25px;min-height:38px}
-  .reelsgo-emoji-tabs{height:45px;flex-basis:45px}
-}
-@media(max-width:390px){
-  .reelsgo-emoji-picker{left:5px;right:5px;bottom:calc(66px + env(safe-area-inset-bottom));max-height:50dvh}
-  .reelsgo-emoji-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
-  .reelsgo-emoji-grid button{font-size:24px}
-  .reelsgo-emoji-tabs button{width:35px;min-width:35px;font-size:19px}
-}
-@media(min-width:701px){
-  .reelsgo-emoji-picker{left:auto;right:0}
-}
-@media(prefers-reduced-motion:reduce){
-  .reelsgo-emoji-grid button:hover,.reelsgo-emoji-grid button:active{transform:none}
-}
-
-
-/* ============================================================
-   REELSGO MESSAGES — DESKTOP CURVED GLASS + UNREAD STATE
-   Only the Messages area is changed. Mobile messaging rules
-   above remain in control below 700px.
-============================================================ */
-@media (min-width:701px) {
-
-  /* Curved glass Messages navigation button */
-  .sidebar .messages-nav-item.active{
-    color:#fff !important;
-    background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(124,58,237,.20)) !important;
-    border:1px solid rgba(255,255,255,.12) !important;
-    border-radius:24px !important;
-    box-shadow:
-      0 10px 30px rgba(0,0,0,.25),
-      inset 0 1px 0 rgba(255,255,255,.12) !important;
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-  }
-
-  .sidebar .messages-nav-item.active svg{
-    color:#fff !important;
-    filter:drop-shadow(0 2px 8px rgba(139,92,246,.28));
-  }
-
-  /* Main Messages heading */
-  .messages-page{
-    max-width:1120px !important;
-    padding:24px 26px 50px !important;
-  }
-
-  .messages-page .messages-instagram-head{
-    min-height:64px;
-    margin-bottom:16px !important;
-    padding:10px 16px !important;
-    border:1px solid rgba(255,255,255,.11) !important;
-    border-radius:26px !important;
-    background:linear-gradient(
-      135deg,
-      rgba(255,255,255,.11),
-      rgba(255,255,255,.045)
-    ) !important;
-    box-shadow:
-      0 16px 42px rgba(0,0,0,.24),
-      inset 0 1px 0 rgba(255,255,255,.09) !important;
-    backdrop-filter:blur(22px);
-    -webkit-backdrop-filter:blur(22px);
-  }
-
-  .messages-page .messages-account-title{
-    display:flex;
-    align-items:center;
-    gap:5px;
-    min-width:0;
-  }
-
-  .messages-page .messages-account-title b{
-    color:#f8fafc !important;
-    font-size:20px !important;
-    font-weight:800 !important;
-  }
-
-  .messages-page .messages-account-chevron{
-    width:17px;
-    color:#8f98a7;
-  }
-
-  .messages-page .messages-compose-button{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    color:#f4f6fa;
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.08);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .messages-page .messages-compose-button:hover{
-    background:rgba(255,255,255,.11);
-  }
-
-  /* Search glass */
-  .messages-page .messages-search-bar{
-    width:100%;
-    min-height:48px;
-    margin-bottom:14px;
-    padding:0 15px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.09);
-    background:rgba(255,255,255,.045);
-    box-shadow:
-      0 10px 30px rgba(0,0,0,.18),
-      inset 0 1px 0 rgba(255,255,255,.06);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-  }
-
-  .messages-page .messages-search-bar svg{
-    color:#929baa;
-    width:19px;
-  }
-
-  .messages-page .messages-search-bar input{
-    flex:1;
-    min-width:0;
-    border:0;
-    outline:0;
-    background:transparent;
-    color:#fff;
-  }
-
-  .messages-page .messages-search-bar input::placeholder{
-    color:#818a98;
-  }
-
-  .messages-page .messages-search-bar button{
-    width:30px;
-    height:30px;
-    border-radius:50%;
-    background:rgba(255,255,255,.07);
-    color:#b8c0cc;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  /* Notes glass */
-  .messages-page .messages-notes-section{
-    border-radius:24px !important;
-    background:linear-gradient(
-      135deg,
-      rgba(255,255,255,.09),
-      rgba(255,255,255,.035)
-    ) !important;
-    border:1px solid rgba(255,255,255,.10) !important;
-    box-shadow:
-      0 18px 48px rgba(0,0,0,.23),
-      inset 0 1px 0 rgba(255,255,255,.07) !important;
-    backdrop-filter:blur(22px);
-    -webkit-backdrop-filter:blur(22px);
-  }
-
-  /* Main chat shell */
-  .messages-page .instagram-chat-layout{
-    border-radius:28px !important;
-    border:1px solid rgba(255,255,255,.12) !important;
-    overflow:hidden !important;
-    background:rgba(12,16,22,.78) !important;
-    box-shadow:
-      0 25px 70px rgba(0,0,0,.34),
-      inset 0 1px 0 rgba(255,255,255,.08) !important;
-    backdrop-filter:blur(24px);
-    -webkit-backdrop-filter:blur(24px);
-  }
-
-  .messages-page .instagram-conversation-list{
-    background:rgba(14,19,25,.72) !important;
-    border-right:1px solid rgba(255,255,255,.09) !important;
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-  }
-
-  .messages-page .conversation-list-title{
-    background:rgba(255,255,255,.035) !important;
-    border-bottom:1px solid rgba(255,255,255,.07) !important;
-  }
-
-  .messages-page .conversation-item{
-    margin:5px 8px !important;
-    width:calc(100% - 16px) !important;
-    min-height:76px !important;
-    padding:10px 12px !important;
-    border:1px solid transparent !important;
-    border-radius:20px !important;
-    background:transparent !important;
-    transition:
-      background .18s ease,
-      border-color .18s ease,
-      transform .18s ease;
-  }
-
-  .messages-page .conversation-item:hover{
-    background:rgba(255,255,255,.055) !important;
-    border-color:rgba(255,255,255,.07) !important;
-    transform:translateY(-1px);
-  }
-
-  .messages-page .conversation-item.active{
-    background:linear-gradient(
-      135deg,
-      rgba(124,58,237,.22),
-      rgba(255,255,255,.06)
-    ) !important;
-    border-color:rgba(139,92,246,.24) !important;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,.08),
-      0 8px 24px rgba(0,0,0,.15);
-  }
-
-  /* Unread conversation */
-  .messages-page .conversation-item.unread{
-    background:rgba(34,197,94,.035) !important;
-  }
-
-  .messages-page .conversation-item.unread:hover{
-    background:rgba(34,197,94,.075) !important;
-  }
-
-  .conversation-avatar-wrap{
-    position:relative;
-    width:58px;
-    height:58px;
-    flex:0 0 58px;
-  }
-
-  .conversation-avatar-wrap .avatar{
-    width:58px !important;
-    height:58px !important;
-  }
-
-  .conversation-unread-dot{
-    position:absolute;
-    right:-1px;
-    bottom:1px;
-    width:13px;
-    height:13px;
-    border-radius:50%;
-    background:#22c55e;
-    border:3px solid #11161c;
-    box-shadow:
-      0 0 0 2px rgba(34,197,94,.12),
-      0 0 14px rgba(34,197,94,.52);
-  }
-
-  .messages-page .conversation-copy{
-    min-width:0;
-  }
-
-  .messages-page .conversation-username.is-unread{
-    color:#fff !important;
-    font-weight:850 !important;
-  }
-
-  .messages-page .conversation-preview.is-unread{
-    color:#e8edf3 !important;
-    font-weight:750 !important;
-  }
-
-  .messages-page .conversation-item.unread .conversation-copy small{
-    color:#d5dbe4 !important;
-    font-weight:700 !important;
-  }
-
-  /* Chat side also gets the curved glass treatment */
-  .messages-page .instagram-chat{
-    background:
-      radial-gradient(circle at 75% 0%,rgba(124,58,237,.12),transparent 34%),
-      rgba(8,12,17,.76) !important;
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-  }
-
-  .messages-page .instagram-chat-head{
-    background:rgba(255,255,255,.035) !important;
-    border-bottom:1px solid rgba(255,255,255,.08) !important;
-  }
-
-  .messages-page .instagram-chat-messages{
-    background:transparent !important;
-  }
-
-  .messages-page .instagram-chat-input{
-    background:rgba(255,255,255,.045) !important;
-    border-top:1px solid rgba(255,255,255,.08) !important;
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-  }
-
-  .messages-page .instagram-chat-input input{
-    background:rgba(255,255,255,.055) !important;
-    border:1px solid rgba(255,255,255,.10) !important;
-    color:#fff !important;
-  }
-
-  /* Preserve the existing message bubbles and timestamp behavior. */
-  .messages-page .message-line .bubble{
-    overflow:hidden;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-  }
-}
-
-/* Unread state remains readable on mobile too. */
-@media (max-width:700px){
-  .conversation-avatar-wrap{
-    position:relative;
-    width:58px;
-    height:58px;
-    flex:0 0 58px;
-  }
-
-  .conversation-unread-dot{
-    position:absolute;
-    right:-1px;
-    bottom:0;
-    width:13px;
-    height:13px;
-    border-radius:50%;
-    background:#22c55e;
-    border:3px solid #08090d;
-    box-shadow:0 0 12px rgba(34,197,94,.48);
-  }
-
-  .conversation-username.is-unread,
-  .conversation-preview.is-unread{
-    color:#fff !important;
-    font-weight:800 !important;
-  }
-
-  .conversation-item.unread .conversation-copy small{
-    color:#d9dee6 !important;
-    font-weight:700 !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO — LAPTOP / DESKTOP MESSAGES SCREEN FIT ONLY
-   MOBILE VIEW IS NOT CHANGED
-   ============================================================ */
-
-@media (min-width: 701px) {
-
-  .messages-page {
-    width: 100% !important;
-    max-width: none !important;
-    min-height: calc(100vh - 40px) !important;
-    margin: 0 !important;
-    padding: 18px 22px 22px !important;
-  }
-
-  .messages-page .messages-instagram-head {
-    width: 100% !important;
-    max-width: none !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    margin: 0 0 10px !important;
-    padding: 0 8px !important;
-  }
-
-  .messages-page .messages-search-bar {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 0 10px !important;
-    min-height: 44px !important;
-    height: 44px !important;
-  }
-
-  .messages-page .messages-notes-section {
-    width: 100% !important;
-    max-width: none !important;
-    margin-bottom: 10px !important;
-    padding: 10px 14px !important;
-    border-radius: 18px !important;
-  }
-
-  .messages-page .messages-notes-header {
-    margin-bottom: 7px !important;
-  }
-
-  .messages-page .messages-notes-scroll {
-    padding: 2px 0 3px !important;
-    gap: 15px !important;
-  }
-
-  .messages-page .message-note-card {
-    min-width: 68px !important;
-    width: 68px !important;
-  }
-
-  .messages-page .message-note-avatar {
-    width: 54px !important;
-    height: 54px !important;
-  }
-
-  .messages-page .instagram-chat-layout {
-    width: 100% !important;
-    max-width: none !important;
-    height: calc(100vh - 190px) !important;
-    min-height: 420px !important;
-    margin: 0 !important;
-    display: grid !important;
-    grid-template-columns: 330px minmax(0, 1fr) !important;
-    border-radius: 22px !important;
-    overflow: hidden !important;
-  }
-
-  .messages-page .instagram-conversation-list {
-    width: 330px !important;
-    min-width: 330px !important;
-    max-width: 330px !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-  }
-
-  .messages-page .conversation-list-title {
-    height: 52px !important;
-    min-height: 52px !important;
-    padding: 0 14px !important;
-    flex: 0 0 52px !important;
-  }
-
-  .messages-page .conversation-scroll {
-    flex: 1 1 auto !important;
-    height: auto !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .messages-page .conversation-item {
-    min-height: 64px !important;
-    margin: 3px 6px !important;
-    width: calc(100% - 12px) !important;
-    padding: 8px 10px !important;
-  }
-
-  .messages-page .conversation-avatar-wrap {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    flex: 0 0 50px !important;
-  }
-
-  .messages-page .conversation-avatar-wrap .avatar {
-    width: 50px !important;
-    height: 50px !important;
-  }
-
-  .messages-page .instagram-chat {
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-  }
-
-  .messages-page .instagram-chat-head {
-    width: 100% !important;
-    height: 58px !important;
-    min-height: 58px !important;
-    flex: 0 0 58px !important;
-    padding: 0 14px !important;
-  }
-
-  .messages-page .instagram-chat-messages {
-    width: 100% !important;
-    flex: 1 1 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 18px 22px !important;
-  }
-
-  .messages-page .message-line {
-    max-width: 100% !important;
-    margin-bottom: 8px !important;
-  }
-
-  .messages-page .message-line .bubble {
-    max-width: min(68%, 650px) !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-  }
-
-  .messages-page .instagram-chat-input {
-    width: 100% !important;
-    height: 58px !important;
-    min-height: 58px !important;
-    flex: 0 0 58px !important;
-    display: flex !important;
-    align-items: center !important;
-    padding: 9px 12px !important;
-  }
-
-  .messages-page .instagram-chat-input input {
-    min-width: 0 !important;
-    width: 100% !important;
-  }
-
-  .messages-page .instagram-chat-placeholder {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    flex: 1 1 auto !important;
-  }
-}
-
-@media (min-width: 701px) and (max-width: 1100px) {
-  .messages-page {
-    padding-left: 14px !important;
-    padding-right: 14px !important;
-  }
-
-  .messages-page .instagram-chat-layout {
-    grid-template-columns: 285px minmax(0, 1fr) !important;
-  }
-
-  .messages-page .instagram-conversation-list {
-    width: 285px !important;
-    min-width: 285px !important;
-    max-width: 285px !important;
-  }
-
-  .messages-page .message-line .bubble {
-    max-width: 75% !important;
-  }
-}
-
-@media (min-width: 1101px) {
-  .messages-page .instagram-chat-layout {
-    grid-template-columns: 350px minmax(0, 1fr) !important;
-  }
-
-  .messages-page .instagram-conversation-list {
-    width: 350px !important;
-    min-width: 350px !important;
-    max-width: 350px !important;
-  }
-
-  .messages-page .instagram-chat-messages {
-    padding-left: 28px !important;
-    padding-right: 28px !important;
-  }
-}
-
-
-/* ============================================================
-   FINAL LAPTOP WIDTH FIX
-   Fill the complete available desktop canvas.
-   Mobile is untouched.
-   ============================================================ */
-
-@media (min-width: 701px) {
-  .main > .page.messages-page {
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    box-sizing: border-box !important;
-  }
-
-  .main > .page.messages-page .instagram-chat-layout {
-    width: 100% !important;
-    max-width: none !important;
-    box-sizing: border-box !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO — MESSAGE TIMESTAMP / SEEN TEXT FIX
-   ALL DEVICES: MOBILE + TABLET + LAPTOP + DESKTOP
-
-   Keeps:
-   - timestamp horizontal
-   - Sent / Seen horizontal
-   - timestamp below the message text
-   - timestamp and status on the same row
-   - no vertical character stacking
-   - existing message functionality unchanged
-   ============================================================ */
-
-.messages-page .message-line .bubble {
-  box-sizing: border-box !important;
-}
-
-.messages-page .message-line .bubble .message-meta {
-  width: 100% !important;
-  min-width: max-content !important;
-  max-width: 100% !important;
-  height: auto !important;
-  min-height: 12px !important;
-
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-
-  gap: 6px !important;
-  margin: 4px 0 0 !important;
-  padding: 0 !important;
-
-  white-space: nowrap !important;
-  writing-mode: horizontal-tb !important;
-  text-orientation: mixed !important;
-
-  overflow: visible !important;
-}
-
-.messages-page .message-line .bubble .message-meta small {
-  display: inline-flex !important;
-  flex: 0 0 auto !important;
-
-  width: auto !important;
-  min-width: max-content !important;
-  max-width: none !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  font-size: 8px !important;
-  line-height: 1.2 !important;
-
-  white-space: nowrap !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-  writing-mode: horizontal-tb !important;
-  text-orientation: mixed !important;
-
-  overflow: visible !important;
-  text-overflow: clip !important;
-}
-
-/* Make short messages large enough to contain timestamp + Seen/Sent. */
-.messages-page .message-line .bubble {
-  min-width: max-content !important;
-}
-
-/* Do not allow long message text to force the entire bubble off-screen. */
-.messages-page .message-line .bubble > span {
-  min-width: 0 !important;
-  max-width: 100% !important;
-  overflow-wrap: anywhere !important;
-  word-break: break-word !important;
-}
-
-/* Keep the meta row below the message text. */
-.messages-page .message-line .bubble > .message-meta {
-  position: static !important;
-  clear: both !important;
-}
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
-@media (max-width: 700px) {
-
-  .messages-page .message-line .bubble {
-    width: fit-content !important;
-    max-width: min(82%, 310px) !important;
-    min-width: max-content !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta {
-    width: max-content !important;
-    max-width: 100% !important;
-    min-width: max-content !important;
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 5px !important;
-    overflow: visible !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta small {
-    display: inline-flex !important;
-    flex: 0 0 auto !important;
-    width: auto !important;
-    min-width: max-content !important;
-    max-width: none !important;
-    white-space: nowrap !important;
-    word-break: normal !important;
-    overflow-wrap: normal !important;
-    writing-mode: horizontal-tb !important;
-    text-orientation: mixed !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-  }
-
-  .messages-page .message-line .bubble.mine .message-meta {
-    justify-content: flex-end !important;
-  }
-}
-
-/* ============================================================
-   TABLET
-   ============================================================ */
-@media (min-width: 701px) and (max-width: 1100px) {
-
-  .messages-page .message-line .bubble {
-    min-width: max-content !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta {
-    flex-wrap: nowrap !important;
-    min-width: max-content !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta small {
-    flex: 0 0 auto !important;
-    min-width: max-content !important;
-    white-space: nowrap !important;
-  }
-}
-
-/* ============================================================
-   LAPTOP / DESKTOP
-   ============================================================ */
-@media (min-width: 1101px) {
-
-  .messages-page .message-line .bubble {
-    min-width: max-content !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    min-width: max-content !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta small {
-    flex: 0 0 auto !important;
-    min-width: max-content !important;
-    white-space: nowrap !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO — TIMESTAMP ABOVE SENT / SEEN
-   ALL DEVICES
-   Layout:
-      😍
-      10:51 AM
-      Seen
-   or
-      😍
-      10:51 AM
-      Sent
-   ============================================================ */
-
-.messages-page .message-line .bubble .message-meta {
-  width: max-content !important;
-  min-width: max-content !important;
-  max-width: 100% !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-
-  align-items: flex-end !important;
-  justify-content: flex-start !important;
-
-  gap: 1px !important;
-  margin-top: 4px !important;
-
-  white-space: nowrap !important;
-  writing-mode: horizontal-tb !important;
-  text-orientation: mixed !important;
-
-  overflow: visible !important;
-}
-
-.messages-page .message-line .bubble .message-meta small {
-  display: block !important;
-  width: max-content !important;
-  min-width: max-content !important;
-  max-width: none !important;
-
-  flex: 0 0 auto !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  font-size: 8px !important;
-  line-height: 1.25 !important;
-
-  white-space: nowrap !important;
-  word-break: normal !important;
-  overflow-wrap: normal !important;
-
-  writing-mode: horizontal-tb !important;
-  text-orientation: mixed !important;
-
-  overflow: visible !important;
-  text-overflow: clip !important;
-}
-
-/* Keep the timestamp and Sent/Seen clearly separated. */
-.messages-page .message-line .bubble .message-meta small:first-child {
-  order: 1 !important;
-}
-
-.messages-page .message-line .bubble .message-meta small:nth-child(2) {
-  order: 2 !important;
-}
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
-@media (max-width: 700px) {
-
-  .messages-page .message-line .bubble .message-meta {
-    width: max-content !important;
-    min-width: max-content !important;
-    max-width: 100% !important;
-
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-
-    align-items: flex-end !important;
-    justify-content: flex-start !important;
-
-    gap: 1px !important;
-    overflow: visible !important;
-  }
-
-  .messages-page .message-line .bubble .message-meta small {
-    width: max-content !important;
-    min-width: max-content !important;
-    max-width: none !important;
-
-    flex: 0 0 auto !important;
-
-    white-space: nowrap !important;
-    word-break: normal !important;
-    overflow-wrap: normal !important;
-
-    writing-mode: horizontal-tb !important;
-    text-orientation: mixed !important;
-
-    overflow: visible !important;
-    text-overflow: clip !important;
-  }
-}
-
-/* ============================================================
-   TABLET
-   ============================================================ */
-@media (min-width: 701px) and (max-width: 1100px) {
-
-  .messages-page .message-line .bubble .message-meta {
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: flex-end !important;
-    gap: 1px !important;
-  }
-}
-
-/* ============================================================
-   LAPTOP / DESKTOP
-   ============================================================ */
-@media (min-width: 1101px) {
-
-  .messages-page .message-line .bubble .message-meta {
-    flex-direction: column !important;
-    flex-wrap: nowrap !important;
-    align-items: flex-end !important;
-    gap: 1px !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO — INSTAGRAM STYLE DELETE MENUS
-   Added only for Post / Reel / Saved / Profile / Story delete UI.
-   Existing application styles and responsive rules remain unchanged.
-   ============================================================ */
-
-/* Three-dot popup used by Post and Reel delete actions */
-div[style*="min-width: 170px"]{
-  min-width:220px !important;
-  width:220px !important;
-  padding:6px !important;
-  border-radius:16px !important;
-  background:rgba(255,255,255,.98) !important;
-  border:1px solid rgba(0,0,0,.10) !important;
-  box-shadow:0 12px 38px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08) !important;
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-  overflow:hidden !important;
-}
-
-/* Delete / Cancel rows inside the popup */
-div[style*="min-width: 170px"] > button{
-  width:100% !important;
-  min-height:44px !important;
-  margin:0 !important;
-  padding:11px 13px !important;
-  border:0 !important;
-  border-radius:11px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:10px !important;
-  background:transparent !important;
-  font-size:14px !important;
-  font-weight:650 !important;
-  line-height:1.2 !important;
-  text-align:left !important;
-  transition:background .16s ease,transform .16s ease !important;
-}
-
-div[style*="min-width: 170px"] > button:hover{
-  background:#f3f3f5 !important;
-  transform:none !important;
-}
-
-div[style*="min-width: 170px"] > button:active{
-  background:#e9e9ed !important;
-}
-
-div[style*="min-width: 170px"] > button:first-child{
-  color:#ed4956 !important;
-}
-
-div[style*="min-width: 170px"] > button:first-child:hover{
-  background:#fff0f1 !important;
-}
-
-div[style*="min-width: 170px"] > button:first-child svg{
-  width:17px !important;
-  height:17px !important;
-  flex:0 0 17px !important;
-  stroke-width:2.1 !important;
-}
-
-div[style*="min-width: 170px"] > button:last-child{
-  color:#26262a !important;
-}
-
-div[style*="min-width: 170px"] > button:last-child:hover{
-  background:#f3f3f5 !important;
-}
-
-/* Owner three-dot button */
-.post-head .icon-button[aria-label="More options"]{
-  position:relative;
-  width:38px !important;
-  height:38px !important;
-  border-radius:50% !important;
-  color:#26262a !important;
-  transition:background .16s ease,transform .16s ease !important;
-}
-
-.post-head .icon-button[aria-label="More options"]:hover{
-  background:#f1f1f2 !important;
-  transform:none !important;
-}
-
-.post-head .icon-button[aria-label="More options"]:active{
-  background:#e7e7e9 !important;
-}
-
-/* Story viewer top-right delete / close buttons */
-.story-viewer-top-actions{
-  display:flex !important;
-  align-items:center !important;
-  gap:7px !important;
-}
-
-.story-viewer-top-actions > button{
-  width:42px !important;
-  height:42px !important;
-  min-width:42px !important;
-  border-radius:50% !important;
-  background:rgba(255,255,255,.12) !important;
-  border:1px solid rgba(255,255,255,.12) !important;
-  color:#fff !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  transition:background .16s ease,transform .16s ease !important;
-}
-
-.story-viewer-top-actions > button:hover{
-  background:rgba(255,255,255,.22) !important;
-  transform:none !important;
-}
-
-.story-viewer-top-actions > button:first-child{
-  color:#ff5264 !important;
-}
-
-.story-viewer-top-actions > button:first-child:hover{
-  background:rgba(255,82,100,.18) !important;
-}
-
-.story-viewer-top-actions > button svg{
-  width:20px !important;
-  height:20px !important;
-}
-
-/* Reel three-dot button */
-.reel-card button[aria-label="More options"],
-.reels-page button[aria-label="More options"]{
-  border-radius:50% !important;
-  transition:background .16s ease !important;
-}
-
-.reel-card button[aria-label="More options"]:hover,
-.reels-page button[aria-label="More options"]:hover{
-  background:rgba(255,255,255,.14) !important;
-}
-
-/* Make delete menu stay above media and other cards */
-.post-card,
-.reel-card,
-.grid-media,
-.grid-reel{
-  position:relative;
-}
-
-div[style*="min-width: 170px"]{
-  isolation:isolate;
-}
-
-/* Mobile: compact Instagram-like bottom/right popup */
-@media (max-width:700px){
-  div[style*="min-width: 170px"]{
-    min-width:205px !important;
-    width:205px !important;
-    max-width:calc(100vw - 28px) !important;
-    border-radius:17px !important;
-    padding:6px !important;
-    box-shadow:0 16px 45px rgba(0,0,0,.45) !important;
-    background:rgba(28,29,34,.98) !important;
-    border:1px solid rgba(255,255,255,.12) !important;
-    color:#fff !important;
-  }
-
-  div[style*="min-width: 170px"] > button{
-    min-height:45px !important;
-    border-radius:11px !important;
-    color:#f4f4f6 !important;
-    font-size:14px !important;
-  }
-
-  div[style*="min-width: 170px"] > button:hover{
-    background:rgba(255,255,255,.09) !important;
-  }
-
-  div[style*="min-width: 170px"] > button:first-child,
-  div[style*="min-width: 170px"] > button:first-child:hover{
-    color:#ff5b6e !important;
-    background:rgba(255,80,100,.08) !important;
-  }
-
-  div[style*="min-width: 170px"] > button:last-child{
-    color:#f4f4f6 !important;
-  }
-
-  .story-viewer-top-actions > button{
-    width:40px !important;
-    height:40px !important;
-    min-width:40px !important;
-  }
-}
-
-/* Small phones */
-@media (max-width:390px){
-  div[style*="min-width: 170px"]{
-    min-width:190px !important;
-    width:190px !important;
-  }
-}
-
-/* ==========================================================
-   Instagram-style media options sheet
-   Added without changing the existing page/mobile layout.
-   Menus are rendered outside media cards so they cannot be clipped.
-   ========================================================== */
-.profile-media-more{
-  position:absolute !important;
-  top:10px !important;
-  right:10px !important;
-  z-index:30 !important;
-  width:38px !important;
-  height:38px !important;
-  min-width:38px !important;
-  border:1px solid rgba(255,255,255,.14) !important;
-  border-radius:50% !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  background:rgba(0,0,0,.58) !important;
-  color:#fff !important;
-  box-shadow:0 6px 20px rgba(0,0,0,.28) !important;
-  backdrop-filter:blur(10px) !important;
-  -webkit-backdrop-filter:blur(10px) !important;
-  cursor:pointer !important;
-}
-
-.profile-media-more:hover{
-  background:rgba(0,0,0,.74) !important;
-  transform:scale(1.03) !important;
-}
-
-.profile-media-more:active{
-  transform:scale(.96) !important;
-}
-
-.grid-post-more{
-  top:10px !important;
-  right:10px !important;
-}
-
-.profile-reel-card{
-  position:relative !important;
-  width:100% !important;
-  aspect-ratio:1 / 1 !important;
-  min-width:0 !important;
-  overflow:hidden !important;
-  background:#111318 !important;
-  border-radius:0 !important;
-  isolation:isolate !important;
-}
-
-.profile-reel-card > video{
-  width:100% !important;
-  height:100% !important;
-  display:block !important;
-  object-fit:cover !important;
-  background:#111318 !important;
-}
-
-.profile-reel-overlay{
-  position:absolute !important;
-  inset:0 !important;
-  z-index:4 !important;
-  pointer-events:none !important;
-  background:linear-gradient(to bottom,rgba(0,0,0,.42),transparent 30%,transparent 65%,rgba(0,0,0,.5)) !important;
-}
-
-.profile-reel-overlay .profile-media-more{
-  pointer-events:auto !important;
-}
-
-.profile-reel-caption{
-  position:absolute !important;
-  left:11px !important;
-  bottom:10px !important;
-  max-width:calc(100% - 58px) !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:6px !important;
-  color:#fff !important;
-  font-size:12px !important;
-  font-weight:700 !important;
-  text-shadow:0 2px 8px rgba(0,0,0,.7) !important;
-  overflow:hidden !important;
-}
-
-.profile-reel-caption span{
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  white-space:nowrap !important;
-}
-
-/* Full-screen backdrop. This is outside the card and above the entire app. */
-.ig-options-backdrop{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:999999 !important;
-  display:flex !important;
-  align-items:flex-end !important;
-  justify-content:center !important;
-  padding:18px !important;
-  background:rgba(0,0,0,.62) !important;
-  backdrop-filter:blur(5px) !important;
-  -webkit-backdrop-filter:blur(5px) !important;
-  animation:igOptionsFadeIn .16s ease-out !important;
-}
-
-.ig-options-sheet{
-  width:min(100%,520px) !important;
-  max-height:min(88vh,760px) !important;
-  overflow:hidden !important;
-  display:flex !important;
-  flex-direction:column !important;
-  background:#272c32 !important;
-  color:#f5f5f7 !important;
-  border:1px solid rgba(255,255,255,.10) !important;
-  border-radius:24px !important;
-  box-shadow:0 28px 90px rgba(0,0,0,.62) !important;
-  animation:igOptionsSheetUp .2s cubic-bezier(.2,.8,.2,1) !important;
-}
-
-.ig-options-handle{
-  width:46px !important;
-  height:5px !important;
-  border-radius:999px !important;
-  background:rgba(255,255,255,.55) !important;
-  margin:11px auto 8px !important;
-  flex:0 0 auto !important;
-}
-
-.ig-options-list{
-  overflow-y:auto !important;
-  overscroll-behavior:contain !important;
-  scrollbar-width:none !important;
-}
-
-.ig-options-list::-webkit-scrollbar{display:none !important;}
-
-.ig-option-row{
-  width:100% !important;
-  min-height:64px !important;
-  padding:14px 22px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:25px !important;
-  border:0 !important;
-  border-top:1px solid rgba(255,255,255,.13) !important;
-  background:transparent !important;
-  color:#f4f4f5 !important;
-  font-size:17px !important;
-  font-weight:450 !important;
-  line-height:1.2 !important;
-  text-align:left !important;
-  cursor:pointer !important;
-  transition:background .15s ease !important;
-}
-
-.ig-option-row:first-child{border-top:0 !important;}
-
-.ig-option-row svg{
-  width:28px !important;
-  height:28px !important;
-  min-width:28px !important;
-  color:#f5f5f6 !important;
-}
-
-.ig-option-row:hover{background:rgba(255,255,255,.055) !important;}
-.ig-option-row:active{background:rgba(255,255,255,.09) !important;}
-
-.ig-option-delete{
-  color:#ff6b7c !important;
-}
-
-.ig-option-delete svg{color:#ff6b7c !important;}
-.ig-option-delete:hover{background:rgba(255,82,104,.09) !important;}
-.ig-option-delete:disabled{opacity:.55 !important;cursor:wait !important;}
-
-.ig-options-cancel{
-  flex:0 0 auto !important;
-  width:calc(100% - 20px) !important;
-  min-height:58px !important;
-  margin:10px !important;
-  border:1px solid rgba(255,255,255,.10) !important;
-  border-radius:17px !important;
-  background:#30353b !important;
-  color:#fff !important;
-  font-size:16px !important;
-  font-weight:700 !important;
-  cursor:pointer !important;
-}
-
-.ig-options-cancel:hover{background:#383e45 !important;}
-
-@keyframes igOptionsFadeIn{
-  from{opacity:0}
-  to{opacity:1}
-}
-
-@keyframes igOptionsSheetUp{
-  from{opacity:0;transform:translateY(26px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-/* Mobile matches the tall Instagram bottom-sheet presentation. */
-@media (max-width:700px){
-  .ig-options-backdrop{
-    align-items:flex-end !important;
-    padding:0 !important;
-    background:rgba(0,0,0,.68) !important;
-  }
-
-  .ig-options-sheet{
-    width:100% !important;
-    max-width:none !important;
-    max-height:91vh !important;
-    border-radius:24px 24px 0 0 !important;
-    border-left:0 !important;
-    border-right:0 !important;
-    border-bottom:0 !important;
-    background:#292e34 !important;
-    box-shadow:0 -14px 55px rgba(0,0,0,.55) !important;
-  }
-
-  .ig-options-handle{
-    width:54px !important;
-    height:5px !important;
-    margin:12px auto 9px !important;
-    background:#aeb3ba !important;
-  }
-
-  .ig-option-row{
-    min-height:67px !important;
-    padding:15px 28px !important;
-    gap:28px !important;
-    font-size:18px !important;
-  }
-
-  .ig-option-row svg{
-    width:31px !important;
-    height:31px !important;
-    min-width:31px !important;
-  }
-
-  .ig-options-cancel{
-    min-height:62px !important;
-    margin:10px 12px 14px !important;
-    width:calc(100% - 24px) !important;
-    border-radius:18px !important;
-    background:#33383f !important;
-    font-size:17px !important;
-  }
-
-  .profile-media-more{
-    width:36px !important;
-    height:36px !important;
-    min-width:36px !important;
-    top:8px !important;
-    right:8px !important;
-  }
-}
-
-@media (max-width:390px){
-  .ig-options-sheet{max-height:94vh !important;}
-  .ig-option-row{
-    min-height:60px !important;
-    padding:13px 20px !important;
-    gap:21px !important;
-    font-size:16px !important;
-  }
-  .ig-option-row svg{
-    width:28px !important;
-    height:28px !important;
-    min-width:28px !important;
-  }
-}
-
-/* =========================================================
-   PRIVATE ACCOUNT FOLLOW REQUESTS - ACCEPT / REJECT
-   ========================================================= */
-.messages-requests-modal .request-row {
-  display: grid !important;
-  grid-template-columns: 48px minmax(0, 1fr) auto !important;
-  align-items: center !important;
-  gap: 12px !important;
-  padding: 13px 16px !important;
-}
-
-.messages-requests-modal .request-row-copy {
-  min-width: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-}
-
-.messages-requests-modal .request-row-copy span {
-  color: #888 !important;
-  font-size: 11px !important;
-  margin-top: 3px !important;
-}
-
-.messages-requests-modal .request-actions {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-  flex-shrink: 0 !important;
-}
-
-.messages-requests-modal .request-actions button {
-  height: 36px !important;
-  min-width: 76px !important;
-  padding: 0 13px !important;
-  border: 0 !important;
-  border-radius: 10px !important;
-  font-size: 12px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: transform .15s ease, opacity .15s ease, background .15s ease !important;
-}
-
-.messages-requests-modal .request-actions button:active {
-  transform: scale(.97) !important;
-}
-
-.messages-requests-modal .request-actions button:disabled {
-  opacity: .55 !important;
-  cursor: not-allowed !important;
-}
-
-.messages-requests-modal .request-accept-btn {
-  background: #0095f6 !important;
-  color: #fff !important;
-}
-
-.messages-requests-modal .request-accept-btn:hover:not(:disabled) {
-  background: #1877f2 !important;
-}
-
-.messages-requests-modal .request-reject-btn {
-  background: #efefef !important;
-  color: #111827 !important;
-}
-
-.messages-requests-modal .request-reject-btn:hover:not(:disabled) {
-  background: #e2e2e2 !important;
-}
-
-@media (max-width: 700px) {
-  .messages-requests-modal .request-row {
-    grid-template-columns: 48px minmax(0, 1fr) !important;
-    gap: 10px !important;
-    padding: 13px 14px !important;
-  }
-
-  .messages-requests-modal .request-actions {
-    grid-column: 2 !important;
-    width: 100% !important;
-    justify-content: flex-start !important;
-    margin-top: 4px !important;
-  }
-
-  .messages-requests-modal .request-actions button {
-    min-width: 0 !important;
-    flex: 1 1 0 !important;
-    height: 38px !important;
-  }
-}
-
-
-/* =========================================================
-   Profile Followers / Following modal
-   Opens from the profile stat counters and stays outside
-   the profile grid so the list is never clipped.
-   ========================================================= */
-.profile-stat-button{
-  appearance:none;
-  -webkit-appearance:none;
-  border:0;
-  background:transparent;
-  color:inherit;
-  padding:0;
-  margin:0;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:5px;
-  cursor:pointer;
-  text-align:left;
-  font:inherit;
-}
-.profile-stat-button:hover b{opacity:.78}
-.profile-stat-button:active{transform:scale(.98)}
-.profile-stat-button b{font-size:16px;line-height:1;font-weight:800}
-.profile-stat-button small{color:#8b8f99;font-size:13px;line-height:1}
-.connections-overlay{
-  position:fixed;
-  inset:0;
-  z-index:1200;
-  background:rgba(0,0,0,.68);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-.connections-modal{
-  width:min(100%,460px);
-  max-height:min(78vh,680px);
-  background:#fff;
-  color:#111318;
-  border:1px solid #e7e8ec;
-  border-radius:22px;
-  overflow:hidden;
-  box-shadow:0 24px 80px rgba(0,0,0,.42);
-  display:flex;
-  flex-direction:column;
-}
-.connections-header{
-  min-height:72px;
-  padding:13px 16px 13px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid #ececf0;
-  flex:0 0 auto;
-}
-.connections-header h2{margin:0;font-size:18px;font-weight:800}
-.connections-header span{display:block;margin-top:3px;color:#8a8f99;font-size:11px}
-.connections-header>button{
-  width:38px;
-  height:38px;
-  border:0;
-  border-radius:50%;
-  background:#f1f2f4;
-  color:#222;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-.connections-header>button svg{width:20px;height:20px}
-.connections-body{min-height:250px;overflow:auto;overscroll-behavior:contain}
-.connections-list{padding:6px 8px 12px}
-.connection-row{
-  min-height:70px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:9px 10px;
-  border-radius:14px;
-}
-.connection-row:hover{background:#f6f6f8}
-.connection-info{min-width:0;display:flex;flex-direction:column;gap:3px}
-.connection-info a{font-size:14px;font-weight:750;color:inherit;text-decoration:none}
-.connection-info>span{font-size:11px;color:#858a94;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
-.connections-state{
-  min-height:270px;
-  padding:35px 25px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  gap:8px;
-  color:#8a8f99;
-}
-.connections-state svg{width:38px;height:38px;margin-bottom:3px}
-.connections-state b{color:#202228;font-size:15px}
-.connections-state span{font-size:11px;max-width:280px;line-height:1.45}
-.connections-error b{color:#dc2626}
-.connections-spinner{
-  width:28px;
-  height:28px;
-  border:3px solid #e1e2e6;
-  border-top-color:#111318;
-  border-radius:50%;
-  animation:connectionsSpin .75s linear infinite;
-}
-@keyframes connectionsSpin{to{transform:rotate(360deg)}}
-
-@media(max-width:700px){
-  .profile-stat-button{align-items:flex-start}
-  .profile-stat-button b{font-size:14px}
-  .profile-stat-button small{font-size:10px}
-  .connections-overlay{
-    align-items:flex-end;
-    padding:0;
-    background:rgba(0,0,0,.58);
-  }
-  .connections-modal{
-    width:100%;
-    max-height:82vh;
-    border-radius:24px 24px 0 0;
-    border:0;
-    box-shadow:0 -20px 70px rgba(0,0,0,.5);
-  }
-  .connections-header{
-    min-height:68px;
-    padding:12px 16px 12px 20px;
-  }
-  .connections-header h2{font-size:17px}
-  .connections-body{max-height:calc(82vh - 68px)}
-  .connection-row{min-height:68px;padding:8px 13px}
-  .connection-info a{font-size:13px}
-  .connection-info>span{max-width:220px}
-}
-
-
-/* =========================================================
-   REELSGO - FOLLOWERS / FOLLOWING DARK THEME OVERRIDE
-   Only the connections modal/list is changed to dark UI.
-   ========================================================= */
-
-.connections-overlay{
-  background:rgba(0,0,0,.78) !important;
-  backdrop-filter:blur(12px) !important;
-  -webkit-backdrop-filter:blur(12px) !important;
-}
-
-.connections-modal{
-  background:#111318 !important;
-  color:#f5f7fa !important;
-  border:1px solid #2b2f38 !important;
-  box-shadow:0 28px 90px rgba(0,0,0,.70) !important;
-}
-
-.connections-header{
-  background:#111318 !important;
-  border-bottom:1px solid #2b2f38 !important;
-}
-
-.connections-header h2{
-  color:#f5f7fa !important;
-}
-
-.connections-header span{
-  color:#8e949f !important;
-}
-
-.connections-header>button{
-  background:#22262d !important;
-  color:#f5f7fa !important;
-}
-
-.connections-header>button:hover{
-  background:#2c3139 !important;
-}
-
-.connections-body{
-  background:#111318 !important;
-  scrollbar-color:#3a3f48 #111318;
-}
-
-.connections-list{
-  background:#111318 !important;
-}
-
-.connection-row{
-  background:transparent !important;
-  color:#f5f7fa !important;
-  border-bottom:1px solid #252932 !important;
-  border-radius:0 !important;
-  transition:background .18s ease;
-}
-
-.connection-row:hover{
-  background:#191c22 !important;
-}
-
-.connection-info a{
-  color:#f5f7fa !important;
-}
-
-.connection-info>span{
-  color:#8e949f !important;
-}
-
-.connections-state{
-  background:#111318 !important;
-  color:#8e949f !important;
-}
-
-.connections-state b{
-  color:#f5f7fa !important;
-}
-
-.connections-state span{
-  color:#8e949f !important;
-}
-
-.connections-spinner{
-  border-color:#30353e !important;
-  border-top-color:#f5f7fa !important;
-}
-
-.connections-error b{
-  color:#ff667d !important;
-}
-
-.connections-error svg{
-  color:#ff667d !important;
-}
-
-@media(max-width:700px){
-  .connections-overlay{
-    background:rgba(0,0,0,.82) !important;
-  }
-
-  .connections-modal{
-    background:#111318 !important;
-    border-top:1px solid #30343c !important;
-    border-radius:26px 26px 0 0 !important;
-    box-shadow:0 -22px 80px rgba(0,0,0,.75) !important;
-  }
-
-  .connections-header{
-    background:#111318 !important;
-    border-bottom:1px solid #2b2f38 !important;
-  }
-
-  .connections-body{
-    background:#111318 !important;
-  }
-
-  .connections-list{
-    padding:4px 8px 16px !important;
-    background:#111318 !important;
-  }
-
-  .connection-row{
-    min-height:72px !important;
-    background:transparent !important;
-    border-bottom:1px solid #252932 !important;
-  }
-
-  .connection-row:hover,
-  .connection-row:active{
-    background:#191c22 !important;
-  }
-}
-
-/* =========================================================
-   REELSGO - MUTUAL FOLLOW CONNECTION ACCESS
-   Private profile stats are clickable only when the relationship
-   is mutual (both users follow each other with accepted status).
-   ========================================================= */
-.profile-stat-locked{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-  gap:5px;
-  min-width:64px;
-  color:#f5f7fa;
-  opacity:.9;
-}
-
-.profile-stat-locked b{
-  font-size:16px;
-  line-height:1;
-  font-weight:800;
-}
-
-.profile-stat-locked small{
-  color:#8e949f;
-  font-size:13px;
-  line-height:1;
-}
-
-.profile-stat-button{
-  appearance:none;
-  -webkit-appearance:none;
-  border:0;
-  background:transparent;
-  color:#f5f7fa;
-  padding:0;
-  min-width:64px;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-  gap:5px;
-  cursor:pointer;
-  font:inherit;
-  text-align:left;
-}
-
-.profile-stat-button b{
-  color:#f5f7fa;
-}
-
-.profile-stat-button small{
-  color:#8e949f;
-}
-
-.profile-stat-button:hover b{
-  color:#ffffff;
-  opacity:1;
-}
-
-.connection-row .avatar{
-  flex:0 0 auto;
-  width:52px !important;
-  height:52px !important;
-  min-width:52px !important;
-  min-height:52px !important;
-  aspect-ratio:1 / 1 !important;
-  border-radius:50% !important;
-  overflow:hidden !important;
-  border:2px solid #303640 !important;
-  background:#191d24 !important;
-}
-
-.connection-row .avatar img{
-  width:100% !important;
-  height:100% !important;
-  min-width:100% !important;
-  min-height:100% !important;
-  max-width:none !important;
-  max-height:none !important;
-  aspect-ratio:1 / 1 !important;
-  object-fit:cover !important;
-  object-position:center !important;
-  border-radius:50% !important;
-  display:block !important;
-}
-
-@media(max-width:700px){
-  .profile-stat-locked,
-  .profile-stat-button{
-    min-width:54px;
-  }
-
-  .profile-stat-locked b,
-  .profile-stat-button b{
-    font-size:14px;
-  }
-
-  .profile-stat-locked small,
-  .profile-stat-button small{
-    font-size:10px;
-  }
-
-  .connection-row .avatar{
-    width:52px !important;
-    height:52px !important;
-    min-width:52px !important;
-    min-height:52px !important;
-  }
-}
-
-/* FINAL STORY AVATAR FIX - full circular profile image */
-.story-ring {
-  width: 70px !important;
-  height: 70px !important;
-  min-width: 70px !important;
-  min-height: 70px !important;
-  aspect-ratio: 1 / 1 !important;
-  border-radius: 50% !important;
-  padding: 3px !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  position: relative !important;
-  flex: 0 0 70px !important;
-  isolation: isolate !important;
-}
-
-.story-ring .avatar {
-  position: absolute !important;
-  inset: 3px !important;
-  width: calc(100% - 6px) !important;
-  height: calc(100% - 6px) !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 3px solid #fff !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  display: block !important;
-  background: #111827 !important;
-  aspect-ratio: 1 / 1 !important;
-}
-
-.story-ring .avatar img {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: block !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  border: 0 !important;
-  border-radius: 50% !important;
-  box-sizing: border-box !important;
-}
-
-.story-ring > img,
-.story-ring > video,
-.story-ring > .story-text-thumb {
-  position: absolute !important;
-  inset: 3px !important;
-  width: calc(100% - 6px) !important;
-  height: calc(100% - 6px) !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  border: 3px solid #fff !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-
-.story-ring i {
-  z-index: 5 !important;
-}
-
-@media (max-width: 700px) {
-  .story-ring {
-    width: 68px !important;
-    height: 68px !important;
-    min-width: 68px !important;
-    min-height: 68px !important;
-    flex-basis: 68px !important;
-  }
-
-  .story-ring .avatar {
-    inset: 3px !important;
-    width: calc(100% - 6px) !important;
-    height: calc(100% - 6px) !important;
-  }
-
-  .story-ring .avatar img {
-    width: 100% !important;
-    height: 100% !important;
-  }
-}
-
-
-/* Story profile: remove white borders while keeping the Instagram gradient ring */
-.story-ring .avatar,
-.story-ring .avatar img,
-.story-ring > img {
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-}
-
-.story-ring i {
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.story-placeholder {
-  border: 0 !important;
-}
-
-
-/* ============================================================
-   FINAL REELSGO STORY FIX
-   - No pink/orange/purple story ring
-   - No white border
-   - Full circular profile image
-   - + button sits OUTSIDE the photo
-   - Does not clip the + button
-   ============================================================ */
-
-.story-ring,
-.story-placeholder {
-  width: 70px !important;
-  height: 70px !important;
-  min-width: 70px !important;
-  min-height: 70px !important;
-  flex: 0 0 70px !important;
-  aspect-ratio: 1 / 1 !important;
-  position: relative !important;
-  padding: 0 !important;
-  margin-bottom: 6px !important;
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  background: transparent !important;
-  overflow: visible !important;
-  isolation: isolate !important;
-}
-
-.story-ring .avatar {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 70px !important;
-  height: 70px !important;
-  min-width: 70px !important;
-  min-height: 70px !important;
-  max-width: 70px !important;
-  max-height: 70px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  background: #111318 !important;
-  box-sizing: border-box !important;
-  display: block !important;
-}
-
-.story-ring .avatar img {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  display: block !important;
-}
-
-.story-ring > img,
-.story-ring > video,
-.story-ring > .story-text-thumb {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 70px !important;
-  height: 70px !important;
-  min-width: 70px !important;
-  min-height: 70px !important;
-  max-width: 70px !important;
-  max-height: 70px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-  display: block !important;
-  background: #111318 !important;
-}
-
-.story-ring .story-text-thumb {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: #fff !important;
-  font-size: 20px !important;
-  font-weight: 800 !important;
-}
-
-.story-ring i {
-  position: absolute !important;
-  right: -5px !important;
-  bottom: -4px !important;
-  z-index: 20 !important;
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  min-height: 24px !important;
-  border-radius: 50% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  background: #0095f6 !important;
-  color: #fff !important;
-  border: 2px solid #111318 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-style: normal !important;
-  font-size: 17px !important;
-  line-height: 1 !important;
-  overflow: visible !important;
-}
-
-.story-placeholder {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  color: #fff !important;
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  background: #111318 !important;
-}
-
-@media (max-width: 700px) {
-  .story-ring,
-  .story-placeholder {
-    width: 68px !important;
-    height: 68px !important;
-    min-width: 68px !important;
-    min-height: 68px !important;
-    flex-basis: 68px !important;
-  }
-
-  .story-ring .avatar {
-    width: 68px !important;
-    height: 68px !important;
-    min-width: 68px !important;
-    min-height: 68px !important;
-    max-width: 68px !important;
-    max-height: 68px !important;
-  }
-
-  .story-ring > img,
-  .story-ring > video,
-  .story-ring > .story-text-thumb {
-    width: 68px !important;
-    height: 68px !important;
-    min-width: 68px !important;
-    min-height: 68px !important;
-    max-width: 68px !important;
-    max-height: 68px !important;
-  }
-
-  .story-ring i {
-    right: -5px !important;
-    bottom: -4px !important;
-    width: 23px !important;
-    height: 23px !important;
-    min-width: 23px !important;
-    min-height: 23px !important;
-    font-size: 16px !important;
-  }
-}
-
-/* Keep the Story row horizontal and prevent the outside + button
-   from being clipped by the stories container. */
-.stories-card {
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-}
-
-.story {
-  overflow: visible !important;
-}
-
-.story > span {
-  position: relative;
-  z-index: 1;
-}
-
-/* Final dark/mobile story appearance */
-@media (max-width: 700px) {
-  .stories-card {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-  }
-
-  .story-ring {
-    background: transparent !important;
-  }
-}
-
-
-/* ============================================================
-   FINAL STORY VIEWERS DARK THEME
-   - Story viewers sheet is dark on mobile and desktop
-   - Dark rows, text, separators and close button
-   - Keeps the existing Story viewer functionality unchanged
-   ============================================================ */
-
-.story-viewers-sheet {
-  background: #111318 !important;
-  color: #f5f5f7 !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: 0 -20px 70px rgba(0,0,0,.75) !important;
-}
-
-.story-viewers-head {
-  background: #111318 !important;
-  border-bottom: 1px solid rgba(255,255,255,.10) !important;
-  color: #fff !important;
-}
-
-.story-viewers-head h2,
-.story-viewers-head b,
-.story-viewers-head strong {
-  color: #fff !important;
-}
-
-.story-viewers-head span {
-  color: #9297a3 !important;
-}
-
-.story-viewers-head button {
-  background: rgba(255,255,255,.09) !important;
-  color: #f5f5f7 !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-}
-
-.story-viewers-head button:hover {
-  background: rgba(255,255,255,.16) !important;
-}
-
-.story-viewers-list {
-  background: #111318 !important;
-}
-
-.story-viewer-row {
-  background: #111318 !important;
-  border-bottom: 1px solid rgba(255,255,255,.08) !important;
-  color: #f5f5f7 !important;
-}
-
-.story-viewer-row:hover {
-  background: rgba(255,255,255,.045) !important;
-}
-
-.story-viewer-user-info b {
-  color: #fff !important;
-}
-
-.story-viewer-user-info span {
-  color: #969ba6 !important;
-}
-
-.story-viewer-row > small {
-  color: #777d88 !important;
-}
-
-.story-viewers-empty {
-  background: #111318 !important;
-  color: #9297a3 !important;
-}
-
-.story-viewers-empty b {
-  color: #fff !important;
-}
-
-.story-viewers-empty span {
-  color: #8d929d !important;
-}
-
-.story-viewers-empty svg {
-  color: #aeb3bd !important;
-}
-
-.story-viewers-sheet .avatar {
-  border: 0 !important;
-  box-shadow: none !important;
-  background: #252832 !important;
-}
-
-.story-viewers-sheet .avatar img {
-  border: 0 !important;
-  box-shadow: none !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-}
-
-@media (max-width: 700px) {
-  .story-viewers-sheet {
-    width: 100% !important;
-    max-height: 72vh !important;
-    border-radius: 24px 24px 0 0 !important;
-    background: #111318 !important;
-    border-left: 0 !important;
-    border-right: 0 !important;
-    border-bottom: 0 !important;
-  }
-
-  .story-viewers-head {
-    height: 68px !important;
-    background: #111318 !important;
-  }
-
-  .story-viewers-list {
-    background: #111318 !important;
-    max-height: calc(72vh - 68px) !important;
-    padding-bottom: 18px !important;
-  }
-
-  .story-viewer-row {
-    background: #111318 !important;
-    padding: 12px 10px !important;
-  }
-
-  .story-viewer-row:active {
-    background: rgba(255,255,255,.07) !important;
-  }
-
-  .story-viewers-empty {
-    background: #111318 !important;
-  }
-}
-
-/* Story viewer itself stays completely dark. */
-.story-viewer {
-  background: rgba(5,6,9,.97) !important;
-}
-
-.story-viewer-content {
-  background: #050609 !important;
-}
-
-.story-viewer-top > button {
-  background: rgba(255,255,255,.10) !important;
-  border: 1px solid rgba(255,255,255,.10) !important;
-  color: #fff !important;
-}
-
-.story-viewer-top > button:hover {
-  background: rgba(255,255,255,.18) !important;
-}
-
-/* ============================================================
-   REELSGO WORDMARK — USE THE STYLISH REELSGO IMAGE
-   The supplied 222x93 wordmark is shown without cropping.
-   ============================================================ */
-.reelsgo-wordmark {
-  display: block !important;
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  object-fit: contain !important;
-  object-position: center !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  flex: 0 0 auto !important;
-}
-
-.brand {
-  justify-content: flex-start !important;
-  align-items: center !important;
-  gap: 0 !important;
-  overflow: hidden !important;
-}
-
-.brand-wordmark {
-  width: 148px !important;
-  height: auto !important;
-  max-height: 50px !important;
-  object-fit: contain !important;
-}
-
-.mobile-brand {
-  justify-content: flex-start !important;
-  gap: 0 !important;
-  overflow: hidden !important;
-}
-
-.mobile-brand-wordmark {
-  width: 118px !important;
-  height: auto !important;
-  max-height: 42px !important;
-  object-fit: contain !important;
-}
-
-.auth-title {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
-  flex-wrap: wrap !important;
-}
-
-.auth-inline-wordmark {
-  display: inline-block !important;
-  width: 112px !important;
-  height: auto !important;
-  max-height: 40px !important;
-  vertical-align: middle !important;
-}
-
-.auth-inline-wordmark-small {
-  width: 92px !important;
-  max-height: 34px !important;
-}
-
-@media (min-width: 701px) {
-  .brand-wordmark {
-    width: 150px !important;
-  }
-}
-
-@media (max-width: 700px) {
-  .mobile-brand-wordmark {
-    width: 112px !important;
-    max-height: 40px !important;
-  }
-
-  .auth-inline-wordmark {
-    width: 100px !important;
-    max-height: 36px !important;
-  }
-
-  .auth-inline-wordmark-small {
-    width: 86px !important;
-    max-height: 32px !important;
-  }
-}
-
-
-/* =========================================================
-   REELSGO — TEXT-ONLY CINEMATIC WORDMARK
-   No logo image is used anywhere.
-   ========================================================= */
-.reelsgo-text-logo {
-  display: inline-block !important;
-  position: relative !important;
-  white-space: nowrap !important;
-  font-family: Georgia, "Times New Roman", Times, serif !important;
-  font-weight: 900 !important;
-  font-style: normal !important;
-  letter-spacing: -2.8px !important;
-  line-height: .86 !important;
-  color: #f7f8fb !important;
-  text-transform: uppercase !important;
-  text-rendering: geometricPrecision !important;
-  -webkit-font-smoothing: antialiased !important;
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.72),
-    0 2px 0 rgba(255,255,255,.20),
-    0 3px 3px rgba(0,0,0,.55) !important;
-}
-
-.reelsgo-text-logo::first-letter {
-  letter-spacing: -3.2px !important;
-}
-
-.brand .reelsgo-text-logo {
-  font-size: 30px !important;
-  transform: scaleX(.93) !important;
-  transform-origin: left center !important;
-}
-
-.mobile-brand .reelsgo-text-logo {
-  font-size: 24px !important;
-  letter-spacing: -2.3px !important;
-  transform: scaleX(.94) !important;
-  transform-origin: left center !important;
-}
-
-.auth-showcase-wordmark {
-  font-size: clamp(42px, 5vw, 68px) !important;
-  letter-spacing: -5px !important;
-  transform: scaleX(.92) !important;
-  transform-origin: center center !important;
-}
-
-.auth-page-wordmark {
-  font-size: 42px !important;
-  letter-spacing: -4px !important;
-  transform: scaleX(.92) !important;
-  transform-origin: center center !important;
-}
-
-.auth-inline-wordmark {
-  font-size: 25px !important;
-  letter-spacing: -2.5px !important;
-  vertical-align: middle !important;
-  line-height: .9 !important;
-}
-
-.auth-inline-wordmark-small {
-  font-size: 22px !important;
-  letter-spacing: -2.2px !important;
-}
-
-/* Override the old image-wordmark sizing rules */
-.brand-wordmark,
-.mobile-brand-wordmark,
-.auth-inline-wordmark {
-  width: auto !important;
-  max-width: none !important;
-  height: auto !important;
-  max-height: none !important;
-  object-fit: initial !important;
-}
-
-@media (max-width: 700px) {
-  .brand .reelsgo-text-logo { font-size: 27px !important; }
-  .mobile-brand .reelsgo-text-logo {
-    font-size: 23px !important;
-    letter-spacing: -2.2px !important;
-  }
-  .auth-showcase-wordmark {
-    font-size: 45px !important;
-    letter-spacing: -4px !important;
-  }
-  .auth-page-wordmark {
-    font-size: 38px !important;
-    letter-spacing: -3.5px !important;
-  }
-  .auth-inline-wordmark {
-    font-size: 23px !important;
-    letter-spacing: -2.2px !important;
-  }
-  .auth-inline-wordmark-small {
-    font-size: 20px !important;
-  }
-}
-
-/* =========================================================
-   REELSGO TEXT WORDMARK — FINAL MOBILE WIDTH FIX
-   The mobile header buttons have a global 40px width rule.
-   Override that rule so the full REELSGO wordmark is visible.
-   ========================================================= */
-.mobile-header > .mobile-brand,
-.mobile-header > button.mobile-brand {
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  flex: 0 0 auto !important;
-  flex-shrink: 0 !important;
-  padding: 0 4px !important;
-  margin: 0 !important;
-  overflow: visible !important;
-  white-space: nowrap !important;
-  display: inline-flex !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-}
-
-.mobile-header > .mobile-brand .reelsgo-text-logo,
-.mobile-header > button.mobile-brand .reelsgo-text-logo {
-  display: inline-block !important;
-  width: max-content !important;
-  max-width: none !important;
-  min-width: max-content !important;
-  flex: 0 0 auto !important;
-  overflow: visible !important;
-  white-space: nowrap !important;
-  font-size: 27px !important;
-  letter-spacing: -2.2px !important;
-  line-height: .86 !important;
-  transform: none !important;
-}
-
-@media (max-width: 430px) {
-  .mobile-header > .mobile-brand,
-  .mobile-header > button.mobile-brand {
-    width: auto !important;
-    min-width: 145px !important;
-    max-width: calc(100vw - 120px) !important;
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-  }
-
-  .mobile-header > .mobile-brand .reelsgo-text-logo,
-  .mobile-header > button.mobile-brand .reelsgo-text-logo {
-    font-size: 25px !important;
-    letter-spacing: -2px !important;
-  }
-}
-
-@media (min-width: 431px) and (max-width: 700px) {
-  .mobile-header > .mobile-brand,
-  .mobile-header > button.mobile-brand {
-    min-width: 155px !important;
-  }
-}
-
-/* Make the desktop sidebar wordmark wide enough for the complete name. */
-.brand .reelsgo-text-logo {
-  width: max-content !important;
-  max-width: none !important;
-  min-width: max-content !important;
-  overflow: visible !important;
-  white-space: nowrap !important;
-  flex: 0 0 auto !important;
-  transform: none !important;
-  font-size: 30px !important;
-  letter-spacing: -2.5px !important;
-}
-
-/* =========================================================
-   REELSGO - TAG PEOPLE / MENTION PICKER
-   ========================================================= */
-.tag-people-trigger {
-  justify-content: center !important;
-  gap: 8px !important;
-}
-
-.tag-people-trigger.has-tags {
-  border-color: rgba(0,149,246,.45) !important;
-}
-
-.tag-people-panel {
-  width: 100%;
-  margin: 10px 0 12px;
-  padding: 12px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 18px;
-  background: rgba(20,22,28,.98);
-  box-sizing: border-box;
-}
-
-.tag-people-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.tag-people-head > div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.tag-people-head b {
-  color: #fff;
-  font-size: 15px;
-}
-
-.tag-people-head span {
-  color: #9499a5;
-  font-size: 12px;
-}
-
-.tag-selected-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin: 0 0 10px;
-}
-
-.tag-selected-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  max-width: 100%;
-  min-height: 34px;
-  padding: 3px 8px 3px 4px;
-  border: 1px solid rgba(0,149,246,.35);
-  border-radius: 999px;
-  background: rgba(0,149,246,.10);
-  color: #f5f7fa;
-  cursor: pointer;
-}
-
-.tag-selected-chip span {
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-.tag-selected-chip > svg {
-  width: 14px;
-  height: 14px;
-  color: #aeb5c1;
-  flex: 0 0 auto;
-}
-
-.tag-people-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-height: 42px;
-  padding: 0 10px;
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 12px;
-  background: rgba(255,255,255,.055);
-  box-sizing: border-box;
-}
-
-.tag-people-search > svg {
-  width: 17px;
-  height: 17px;
-  color: #8e94a0;
-  flex: 0 0 auto;
-}
-
-.tag-people-search input {
-  min-width: 0;
-  flex: 1;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #fff;
-  font-size: 13px;
-}
-
-.tag-people-search input::placeholder {
-  color: #777d88;
-}
-
-.tag-people-search > button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255,255,255,.08);
-  color: #dfe3ea;
-  cursor: pointer;
-}
-
-.tag-people-search > button svg {
-  width: 14px;
-  height: 14px;
-}
-
-.tag-people-results {
-  width: 100%;
-  max-height: 245px;
-  margin: 9px 0 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-radius: 12px;
-}
-
-.tag-person-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 60px;
-  padding: 7px 8px;
-  border: 0;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  background: transparent;
-  color: #fff;
-  text-align: left;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.tag-person-row:hover,
-.tag-person-row.selected {
-  background: rgba(255,255,255,.065);
-}
-
-.tag-person-row .avatar {
-  flex: 0 0 46px;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-.tag-person-info {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.tag-person-info b {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #fff;
-  font-size: 13px;
-}
-
-.tag-person-info small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #858b97;
-  font-size: 11px;
-}
-
-.tag-person-check {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  border: 1px solid rgba(255,255,255,.22);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.tag-person-check.active {
-  border-color: #0095f6;
-  background: #0095f6;
-  color: #fff;
-}
-
-.tag-person-check svg {
-  width: 14px;
-  height: 14px;
-}
-
-.tag-people-state {
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  color: #858b97;
-  text-align: center;
-  font-size: 12px;
-}
-
-.tag-people-state svg {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 2px;
-}
-
-.tag-people-state b {
-  color: #e8ebf0;
-  font-size: 13px;
-}
-
-@media (max-width: 700px) {
-  .tag-people-panel {
-    padding: 10px;
-    border-radius: 16px;
-  }
-
-  .tag-people-results {
-    max-height: 220px;
-  }
-
-  .tag-person-row {
-    min-height: 58px;
-  }
-}
-
-
-/* ============================================================
-   NEW POST / PUBLISH PAGE — DARK INSTAGRAM-STYLE MOBILE UI
-   ============================================================ */
-.publish-page-overlay{
-  position:fixed;
-  inset:0;
-  z-index:2000;
-  background:#080b11;
-  color:#f5f7fb;
-}
-.publish-page{
-  position:relative;
-  width:100%;
-  height:100dvh;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  background:#080b11;
-}
-.publish-page-header{
-  flex:0 0 76px;
-  min-height:76px;
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:18px 28px 8px;
-  background:#080b11;
-  border-bottom:1px solid rgba(255,255,255,.035);
-  z-index:10;
-}
-.publish-page-header h1{
-  margin:0;
-  flex:1;
-  text-align:center;
-  font-size:22px;
-  line-height:1;
-  font-weight:800;
-  color:#f7f8fb;
-  letter-spacing:-.45px;
-}
-.publish-header-spacer{width:48px;min-width:48px;height:48px}
-.publish-back-button{
-  width:48px;
-  height:48px;
-  min-width:48px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#20242c;
-  border:1px solid rgba(255,255,255,.10);
-  color:#f4f6fa;
-  box-shadow:0 5px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);
-}
-.publish-back-button:hover{background:#292e37}
-.publish-back-button svg{width:27px;height:27px}
-.publish-scroll-area{
-  flex:1 1 auto;
-  min-height:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;
-  scrollbar-color:#343943 transparent;
-  padding:24px 28px 150px;
-}
-.publish-scroll-area::-webkit-scrollbar{width:6px}
-.publish-scroll-area::-webkit-scrollbar-track{background:transparent}
-.publish-scroll-area::-webkit-scrollbar-thumb{background:#343943;border-radius:999px}
-.publish-media-section{width:100%;display:flex;justify-content:center;margin-bottom:22px}
-.publish-media-preview{
-  width:min(100%,560px);
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:2px 2px 8px;
-  scrollbar-width:none;
-  scroll-snap-type:x mandatory;
-}
-.publish-media-preview::-webkit-scrollbar{display:none}
-.publish-media-preview.multiple .publish-media-item{flex:0 0 min(78%,430px)}
-.publish-media-item{
-  position:relative;
-  flex:0 0 min(100%,430px);
-  aspect-ratio:4/5;
-  overflow:hidden;
-  border-radius:18px;
-  background:#12161d;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 15px 45px rgba(0,0,0,.35);
-  scroll-snap-align:center;
-}
-.publish-media-item img,.publish-media-item video{
-  width:100%;
-  height:100%;
-  max-width:none;
-  object-fit:cover;
-  object-position:center;
-}
-.publish-media-remove{
-  position:absolute;
-  top:10px;
-  right:10px;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(0,0,0,.58);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.16);
-  backdrop-filter:blur(12px);
-}
-.publish-media-remove svg{width:18px;height:18px}
-.publish-media-count{
-  position:absolute;
-  left:10px;
-  bottom:10px;
-  padding:6px 9px;
-  border-radius:999px;
-  background:rgba(0,0,0,.62);
-  color:#fff;
-  font-size:11px;
-  font-weight:800;
-  backdrop-filter:blur(12px);
-}
-.publish-empty-media{
-  width:min(100%,430px);
-  aspect-ratio:4/5;
-  border:1px dashed rgba(255,255,255,.16);
-  border-radius:18px;
-  background:#11151c;
-  color:#cbd0da;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-}
-.publish-empty-media svg{width:42px;height:42px;color:#e8ebf1}
-.publish-empty-media b{font-size:15px;color:#f5f7fa}
-.publish-empty-media span{font-size:12px;color:#858c98}
-.publish-caption-section{width:min(100%,560px);margin:0 auto}
-.publish-user-row{display:flex;align-items:center;gap:11px;margin-bottom:12px}
-.publish-user-row>div{display:flex;flex-direction:column;min-width:0}
-.publish-user-row b{font-size:13px;color:#f5f7fa}
-.publish-user-row span{font-size:11px;color:#7f8794;margin-top:2px}
-.publish-caption{
-  display:block;
-  width:100%;
-  min-height:76px;
-  max-height:170px;
-  resize:vertical;
-  padding:4px 2px;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#f4f6fa;
-  font-size:17px;
-  line-height:1.45;
-}
-.publish-caption::placeholder{color:#8c94a1}
-.publish-caption-meta{display:flex;justify-content:space-between;gap:12px;min-height:18px;font-size:10px;color:#656d79;margin:4px 0 18px}
-.publish-pills{width:min(100%,560px);margin:0 auto 12px;display:flex;gap:12px}
-.publish-pills button{
-  min-width:112px;
-  height:48px;
-  padding:0 17px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  background:#20242c;
-  border:1px solid rgba(255,255,255,.05);
-  color:#f4f6fa;
-  font-size:14px;
-  font-weight:700;
-}
-.publish-pills button:hover,.publish-pills button.active{background:#292e37;border-color:rgba(255,255,255,.12)}
-.publish-pills svg{width:20px;height:20px}
-.publish-options-card{width:min(100%,560px);margin:0 auto;background:#11151b;border-radius:18px;border:1px solid rgba(255,255,255,.055);overflow:hidden}
-.publish-option-row{
-  width:100%;
-  min-height:78px;
-  padding:12px 8px 12px 4px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  text-align:left;
-  color:#f5f7fb;
-  background:transparent;
-}
-.publish-option-row:hover{background:rgba(255,255,255,.035)}
-.publish-option-row.selected{background:rgba(255,255,255,.025)}
-.publish-option-row>svg{width:23px;height:23px;color:#9ca4b0;flex:0 0 23px}
-.publish-option-icon{width:50px;height:50px;min-width:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#f4f6fa;background:#20242c}
-.publish-option-icon svg{width:27px;height:27px}
-.publish-audio-icon{background:transparent;color:#f4f6fa}
-.publish-option-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.publish-option-copy b{font-size:15px;font-weight:700;color:#f5f7fa}
-.publish-option-copy small{font-size:11px;color:#747d89;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.publish-option-divider{height:1px;background:rgba(255,255,255,.055);margin-left:68px}
-.publish-inline-field{margin:0 14px 14px 68px;min-height:44px;border:1px solid #30353f;border-radius:12px;background:#1a1e25;display:flex;align-items:center;gap:8px;padding:0 10px}
-.publish-inline-field>svg{width:18px;height:18px;color:#969eaa;flex:0 0 auto}
-.publish-inline-field input{width:100%;min-width:0;background:transparent;border:0;color:#f5f7fa;font-size:13px;outline:none}
-.publish-inline-field input::placeholder{color:#6f7784}
-.publish-inline-field button{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;color:#9aa2ae}
-.publish-inline-field button svg{width:16px;height:16px}
-.publish-hashtags-section{width:min(100%,560px);margin:14px auto 0;padding:14px 16px;border-radius:16px;background:#11151b;border:1px solid rgba(255,255,255,.055)}
-.publish-hashtags-section label{display:block;color:#8b94a1;font-size:11px;margin-bottom:7px}
-.publish-hashtags-section input{width:100%;border:0;outline:0;background:transparent;color:#f5f7fa;font-size:13px}
-.publish-hashtags-section input::placeholder{color:#646c78}
-.publish-bottom-bar{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  z-index:20;
-  padding:14px 28px calc(16px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,#080b11 68%,rgba(8,11,17,.94) 82%,rgba(8,11,17,0));
-}
-.publish-share-button{
-  width:min(100%,560px);
-  height:58px;
-  display:block;
-  margin:0 auto;
-  border-radius:16px;
-  background:#465df5;
-  color:#fff;
-  font-size:16px;
-  font-weight:800;
-  box-shadow:0 12px 35px rgba(70,93,245,.22);
-}
-.publish-share-button:hover{background:#5368ff}
-.publish-share-button:disabled{background:#303641;color:#777f8b;box-shadow:none}
-.publish-tag-overlay{position:absolute;inset:0;z-index:40;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;padding:0}
-.publish-tag-card{width:min(100%,560px);max-height:88%;overflow:hidden;background:#111318;border-radius:26px 26px 0 0;border:1px solid rgba(255,255,255,.10);box-shadow:0 -20px 70px rgba(0,0,0,.65)}
-.publish-tag-card .tag-people-panel{max-height:78vh;border:0;border-radius:0;background:#111318}
-.publish-tag-card .tag-people-results{max-height:45vh;overflow-y:auto}
-
-@media(max-width:700px){
-  .publish-page-header{flex-basis:74px;min-height:74px;padding:18px 20px 7px}
-  .publish-page-header h1{font-size:20px}
-  .publish-header-spacer{width:46px;min-width:46px}
-  .publish-back-button{width:46px;height:46px;min-width:46px}
-  .publish-scroll-area{padding:20px 20px 145px}
-  .publish-media-item{border-radius:16px}
-  .publish-media-preview.multiple .publish-media-item{flex-basis:82%}
-  .publish-caption{font-size:16px;min-height:72px}
-  .publish-pills{gap:10px}
-  .publish-pills button{height:46px;min-width:104px}
-  .publish-option-row{min-height:76px}
-  .publish-bottom-bar{padding-left:20px;padding-right:20px;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
-  .publish-share-button{height:58px;border-radius:15px}
-}
-
-@media(min-width:701px){
-  .publish-page{max-width:760px;margin:0 auto;border-left:1px solid rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.05);box-shadow:0 0 90px rgba(0,0,0,.38)}
-  .publish-page-overlay{background:#030507}
-}
-
-/* ============================================================
-   NEW STORY — SAME PUBLISH INTERFACE AS NEW POST
-   ============================================================ */
-.story-publish-page .publish-media-section{
-  margin-bottom:22px;
-}
-.story-publish-preview{
-  width:min(100%,560px);
-  overflow:hidden;
-  padding:2px 2px 8px;
-}
-.story-publish-preview .publish-media-item{
-  flex:0 0 min(100%,430px);
-}
-.story-publish-media-item{
-  aspect-ratio:4/5;
-}
-.story-empty-media{
-  cursor:pointer;
-}
-.story-empty-media svg{
-  width:42px;
-  height:42px;
-}
-.story-publish-caption{
-  min-height:90px;
-}
-.story-publish-page .publish-option-icon{
-  background:#20242c;
-}
-
-@media(max-width:700px){
-  .story-publish-preview .publish-media-item{
-    flex-basis:min(100%,430px);
-  }
-  .story-publish-media-item{
-    border-radius:16px;
-  }
-  .story-publish-caption{
-    min-height:82px;
-  }
-}
-
-
-/* =========================================================
-   AUTH — USE THE REAL REELSGO LOGO IMAGE
-   Login and Signup use image.png only for the brand mark.
-   ========================================================= */
-.auth-showcase-logo{
-  width:88px !important;
-  height:88px !important;
-  margin:0 0 24px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border-radius:0 !important;
-}
-
-.auth-logo{
-  width:100px !important;
-  height:100px !important;
-  margin:0 auto 12px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border-radius:0 !important;
-}
-
-.auth-logo-image{
-  display:block !important;
-  width:100% !important;
-  height:100% !important;
-  max-width:100% !important;
-  max-height:100% !important;
-  object-fit:contain !important;
-  object-position:center !important;
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-  border-radius:0 !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-
-.auth-showcase-image{
-  width:88px !important;
-  height:88px !important;
-}
-
-.auth-page-image{
-  width:100px !important;
-  height:100px !important;
-}
-
-.auth-title{
-  margin-top:4px !important;
-}
-
-@media (max-width:700px){
-  .auth-showcase-logo{
-    width:76px !important;
-    height:76px !important;
-    margin-bottom:20px !important;
-  }
-
-  .auth-showcase-image{
-    width:76px !important;
-    height:76px !important;
-  }
-
-  .auth-logo{
-    width:86px !important;
-    height:86px !important;
-    margin-bottom:10px !important;
-  }
-
-  .auth-page-image{
-    width:86px !important;
-    height:86px !important;
-  }
-}
-
-/* =========================================================
-   AUTH LOGO — SMALL ROUNDED APP-ICON STYLE
-   ========================================================= */
-.auth-showcase-logo{
-  width:64px !important;
-  height:64px !important;
-  margin:0 0 18px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border-radius:18px !important;
-  overflow:hidden !important;
-}
-
-.auth-showcase-image{
-  width:64px !important;
-  height:64px !important;
-  max-width:64px !important;
-  max-height:64px !important;
-  object-fit:cover !important;
-  object-position:center !important;
-  display:block !important;
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  border-radius:18px !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-
-.auth-logo{
-  width:58px !important;
-  height:58px !important;
-  margin:0 auto 10px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  border-radius:16px !important;
-  overflow:hidden !important;
-}
-
-.auth-page-image{
-  width:58px !important;
-  height:58px !important;
-  max-width:58px !important;
-  max-height:58px !important;
-  object-fit:cover !important;
-  object-position:center !important;
-  display:block !important;
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  border-radius:16px !important;
-  margin:0 !important;
-  padding:0 !important;
-}
-
-.auth-title{
-  margin-top:2px !important;
-}
-
-@media(max-width:700px){
-  .auth-showcase-logo{
-    width:58px !important;
-    height:58px !important;
-    margin-bottom:16px !important;
-    border-radius:16px !important;
-  }
-
-  .auth-showcase-image{
-    width:58px !important;
-    height:58px !important;
-    max-width:58px !important;
-    max-height:58px !important;
-    border-radius:16px !important;
-  }
-
-  .auth-logo{
-    width:52px !important;
-    height:52px !important;
-    margin-bottom:9px !important;
-    border-radius:15px !important;
-  }
-
-  .auth-page-image{
-    width:52px !important;
-    height:52px !important;
-    max-width:52px !important;
-    max-height:52px !important;
-    border-radius:15px !important;
-  }
-}
-
-
-/* ============================================================
-   REELSGO EDIT PROFILE — INSTAGRAM STYLE
-   Feature-only update. Existing styles above remain unchanged.
-   ============================================================ */
-
-.edit-profile-overlay{
-  position:fixed;
-  inset:0;
-  z-index:1500;
-  background:#080b10;
-  color:#f5f5f7;
-  display:flex;
-  align-items:stretch;
-  justify-content:center;
-}
-
-.edit-profile-screen{
-  width:100%;
-  max-width:760px;
-  height:100%;
-  background:#090c11;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  border-left:1px solid rgba(255,255,255,.06);
-  border-right:1px solid rgba(255,255,255,.06);
-}
-
-.edit-profile-topbar{
-  flex:0 0 82px;
-  height:82px;
-  min-height:82px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  border-bottom:1px solid rgba(255,255,255,.09);
-  background:#090c11;
-  padding:0 24px;
-}
-
-.edit-profile-topbar h1{
-  color:#f5f5f7;
-  font-size:23px;
-  font-weight:750;
-  letter-spacing:-.3px;
-}
-
-.edit-profile-back{
-  position:absolute;
-  left:24px;
-  top:50%;
-  transform:translateY(-50%) rotate(180deg);
-  width:54px;
-  height:54px;
-  border-radius:50%;
-  background:#22262d;
-  border:1px solid rgba(255,255,255,.12);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.edit-profile-back svg{
-  width:30px;
-  height:30px;
-}
-
-.edit-profile-back:hover{
-  background:#2c3139;
-}
-
-.edit-profile-done{
-  position:absolute;
-  right:24px;
-  top:50%;
-  transform:translateY(-50%);
-  background:transparent;
-  color:#78a0ff;
-  font-size:16px;
-  font-weight:750;
-  padding:9px 4px;
-}
-
-.edit-profile-done:hover{
-  color:#a7bdff;
-}
-
-.edit-profile-scroll{
-  flex:1 1 auto;
-  min-height:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;
-  scrollbar-color:#343943 transparent;
-  padding-bottom:40px;
-}
-
-.edit-profile-scroll::-webkit-scrollbar{
-  width:7px;
-}
-
-.edit-profile-scroll::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-.edit-profile-scroll::-webkit-scrollbar-thumb{
-  background:#343943;
-  border-radius:999px;
-}
-
-.edit-profile-photo-section{
-  padding:38px 28px 32px;
-  text-align:center;
-  border-bottom:1px solid rgba(255,255,255,.09);
-}
-
-.edit-profile-photo-row{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:44px;
-}
-
-.edit-profile-photo-button,
-.edit-profile-avatar-button{
-  padding:0;
-  background:transparent;
-  color:#fff;
-}
-
-.edit-profile-photo-button{
-  width:168px;
-  height:168px;
-  border-radius:50%;
-  overflow:hidden;
-}
-
-.edit-profile-photo-button .avatar{
-  width:168px!important;
-  height:168px!important;
-  min-width:168px!important;
-  min-height:168px!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-
-.edit-profile-avatar-button{
-  width:168px;
-  height:168px;
-  border-radius:50%;
-  border:2px solid #282d35;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.edit-profile-avatar-button svg{
-  width:58px;
-  height:58px;
-  color:#f4f5f7;
-}
-
-.edit-profile-photo-link{
-  margin-top:25px;
-  background:transparent;
-  color:#78a0ff;
-  font-size:20px;
-  font-weight:650;
-}
-
-.edit-profile-fields{
-  width:100%;
-}
-
-.edit-profile-field-row{
-  min-height:92px;
-  display:grid;
-  grid-template-columns:200px minmax(0,1fr);
-  align-items:center;
-  gap:20px;
-  padding:0 34px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.edit-profile-field-row>label{
-  color:#f1f2f5;
-  font-size:20px;
-  font-weight:400;
-}
-
-.edit-profile-field-control{
-  min-width:0;
-  border-bottom:1px solid rgba(255,255,255,.09);
-  min-height:68px;
-  display:flex;
-  align-items:center;
-}
-
-.edit-profile-field-control input,
-.edit-profile-field-control textarea{
-  width:100%;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#f5f5f7;
-  font-size:19px;
-  padding:14px 0;
-}
-
-.edit-profile-field-control input::placeholder,
-.edit-profile-field-control textarea::placeholder{
-  color:#8f96a3;
-}
-
-.edit-profile-field-control input[readonly]{
-  color:#e7e9ed;
-}
-
-.edit-profile-bio-row{
-  align-items:start;
-  padding-top:10px;
-  padding-bottom:10px;
-}
-
-.edit-profile-bio-row>label{
-  padding-top:16px;
-}
-
-.edit-profile-bio-control{
-  position:relative;
-  display:block;
-  min-height:155px;
-}
-
-.edit-profile-bio-control textarea{
-  min-height:125px;
-  resize:none;
-  line-height:1.45;
-}
-
-.edit-profile-bio-control>span{
-  display:block;
-  text-align:right;
-  color:#858c98;
-  font-size:12px;
-  padding-bottom:7px;
-}
-
-.edit-profile-action-row{
-  width:100%;
-  min-height:92px;
-  padding:0 34px;
-  background:transparent;
-  color:#f5f5f7;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-  text-align:left;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.edit-profile-action-row:hover{
-  background:rgba(255,255,255,.025);
-}
-
-.edit-profile-action-row>span:first-child{
-  font-size:20px;
-}
-
-.edit-profile-action-value{
-  color:#a2a9b5;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:8px;
-  min-width:0;
-  text-align:right;
-}
-
-.edit-profile-action-value svg{
-  width:28px;
-  height:28px;
-  color:#aeb5c0;
-  flex:0 0 auto;
-}
-
-.edit-profile-action-stack{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.edit-profile-action-stack b{
-  color:#f5f5f7;
-  font-size:20px;
-  font-weight:400;
-}
-
-.edit-profile-action-stack small{
-  color:#a0a7b2;
-  font-size:16px;
-}
-
-.edit-profile-ai-row,
-.edit-profile-privacy{
-  min-height:116px;
-  padding:18px 34px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:25px;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.edit-profile-ai-row>div,
-.edit-profile-privacy>div{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.edit-profile-ai-row b,
-.edit-profile-privacy b{
-  color:#f5f5f7;
-  font-size:20px;
-  font-weight:400;
-}
-
-.edit-profile-ai-row span,
-.edit-profile-privacy span{
-  color:#a0a7b2;
-  font-size:16px;
-  line-height:1.4;
-}
-
-.edit-profile-ai-row a{
-  color:#6d8fff;
-}
-
-.edit-profile-toggle{
-  width:74px;
-  height:40px;
-  min-width:74px;
-  border-radius:999px;
-  background:#aeb5c0;
-  padding:4px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  transition:background .18s ease;
-}
-
-.edit-profile-toggle span{
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  background:#11151b;
-  display:block;
-  transition:transform .18s ease;
-}
-
-.edit-profile-toggle.on{
-  background:#4f72ff;
-  justify-content:flex-end;
-}
-
-.edit-profile-toggle.on span{
-  background:#fff;
-}
-
-.edit-profile-professional{
-  width:100%;
-  min-height:82px;
-  padding:0 34px;
-  background:transparent;
-  color:#79a0ff;
-  border-bottom:1px solid rgba(255,255,255,.08);
-  text-align:left;
-  font-size:20px;
-  font-weight:500;
-}
-
-.edit-profile-professional:hover{
-  background:rgba(255,255,255,.025);
-}
-
-@media(max-width:700px){
-  .edit-profile-overlay{
-    align-items:stretch;
-  }
-
-  .edit-profile-screen{
-    max-width:none;
-    border:0;
-  }
-
-  .edit-profile-topbar{
-    flex:0 0 82px;
-    height:82px;
-    min-height:82px;
-    padding:0 62px;
-  }
-
-  .edit-profile-topbar h1{
-    font-size:21px;
-  }
-
-  .edit-profile-back{
-    left:28px;
-    width:52px;
-    height:52px;
-  }
-
-  .edit-profile-done{
-    right:22px;
-    font-size:15px;
-  }
-
-  .edit-profile-photo-section{
-    padding:38px 20px 30px;
-  }
-
-  .edit-profile-photo-row{
-    justify-content:center;
-    gap:0;
-  }
-
-  .edit-profile-photo-button,
-  .edit-profile-photo-button .avatar{
-    width:128px!important;
-    height:128px!important;
-    min-width:128px!important;
-    min-height:128px!important;
-  }
-
-  .edit-profile-avatar-button{
-    width:128px;
-    height:128px;
-  }
-
-  .edit-profile-avatar-button svg{
-    width:48px;
-    height:48px;
-  }
-
-  .edit-profile-photo-link{
-    margin-top:22px;
-    font-size:17px;
-  }
-
-  .edit-profile-field-row{
-    min-height:76px;
-    grid-template-columns:112px minmax(0,1fr);
-    gap:10px;
-    padding:0 18px;
-  }
-
-  .edit-profile-field-row>label{
-    font-size:17px;
-  }
-
-  .edit-profile-field-control{
-    min-height:58px;
-  }
-
-  .edit-profile-field-control input,
-  .edit-profile-field-control textarea{
-    font-size:16px;
-  }
-
-  .edit-profile-bio-row{
-    min-height:150px;
-    padding-top:8px;
-    padding-bottom:8px;
-  }
-
-  .edit-profile-bio-control{
-    min-height:130px;
-  }
-
-  .edit-profile-bio-control textarea{
-    min-height:105px;
-  }
-
-  .edit-profile-action-row{
-    min-height:76px;
-    padding:0 18px;
-  }
-
-  .edit-profile-action-row>span:first-child{
-    font-size:17px;
-  }
-
-  .edit-profile-action-value{
-    font-size:15px;
-  }
-
-  .edit-profile-action-value svg{
-    width:23px;
-    height:23px;
-  }
-
-  .edit-profile-action-stack b{
-    font-size:17px;
-  }
-
-  .edit-profile-action-stack small{
-    font-size:13px;
-  }
-
-  .edit-profile-ai-row,
-  .edit-profile-privacy{
-    min-height:110px;
-    padding:17px 18px;
-    gap:15px;
-  }
-
-  .edit-profile-ai-row b,
-  .edit-profile-privacy b{
-    font-size:17px;
-  }
-
-  .edit-profile-ai-row span,
-  .edit-profile-privacy span{
-    font-size:13px;
-  }
-
-  .edit-profile-toggle{
-    width:68px;
-    min-width:68px;
-    height:37px;
-  }
-
-  .edit-profile-toggle span{
-    width:29px;
-    height:29px;
-  }
-
-  .edit-profile-professional{
-    min-height:76px;
-    padding:0 18px;
-    font-size:17px;
-  }
-}
-
-@media(max-width:390px){
-  .edit-profile-photo-row{
-    justify-content:center;
-    gap:0;
-  }
-
-  .edit-profile-photo-button,
-  .edit-profile-photo-button .avatar{
-    width:112px!important;
-    height:112px!important;
-    min-width:112px!important;
-    min-height:112px!important;
-  }
-
-  .edit-profile-avatar-button{
-    width:112px;
-    height:112px;
-  }
-
-  .edit-profile-field-row{
-    grid-template-columns:98px minmax(0,1fr);
-  }
-
-  .edit-profile-field-row>label{
-    font-size:16px;
-  }
-
-  .edit-profile-action-value{
-    max-width:58%;
-  }
-}
-
-
-/* =========================================================
-   REELSGO INSTAGRAM-STYLE NOTIFICATION CENTER
-   ========================================================= */
-
-.notifications-page{
-  width:100%;
-  min-height:100vh;
-  background:#080b0f;
-  color:#f5f7fa;
-  padding:18px 34px 60px;
-}
-
-.notifications-topbar{
-  width:100%;
-  max-width:980px;
-  height:66px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:52px 1fr 82px;
-  align-items:center;
-}
-
-.notifications-topbar h1{
-  margin:0;
-  text-align:center;
-  color:#f7f8fa;
-  font-size:24px;
-  line-height:1;
-  font-weight:800;
-  letter-spacing:-.35px;
-}
-
-.notifications-back,
-.notifications-top-action{
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  border:1px solid rgba(255,255,255,.08);
-  background:#252a30;
-  color:#f5f7fa;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
-.notifications-back:hover,
-.notifications-top-action:hover{
-  background:#30353c;
-}
-
-.notifications-back svg{
-  width:27px;
-  height:27px;
-}
-
-.notifications-top-action{
-  width:52px;
-  border-radius:16px;
-  justify-self:end;
-  gap:0;
-  background:transparent;
-  border:0;
-}
-
-.notifications-top-action svg:first-child{
-  width:25px;
-  height:25px;
-}
-
-.notifications-top-action svg:last-child{
-  width:15px;
-  height:15px;
-  margin-left:-6px;
-  margin-top:19px;
-}
-
-.notifications-filter-wrap{
-  width:100%;
-  max-width:980px;
-  margin:8px auto 0;
-  overflow:hidden;
-}
-
-.notifications-filters{
-  width:100%;
-  display:flex;
-  gap:14px;
-  overflow-x:auto;
-  padding:0 0 8px;
-  scrollbar-width:none;
-}
-
-.notifications-filters::-webkit-scrollbar{
-  display:none;
-}
-
-.notifications-filters button{
-  flex:0 0 auto;
-  min-height:50px;
-  padding:0 28px;
-  border:0;
-  border-radius:16px;
-  background:#252a30;
-  color:#f3f4f6;
-  font-size:16px;
-  font-weight:700;
-  white-space:nowrap;
-  cursor:pointer;
-  transition:.18s ease;
-}
-
-.notifications-filters button:hover{
-  background:#30353c;
-}
-
-.notifications-filters button.active{
-  background:#fff;
-  color:#111318;
-}
-
-.notifications-content{
-  width:100%;
-  max-width:980px;
-  margin:22px auto 0;
-}
-
-.notification-group{
-  margin:0 0 30px;
-}
-
-.notification-group h2{
-  margin:0 0 18px;
-  color:#f6f7f9;
-  font-size:20px;
-  line-height:1.1;
-  font-weight:800;
-}
-
-.notification-group-list{
-  width:100%;
-}
-
-.notification-row{
-  width:100%;
-  min-height:92px;
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:10px 2px;
-  position:relative;
-}
-
-.notification-avatar-button{
-  flex:0 0 64px;
-  width:64px;
-  height:64px;
-  padding:0;
-  border:0;
-  background:transparent;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
-.notification-avatar-button .avatar{
-  width:58px!important;
-  height:58px!important;
-  min-width:58px!important;
-  min-height:58px!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-
-.notification-copy{
-  flex:1 1 auto;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-}
-
-.notification-main-text{
-  min-width:0;
-  display:block;
-  color:#f1f3f5;
-  font-size:16px;
-  line-height:1.25;
-}
-
-.notification-main-text .profile-username-link{
-  color:#fff;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.notification-message{
-  color:#f0f2f5;
-  font-weight:500;
-}
-
-.notification-time{
-  color:#9299a4;
-  font-size:14px;
-  margin-left:5px;
-  white-space:nowrap;
-}
-
-.notification-message-button{
-  margin-top:10px;
-  min-width:204px;
-  height:49px;
-  padding:0 20px;
-  border:0;
-  border-radius:13px;
-  background:#2b3037;
-  color:#f4f5f7;
-  font-size:16px;
-  font-weight:750;
-  cursor:pointer;
-}
-
-.notification-message-button:hover{
-  background:#343a42;
-}
-
-.notification-media{
-  flex:0 0 86px;
-  width:86px;
-  height:86px;
-  padding:0;
-  border:0;
-  border-radius:13px;
-  overflow:hidden;
-  background:#181c21;
-  cursor:pointer;
-}
-
-.notification-media img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center;
-}
-
-.notification-chevron{
-  flex:0 0 27px;
-  width:27px;
-  height:27px;
-  color:#a1a8b3;
-  margin-right:4px;
-}
-
-.notifications-loading{
-  min-height:260px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#9aa1ac;
-  font-size:15px;
-}
-
-.notifications-empty{
-  min-height:320px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:22px;
-  background:#11151a;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:#9299a4;
-}
-
-.notifications-empty svg{
-  width:44px;
-  height:44px;
-  margin-bottom:13px;
-  color:#b7bdc6;
-}
-
-.notifications-empty h2{
-  color:#fff;
-  margin:0 0 7px;
-  font-size:20px;
-}
-
-.notifications-empty p{
-  margin:0;
-  color:#9299a4;
-  font-size:13px;
-}
-
-/* Keep this page wide on desktop instead of the old 920px page width. */
-@media(min-width:701px){
-  .main:has(.notifications-page){
-    padding-bottom:0!important;
-  }
-}
-
-@media(max-width:700px){
-  .notifications-page{
-    min-height:calc(100dvh - 57px);
-    padding:8px 14px 86px;
-    background:#080b0f;
-  }
-
-  .notifications-topbar{
-    height:58px;
-    grid-template-columns:45px 1fr 56px;
-  }
-
-  .notifications-topbar h1{
-    font-size:20px;
-  }
-
-  .notifications-back{
-    width:42px;
-    height:42px;
-  }
-
-  .notifications-top-action{
-    width:48px;
-    height:42px;
-  }
-
-  .notifications-top-action svg:first-child{
-    width:22px;
-    height:22px;
-  }
-
-  .notifications-top-action svg:last-child{
-    width:14px;
-    height:14px;
-    margin-left:-5px;
-    margin-top:16px;
-  }
-
-  .notifications-filter-wrap{
-    margin-top:5px;
-  }
-
-  .notifications-filters{
-    gap:9px;
-    padding-bottom:5px;
-  }
-
-  .notifications-filters button{
-    min-height:45px;
-    padding:0 19px;
-    border-radius:14px;
-    font-size:14px;
-  }
-
-  .notifications-content{
-    margin-top:20px;
-  }
-
-  .notification-group{
-    margin-bottom:26px;
-  }
-
-  .notification-group h2{
-    margin-bottom:13px;
-    font-size:19px;
-  }
-
-  .notification-row{
-    min-height:86px;
-    gap:9px;
-    padding:8px 0;
-  }
-
-  .notification-avatar-button{
-    flex:0 0 58px;
-    width:58px;
-    height:58px;
-  }
-
-  .notification-avatar-button .avatar{
-    width:54px!important;
-    height:54px!important;
-    min-width:54px!important;
-    min-height:54px!important;
-  }
-
-  .notification-main-text{
-    font-size:14px;
-    line-height:1.32;
-  }
-
-  .notification-time{
-    font-size:13px;
-  }
-
-  .notification-media{
-    flex:0 0 70px;
-    width:70px;
-    height:70px;
-    border-radius:11px;
-  }
-
-  .notification-chevron{
-    width:21px;
-    height:21px;
-    flex:0 0 21px;
-  }
-
-  .notification-message-button{
-    min-width:145px;
-    height:43px;
-    margin-top:8px;
-    padding:0 17px;
-    border-radius:12px;
-    font-size:14px;
-  }
-}
-
-@media(max-width:390px){
-  .notifications-page{
-    padding-left:10px;
-    padding-right:10px;
-  }
-
-  .notifications-filters button{
-    padding:0 16px;
-    font-size:13px;
-  }
-
-  .notification-row{
-    gap:7px;
-  }
-
-  .notification-avatar-button{
-    flex-basis:54px;
-    width:54px;
-  }
-
-  .notification-avatar-button .avatar{
-    width:50px!important;
-    height:50px!important;
-    min-width:50px!important;
-    min-height:50px!important;
-  }
-
-  .notification-media{
-    width:62px;
-    height:62px;
-    flex-basis:62px;
-  }
-
-  .notification-main-text{
-    font-size:13px;
-  }
-}
-
-
-/* ============================================================
-   FINAL REELSGO NOTIFICATIONS CENTER
-   Uses the exact class names from NotificationsPage in App.jsx.
-   The old notification CSS used different class names, which
-   caused the mobile layout to break. This block intentionally
-   overrides only the notification center.
-   ============================================================ */
-
-.notifications-page{
-  width:100%!important;
-  max-width:none!important;
-  min-height:calc(100vh - 57px)!important;
-  margin:0!important;
-  padding:22px 28px 60px!important;
-  background:#080b0f!important;
-  color:#f5f7fa!important;
-  overflow-x:hidden!important;
-}
-
-.notifications-center-head{
-  width:min(980px,100%)!important;
-  min-height:72px!important;
-  margin:0 auto 18px!important;
-  padding:0!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:16px!important;
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-
-.notifications-center-head h1{
-  margin:0!important;
-  padding:0!important;
-  color:#f7f8fa!important;
-  font-size:32px!important;
-  line-height:1.1!important;
-  font-weight:800!important;
-  letter-spacing:-.8px!important;
-}
-
-.notifications-refresh{
-  flex:0 0 52px!important;
-  width:52px!important;
-  height:52px!important;
-  min-width:52px!important;
-  min-height:52px!important;
-  border-radius:50%!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  background:#171c23!important;
-  color:#f5f7fa!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  box-shadow:none!important;
-}
-
-.notifications-refresh svg{
-  width:25px!important;
-  height:25px!important;
-  margin:0!important;
-}
-
-.notifications-refresh:hover{
-  background:#222831!important;
-}
-
-.notification-tabs{
-  width:min(980px,100%)!important;
-  margin:0 auto 18px!important;
-  padding:0!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:10px!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  scrollbar-width:none!important;
-  -webkit-overflow-scrolling:touch!important;
-}
-
-.notification-tabs::-webkit-scrollbar{
-  display:none!important;
-}
-
-.notification-tabs button{
-  flex:0 0 auto!important;
-  min-height:44px!important;
-  height:44px!important;
-  padding:0 18px!important;
-  border-radius:13px!important;
-  border:1px solid rgba(255,255,255,.08)!important;
-  background:#20252c!important;
-  color:#f2f4f7!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:7px!important;
-  font-size:13px!important;
-  font-weight:700!important;
-  white-space:nowrap!important;
-}
-
-.notification-tabs button:hover{
-  background:#292f37!important;
-}
-
-.notification-tabs button.active{
-  background:#fff!important;
-  color:#111318!important;
-  border-color:#fff!important;
-}
-
-.notification-tab-count{
-  min-width:18px!important;
-  height:18px!important;
-  padding:0 5px!important;
-  border-radius:999px!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  background:#ef4444!important;
-  color:#fff!important;
-  font-size:10px!important;
-  line-height:1!important;
-}
-
-.notification-tabs button.active .notification-tab-count{
-  background:#111318!important;
-  color:#fff!important;
-}
-
-.notification-feed,
-.notification-request-center{
-  width:min(980px,100%)!important;
-  margin:0 auto!important;
-}
-
-.notification-card{
-  width:100%!important;
-  min-height:82px!important;
-  margin:0 0 10px!important;
-  padding:12px 14px!important;
-  display:flex!important;
-  align-items:center!important;
-  gap:12px!important;
-  text-align:left!important;
-  border-radius:16px!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  background:#0d1116!important;
-  color:#f5f7fa!important;
-}
-
-.notification-card:hover{
-  background:#11161d!important;
-}
-
-.notification-card .avatar{
-  flex:0 0 48px!important;
-  width:48px!important;
-  height:48px!important;
-  min-width:48px!important;
-  min-height:48px!important;
-}
-
-.notification-copy{
-  min-width:0!important;
-  flex:1 1 auto!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:4px!important;
-}
-
-.notification-copy>span{
-  min-width:0!important;
-  color:#f5f7fa!important;
-  font-size:14px!important;
-  line-height:1.35!important;
-  overflow-wrap:anywhere!important;
-}
-
-.notification-copy .profile-username-link{
-  color:#fff!important;
-  font-weight:800!important;
-}
-
-.notification-copy small{
-  color:#8e96a3!important;
-  font-size:11px!important;
-}
-
-.notification-arrow{
-  flex:0 0 22px!important;
-  width:22px!important;
-  height:22px!important;
-  color:#aeb5bf!important;
-}
-
-.notification-section-title{
-  width:100%!important;
-  min-height:52px!important;
-  margin:0 0 10px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:12px!important;
-}
-
-.notification-section-title h2{
-  margin:0!important;
-  color:#fff!important;
-  font-size:20px!important;
-  line-height:1.2!important;
-}
-
-.notification-section-title p{
-  margin:4px 0 0!important;
-  color:#8e96a3!important;
-  font-size:12px!important;
-}
-
-.notification-section-title>button{
-  flex:0 0 auto!important;
-  height:36px!important;
-  padding:0 13px!important;
-  border-radius:10px!important;
-  background:#20252c!important;
-  color:#fff!important;
-  font-size:11px!important;
-  font-weight:700!important;
-}
-
-.notification-requests-list{
-  width:100%!important;
-}
-
-.notification-request-row{
-  width:100%!important;
-  min-height:76px!important;
-  margin:0 0 10px!important;
-  padding:12px 14px!important;
-  display:grid!important;
-  grid-template-columns:52px minmax(0,1fr) auto!important;
-  align-items:center!important;
-  gap:12px!important;
-  border-radius:16px!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  background:#0d1116!important;
-  color:#fff!important;
-}
-
-.notification-request-row>.avatar{
-  width:52px!important;
-  height:52px!important;
-  min-width:52px!important;
-  min-height:52px!important;
-}
-
-.notification-request-copy{
-  min-width:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:3px!important;
-}
-
-.notification-request-copy .profile-username-link{
-  color:#fff!important;
-  font-size:14px!important;
-  font-weight:800!important;
-}
-
-.notification-request-copy>span{
-  color:#e8ebef!important;
-  font-size:12px!important;
-}
-
-.notification-request-copy>small{
-  color:#8e96a3!important;
-  font-size:10px!important;
-}
-
-.notification-request-actions{
-  display:flex!important;
-  align-items:center!important;
-  gap:7px!important;
-}
-
-.notification-request-actions button{
-  height:36px!important;
-  min-width:76px!important;
-  padding:0 12px!important;
-  border-radius:10px!important;
-  font-size:11px!important;
-  font-weight:800!important;
-}
-
-.notification-request-accept{
-  background:#fff!important;
-  color:#111318!important;
-}
-
-.notification-request-reject{
-  background:#252b33!important;
-  color:#fff!important;
-}
-
-.notification-center-state{
-  width:100%!important;
-  min-height:180px!important;
-  padding:30px 15px!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  flex-direction:column!important;
-  gap:7px!important;
-  text-align:center!important;
-  color:#9299a4!important;
-  border:1px solid rgba(255,255,255,.08)!important;
-  border-radius:16px!important;
-  background:#0d1116!important;
-}
-
-.notification-center-state svg{
-  width:32px!important;
-  height:32px!important;
-  color:#aeb5bf!important;
-}
-
-.notification-center-state h3{
-  margin:0!important;
-  color:#fff!important;
-  font-size:16px!important;
-}
-
-.notification-center-state p{
-  margin:0!important;
-  color:#8e96a3!important;
-  font-size:11px!important;
-}
-
-/* Mobile: compact Instagram-style notification page.
-   No large title hero and no subtitle. */
-@media(max-width:700px){
-  .main:has(.notifications-page){
-    padding-top:57px!important;
-    padding-bottom:76px!important;
-  }
-
-  .notifications-page{
-    width:100%!important;
-    min-height:calc(100dvh - 57px)!important;
-    padding:10px 10px 82px!important;
-    margin:0!important;
-    background:#080b0f!important;
-    overflow-x:hidden!important;
-  }
-
-  .notifications-center-head{
-    width:100%!important;
-    min-height:46px!important;
-    height:46px!important;
-    margin:0 0 8px!important;
-    padding:0 2px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-  }
-
-  .notifications-center-head h1{
-    font-size:22px!important;
-    line-height:1!important;
-    letter-spacing:-.4px!important;
-  }
-
-  .notifications-refresh{
-    flex:0 0 38px!important;
-    width:38px!important;
-    height:38px!important;
-    min-width:38px!important;
-    min-height:38px!important;
-    border-radius:50%!important;
-    background:#171c23!important;
-  }
-
-  .notifications-refresh svg{
-    width:20px!important;
-    height:20px!important;
-  }
-
-  .notification-tabs{
-    width:calc(100% + 20px)!important;
-    margin:0 -10px 12px!important;
-    padding:2px 10px 5px!important;
-    gap:7px!important;
-    overflow-x:auto!important;
-  }
-
-  .notification-tabs button{
-    min-height:38px!important;
-    height:38px!important;
-    padding:0 13px!important;
-    border-radius:11px!important;
-    font-size:11px!important;
-  }
-
-  .notification-feed,
-  .notification-request-center{
-    width:100%!important;
-    margin:0!important;
-  }
-
-  .notification-card{
-    min-height:70px!important;
-    margin-bottom:8px!important;
-    padding:9px 10px!important;
-    gap:9px!important;
-    border-radius:14px!important;
-  }
-
-  .notification-card .avatar{
-    flex:0 0 44px!important;
-    width:44px!important;
-    height:44px!important;
-    min-width:44px!important;
-    min-height:44px!important;
-  }
-
-  .notification-copy>span{
-    font-size:12px!important;
-    line-height:1.32!important;
-  }
-
-  .notification-copy small{
-    font-size:9px!important;
-  }
-
-  .notification-arrow{
-    flex:0 0 18px!important;
-    width:18px!important;
-    height:18px!important;
-  }
-
-  .notification-section-title{
-    min-height:42px!important;
-    margin:0 0 8px!important;
-  }
-
-  .notification-section-title h2{
-    font-size:17px!important;
-  }
-
-  .notification-section-title p{
-    font-size:10px!important;
-  }
-
-  .notification-section-title>button{
-    height:32px!important;
-    padding:0 10px!important;
-    border-radius:9px!important;
-    font-size:10px!important;
-  }
-
-  .notification-request-row{
-    min-height:0!important;
-    margin-bottom:8px!important;
-    padding:10px!important;
-    grid-template-columns:44px minmax(0,1fr)!important;
-    gap:8px!important;
-    border-radius:14px!important;
-  }
-
-  .notification-request-row>.avatar{
-    width:44px!important;
-    height:44px!important;
-    min-width:44px!important;
-    min-height:44px!important;
-  }
-
-  .notification-request-copy{
-    min-width:0!important;
-  }
-
-  .notification-request-copy .profile-username-link{
-    font-size:12px!important;
-  }
-
-  .notification-request-copy>span{
-    font-size:10px!important;
-  }
-
-  .notification-request-copy>small{
-    font-size:8px!important;
-  }
-
-  .notification-request-actions{
-    grid-column:2!important;
-    width:100%!important;
-    display:grid!important;
-    grid-template-columns:1fr 1fr!important;
-    gap:6px!important;
-  }
-
-  .notification-request-actions button{
-    width:100%!important;
-    min-width:0!important;
-    height:32px!important;
-    min-height:32px!important;
-    padding:0 7px!important;
-    border-radius:9px!important;
-    font-size:10px!important;
-  }
-
-  .notification-center-state{
-    min-height:150px!important;
-    border-radius:14px!important;
-  }
-}
-
-@media(max-width:390px){
-  .notifications-page{
-    padding-left:8px!important;
-    padding-right:8px!important;
-  }
-
-  .notification-tabs{
-    width:calc(100% + 16px)!important;
-    margin-left:-8px!important;
-    margin-right:-8px!important;
-    padding-left:8px!important;
-    padding-right:8px!important;
-  }
-
-  .notification-tabs button{
-    padding:0 11px!important;
-    font-size:10px!important;
-  }
-
-  .notification-card{
-    padding:8px!important;
-  }
-
-  .notification-card .avatar{
-    width:42px!important;
-    height:42px!important;
-    min-width:42px!important;
-    min-height:42px!important;
-  }
-}
-
-
-/* ============================================================
    REELSGO CUSTOM BLUE VERIFICATION
-   ============================================================ */
-
-.verified-badge{
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  width:18px !important;
-  height:18px !important;
-  min-width:18px !important;
-  min-height:18px !important;
-  margin-left:4px !important;
-  color:#fff !important;
-  vertical-align:middle !important;
-  flex:0 0 auto !important;
-}
-
-.verified-badge svg{
-  width:18px !important;
-  height:18px !important;
-  fill:#168cff !important;
-  color:#fff !important;
-  stroke-width:2.3 !important;
-}
-
-.profile-username-link{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:2px !important;
-}
-
-.profile-line h1{
-  display:flex !important;
-  align-items:center !important;
-  gap:4px !important;
-  min-width:0 !important;
-}
-
-.profile-line h1 .verified-badge{
-  transform:translateY(1px);
-}
-
-.verification-overlay{
-  position:fixed !important;
-  inset:0 !important;
-  z-index:10000 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  padding:20px !important;
-  background:rgba(0,0,0,.72) !important;
-  backdrop-filter:blur(10px) !important;
-  -webkit-backdrop-filter:blur(10px) !important;
-}
-
-.verification-card{
-  width:min(100%,460px) !important;
-  max-height:90vh !important;
-  overflow:auto !important;
-  padding:26px !important;
-  border:1px solid rgba(255,255,255,.12) !important;
-  border-radius:24px !important;
-  background:#111418 !important;
-  color:#f5f5f5 !important;
-  box-shadow:0 30px 100px rgba(0,0,0,.65) !important;
-}
-
-.verification-head{
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  margin-bottom:18px !important;
-}
-
-.verification-icon{
-  width:58px !important;
-  height:58px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:50% !important;
-  background:rgba(22,140,255,.13) !important;
-  color:#168cff !important;
-}
-
-.verification-icon svg{
-  width:34px !important;
-  height:34px !important;
-  fill:#168cff !important;
-  color:#fff !important;
-}
-
-.verification-card h2{
-  margin:0 0 9px !important;
-  color:#fff !important;
-  font-size:24px !important;
-  line-height:1.2 !important;
-}
-
-.verification-card > p{
-  margin:0 0 20px !important;
-  color:#a8adb6 !important;
-  font-size:14px !important;
-  line-height:1.6 !important;
-}
-
-.verification-label{
-  display:block !important;
-  margin-bottom:7px !important;
-  color:#fff !important;
-  font-size:13px !important;
-  font-weight:750 !important;
-}
-
-.verification-input{
-  width:100% !important;
-  height:50px !important;
-  border:1px solid #30353d !important;
-  border-radius:12px !important;
-  padding:0 13px !important;
-  outline:none !important;
-  background:#0b0d10 !important;
-  color:#fff !important;
-  font-size:15px !important;
-}
-
-.verification-input:focus{
-  border-color:#168cff !important;
-  box-shadow:0 0 0 3px rgba(22,140,255,.14) !important;
-}
-
-.verification-input::placeholder{
-  color:#777e89 !important;
-}
-
-.verification-hint{
-  display:block !important;
-  margin-top:7px !important;
-  color:#858b96 !important;
-  font-size:11px !important;
-}
-
-.verification-error{
-  margin-top:12px !important;
-  padding:12px !important;
-  border:1px solid rgba(255,77,103,.22) !important;
-  border-radius:10px !important;
-  background:rgba(255,77,103,.09) !important;
-  color:#ff7287 !important;
-  font-size:13px !important;
-  line-height:1.5 !important;
-}
-
-.verification-success{
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  margin-top:14px !important;
-  padding:13px !important;
-  border:1px solid rgba(34,197,94,.18) !important;
-  border-radius:11px !important;
-  background:rgba(34,197,94,.09) !important;
-  color:#63e08c !important;
-  font-size:13px !important;
-}
-
-.verification-success svg{
-  width:20px !important;
-  height:20px !important;
-  fill:#168cff !important;
-  color:#fff !important;
-  flex:0 0 auto !important;
-}
-
-.verification-note{
-  display:flex !important;
-  align-items:flex-start !important;
-  gap:9px !important;
-  margin-top:18px !important;
-  padding:12px !important;
-  border:1px solid #252a31 !important;
-  border-radius:11px !important;
-  background:#171a20 !important;
-  color:#9299a4 !important;
-  font-size:11px !important;
-  line-height:1.55 !important;
-}
-
-.verification-note svg{
-  width:17px !important;
-  height:17px !important;
-  min-width:17px !important;
-  color:#168cff !important;
-}
-
-.verification-settings-card{
-  display:flex !important;
-  align-items:center !important;
-  gap:12px !important;
-  margin:14px 0 8px !important;
-  padding:15px !important;
-  border:1px solid rgba(22,140,255,.22) !important;
-  border-radius:15px !important;
-  background:linear-gradient(135deg,rgba(22,140,255,.10),rgba(22,140,255,.035)) !important;
-}
-
-.verification-settings-icon{
-  width:44px !important;
-  height:44px !important;
-  min-width:44px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:50% !important;
-  background:rgba(22,140,255,.13) !important;
-  color:#168cff !important;
-}
-
-.verification-settings-icon svg{
-  width:26px !important;
-  height:26px !important;
-  fill:#168cff !important;
-  color:#fff !important;
-}
-
-.verification-settings-copy{
-  min-width:0 !important;
-  flex:1 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:4px !important;
-}
-
-.verification-settings-copy b{
-  display:flex !important;
-  align-items:center !important;
-  color:#fff !important;
-  font-size:13px !important;
-}
-
-.verification-settings-copy span{
-  color:#9198a3 !important;
-  font-size:11px !important;
-  line-height:1.45 !important;
-}
-
-.verification-settings-button{
-  flex:0 0 auto !important;
-  margin:0 !important;
-  padding:9px 13px !important;
-  background:#168cff !important;
-}
-
-.verification-active-label{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:5px !important;
-  flex:0 0 auto !important;
-  color:#168cff !important;
-  font-size:12px !important;
-  font-weight:800 !important;
-}
-
-.verification-active-label svg{
-  width:18px !important;
-  height:18px !important;
-  fill:#168cff !important;
-  color:#fff !important;
-}
-
-@media(max-width:700px){
-  .verification-overlay{
-    align-items:flex-end !important;
-    padding:0 !important;
-  }
-
-  .verification-card{
-    width:100% !important;
-    max-height:94vh !important;
-    border-radius:24px 24px 0 0 !important;
-    padding:23px 18px calc(23px + env(safe-area-inset-bottom)) !important;
-  }
-
-  .verification-card h2{
-    font-size:21px !important;
-  }
-
-  .verification-settings-card{
-    align-items:flex-start !important;
-  }
-
-  .verification-settings-button{
-    padding:8px 10px !important;
-    font-size:12px !important;
-  }
-
-  .verified-badge,
-  .verified-badge svg{
-    width:17px !important;
-    height:17px !important;
-    min-width:17px !important;
-    min-height:17px !important;
-  }
-}
-
-
-/* ReelsGo verification success alert */
-.verification-alert{
-  position:fixed !important;
-  top:24px !important;
-  right:24px !important;
-  z-index:100000 !important;
-  width:min(430px,calc(100vw - 32px)) !important;
-  min-height:76px !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:12px !important;
-  padding:14px 15px !important;
-  background:#ecfdf3 !important;
-  border:1px solid #86efac !important;
-  border-left:5px solid #16a34a !important;
-  border-radius:14px !important;
-  box-shadow:0 16px 40px rgba(0,0,0,.22) !important;
-  color:#166534 !important;
-  animation:verificationAlertIn .28s ease-out both !important;
-}
-.verification-alert-icon{
-  width:42px !important;
-  height:42px !important;
-  flex:0 0 42px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border-radius:50% !important;
-  background:#22c55e !important;
-  color:#fff !important;
-}
-.verification-alert-icon svg{
-  width:25px !important;
-  height:25px !important;
-  color:#fff !important;
-  fill:#16a34a !important;
-}
-.verification-alert-copy{
-  min-width:0 !important;
-  flex:1 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:3px !important;
-}
-.verification-alert-copy strong{
-  color:#166534 !important;
-  font-size:14px !important;
-  font-weight:800 !important;
-  line-height:1.3 !important;
-}
-.verification-alert-copy span{
-  color:#15803d !important;
-  font-size:12px !important;
-  line-height:1.4 !important;
-}
-.verification-alert-close{
-  width:30px !important;
-  height:30px !important;
-  flex:0 0 30px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  border:0 !important;
-  background:transparent !important;
-  color:#15803d !important;
-  border-radius:8px !important;
-  cursor:pointer !important;
-}
-.verification-alert-close:hover{
-  background:#dcfce7 !important;
-}
-.verification-alert-close svg{
-  width:17px !important;
-  height:17px !important;
-}
-@keyframes verificationAlertIn{
-  from{opacity:0;transform:translateY(-12px) translateX(10px);}
-  to{opacity:1;transform:translateY(0) translateX(0);}
-}
-@media(max-width:700px){
-  .verification-alert{
-    top:14px !important;
-    right:14px !important;
-    width:calc(100vw - 28px) !important;
-  }
-}
-
-
-
-/* Audience selector for posts, stories and reels */
-.publish-audience-section{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin:16px 0;
-  padding:14px;
-  border:1px solid var(--line,#e6e7eb);
-  border-radius:14px;
-  background:var(--card,#fff);
-}
-.publish-audience-section label,
-.publish-audience-label{
-  display:block;
-  color:var(--text,#111318);
-  font-size:13px;
-  font-weight:750;
-}
-.publish-audience-section select,
-.publish-audience-label + select{
-  width:100%;
-  min-height:44px;
-  padding:10px 12px;
-  border:1px solid var(--line,#e6e7eb);
-  border-radius:10px;
-  background:var(--card,#fff);
-  color:var(--text,#111318);
-}
-.publish-audience-section small,
-.publish-audience-hint{
-  color:var(--muted,#737985);
-  font-size:11px;
-  line-height:1.45;
-}
-.publish-audience-label{margin-top:12px}
-
-
-/* Backend-backed settings save/load feedback */
-.settings-save-status{font-size:12px;color:var(--muted);padding:8px 0}
-.settings-save-error{font-size:12px;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 12px;margin:8px 0}
-.setting-switch button:disabled{opacity:.55;cursor:wait}
-
-
-
-/* ReelsGo Close Friends manager */
-.rg-close-friends{margin:22px 0 8px;padding:20px;border:1px solid var(--border-color,#e6e7eb);border-radius:16px;background:var(--surface,#fff);color:var(--text-color,#171717)}
-.rg-cf-intro{display:flex;align-items:center;gap:13px;margin-bottom:18px}
-.rg-cf-icon{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:15px;background:rgba(124,58,237,.12);color:#8b5cf6}
-.rg-cf-icon svg{width:24px;height:24px}
-.rg-cf-intro h2{margin:0 0 5px;font-size:19px;line-height:1.3}
-.rg-cf-intro p{margin:0;font-size:13px;line-height:1.5;color:var(--muted-color,#777)}
-.rg-cf-search{display:flex;align-items:center;gap:10px;min-height:46px;padding:0 12px;border:1px solid var(--border-color,#e2e2e2);border-radius:12px;background:var(--input-bg,#fff)}
-.rg-cf-search>svg{width:18px;height:18px;flex:0 0 auto;color:#858585}
-.rg-cf-search input{width:100%;min-width:0;height:44px;border:0!important;outline:0!important;background:transparent!important;box-shadow:none!important;color:inherit!important;font:inherit}
-.rg-cf-search button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer}
-.rg-cf-search button svg{width:16px;height:16px}
-.rg-cf-search-results{margin-top:8px;padding-bottom:10px;border-bottom:1px solid var(--border-color,#e8e8e8)}
-.rg-cf-person{display:flex;align-items:center;gap:12px;min-width:0;padding:10px 0}
-.rg-cf-person-info{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}
-.rg-cf-person-info b{font-size:14px;overflow-wrap:anywhere}
-.rg-cf-person-info span{font-size:12px;color:var(--muted-color,#777);overflow-wrap:anywhere}
-.rg-cf-add,.rg-cf-remove{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;padding:9px 13px;border:0;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
-.rg-cf-add{background:#7c3aed;color:#fff}
-.rg-cf-remove{background:var(--secondary-bg,#f0f0f3);color:var(--text-color,#222)}
-.rg-cf-add:disabled,.rg-cf-remove:disabled{opacity:.55;cursor:wait}
-.rg-cf-list-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 7px}
-.rg-cf-list-heading h3{margin:0;font-size:15px}
-.rg-cf-list-heading span,.rg-cf-muted{font-size:12px;color:var(--muted-color,#777)}
-.rg-cf-empty{display:flex;align-items:center;flex-direction:column;gap:8px;padding:25px 10px;text-align:center;color:var(--muted-color,#777)}
-.rg-cf-empty svg{width:28px;height:28px}
-.rg-cf-empty b{font-size:14px;color:var(--text-color,#222)}
-.rg-cf-empty span{font-size:12px}
-.rg-cf-message{margin:12px 0;padding:10px 12px;border-radius:10px;font-size:13px;overflow-wrap:anywhere}
-.rg-cf-message.error{background:rgba(220,38,38,.09);color:#dc2626}
-.rg-cf-message.success{background:rgba(22,163,74,.09);color:#16803d}
-.rg-cf-footnote{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--border-color,#e8e8e8);font-size:12px;line-height:1.5;color:var(--muted-color,#777)}
-@media(max-width:600px){.rg-close-friends{padding:14px;margin-top:16px}.rg-cf-intro{align-items:flex-start}.rg-cf-person{gap:9px}.rg-cf-add,.rg-cf-remove{padding:8px 10px}}
-
-
-/* Instagram-style individual settings detail screens */
-.settings-content:has(> .setting-detail-screen) > :not(.setting-detail-screen),
-.settings-mobile-detail:has(> .setting-detail-screen) > :not(.setting-detail-screen) { display:none !important; }
-.setting-detail-screen{display:block!important;min-height:100%;padding:20px 24px 36px;color:var(--text,#f7f7f8);background:var(--settings-panel,#0d1015);border-radius:14px;box-sizing:border-box;}
-.rg-detail-heading{padding:18px 0 22px;border-bottom:1px solid var(--settings-border,#292e37);margin-bottom:22px;}
-.rg-detail-kicker{font-size:10px;letter-spacing:.15em;font-weight:800;color:#a78bfa;}
-.rg-detail-heading h2{font-size:25px;margin:8px 0 7px;color:inherit;}
-.rg-detail-heading p{margin:0;color:var(--muted,#a2aab6);font-size:14px;line-height:1.6;max-width:620px;}
-.rg-detail-form{display:flex;flex-direction:column;gap:16px;max-width:650px;}
-.rg-detail-form label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;color:inherit;}
-.rg-detail-form input,.rg-detail-form textarea{width:100%;box-sizing:border-box;padding:12px 13px;border-radius:10px;border:1px solid var(--settings-border,#343a45);background:#151920;color:#f7f7f8;font:inherit;outline:none;}
-.rg-detail-form input:focus,.rg-detail-form textarea:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px #8b5cf626;}
-.rg-detail-save{align-self:flex-start;min-width:140px;margin-top:6px;}
-.rg-detail-control-card{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px;border:1px solid var(--settings-border,#292e37);border-radius:14px;background:#11151b;max-width:720px;}
-.rg-detail-control-card b{display:block;font-size:15px;margin-bottom:6px;}
-.rg-detail-control-card p{margin:0 0 9px;color:var(--muted,#a2aab6);font-size:13px;line-height:1.6;}
-.rg-detail-control-card small{font-size:12px;color:#a78bfa;}
-.rg-detail-control-card.danger{border-color:#743b43;}
-.rg-detail-message{padding:12px 14px;border-radius:10px;margin:12px 0 18px;font-size:13px;overflow-wrap:anywhere;}
-.rg-detail-message.error{color:#ffb8b8;background:#5a2028;}
-.rg-detail-message.success{color:#b7f7cf;background:#153b2b;}
-.rg-detail-footnote{font-size:12px;color:var(--muted,#a2aab6);line-height:1.6;margin-top:18px;max-width:720px;}
-.rg-settings-options .setting-row{width:100%;}
-@media(max-width:700px){.settings-mobile-detail:has(> .setting-detail-screen) > :not(.setting-detail-screen){display:none!important}.setting-detail-screen{padding:16px 14px 28px;border-radius:0;overflow-y:auto}.rg-detail-heading h2{font-size:22px}.rg-detail-control-card{padding:15px;gap:12px}.rg-detail-form{gap:14px}}
-
-
-/* ===== ReelsGo dark, polished Search and Messages UI ===== */
-.page:has(.recent-searches-section),
-.page:has(.instagram-chat-layout) {
-  color: #f5f5f7;
-}
-.page:has(.recent-searches-section) .page-heading p,
-.page:has(.recent-searches-section) .recent-searches-heading p {
-  color: #9ca3af;
-}
-.page:has(.recent-searches-section) .search-box {
-  background: #202328;
-  border: 1px solid #30343b;
-  border-radius: 999px;
-  min-height: 52px;
-  padding: 0 17px;
-  color: #f5f5f7;
-}
-.page:has(.recent-searches-section) .search-box svg { color: #a8adb7; flex-shrink: 0; }
-.page:has(.recent-searches-section) .search-box input {
-  color: #f5f5f7;
-  background: transparent;
-  border: 0;
-  width: 100%;
-}
-.page:has(.recent-searches-section) .search-box input::placeholder { color: #9298a3; }
-.recent-searches-section {
-  margin-top: 26px;
-  max-width: 720px;
-}
-.recent-searches-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-.recent-searches-heading h2 { color: #f7f7f8; font-size: 19px; font-weight: 750; }
-.recent-searches-heading p { font-size: 12px; margin-top: 4px; }
-.recent-clear-button {
-  background: transparent;
-  color: #a78bfa;
-  font-weight: 700;
-  padding: 9px 11px;
-  border-radius: 9px;
-}
-.recent-clear-button:hover { background: #292432; }
-.recent-searches-list { display: grid; gap: 7px; margin-top: 0; }
-.recent-profile-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-  background: #15181d;
-  border: 1px solid #282c33;
-  border-radius: 15px;
-  padding: 5px 8px 5px 5px;
-  transition: background .18s ease, border-color .18s ease, transform .18s ease;
-}
-.recent-profile-wrap:hover { background: #1b1f25; border-color: #3a3f49; }
-.recent-profile-row.user-row {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  border: 0;
-  background: transparent;
-  padding: 8px;
-  color: #f5f5f7;
-  text-align: left;
-  border-radius: 10px;
-}
-.recent-profile-row .avatar { width: 48px; height: 48px; }
-.recent-profile-row>div { min-width: 0; gap: 4px; }
-.recent-profile-row b { color: #f5f5f7; font-size: 14px; }
-.recent-profile-row span { color: #9ca3af; font-size: 12px; }
-.recent-profile-options { position: relative; flex: 0 0 auto; }
-.recent-more-button {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: transparent;
-  color: #c5c9d1;
-}
-.recent-more-button:hover { background: #30343b; color: white; }
-.recent-more-button svg { width: 20px; height: 20px; }
-.recent-profile-menu,
-.conversation-options-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 5px);
-  z-index: 80;
-  min-width: 190px;
-  padding: 6px;
-  border-radius: 13px;
-  border: 1px solid #383d46;
-  background: #24272d;
-  box-shadow: 0 16px 45px #0008;
-}
-.recent-profile-menu button,
-.conversation-options-menu button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  padding: 11px 12px;
-  border-radius: 8px;
-  background: transparent;
-  color: #f3f4f6;
-  text-align: left;
-  font-size: 13px;
-}
-.recent-profile-menu button:hover,
-.conversation-options-menu button:hover { background: #343841; }
-.recent-profile-menu button svg,
-.conversation-options-menu button svg { color: #fb7185; }
-.recent-searches-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 48px 20px;
-  color: #9ca3af;
-  background: #15181d;
-  border: 1px dashed #363b44;
-  border-radius: 18px;
-}
-.recent-searches-empty>svg { width: 34px; height: 34px; margin-bottom: 12px; color: #a78bfa; }
-.recent-searches-empty h3 { color: #f5f5f7; margin-bottom: 6px; }
-.recent-searches-empty p { max-width: 340px; line-height: 1.5; font-size: 13px; }
-
-.page:has(.instagram-chat-layout) { width: min(100%, 1250px); padding-top: 22px; }
-.page:has(.instagram-chat-layout) .page-heading h1 { color: #f5f5f7; }
-.chat-layout.instagram-chat-layout {
-  display: grid;
-  grid-template-columns: minmax(290px, 360px) minmax(0, 1fr);
-  min-height: min(76vh, 760px);
-  background: #0f1115;
-  border: 1px solid #292d34;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 18px 50px #0002;
-}
-.instagram-conversation-list { min-width: 0; background: #111318; border-right: 1px solid #292d34; }
-.conversation-list-title {
-  height: 66px;
-  padding: 0 17px;
-  border-bottom: 1px solid #272b32;
-  color: #f5f5f7;
-}
-.conversation-list-title b { font-size: 18px; }
-.conversation-list-title span { color: #a0a6b1; }
-.conversation-scroll { max-height: 660px; overflow-y: auto; }
-.conversation-item {
-  position: relative;
-  min-height: 78px;
-  gap: 10px;
-  padding: 12px 46px 12px 13px;
-  border-bottom: 1px solid #20242b;
-  color: #f5f5f7;
-  transition: background .15s ease;
-}
-.conversation-item:hover { background: #1a1d23; }
-.conversation-item.active { background: #25212f; box-shadow: inset 3px 0 #a855f7; }
-.conversation-copy b { color: #f5f5f7; font-size: 13px; }
-.conversation-copy span { color: #a1a6b0; font-size: 12px; }
-.conversation-copy small { color: #777f8b; font-size: 10px; }
-/* Each inbox row is the positioning anchor for its own three-dot menu.
-   Without this, the absolute menu button can drift into the Messages header. */
-.conversation-item-shell {
-  position: relative !important;
-  display: block;
-  width: 100%;
-  min-width: 0;
-}
-.conversation-item-shell > .conversation-item {
-  width: 100%;
-  box-sizing: border-box;
-}
-.conversation-options-wrap {
-  position: absolute;
-  right: 7px;
-  /* Keep the three-dot button aligned with the username row, not the
-     vertical center of the entire conversation preview. */
-  top: 12px;
-  transform: none;
-  z-index: 30;
-}
-.conversation-options-button,
-.chat-header-options-button {
-  display: grid;
-  place-items: center;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: transparent;
-  color: #b6bbc5;
-}
-.conversation-options-button:hover,
-.chat-header-options-button:hover { background: #30343b; color: #fff; }
-.conversation-options-menu { min-width: 200px; }
-.conversation-options-menu button { color: #f3f4f6; }
-.conversation-options-menu button:disabled { opacity: .6; }
-.instagram-chat { min-width: 0; background: #0e1014; color: #f5f5f7; }
-.instagram-chat-placeholder {
-  min-height: 100%;
-  color: #a7adb8;
-  background: radial-gradient(ellipse at center, #191620 0%, #0e1014 64%);
-}
-.instagram-chat-placeholder h2 { color: #f5f5f7; font-size: 23px; margin: 17px 0 7px; }
-.instagram-chat-placeholder p { color: #c2c6ce; }
-.instagram-chat-placeholder span { font-size: 12px; margin-top: 7px; }
-.message-placeholder-icon {
-  width: 82px; height: 82px; border: 1.5px solid #a78bfa; color: #c4b5fd;
-  background: #201a2c; border-radius: 50%; display: grid; place-items: center;
-}
-.message-placeholder-icon svg { width: 36px; height: 36px; }
-.instagram-chat-head {
-  min-height: 72px;
-  padding: 10px 15px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  background: #111318;
-  border-bottom: 1px solid #292d34;
-}
-.chat-profile-open { background: transparent; border-radius: 50%; flex: 0 0 auto; }
-.chat-profile-title { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 4px; color: #f5f5f7; }
-.chat-profile-title span { color: #9ca3af; font-size: 11px; }
-.chat-header-options-wrap { position: relative; }
-.chat-messages.instagram-chat-messages { background: #0e1014; padding: 20px; }
-.message-bubble-wrap .bubble,
-.message-bubble-wrap .message-bubble { border-radius: 18px; }
-.bubble:not(.mine) { background: #262a32; color: #f5f5f7; }
-.bubble.mine { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
-.chat-input { background: #111318; border-top: 1px solid #292d34; padding: 12px; }
-.chat-input input { background: #202329; border: 1px solid #383d46; color: #f5f5f7; border-radius: 999px; padding: 12px 16px; }
-.chat-input input::placeholder { color: #8f96a2; }
-.chat-input button { color: #c4b5fd; }
-.chat-empty-list { color: #9ca3af; padding: 30px; text-align: center; }
-.chat-empty-list b { color: #f5f5f7; }
-.page:has(.instagram-chat-layout) .search-box { background: #202329; border-color: #383d46; }
-@media (max-width: 760px) {
-  .page:has(.instagram-chat-layout) { padding: 12px 0 20px; }
-  .chat-layout.instagram-chat-layout { grid-template-columns: 1fr; min-height: calc(100dvh - 130px); border-radius: 0; border-left: 0; border-right: 0; }
-  .chat-layout.instagram-chat-layout.has-active .instagram-conversation-list { display: none; }
-  .chat-layout.instagram-chat-layout:not(.has-active) .instagram-chat { display: none; }
-  .conversation-scroll { max-height: calc(100dvh - 250px); }
-  .recent-searches-section { margin-top: 20px; }
-  .recent-profile-wrap { border-radius: 13px; }
-}
-
-/* Mobile Instagram-style long-press conversation action sheet */
-.conversation-name-line{display:flex;align-items:center;gap:6px;min-width:0}
-.conversation-name-line .conversation-username{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.conversation-pin-indicator,.conversation-mute-indicator{flex:0 0 auto;color:#9ca3af}
-.conversation-item.is-pinned{border-left:2px solid #a855f7}
-.mobile-conversation-action-overlay{display:none}
-@media(max-width:700px){
-  .conversation-item{-webkit-touch-callout:none;touch-action:pan-y;user-select:none;-webkit-user-select:none}
-  .mobile-conversation-action-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.62);backdrop-filter:blur(2px)}
-  .mobile-conversation-action-sheet{width:100%;max-width:560px;padding:10px 14px calc(16px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;background:#242629;color:#f5f5f5;box-shadow:0 -12px 48px #0008;animation:conversationSheetIn .18s ease-out}
-  .mobile-action-sheet-handle{width:38px;height:4px;border-radius:99px;background:#666970;margin:0 auto 14px}
-  .mobile-action-sheet-user{display:flex;align-items:center;gap:11px;padding:5px 7px 15px;margin-bottom:5px;border-bottom:1px solid #3a3c40}
-  .mobile-action-sheet-user>div{display:flex;flex-direction:column;gap:3px;min-width:0}
-  .mobile-action-sheet-user b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .mobile-action-sheet-user span{font-size:12px;color:#a8abb2}
-  .mobile-conversation-action-sheet>button{width:100%;min-height:58px;padding:0 10px;display:flex;align-items:center;gap:18px;border-radius:10px;background:transparent;color:#f4f4f5;text-align:left;font-size:16px;font-weight:450}
-  .mobile-conversation-action-sheet>button:active{background:#36383d}
-  .mobile-conversation-action-sheet>button svg{width:25px;height:25px;stroke-width:1.8;flex:0 0 25px;color:#f4f4f5}
-  .mobile-conversation-action-sheet>button span{flex:1}
-  .mobile-conversation-action-sheet>button.mobile-action-delete{color:#ff5968}
-  .mobile-conversation-action-sheet>button.mobile-action-delete svg{color:#ff5968}
-}
-@keyframes conversationSheetIn{from{transform:translateY(22px);opacity:.7}to{transform:translateY(0);opacity:1}}
-
-/* Instagram-inspired recent profiles in Search */
-.recent-searches-section { margin-top: 28px; max-width: 760px; }
-.recent-searches-heading { margin-bottom: 22px; }
-.recent-searches-heading h2 { font-size: 19px; font-weight: 750; }
-.recent-see-all-button { background: transparent; color: #7895ff; font-size: 14px; font-weight: 700; padding: 7px 0 7px 12px; }
-.recent-see-all-button:hover { color: #a5b6ff; }
-.recent-searches-list { gap: 4px; }
-.recent-profile-wrap { border: 0; background: transparent; border-radius: 12px; padding: 5px 2px 5px 0; gap: 10px; }
-.recent-profile-wrap:hover { background: #171a20; border-color: transparent; }
-.recent-profile-row.user-row { padding: 8px 0; gap: 13px; }
-.recent-profile-row .avatar { width: 58px; height: 58px; }
-.recent-profile-row b { font-size: 15px; font-weight: 700; }
-.recent-profile-row span { font-size: 13px; color: #9ca3af; }
-.recent-profile-text { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-.recent-profile-options { display: flex; align-items: center; justify-content: center; }
-.recent-remove-button { display: grid; place-items: center; width: 38px; height: 38px; background: transparent; color: #a4aab4; border-radius: 50%; }
-.recent-remove-button:hover { background: #272b32; color: #f5f5f7; }
-.recent-remove-button svg { width: 22px; height: 22px; stroke-width: 1.8; }
-@media (max-width: 700px) {
-  .page:has(.recent-searches-section) .page-heading { display: none; }
-  .page:has(.recent-searches-section) .search-box { min-height: 52px; }
-  .recent-searches-section { margin-top: 26px; width: 100%; }
-  .recent-searches-heading { margin-bottom: 18px; }
-  .recent-profile-wrap { padding-right: 2px; }
-  .recent-profile-row .avatar { width: 58px; height: 58px; }
-}
-
-
-/* =========================================================
-   REELSGO CLOSE FRIENDS — DARK THEME CONTRAST UPDATE
-   Scoped to Close Friends so other screens are unchanged.
+   No OTP / Firebase / Twilio / SMS.
+   The backend stores the phone number once and returns
+   verified=true. This is a custom ReelsGo badge system.
    ========================================================= */
-.rg-close-friends{
-  --cf-bg:#15191f;
-  --cf-panel:#1c2128;
-  --cf-input:#252b34;
-  --cf-border:#343b46;
-  --cf-text:#f5f7fb;
-  --cf-muted:#a7b0bd;
-  color:var(--cf-text)!important;
-  background:var(--cf-bg)!important;
-  border-color:var(--cf-border)!important;
-}
-.rg-close-friends h1,
-.rg-close-friends h2,
-.rg-close-friends h3,
-.rg-close-friends b,
-.rg-close-friends strong,
-.rg-close-friends label,
-.rg-close-friends .rg-cf-person-info b{
-  color:var(--cf-text)!important;
-}
-.rg-close-friends .rg-cf-intro p,
-.rg-close-friends .rg-cf-person-info span,
-.rg-close-friends .rg-cf-list-heading span,
-.rg-close-friends .rg-cf-muted,
-.rg-close-friends .rg-cf-empty,
-.rg-close-friends .rg-cf-empty span,
-.rg-close-friends .rg-cf-footnote{
-  color:var(--cf-muted)!important;
-}
-.rg-close-friends .rg-cf-search{
-  background:var(--cf-input)!important;
-  border:1px solid var(--cf-border)!important;
-  color:var(--cf-text)!important;
-}
-.rg-close-friends .rg-cf-search>svg{color:#b7c0cc!important}
-.rg-close-friends .rg-cf-search input{
-  color:var(--cf-text)!important;
-  caret-color:#a78bfa!important;
-  -webkit-text-fill-color:var(--cf-text)!important;
-}
-.rg-close-friends .rg-cf-search input::placeholder{
-  color:#929cab!important;
-  opacity:1!important;
-  -webkit-text-fill-color:#929cab!important;
-}
-.rg-close-friends .rg-cf-search input::-webkit-search-cancel-button{
-  filter:invert(1);
-}
-.rg-close-friends .rg-cf-search button{color:#e4e8ef!important}
-.rg-close-friends .rg-cf-search-results,
-.rg-close-friends .rg-cf-footnote{
-  border-color:var(--cf-border)!important;
-}
-.rg-close-friends .rg-cf-add{
-  background:#7c3aed!important;
-  color:#fff!important;
-}
-.rg-close-friends .rg-cf-remove{
-  background:#e9edf3!important;
-  color:#171b22!important;
-}
-.rg-close-friends .rg-cf-message.error{
-  color:#ffb4b4!important;
-  background:rgba(239,68,68,.14)!important;
-  border:1px solid rgba(248,113,113,.25)!important;
-}
-.rg-close-friends .rg-cf-message.success{
-  color:#9be8b0!important;
-  background:rgba(34,197,94,.12)!important;
-  border:1px solid rgba(74,222,128,.2)!important;
-}
-.rg-close-friends .rg-cf-icon{
-  background:rgba(124,58,237,.18)!important;
-  color:#a78bfa!important;
-}
-.rg-close-friends .rg-cf-empty b{color:var(--cf-text)!important}
-@media(max-width:600px){
-  .rg-close-friends{padding:14px!important}
-  .rg-close-friends .rg-cf-search{min-height:48px}
-  .rg-close-friends .rg-cf-search input{min-height:46px;font-size:16px}
-}
-
-
-/* ===== Instagram desktop Search layout match ===== */
-.page.rg-instagram-search-page:has(.recent-searches-section){
-  width:min(100%, 680px);
-  padding:26px 16px 100px;
-  margin-left:auto;
-  margin-right:auto;
-  min-height:calc(100vh - 24px);
-}
-.rg-search-topbar{display:flex;align-items:center;gap:14px;width:100%;margin:0 0 18px;}
-.rg-search-back{width:38px;height:42px;flex:0 0 38px;display:grid;place-items:center;background:transparent;color:#f5f5f7;border-radius:50%;}
-.rg-search-back:hover{background:#202328;}
-.rg-search-back svg{width:25px;height:25px;transform:rotate(180deg);}
-.page:has(.recent-searches-section) .search-box.rg-search-pill{height:44px;min-height:44px;flex:1;min-width:0;padding:0 15px;background:#24272c;border:1px solid #24272c;border-radius:999px;gap:10px;}
-.page:has(.recent-searches-section) .rg-search-pill>svg{width:17px;height:17px;color:#8f969f;}
-.page:has(.recent-searches-section) .rg-search-pill input{font-size:14px;min-width:0;padding:0;}
-.rg-search-clear{display:grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:transparent;color:#a8adb7;}
-.rg-search-clear:hover{background:#3a3e45;color:#fff;}
-.rg-search-clear svg{width:16px;height:16px;}
-.page:has(.recent-searches-section) .recent-searches-section{margin-top:0;max-width:none;width:100%;}
-.page:has(.recent-searches-section) .recent-searches-heading{margin-bottom:14px;}
-.page:has(.recent-searches-section) .recent-searches-heading h2{font-size:15px;font-weight:700;}
-.page:has(.recent-searches-section) .recent-clear-button{color:#7895ff;font-size:14px;padding:6px 0 6px 10px;}
-.page:has(.recent-searches-section) .recent-searches-list{gap:0;}
-.page:has(.recent-searches-section) .recent-profile-wrap{padding:6px 0;gap:10px;border:0;border-radius:0;background:transparent;}
-.page:has(.recent-searches-section) .recent-profile-wrap:hover{background:#111419;}
-.page:has(.recent-searches-section) .recent-profile-row.user-row{padding:5px 0;gap:12px;border-radius:0;}
-.page:has(.recent-searches-section) .recent-profile-row .avatar{width:48px;height:48px;min-width:48px;min-height:48px;}
-.page:has(.recent-searches-section) .recent-profile-text{gap:3px;}
-.page:has(.recent-searches-section) .recent-profile-row b{font-size:14px;font-weight:650;color:#f5f5f7;}
-.page:has(.recent-searches-section) .recent-profile-row span{font-size:13px;color:#a3a8b0;}
-.page:has(.recent-searches-section) .recent-profile-options{margin-left:auto;}
-.page:has(.recent-searches-section) .recent-remove-button{width:34px;height:34px;}
-
-/* Final Search Recent list: Instagram-like rows without inner/outer cards */
-.page:has(.recent-searches-section) .recent-searches-list,
-.page:has(.recent-searches-section) .recent-profile-wrap,
-.page:has(.recent-searches-section) .recent-profile-row.user-row {
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-.page:has(.recent-searches-section) .recent-profile-wrap {
-  display: flex !important;
-  align-items: center !important;
-  width: 100% !important;
-  padding: 8px 0 !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-}
-.page:has(.recent-searches-section) .recent-profile-wrap:hover,
-.page:has(.recent-searches-section) .recent-profile-row.user-row:hover {
-  background: transparent !important;
-  box-shadow: none !important;
-}
-.page:has(.recent-searches-section) .recent-profile-row.user-row {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
-}
-.page:has(.recent-searches-section) .recent-profile-options {
-  flex: 0 0 38px !important;
-  margin-left: auto !important;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-.page:has(.recent-searches-section) .recent-remove-button {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-.page:has(.recent-searches-section) .recent-remove-button:hover {
-  background: #202328 !important;
-}
-
-
-/* Suggestions rail — Instagram-like spacing and clickable profiles */
-.suggestions-rail { color: #f5f5f7; }
-.rail-avatar-button,
-.suggestion-avatar-button {
-  display: block;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  line-height: 0;
-  flex: 0 0 auto;
-}
-.rail-avatar-button:focus-visible,
-.suggestion-avatar-button:focus-visible,
-.profile-username-link:focus-visible {
-  outline: 2px solid #5794ff;
-  outline-offset: 3px;
-}
-.rail-account-info { min-width: 0; }
-.rail-username { color: #f5f5f7; }
-.suggestion-copy .profile-username-link {
-  color: #f1f2f4;
-  font-size: 12px;
-  font-weight: 750;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-}
-.suggestion-copy .profile-username-link:hover,
-.rail-username:hover { opacity: .8; }
-.suggestion-row .follow,
-.suggestion-row .following {
-  padding: 7px 0 7px 8px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.suggestion-row .following { color: #9aa0aa; }
-.suggestion-row button:disabled { opacity: .65; cursor: wait; }
-.suggestion-error {
-  color: #ff9ba5;
-  font-size: 11px;
-  line-height: 1.45;
-  margin: -5px 0 12px;
-}
-.suggestion-empty {
-  color: #888e98;
-  font-size: 12px;
-  line-height: 1.5;
-  padding: 5px 0;
-}
-.floating-avatars > .floating-avatar-item {
-  padding: 0;
-  margin-left: -7px;
-  background: transparent;
-  border-radius: 50%;
-  line-height: 0;
-}
-.floating-avatars > .floating-avatar-item:focus-visible {
-  outline: 2px solid #5794ff;
-  outline-offset: 2px;
-}
-@media (max-width: 1100px) {
-  .suggestions-rail { display: none; }
-}
-
-/* Suggestions rail only: remove panels/cards without changing app behavior. */
-.suggestions-rail,
-.suggestions-rail .rail-account,
-.suggestions-rail .suggestions-title,
-.suggestions-rail .suggestion-list,
-.suggestions-rail .suggestion-row,
-.suggestions-rail .rail-footer {
-  background: transparent !important;
-  border: 0 !important;
-  outline: 0 !important;
-  box-shadow: none !important;
-}
-.suggestions-rail {
-  border-radius: 0 !important;
-}
-.suggestions-rail .rail-account {
-  padding: 0 !important;
-  border-radius: 0 !important;
-}
-.suggestions-rail .suggestion-row {
-  border-radius: 0 !important;
-}
-
-
-/* Share picker: three profiles per row, with vertical scrolling for more people. */
-.share-people > .share-loading,
-.share-people > .share-empty { grid-column: 1 / -1; }
-.share-person:focus-visible { outline: 2px solid #7c8cff; outline-offset: 2px; }
-@media (max-width: 420px) {
-  .share-sheet { padding-left: 14px; padding-right: 14px; }
-  .share-people { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 4px; row-gap: 14px; }
-  .share-person-avatar .avatar { width: 58px !important; height: 58px !important; min-width: 58px !important; min-height: 58px !important; }
-  .share-person b { font-size: 10px; }
-  .share-person > span { font-size: 9px; }
-}
-
-
-/* ReelsGo Instagram-style share sheet: multi-select + share shortcuts */
-.share-sheet-overlay{align-items:flex-end!important;background:rgba(0,0,0,.68)!important}
-.share-sheet{display:flex;flex-direction:column;overflow:hidden;max-height:94dvh!important;padding-bottom:calc(14px + env(safe-area-inset-bottom))!important}
-.share-people{flex:1 1 auto;min-height:130px;max-height:min(42vh,390px)!important;overflow-y:auto!important}
-.share-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:12px -4px 0;padding:10px 0 0;border-top:1px solid rgba(255,255,255,.09)}
-.share-shortcuts button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;padding:2px 0;background:transparent;color:#f5f5f7}
-.share-shortcut-icon{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#292d35;color:#fff;flex:none}
-.share-shortcut-icon svg{width:24px;height:24px}
-.share-shortcut-icon.whatsapp{background:#08cf68;color:#fff}
-.share-shortcut-icon.whatsapp svg{width:25px;height:25px}
-.share-shortcuts button b{display:block;max-width:100%;font-size:10px;font-weight:500;line-height:1.25;text-align:center;overflow-wrap:anywhere}
-.share-circle-plus{font-size:36px;font-weight:300;line-height:1}
-.share-notice{margin-top:9px;text-align:center;font-size:12px;color:#b8c8ff;line-height:1.4}
-.share-send-button{flex:none;margin-top:10px}
-@media(max-width:420px){
- .share-sheet{padding-left:12px!important;padding-right:12px!important}
- .share-shortcuts{gap:1px;margin-left:-5px;margin-right:-5px}
- .share-shortcut-icon{width:47px;height:47px}
- .share-shortcuts button b{font-size:9px}
- .share-people{max-height:38vh!important}
-}
-
-/* Final requested layout: exactly three profile choices per row. */
-.share-sheet .share-people {
-  display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  grid-auto-flow: row !important;
-  align-items: start !important;
-  justify-items: center !important;
-  column-gap: 8px !important;
-  row-gap: 16px !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-height: min(42vh, 390px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  padding: 12px 4px 18px !important;
-  scrollbar-width: thin !important;
-}
-.share-sheet .share-people > .share-loading,
-.share-sheet .share-people > .share-empty {
-  grid-column: 1 / -1 !important;
-  width: 100% !important;
-}
-.share-sheet .share-person {
-  display: flex !important;
-  flex: initial !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
-  min-height: 0 !important;
-  padding: 4px 2px !important;
-  margin: 0 !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 5px !important;
-  overflow: hidden !important;
-}
-.share-sheet .share-person-avatar {
-  flex: 0 0 auto !important;
-}
-.share-sheet .share-person-avatar .avatar {
-  width: 64px !important;
-  height: 64px !important;
-  min-width: 64px !important;
-  min-height: 64px !important;
-}
-.share-sheet .share-person b,
-.share-sheet .share-person > span {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  text-align: center !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-@media (max-width: 420px) {
-  .share-sheet .share-people {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    column-gap: 4px !important;
-    row-gap: 14px !important;
-    max-height: min(42vh, 390px) !important;
-  }
-  .share-sheet .share-person-avatar .avatar {
-    width: 58px !important;
-    height: 58px !important;
-    min-width: 58px !important;
-    min-height: 58px !important;
-  }
-}
-
-
-/* ReelsGo mobile Reels experience: full-screen vertical swipe feed */
-.reels-mobile-header { display:none; }
-.reels-mobile-actions { display:none; }
-.reels-feed-end {
-  min-height: min(78vh, 720px);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:12px; text-align:center; color:#fff; padding:28px;
-  scroll-snap-align:start; scroll-snap-stop:always; background:#0b0f12;
-}
-.reels-feed-end-icon {
-  width:58px;height:58px;border-radius:50%;display:grid;place-items:center;
-  border:1px solid rgba(255,255,255,.3);color:#fff;
-}
-.reels-feed-end h2 { font-size:22px; }
-.reels-feed-end p { color:#a6adb8;font-size:14px; }
-.reels-feed-end button {
-  margin-top:8px;padding:11px 16px;border-radius:999px;background:#fff;color:#111;
-  font-weight:750;
-}
-body.reelsgo-reels-active .floating-messages { display:none !important; }
-
-@media (max-width:700px) {
-  body.reelsgo-reels-active { overflow:hidden; background:#000 !important; }
-  body.reelsgo-reels-active .main { padding:0 !important; margin:0 !important; height:100dvh; overflow:hidden; }
-  body.reelsgo-reels-active .mobile-header { display:none !important; }
-  body.reelsgo-reels-active .bottom-nav {
-    height:calc(58px + env(safe-area-inset-bottom)) !important;
-    background:rgba(8,10,12,.94) !important; border-top:1px solid rgba(255,255,255,.12) !important;
-    padding-bottom:env(safe-area-inset-bottom) !important; z-index:120 !important;
-  }
-  body.reelsgo-reels-active .nav-mobile { color:#f5f5f5 !important; }
-  body.reelsgo-reels-active .nav-mobile.active { color:#fff !important; }
-  body.reelsgo-reels-active .nav-mobile span { display:none !important; }
-  body.reelsgo-reels-active .mobile-profile span { display:none !important; }
-  .reels-page {
-    position:fixed !important; inset:0 !important; z-index:50 !important;
-    width:100% !important; max-width:none !important; height:100dvh !important;
-    padding:0 !important; margin:0 !important; background:#000 !important; overflow:hidden !important;
-  }
-  .reels-mobile-header {
-    display:flex; position:absolute; top:env(safe-area-inset-top); left:0; right:0; height:54px;
-    z-index:25; align-items:center; justify-content:space-between; padding:0 14px;
-    color:#fff; background:linear-gradient(180deg,rgba(0,0,0,.42),transparent);
-  }
-  .reels-mobile-create,.reels-mobile-search { width:38px;height:38px;display:grid;place-items:center;background:transparent;color:#fff; }
-  .reels-mobile-create svg,.reels-mobile-search svg { width:24px;height:24px; }
-  .reels-mobile-title { display:flex;align-items:center;justify-content:center;gap:14px; }
-  .reels-mobile-title>b { font-size:19px;font-weight:850; }
-  .reels-mobile-title>button { display:flex;align-items:center;gap:5px;background:transparent;color:#aeb2ba;font-size:17px;font-weight:750; }
-  .reels-friends-avatars { display:inline-flex;align-items:center;padding-left:2px; }
-  .reels-friends-avatars>span { width:20px;height:20px;margin-left:-5px;border:1px solid #111;border-radius:50%;overflow:hidden; }
-  .reels-friends-avatars .avatar { width:19px !important;height:19px !important;min-width:19px !important;min-height:19px !important; }
-  .reels-heading { display:none !important; }
-  .reels-stage { position:absolute;inset:0;min-height:0 !important;display:block !important; }
-  .reels-scroll {
-    position:absolute;inset:0;width:100% !important;height:100dvh !important;min-height:0 !important;
-    overflow-y:auto !important;overflow-x:hidden !important;scroll-snap-type:y mandatory !important;
-    scroll-behavior:smooth;overscroll-behavior-y:contain;padding:0 !important;
-    scrollbar-width:none;touch-action:pan-y;
-  }
-  .reels-scroll::-webkit-scrollbar { display:none; }
-  .reel-feed-card {
-    position:relative;width:100% !important;height:100dvh !important;min-height:100dvh !important;
-    padding:0 !important;margin:0 !important;scroll-snap-align:start !important;scroll-snap-stop:always !important;
-    opacity:1 !important;transform:none !important;display:block !important;background:#000;
-  }
-  .reel-feed-media {
-    position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;
-    min-height:0 !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;
-    background:#000 !important;overflow:hidden;
-  }
-  .reel-feed-media>video {
-    width:100% !important;height:100% !important;object-fit:cover !important;background:#000;
-  }
-  .reel-feed-top {
-    top:calc(env(safe-area-inset-top) + 66px) !important;left:14px !important;right:64px !important;
-    align-items:center !important;gap:8px !important;pointer-events:auto !important;
-  }
-  .reel-feed-top .avatar { width:34px !important;height:34px !important;min-width:34px !important;min-height:34px !important; }
-  .reel-feed-top span { max-width:52vw !important;white-space:normal !important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; }
-  .reel-feed-top button { pointer-events:auto; }
-  .reel-feed-bottom { display:none !important; }
-  .reels-side-controls { display:none !important; }
-  .reels-mobile-actions {
-    display:flex !important;position:absolute;right:10px;bottom:calc(92px + env(safe-area-inset-bottom));z-index:12;
-    flex-direction:column;align-items:center;gap:19px;color:#fff;text-shadow:0 1px 5px #000;
-  }
-  .reels-mobile-actions button { display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;background:transparent;min-width:38px;padding:0; }
-  .reels-mobile-actions svg { width:26px;height:26px;filter:drop-shadow(0 1px 4px #000); }
-  .reels-mobile-actions small { font-size:10px;font-weight:700; }
-  .reels-feed-end { min-height:100dvh !important;height:100dvh !important;scroll-snap-align:start !important;background:#0b0f12;padding:30px 20px 100px; }
-  .reels-feed-end h2 { font-size:22px; }
-  .reels-page>.empty { position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#080a0c;color:#fff;padding:24px; }
-  .reels-page>.empty h2 { color:#fff; }
-  .reels-page>.empty p { color:#aeb4bf; }
-}
-
-
-/* ReelsGo Reel comments + desktop actions + explicit sound control */
-.reels-desktop-actions{position:absolute;left:calc(100% + 18px);bottom:26px;z-index:8;display:flex;flex-direction:column;align-items:center;gap:16px;color:#fff;text-shadow:0 1px 5px #000}
-.reels-desktop-actions button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:44px;background:transparent;color:#f7f7f7;padding:2px;border-radius:9px}
-.reels-desktop-actions button:hover{color:#c4b5fd}
-.reels-desktop-actions svg{width:25px;height:25px}
-.reels-desktop-actions small{font-size:10px;max-width:72px;text-align:center;line-height:1.2}
-.reel-comments-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.66);display:flex;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.reel-comments-panel{width:min(100%,520px);height:min(78vh,760px);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:#15191e;color:#f5f7fa;box-shadow:0 28px 90px rgba(0,0,0,.5)}
-.reel-comments-header{height:58px;flex:0 0 58px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid rgba(255,255,255,.09)}
-.reel-comments-header h2{font-size:16px;font-weight:750}
-.reel-comments-header button{position:absolute;right:10px;top:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:transparent;color:#fff}
-.reel-comments-header button:hover{background:rgba(255,255,255,.1)}
-.reel-comments-list{flex:1;min-height:0;overflow:auto;padding:14px 16px}
-.reel-comments-status{padding:28px 8px;text-align:center;color:#aeb6c1;font-size:13px}
-.reel-comment-row{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px}
-.reel-comment-content{flex:1;min-width:0;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
-.reel-comment-content b{font-size:12px;font-weight:800;color:#fff}
-.reel-comment-content p{margin-top:3px;color:#edf0f4;white-space:pre-wrap}
-.reel-comment-content small{display:block;color:#8993a0;font-size:10px;margin-top:5px}
-.reel-comments-error{padding:10px 0;color:#ff8795;font-size:12px}
-.reel-comment-form{display:flex;align-items:center;gap:9px;padding:12px;border-top:1px solid rgba(255,255,255,.1);background:#111519}
-.reel-comment-form input{flex:1;min-width:0;height:42px;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:0 14px;background:#1d2329;color:#fff;font-size:13px}
-.reel-comment-form input::placeholder{color:#9aa3ad}
-.reel-comment-form button{padding:10px 12px;border-radius:999px;background:#fff;color:#111;font-size:12px;font-weight:800}
-.reel-comment-form button:disabled{opacity:.4}
-@media(min-width:701px){.reels-page .reels-scroll{width:min(430px,42vw)}.reel-feed-card{min-height:calc(100vh - 205px)}.reels-desktop-actions{left:calc(100% + 18px)}.reel-feed-media{overflow:visible}.reel-feed-media>video{border-radius:22px}.reel-feed-top{right:12px}.reel-feed-bottom{right:12px}}
-@media(max-width:700px){.reels-desktop-actions{display:none!important}.reels-mobile-actions{gap:16px!important}.reels-mobile-actions button{min-width:44px!important}.reels-mobile-actions small{max-width:54px;text-align:center;line-height:1.1}.reel-comments-backdrop{align-items:flex-end;padding:0;background:rgba(0,0,0,.48);backdrop-filter:none}.reel-comments-panel{width:100%;height:min(74dvh,760px);max-height:calc(100dvh - env(safe-area-inset-top) - 20px);border-radius:22px 22px 0 0;border:0;background:#171c21}.reel-comments-header{height:50px;flex-basis:50px}.reel-comments-header:before{content:"";position:absolute;top:7px;left:calc(50% - 20px);width:40px;height:4px;border-radius:4px;background:#87909a}.reel-comments-header h2{padding-top:8px}.reel-comment-form{padding-bottom:calc(12px + env(safe-area-inset-bottom))}}
-
-
-/* Additive: notification delete action */
-.notification-card { cursor: pointer; }
-.notification-delete {
-  flex: 0 0 38px; width: 38px; height: 38px; display: inline-flex;
-  align-items: center; justify-content: center; border-radius: 50%;
-  color: #a1a1aa; background: transparent; margin-left: auto;
-}
-.notification-delete:hover { color: #ef4444; background: #ef44441a; }
-
-
-/* Reels UI refinement: visible desktop actions, Instagram-like comment sheet, and nav suppression while commenting. */
-@media (min-width:701px) {
-  .reels-page .reels-stage { display:flex !important; justify-content:center !important; width:100% !important; overflow:visible !important; }
-  .reels-page .reels-scroll { width:min(430px,42vw) !important; overflow-y:auto !important; overflow-x:visible !important; }
-  .reels-page .reel-feed-card { overflow:visible !important; }
-  .reels-page .reel-feed-media { overflow:visible !important; }
-  .reels-page .reels-desktop-actions { display:flex !important; left:calc(100% + 22px) !important; bottom:26px !important; gap:18px !important; z-index:30 !important; }
-  .reels-page .reels-desktop-actions button { min-width:52px !important; min-height:48px !important; text-shadow:0 2px 8px #000 !important; }
-  .reels-page .reels-desktop-actions svg { width:27px !important; height:27px !important; }
-}
-body.reelsgo-comments-open .bottom-nav { display:none !important; }
-body.reelsgo-comments-open .main { padding-bottom:0 !important; }
-.reel-comments-backdrop { z-index:2000 !important; }
-.reel-comments-panel { width:min(100%,560px) !important; height:min(82dvh,780px) !important; }
-.reel-comments-list { overscroll-behavior:contain; }
-.reel-comment-form { position:relative; flex:0 0 auto; }
-.reel-comment-form input { min-height:44px !important; }
-.reel-comment-form button { min-width:58px; min-height:40px; }
-@media(max-width:700px) {
-  body.reelsgo-comments-open .bottom-nav,
-  body.reelsgo-comments-open .glass-bottom-nav { display:none !important; }
-  body.reelsgo-comments-open .reels-mobile-actions { pointer-events:none; }
-  .reel-comments-panel { width:100% !important; height:calc(78dvh + env(safe-area-inset-bottom)) !important; max-height:calc(100dvh - env(safe-area-inset-top)) !important; border-radius:24px 24px 0 0 !important; }
-  .reel-comments-header { flex-basis:54px !important; height:54px !important; }
-  .reel-comment-form { padding:12px 14px calc(14px + env(safe-area-inset-bottom)) !important; }
-  .reel-comment-form input { flex:1 1 auto; }
-  .reels-mobile-actions { right:12px !important; bottom:calc(100px + env(safe-area-inset-bottom)) !important; gap:17px !important; }
-  .reels-mobile-actions button { min-width:44px !important; min-height:42px !important; }
-}
-
-
-/* ReelsGo interaction fixes: navigation stays hidden behind modal sheets. */
-@media(max-width:700px){
-  body:has(.overlay) .bottom-nav,
-  body:has(.share-sheet-overlay) .bottom-nav,
-  body:has(.reel-comments-backdrop) .bottom-nav { display:none !important; }
-  body:has(.overlay) .main,
-  body:has(.share-sheet-overlay) .main { padding-bottom:0 !important; }
-}
-.reels-mobile-actions button.is-liked,.reels-desktop-actions button.is-liked{color:#ff3b65!important}
-.reels-mobile-actions button.is-saved,.reels-desktop-actions button.is-saved{color:#a99cff!important}
-.reels-like-count-link{display:block;margin:4px 0 8px 8px;padding:3px 5px;background:transparent;color:#d7dce5;font-size:12px;font-weight:700;text-align:left}
-.reel-likes-panel{width:min(100%,520px);height:min(72vh,700px);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:#15191e;color:#f5f7fa;box-shadow:0 28px 90px rgba(0,0,0,.5)}
-.reel-likes-list{overflow:auto;flex:1;padding:12px 16px 24px}
-.reel-likes-user{display:flex;align-items:center;gap:12px;padding:10px 2px}
-.reel-likes-user>div{display:flex;flex-direction:column;gap:4px;min-width:0}
-.reel-likes-user b{font-size:14px;color:#f5f7fa}
-.reel-likes-user small{font-size:12px;color:#9ba3ad}
-@media(max-width:700px){.reel-likes-panel{width:100%;height:min(74dvh,760px);max-height:calc(100dvh - env(safe-area-inset-top));border-radius:22px 22px 0 0;border:0}.reels-like-count-link{margin-left:6px}}
-.post-likes-link{display:inline-flex;background:transparent;color:inherit;font-weight:750;font-size:13px;padding:2px 0;cursor:pointer}
-.post-likes-link:hover{text-decoration:underline}
-
-
-/* Reels interaction visibility and likes-count fixes (desktop + mobile). */
-@media (min-width:701px) {
-  .reels-page .reels-scroll { overflow-x:hidden !important; }
-  .reels-page .reel-feed-media { overflow:hidden !important; }
-  .reels-page .reels-desktop-actions {
-    left:auto !important; right:12px !important; bottom:24px !important;
-    z-index:40 !important; gap:15px !important; max-height:calc(100% - 130px);
-    justify-content:flex-end; pointer-events:auto;
-  }
-  .reels-page .reels-desktop-actions button { color:#fff !important; text-shadow:0 2px 7px #000; }
-  .reels-page .reels-desktop-actions button.is-liked { color:#ff3b65 !important; }
-  .reels-page .reels-desktop-actions button.is-saved { color:#c4b5fd !important; }
-  .reels-page .reels-like-count-link { position:absolute; z-index:41; right:8px; bottom:calc(24px + 5 * 55px); margin:0; color:#fff; text-shadow:0 2px 7px #000; }
-}
-.reels-mobile-likes-count { background:transparent !important; color:#fff !important; padding:0 2px !important; }
-.reels-mobile-likes-count small { text-decoration:underline; font-size:9px !important; }
-@media(max-width:700px) {
-  .reels-page .reels-like-count-link { display:none !important; }
-  .reels-page .reels-mobile-actions { z-index:50 !important; }
-  .reels-page .reels-mobile-actions button.is-liked { color:#ff3b65 !important; }
-}
-
-/* Compact Reel action spacing: keep Like, Comment, Share, Sound and Save grouped. */
-@media (max-width:700px) {
-  .reels-page .reels-mobile-actions {
-    gap: 9px !important;
-    bottom: calc(92px + env(safe-area-inset-bottom)) !important;
-  }
-  .reels-page .reels-mobile-actions button {
-    gap: 2px !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-  }
-  .reels-page .reels-mobile-actions svg {
-    width: 24px !important;
-    height: 24px !important;
-  }
-}
-@media (min-width:701px) {
-  .reels-page .reels-desktop-actions {
-    gap: 9px !important;
-  }
-  .reels-page .reels-desktop-actions button {
-    gap: 2px !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-  }
-}
-
-
-/* =========================================================
-   ReelsGo floating mobile navigation — only navigation UI
-   Keeps the existing navigation actions and all other UI.
-   ========================================================= */
-@media (max-width: 700px) {
-  body {
-    padding-bottom: 86px !important;
-  }
-
-  .bottom-nav.glass-bottom-nav {
-    position: fixed !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    grid-template-columns: none !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: max(10px, env(safe-area-inset-bottom)) !important;
-    transform: translateX(-50%) !important;
-    width: calc(100% - 80px) !important;
-    max-width: 640px !important;
-    min-width: 250px !important;
-    height: 58px !important;
-    padding: 5px 7px !important;
-    border: 1px solid rgba(255,255,255,.13) !important;
-    border-radius: 999px !important;
-    background: rgba(20, 21, 24, .88) !important;
-    background-image: linear-gradient(180deg, rgba(38,39,43,.92), rgba(12,13,16,.94)) !important;
-    box-shadow: 0 5px 22px rgba(0,0,0,.42), inset 0 1px 1px rgba(255,255,255,.12) !important;
-    backdrop-filter: blur(22px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(22px) saturate(140%) !important;
-    z-index: 999 !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile,
-  .bottom-nav.glass-bottom-nav .mobile-profile {
-    position: relative !important;
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
-    width: auto !important;
-    height: 46px !important;
-    min-height: 46px !important;
-    padding: 0 !important;
-    margin: 0 2px !important;
-    border: 0 !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    color: #f7f7f8 !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0 !important;
-    font-size: 0 !important;
-    line-height: 1 !important;
-    box-shadow: none !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile > span,
-  .bottom-nav.glass-bottom-nav .mobile-profile > span {
-    display: none !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile > svg {
-    width: 23px !important;
-    height: 23px !important;
-    min-width: 23px !important;
-    min-height: 23px !important;
-    stroke-width: 2.1 !important;
-    color: currentColor !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile.active,
-  .bottom-nav.glass-bottom-nav .mobile-profile.active {
-    background: #45464b !important;
-    color: #fff !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .mobile-profile .avatar {
-    width: 25px !important;
-    height: 25px !important;
-    min-width: 25px !important;
-    min-height: 25px !important;
-    border: 1.5px solid rgba(255,255,255,.75) !important;
-    box-shadow: none !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .mobile-profile.active .avatar {
-    border-color: #fff !important;
-  }
-}
-
-@media (max-width: 390px) {
-  .bottom-nav.glass-bottom-nav {
-    width: calc(100% - 58px) !important;
-    min-width: 245px !important;
-    height: 54px !important;
-    bottom: max(8px, env(safe-area-inset-bottom)) !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile,
-  .bottom-nav.glass-bottom-nav .mobile-profile {
-    height: 42px !important;
-    min-height: 42px !important;
-  }
-
-  .bottom-nav.glass-bottom-nav .nav-mobile > svg {
-    width: 22px !important;
-    height: 22px !important;
-  }
-}
-
-
-/* Story viewers: Instagram-style swipe-up panel (additive override) */
-.story-viewer-viewers-open .story-viewer-content {
-  transform: translateY(-3vh) scale(.88);
-  transition: transform .24s ease;
-}
-.story-viewers-button {
-  bottom: 12px !important;
-  min-height: 54px;
-  flex-direction: column;
-  gap: 5px !important;
-  background: rgba(20,22,26,.96) !important;
-  color: #f8f8f8 !important;
-  border: 1px solid rgba(255,255,255,.1) !important;
-  padding: 7px 22px 9px !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.04) !important;
-}
-.story-viewers-grabber {
-  width: 36px;
-  height: 4px;
-  display: block;
-  border-radius: 999px;
-  background: #9ca3af;
-  margin-bottom: 1px;
-}
-.story-viewers-button svg { display:none; }
-.story-viewers-sheet {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  transform: none !important;
-  width: 100% !important;
-  max-width: none !important;
-  max-height: 78vh !important;
-  height: 62vh;
-  border-radius: 18px 18px 0 0 !important;
-  background: #181b1e !important;
-  color: #f5f5f5 !important;
-  border-top: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 -18px 45px rgba(0,0,0,.35) !important;
-  animation: storyViewersSlideUp .22s ease-out;
-}
-.story-viewers-head {
-  height: 58px !important;
-  background: #181b1e;
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-}
-.story-viewers-head b { color: #f7f7f7; font-size: 15px; }
-.story-viewers-head span { color: #a4a8af !important; font-size: 12px !important; }
-.story-viewers-head button { background: transparent !important; color: #f7f7f7; }
-.story-viewers-list {
-  max-height: calc(78vh - 58px) !important;
-  height: calc(62vh - 58px);
-  background: #181b1e;
-  padding: 8px 14px 22px !important;
-}
-.story-viewer-row { border-bottom: 1px solid rgba(255,255,255,.06) !important; }
-.story-viewer-user-info b { color: #f5f5f5 !important; }
-.story-viewer-user-info span,
-.story-viewer-row small { color: #a4a8af !important; }
-.story-viewers-empty { color: #a4a8af !important; }
-.story-viewers-empty b { color: #f5f5f5 !important; }
-@keyframes storyViewersSlideUp {
-  from { transform: translateY(35px); opacity: .65; }
-  to { transform: translateY(0); opacity: 1; }
-}
-@media(max-width:700px) {
-  .story-viewer { padding: 0 !important; background: #08090b !important; }
-  .story-viewer-content {
-    width: calc(100vw - 20px) !important;
-    height: calc(100dvh - 90px) !important;
-    max-height: none !important;
-    border-radius: 9px !important;
-    align-self: flex-start;
-    margin-top: 0;
-  }
-  .story-viewer-top { top: 12px !important; left: 14px !important; right: 12px !important; }
-  .story-viewers-sheet { height: 62vh !important; max-height: 78vh !important; }
-  .story-viewer-viewers-open .story-viewer-content { transform: translateY(-8vh) scale(.82); transform-origin: top center; }
-  .story-viewers-button { bottom: 8px !important; }
-}
-
-
-/* Comment options + visible comment counts (additive overrides). */
-.reel-comments-header h2{display:flex;align-items:center;justify-content:center;gap:7px}
-.reel-comments-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.12);color:#d8dce3;font-size:12px;font-weight:700}
-.reel-comment-row{position:relative}
-.reel-comment-content[role="button"]{cursor:pointer;border-radius:10px}
-.reel-comment-content[role="button"]:focus-visible{outline:2px solid #818cf8;outline-offset:3px}
-.reel-comment-menu-wrap{position:relative;flex:0 0 auto;align-self:flex-start;z-index:5}
-.reel-comment-menu-trigger{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:#aeb6c1;cursor:pointer}
-.reel-comment-menu-trigger:hover,.reel-comment-menu-trigger:focus-visible{background:rgba(255,255,255,.1);color:#fff}
-.reel-comment-options-menu{position:absolute;right:0;top:30px;z-index:50;width:230px;max-width:min(230px,calc(100vw - 38px));padding:8px;border:1px solid rgba(255,255,255,.12);border-radius:23px;background:linear-gradient(145deg,rgba(42,43,47,.98),rgba(28,29,32,.98));box-shadow:0 16px 48px rgba(0,0,0,.58);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:hidden;animation:commentMenuIn .14s ease-out}
-.reel-comment-options-menu button{width:100%;min-height:36px;display:flex;align-items:center;gap:12px;padding:8px 10px;border:0;border-radius:11px;background:transparent;color:#f7f7f8;text-align:left;font-size:13px;line-height:1.2;cursor:pointer}
-.reel-comment-options-menu button svg{width:19px;height:19px;flex:0 0 19px;stroke-width:1.8}
-.reel-comment-options-menu button:hover,.reel-comment-options-menu button:focus-visible{background:rgba(255,255,255,.1);outline:none}
-.reel-comment-options-menu button.danger{color:#ff626d}
-.reel-comment-options-menu button.danger:hover{background:rgba(255,65,80,.12)}
-.reel-comment-options-menu button:disabled{opacity:.45;cursor:wait}
-.reel-comment-inline-actions button{background:transparent;border:0;color:#9099a6;font-size:11px;margin-right:12px;cursor:pointer}
-.reel-comment-inline-actions button:hover{color:#fff}
-@keyframes commentMenuIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:700px){
- .reel-comment-options-menu{position:fixed;left:18px;right:auto;top:auto;bottom:calc(90px + env(safe-area-inset-bottom));width:min(230px,calc(100vw - 36px));max-width:none;border-radius:25px;padding:9px;background:linear-gradient(145deg,rgba(43,44,47,.98),rgba(30,31,34,.98));box-shadow:0 20px 55px rgba(0,0,0,.62)}
- .reel-comment-options-menu button{min-height:35px;padding:7px 9px;font-size:13px}
- .reel-comments-header h2{padding-top:8px}
-}
-
-/* Messages: new conversation picker and note composer */
-.messages-compose-overlay{z-index:620;background:rgba(0,0,0,.68);backdrop-filter:blur(5px)}
-.new-message-modal,.note-composer-modal{width:min(100%,520px);max-height:min(78vh,720px);background:#111316;color:#f7f7f8;border:1px solid #292c31;border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
-.new-message-modal .messages-requests-head,.note-composer-modal .messages-requests-head{height:62px;border-bottom:1px solid #282b30;color:#f7f7f8}
-.new-message-modal .messages-requests-head button,.note-composer-modal .messages-requests-head button{background:#25282d;color:#f7f7f8}
-.new-message-search{display:flex;align-items:center;gap:12px;padding:14px 17px;border-bottom:1px solid #282b30;color:#aeb3bc;font-size:14px}
-.new-message-search label{font-weight:700;color:#f7f7f8}
-.new-message-search input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#f7f7f8;font:inherit}
-.new-message-search input::placeholder{color:#777e89}
-.new-message-results{max-height:min(58vh,540px);overflow:auto;padding:4px 0 10px}
-.new-message-user-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 17px;text-align:left;background:transparent;border:0;color:#f7f7f8;cursor:pointer}
-.new-message-user-row:hover{background:#202328}
-.new-message-user-row:disabled{opacity:.6;cursor:wait}
-.new-message-user-row>span:nth-child(2){min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.new-message-user-row b{font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.new-message-user-row small{font-size:12px;color:#9299a4}
-.new-message-start-label{font-size:12px;font-weight:700;color:#8e80ff}
-.new-message-status{padding:30px 18px;text-align:center;color:#969ca6;font-size:13px}
-.new-message-error{padding:12px 17px;color:#ff747e;font-size:13px}
-.note-composer-modal{width:min(100%,460px)}
-.note-composer-modal .messages-requests-head{padding:0 15px}
-.note-cancel-button,.note-share-button{border:0;background:transparent;color:#a7acb5;font-size:13px;font-weight:600;cursor:pointer}
-.note-share-button{color:#9a8cff;font-weight:750}
-.note-share-button:disabled{opacity:.4;cursor:not-allowed}
-.note-composer-body{padding:18px}
-.note-composer-profile{display:flex;align-items:center;gap:11px;margin-bottom:16px}
-.note-composer-profile>div{display:flex;flex-direction:column;gap:4px}
-.note-composer-profile b{font-size:14px;color:#f7f7f8}
-.note-composer-profile small{font-size:11px;color:#969ca6}
-.note-composer-body textarea{width:100%;resize:vertical;min-height:105px;max-height:200px;border:0;outline:0;border-radius:13px;padding:13px;background:#202328;color:#f7f7f8;font:inherit;font-size:16px;line-height:1.5}
-.note-composer-body textarea::placeholder{color:#858b95}
-.note-composer-footer{display:flex;align-items:center;gap:10px;margin-top:14px;color:#969ca6;font-size:12px}
-.note-composer-footer label{color:#f7f7f8;font-weight:650}
-.note-composer-footer select{flex:1;min-width:0;padding:8px 10px;background:#202328;border:1px solid #343840;border-radius:9px;color:#f7f7f8;font-size:12px}
-.note-composer-footer>span{white-space:nowrap}
-.note-publish-mobile{display:none}
-@media(max-width:700px){
-  .messages-compose-overlay{align-items:flex-end;padding:0}
-  .new-message-modal,.note-composer-modal{width:100%;max-height:84dvh;border-radius:23px 23px 0 0;border-bottom:0}
-  .new-message-results{max-height:calc(84dvh - 125px)}
-  .new-message-user-row{padding:13px 17px}
-  .note-composer-modal{padding-bottom:env(safe-area-inset-bottom,0px)}
-  .note-composer-body{padding:18px 17px 22px}
-  .note-publish-mobile{display:block;width:100%;margin-top:18px;padding:12px;border:0;border-radius:12px;background:#7461f3;color:white;font-size:14px;font-weight:750}
-  .note-publish-mobile:disabled{opacity:.45}
-}
-
-/* Notes: owner edit/delete controls and reply composer (additive only). */
-.note-card-wrap{position:relative;display:flex;flex:0 0 82px;flex-direction:column;align-items:center;min-width:82px;gap:5px}
-.note-card-wrap .message-note-card{min-width:72px;width:72px}
-.note-owner-actions{display:flex;align-items:center;justify-content:center;gap:7px}
-.note-owner-actions button{border:0;border-radius:999px;padding:4px 7px;background:#202328;color:#cbd0d8;font-size:10px;font-weight:650;cursor:pointer}
-.note-owner-actions button:hover{background:#343840;color:#fff}
-.note-owner-actions button:last-child{color:#ff747e}
-.note-reply-modal .note-composer-profile small{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#a7adb7}
-.note-reply-modal .note-composer-body textarea{min-height:90px}
-@media(max-width:700px){
- .note-card-wrap{flex-basis:76px;min-width:76px}
- .note-owner-actions button{font-size:10px;padding:4px 6px}
- .note-reply-modal .note-composer-profile small{max-width:calc(100vw - 115px)}
-}
-
-/* Note viewer action sheet: opens after tapping another user's note. */
-.note-action-modal{width:min(100%,430px);max-height:min(78vh,620px);background:#111316;color:#f7f7f8;border:1px solid #292c31;border-radius:22px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
-.note-action-modal .messages-requests-head{height:60px;padding:0 17px;border-bottom:1px solid #282b30;color:#f7f7f8;display:flex;align-items:center;justify-content:space-between}
-.note-action-modal .messages-requests-head button{width:36px;height:36px;border:0;border-radius:50%;background:#25282d;color:#f7f7f8;display:grid;place-items:center}
-.note-action-preview{display:flex;gap:13px;align-items:flex-start;padding:20px 18px 17px}
-.note-action-preview>div{min-width:0;flex:1}
-.note-action-preview b{font-size:14px;color:#f7f7f8}
-.note-action-preview p{margin:7px 0 8px;font-size:16px;line-height:1.4;overflow-wrap:anywhere;color:#fff}
-.note-action-preview small{font-size:12px;color:#9ba1aa}
-.note-action-reply-button{margin:0 16px 16px;width:calc(100% - 32px);min-height:46px;border:0;border-radius:14px;background:#635bff;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer}
-.note-action-reply-button:disabled{opacity:.55;cursor:not-allowed}
-.note-reply-modal .note-composer-body textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:110px;background:#202328;color:#fff;border:1px solid #353941;border-radius:14px;padding:13px;font:inherit;outline:none}
-.note-reply-modal .note-composer-body textarea:focus{border-color:#7770ff;box-shadow:0 0 0 2px #7770ff22}
-@media(max-width:600px){.note-action-modal{width:100%;max-height:76dvh;border-radius:24px 24px 0 0;margin-top:auto}.note-action-preview{padding:18px 16px}.note-action-reply-button{min-height:48px}}
-
-/* Notes viewer sheet: Instagram-like note preview and inline reply; owner gets Edit/Delete */
-.note-viewer-overlay{align-items:flex-end!important;padding:0!important;background:rgba(0,0,0,.62)!important;backdrop-filter:blur(3px)}
-.note-viewer-overlay .note-action-modal{width:min(100%,560px);max-height:min(58dvh,520px);margin:0 auto;background:#171a1d;color:#f6f7f8;border:0;border-radius:24px 24px 0 0;box-shadow:0 -12px 50px #0008;padding:10px 0 max(14px,env(safe-area-inset-bottom));overflow-y:auto}
-.note-sheet-handle{width:38px;height:3px;border-radius:4px;background:#8a9098;margin:0 auto 13px}
-.note-viewer-top{display:flex;align-items:center;gap:11px;padding:8px 16px 14px;border-bottom:1px solid #292d32}
-.note-viewer-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
-.note-viewer-copy b{font-size:13px;color:#f7f7f8}
-.note-viewer-copy small{font-size:11px;color:#9da3ad;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.note-viewer-close{width:32px;height:32px;display:grid;place-items:center;border:0;border-radius:50%;background:#292d32;color:#f7f7f8}
-.note-viewer-content{padding:22px 18px 28px;min-height:86px;display:flex;align-items:center;justify-content:center;text-align:center}
-.note-viewer-content p{margin:0;max-width:100%;font-size:18px;line-height:1.45;font-weight:650;color:#f7f7f8;overflow-wrap:anywhere}
-.note-inline-reply{display:flex;align-items:center;gap:8px;margin:0 14px;padding:5px 6px 5px 14px;min-height:46px;border:1px solid #3a3f46;border-radius:24px;background:#272b30}
-.note-inline-reply input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#f7f7f8;font:inherit;font-size:14px}
-.note-inline-reply input::placeholder{color:#a6acb5}
-.note-inline-reply button{border:0;background:transparent;color:#8a9dff;font-weight:750;font-size:13px;padding:8px 10px}
-.note-inline-reply button:disabled{opacity:.4}
-.note-owner-view-actions{display:grid;gap:9px;padding:0 15px 8px}
-.note-owner-view-actions button{width:100%;min-height:43px;border:0;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer}
-.note-owner-new{background:#4c5cff;color:#fff}
-.note-owner-edit{background:#292d32;color:#f7f7f8}
-.note-owner-delete{background:#292d32;color:#ff6977}
-@media(min-width:701px){.note-viewer-overlay .note-action-modal{border-radius:24px;max-height:70vh;margin-bottom:24px}.note-viewer-content{min-height:110px}}
-@media(max-width:700px){.note-viewer-overlay .note-action-modal{max-height:58dvh;border-radius:24px 24px 0 0}.note-viewer-content{padding:22px 20px 27px}.note-viewer-content p{font-size:17px}}
-
-
-/* Notes sheets sit above the floating navigation so every action stays reachable. */
-body:has(.note-viewer-overlay) .bottom-nav,
-body:has(.note-viewer-overlay) .glass-bottom-nav,
-body:has(.note-viewer-overlay) .mobile-bottom-nav {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-.note-viewer-overlay { z-index: 10000 !important; }
-.note-viewer-overlay .note-action-modal {
-  position: relative;
-  z-index: 10001;
-  max-height: min(76dvh, 700px);
-  padding-bottom: max(18px, env(safe-area-inset-bottom));
-}
-.note-viewer-overlay .note-owner-view-actions { padding-bottom: 14px; }
-.note-viewer-overlay .note-owner-view-actions button { min-height: 46px; }
-.note-viewer-overlay .note-inline-reply { margin-bottom: 8px; }
-@media (max-width: 700px) {
-  .note-viewer-overlay .note-action-modal { max-height: 76dvh; border-radius: 24px 24px 0 0; }
-  .note-viewer-overlay .note-viewer-content { padding: 20px 18px 22px; }
-  .note-viewer-overlay .note-inline-reply { min-height: 48px; }
-}
-
-
-/* Note text visibility and remove relative-age placeholder from note sheet. */
-.note-viewer-copy small { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
-.note-viewer-content { display: flex !important; min-height: 100px !important; align-items: center !important; justify-content: center !important; }
-.note-viewer-content p { display: block !important; visibility: visible !important; opacity: 1 !important; white-space: pre-wrap !important; overflow-wrap: anywhere !important; }
-.messages-page .message-note-card.my-note > span { display: block !important; max-width: 82px; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
-@media (max-width: 700px) { .messages-page .message-note-card.my-note > span { max-width: 72px; } }
-
-/* Instagram-style interactive viewer for saved Reels */
-.saved-reel-viewer-overlay{position:fixed;inset:0;z-index:850;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;padding:18px;color:#fff}
-.saved-reel-viewer-close{position:fixed;right:20px;top:18px;z-index:870;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);color:#fff}
-.saved-reel-viewer{position:relative;width:min(92vw,460px);height:min(92vh,850px);background:#050505;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 24px 90px #000;isolation:isolate}
-.saved-reel-viewer-video{width:100%;height:100%;object-fit:contain;background:#000}
-.saved-reel-viewer-top{position:absolute;left:14px;right:76px;top:14px;display:flex;align-items:center;gap:10px;z-index:2;text-shadow:0 1px 5px #000}
-.saved-reel-viewer-user{display:flex;flex-direction:column;min-width:0}.saved-reel-viewer-user b{font-size:13px}.saved-reel-viewer-user span{font-size:11px;color:#ddd;margin-top:3px}
-.saved-reel-viewer-actions{position:absolute;right:10px;bottom:84px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:17px}
-.saved-reel-viewer-actions button{display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;color:#fff;text-shadow:0 1px 5px #000;padding:2px;min-width:42px}.saved-reel-viewer-actions svg{width:27px;height:27px;stroke-width:2}.saved-reel-viewer-actions small{font-size:11px;font-weight:650}.saved-reel-viewer-actions .is-liked{color:#ff3158}.saved-reel-viewer-actions .is-saved{color:#fff}
-.saved-reel-viewer-caption{position:absolute;left:14px;right:70px;bottom:20px;z-index:2;color:#fff;text-shadow:0 1px 5px #000;font-size:13px;line-height:1.4;overflow-wrap:anywhere}.saved-reel-viewer-caption b{margin-right:7px}
-.saved-reel-comments-backdrop{position:fixed;inset:0;z-index:890;background:rgba(0,0,0,.52);display:flex;align-items:flex-end;justify-content:center}
-.saved-reel-comments-panel{width:min(100%,650px);height:min(72vh,720px);background:#17191d;color:#f8f8f8;border-radius:24px 24px 0 0;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 -20px 70px #0008}
-.saved-reel-comments-panel>header{height:58px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.08);position:relative}.saved-reel-comments-panel>header h2{font-size:15px;margin:0}.saved-reel-comments-panel>header h2 span{color:#a9abb2;font-weight:500;margin-left:5px}.saved-reel-comments-panel>header button{position:absolute;right:14px;top:12px;color:#fff;background:transparent;padding:5px}
-.saved-reel-comments-list{padding:14px;overflow:auto;flex:1;min-height:0}.saved-reel-comment{display:flex;align-items:flex-start;gap:10px;margin:0 0 18px}.saved-reel-comment>div{flex:1;min-width:0}.saved-reel-comment b{font-size:12px}.saved-reel-comment p{font-size:13px;line-height:1.45;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}.saved-reel-comment small{color:#9da1aa;font-size:10px}.saved-reel-comment>button{color:#aeb1b8;background:transparent;padding:5px}.saved-reel-comments-status,.saved-reel-comments-error{color:#a5a8b0;text-align:center;padding:30px 10px;font-size:13px}.saved-reel-comments-error{color:#ff727e}
-.saved-reel-comment-form{display:flex;align-items:center;gap:9px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.09);flex-shrink:0}.saved-reel-comment-form input{flex:1;min-width:0;height:40px;background:transparent;border:0;color:#fff;outline:none}.saved-reel-comment-form input::placeholder{color:#92959e}.saved-reel-comment-form button{background:transparent;color:#7aa7ff;font-weight:750;padding:8px}.saved-reel-comment-form button:disabled{opacity:.45}
-@media(max-width:700px){.saved-reel-viewer-overlay{padding:0}.saved-reel-viewer{width:100%;height:100%;border-radius:0;border:0}.saved-reel-viewer-close{right:12px;top:12px}.saved-reel-viewer-actions{right:9px;bottom:95px;gap:18px}.saved-reel-viewer-caption{bottom:calc(18px + env(safe-area-inset-bottom));left:12px}.saved-reel-comments-panel{height:min(76vh,760px);border-radius:22px 22px 0 0}}
-
-
-/* ReelsGo saved Reels: playable media with familiar social actions */
-.saved-reel-viewer-overlay{z-index:250;backdrop-filter:blur(8px)}
-.saved-reel-viewer-card{width:min(100%,520px)!important;max-height:92vh;overflow:auto;border-radius:20px;background:#101114;color:#fff;box-shadow:0 24px 80px #0008}
-.saved-reel-viewer-card .reel-viewer-user{padding:13px 15px;gap:11px;align-items:center}
-.saved-reel-viewer-card .reel-viewer-user>div{min-width:0;display:flex;flex-direction:column;gap:4px}
-.saved-reel-viewer-card .reel-viewer-user>div>span{color:#d1d5db;font-size:13px;line-height:1.4;overflow-wrap:anywhere}
-.saved-reel-player-wrap{position:relative;background:#000;max-height:72vh;display:flex;justify-content:center;overflow:hidden}
-.saved-reel-player-wrap>video{width:100%;max-height:72vh;aspect-ratio:9/16;object-fit:contain;background:#000}
-.saved-reel-actions{position:absolute;right:12px;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.saved-reel-actions button{width:46px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:14px;background:#1119;color:#fff;backdrop-filter:blur(8px);padding:5px 3px}
-.saved-reel-actions button svg{width:23px;height:23px}
-.saved-reel-actions button span{font-size:10px;font-weight:700;line-height:1.1}
-.saved-reel-actions button.is-liked{color:#ff4d72}
-.saved-reel-actions button.is-saved{color:#b8aaff}
-.saved-reel-notice{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 13px;background:#20232a;color:#f3f4f6;font-size:12px}
-.saved-reel-notice button{background:transparent;color:inherit;display:flex;align-items:center}
-.saved-reel-comments-backdrop{position:fixed;inset:0;z-index:270;background:#0009;display:flex;align-items:flex-end;justify-content:center;padding:16px}
-.saved-reel-comments-panel{width:min(100%,560px);max-height:min(72vh,680px);background:#fff;color:#171717;border-radius:20px 20px 16px 16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px #0004}
-.saved-reel-comments-panel>header{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #eee}
-.saved-reel-comments-panel>header h3{font-size:16px}
-.saved-reel-comments-panel>header h3 span{font-size:12px;color:#777;margin-left:5px}
-.saved-reel-comments-panel>header button{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f4f4f5}
-.saved-reel-comments-list{padding:12px 16px;overflow:auto;flex:1;min-height:120px}
-.saved-reel-comment{display:flex;gap:10px;padding:10px 0;align-items:flex-start}
-.saved-reel-comment>div{min-width:0;flex:1}
-.saved-reel-comment b{font-size:13px}
-.saved-reel-comment p{font-size:13px;line-height:1.45;overflow-wrap:anywhere;margin:3px 0}
-.saved-reel-comment small{font-size:10px;color:#8a8a8a}
-.saved-reel-comment-state{padding:34px 10px;text-align:center;color:#777;font-size:13px}
-.saved-reel-comment-form{display:flex;gap:8px;padding:12px;border-top:1px solid #eee}
-.saved-reel-comment-form input{flex:1;min-width:0;border:1px solid #e5e5e5;border-radius:999px;padding:11px 14px}
-.saved-reel-comment-form button{padding:0 15px;background:#4f46e5;color:#fff;border-radius:999px;font-weight:700}
-.saved-reel-comment-form button:disabled{opacity:.5}
-
-/* Shared posts/Reels in DMs render as tappable media cards, not plain URLs */
-.shared-message-content{width:min(100%,340px);min-width:0;margin:2px 0}
-.shared-message-link{display:block;color:inherit!important;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #e5e7eb;text-decoration:none!important}
-.bubble.mine .shared-message-link{background:#fff;color:#171717!important;border-color:#ffffff40}
-.shared-message-media{position:relative;width:100%;max-height:340px;aspect-ratio:4/3;background:#111;overflow:hidden}
-.shared-message-media.is-reel{aspect-ratio:9/12;max-height:380px}
-.shared-message-media img,.shared-message-media video{width:100%;height:100%;object-fit:cover;background:#000}
-.shared-message-media video{object-fit:contain}
-.shared-message-reel-label{position:absolute;left:10px;top:10px;border-radius:999px;background:#111b;color:#fff;display:flex;align-items:center;gap:5px;padding:5px 8px;font-size:11px;font-weight:750}
-.shared-message-preview-copy{padding:10px 12px;color:#171717}
-.shared-message-preview-copy>b{font-size:12px;display:block}
-.shared-message-preview-copy>p{font-size:12px;line-height:1.45;margin:4px 0 8px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;overflow-wrap:anywhere}
-.shared-message-preview-copy>small{display:flex;align-items:center;gap:2px;color:#666;font-size:10px}
-.shared-message-loading,.shared-message-unavailable,.shared-message-media-fallback{min-height:92px;display:flex;align-items:center;justify-content:center;gap:9px;color:#6b7280;font-size:12px;padding:14px}
-.shared-message-unavailable{flex-direction:column;gap:5px}
-.shared-message-unavailable small{font-size:10px}
-.shared-message-media-fallback{height:100%;color:#fff}
-.message-text-lines{display:block;max-width:100%;min-width:0}
-.message-text-line{display:block;max-width:100%;overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.45}
-.bubble{min-width:0;overflow-wrap:anywhere;word-break:normal}
-.bubble>span{min-width:0}
-.message-line{min-width:0;max-width:100%}
-.message-bubble-wrap{min-width:0;max-width:min(78%,520px)}
-.message-bubble-wrap .bubble{max-width:100%}
-@media(max-width:700px){
- .saved-reel-viewer-card{width:100%!important;max-height:calc(100dvh - 20px);border-radius:18px}
- .saved-reel-player-wrap,.saved-reel-player-wrap>video{max-height:calc(100dvh - 180px)}
- .saved-reel-comments-backdrop{padding:0}
- .saved-reel-comments-panel{width:100%;max-height:78dvh;border-radius:20px 20px 0 0}
- .shared-message-content{width:min(100%,290px)}
- .message-bubble-wrap{max-width:84%}
-}
-
-
-/* Instagram-inspired Saved library refresh */
-.saved-page-shell{max-width:1120px;margin:0 auto;padding:30px 24px 70px;min-height:70vh}
-.saved-page-content{width:100%;color:var(--text,#171717)}
-.saved-page-header{display:flex;align-items:center;gap:16px;padding:8px 0 27px;border-bottom:1px solid var(--line,#e6e7eb);margin-bottom:22px}
-.saved-page-title-icon{width:54px;height:54px;display:grid;place-items:center;border:1px solid var(--line,#e6e7eb);border-radius:17px;background:var(--card,#fff);flex:0 0 auto}
-.saved-page-title-copy{min-width:0;flex:1}
-.saved-page-title-copy h1{font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-.7px;margin:0 0 5px}
-.saved-page-title-copy p{font-size:13px;color:var(--muted,#737985);line-height:1.5;margin:0}
-.saved-page-total{display:flex;flex-direction:column;align-items:flex-end;gap:2px;white-space:nowrap}
-.saved-page-total strong{font-size:20px;font-weight:750}.saved-page-total span{font-size:11px;color:var(--muted,#737985)}
-.saved-page-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 18px;flex-wrap:wrap}
-.saved-page-tabs{display:flex;align-items:center;gap:7px}
-.saved-page-tabs button{appearance:none;display:flex;align-items:center;gap:8px;padding:10px 15px;border:1px solid var(--line,#e6e7eb);border-radius:12px;background:var(--card,#fff);color:var(--muted,#737985);font-size:13px;font-weight:650;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
-.saved-page-tabs button b{font-size:11px;min-width:20px;padding:2px 6px;text-align:center;border-radius:999px;background:var(--soft,#f1f2f5);color:inherit}
-.saved-page-tabs button.active{background:var(--text,#171717);color:var(--bg,#fff);border-color:var(--text,#171717)}
-.saved-page-tabs button.active b{background:#ffffff26;color:inherit}
-.saved-private-note{display:flex;align-items:center;gap:6px;color:var(--muted,#737985);font-size:11px}
-.saved-posts-grid,.saved-reels-grid{gap:4px!important}
-.saved-page-empty,.saved-page-state{min-height:310px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 20px}
-.saved-empty-art,.saved-loading-mark{width:78px;height:78px;border:1.5px solid var(--text,#171717);border-radius:50%;display:grid;place-items:center;margin-bottom:19px;color:var(--text,#171717)}
-.saved-empty-art svg{width:33px;height:33px}
-.saved-page-empty h2,.saved-page-state strong{font-size:20px;line-height:1.3;font-weight:700;margin:0 0 8px}
-.saved-page-empty p,.saved-page-state span{max-width:350px;font-size:13px;line-height:1.6;color:var(--muted,#737985);margin:0}
-.saved-loading-mark{border-color:var(--line,#e6e7eb);color:var(--muted,#737985)}
-.saved-reel-tile{position:relative!important;aspect-ratio:9/16!important;overflow:hidden!important;padding:0!important;border:0!important;background:#111!important;border-radius:2px!important;cursor:pointer!important}
-.saved-reel-tile video{width:100%;height:100%;object-fit:cover;display:block}
-.saved-reel-play{position:absolute;right:10px;top:10px;color:white;filter:drop-shadow(0 1px 4px #0009)}
-.saved-reel-caption{position:absolute;left:9px;right:9px;bottom:9px;color:white;text-align:left;font-size:12px;line-height:1.35;text-shadow:0 1px 4px #000;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.saved-page-embedded .saved-page-toolbar{margin-top:4px}
-.saved-page-embedded .saved-page-empty,.saved-page-embedded .saved-page-state{min-height:260px}
-@media(max-width:640px){.saved-page-shell{padding:18px 12px 38px}.saved-page-header{gap:12px;padding-bottom:20px;margin-bottom:16px}.saved-page-title-icon{width:45px;height:45px;border-radius:14px}.saved-page-title-copy h1{font-size:23px}.saved-page-title-copy p{font-size:12px}.saved-page-total strong{font-size:17px}.saved-page-total span{font-size:10px}.saved-page-toolbar{align-items:flex-start;flex-direction:column;gap:12px}.saved-page-tabs{width:100%}.saved-page-tabs button{flex:1;justify-content:center;padding:10px 8px}.saved-private-note{font-size:10px}.saved-posts-grid,.saved-reels-grid{gap:2px!important}.saved-page-empty,.saved-page-state{min-height:260px;padding:28px 14px}.saved-empty-art,.saved-loading-mark{width:68px;height:68px}}
-
-
-/* Saved Reels: full-height immersive playback, aligned like a modern short-video viewer */
-.saved-reel-fullscreen{position:fixed!important;inset:0!important;z-index:1200!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.94)!important;backdrop-filter:blur(12px)}
-.saved-reel-fullscreen .saved-reel-close{position:fixed;z-index:12;left:max(14px,env(safe-area-inset-left));top:max(14px,env(safe-area-inset-top));width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:rgba(20,20,22,.62);border:1px solid rgba(255,255,255,.18);color:#fff;backdrop-filter:blur(12px)}
-.saved-reel-fullscreen-stage{position:relative;width:min(100%,460px);height:min(100dvh,920px);height:min(100svh,920px);aspect-ratio:9/16;overflow:hidden;background:#09090b;color:#fff;border-radius:16px;isolation:isolate;box-shadow:0 22px 80px #0008;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.saved-reel-fullscreen-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#080808;cursor:pointer}
-.saved-reel-no-media{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center;color:#fff;background:#171717}
-.saved-reel-top-gradient,.saved-reel-bottom-gradient{position:absolute;z-index:1;left:0;right:0;pointer-events:none}
-.saved-reel-top-gradient{top:0;height:24%;background:linear-gradient(180deg,rgba(0,0,0,.62),transparent)}
-.saved-reel-bottom-gradient{bottom:0;height:36%;background:linear-gradient(0deg,rgba(0,0,0,.78),transparent)}
-.saved-reel-topbar{position:absolute;z-index:3;top:max(17px,env(safe-area-inset-top));left:16px;right:15px;display:flex;align-items:center;gap:10px;min-width:0;text-shadow:0 1px 5px #0008}
-.saved-reel-author-copy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.saved-reel-author-copy strong{font-size:13px;font-weight:750;letter-spacing:.05px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.saved-reel-author-copy span{font-size:11px;color:#f0f0f0;opacity:.88}
-.saved-reel-soundless-label{border:1px solid #ffffff55;border-radius:999px;background:#1115;color:#fff;padding:6px 10px;font-size:10px;font-weight:650;backdrop-filter:blur(8px)}
-.saved-reel-play-toggle{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;display:grid;place-items:center;border-radius:50%;background:#0008;color:#fff;opacity:0;transition:opacity .18s;pointer-events:none}.saved-reel-play-toggle:not(.is-playing){opacity:1;pointer-events:auto}
-.saved-reel-fullscreen-actions{position:absolute;z-index:4;right:12px;bottom:clamp(104px,17%,150px);display:flex;flex-direction:column;align-items:center;gap:15px}
-.saved-reel-fullscreen-actions button{width:48px;min-height:47px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:15px;background:rgba(22,22,24,.52);color:#fff;padding:5px 2px;backdrop-filter:blur(9px);text-shadow:0 1px 3px #0006;transition:transform .16s,background .16s}
-.saved-reel-fullscreen-actions button:active{transform:scale(.92)}.saved-reel-fullscreen-actions svg{width:23px;height:23px;stroke-width:1.9}.saved-reel-fullscreen-actions span{font-size:10px;font-weight:700;line-height:1.1}.saved-reel-fullscreen-actions .is-liked{color:#ff5577}.saved-reel-fullscreen-actions .is-saved{color:#c4b5fd}
-.saved-reel-fullscreen-caption{position:absolute;z-index:3;left:16px;right:76px;bottom:max(20px,env(safe-area-inset-bottom));text-shadow:0 1px 5px #0009}.saved-reel-fullscreen-caption>strong{font-size:13px;font-weight:750;letter-spacing:.1px}.saved-reel-fullscreen-caption p{font-size:13px;line-height:1.42;font-weight:520;margin:5px 0 9px;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.saved-reel-fullscreen-caption>span{display:inline-flex;align-items:center;gap:5px;color:#f1f1f1;font-size:10px;font-weight:550;opacity:.9}
-.saved-reel-fullscreen-notice{position:absolute;z-index:10;left:12px;right:70px;bottom:105px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-radius:12px;background:rgba(20,20,22,.82);font-size:12px;backdrop-filter:blur(10px)}.saved-reel-fullscreen-notice button{background:transparent;color:#fff;display:grid;place-items:center}
-.saved-reels-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:3px!important;align-items:start!important}.saved-reels-grid .saved-reel-tile{display:block!important;position:relative!important;width:100%!important;min-width:0!important;aspect-ratio:9/16!important;height:auto!important;min-height:0!important;overflow:hidden!important;border-radius:5px!important;background:#111!important;box-shadow:none!important}.saved-reels-grid .saved-reel-tile video{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover!important}.saved-reels-grid .saved-reel-tile:focus-visible{outline:2px solid #a78bfa;outline-offset:2px}.saved-reels-grid .saved-reel-caption{font-size:clamp(9px,1.5vw,12px);line-height:1.3;left:7px;right:7px;bottom:8px;-webkit-line-clamp:2}.saved-reels-grid .saved-reel-play{right:7px;top:7px;filter:drop-shadow(0 1px 5px #000b)}
-@media(max-width:600px){.saved-reel-fullscreen{align-items:stretch!important}.saved-reel-fullscreen-stage{width:100%;height:100dvh;height:100svh;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none}.saved-reel-fullscreen-video{object-fit:cover}.saved-reel-topbar{top:max(16px,env(safe-area-inset-top));left:14px;right:12px}.saved-reel-fullscreen-actions{right:10px;bottom:calc(112px + env(safe-area-inset-bottom));gap:11px}.saved-reel-fullscreen-actions button{width:44px;min-height:44px;border-radius:13px;background:rgba(25,25,27,.54)}.saved-reel-fullscreen-actions svg{width:22px;height:22px}.saved-reel-fullscreen-caption{left:14px;right:68px;bottom:calc(18px + env(safe-area-inset-bottom))}.saved-reel-fullscreen-caption p{font-size:12.5px;-webkit-line-clamp:3}.saved-reel-play-toggle{width:58px;height:58px}.saved-reel-fullscreen-notice{bottom:calc(100px + env(safe-area-inset-bottom))}.saved-reel-fullscreen .saved-reel-close{left:10px;top:max(10px,env(safe-area-inset-top));width:38px;height:38px}.saved-reels-grid{gap:2px!important}.saved-reels-grid .saved-reel-tile{border-radius:2px!important}}
-
-
-/* ============================================================
-   REELSGO NOTIFICATIONS — INSTAGRAM-INSPIRED RESPONSIVE CENTER
-   Desktop opens as a left drawer over the current page; mobile
-   stays a full-screen page. Notification rows are flat, not cards.
-   ============================================================ */
-.notifications-drawer-backdrop{
-  position:fixed!important;inset:0!important;z-index:999!important;
-  background:rgba(0,0,0,.22)!important;display:flex!important;align-items:stretch!important;
-}
-.notifications-drawer{
-  width:min(490px,42vw)!important;min-width:410px!important;height:100dvh!important;
-  overflow:hidden!important;background:#0b0f12!important;border-right:1px solid #292e33!important;
-  box-shadow:16px 0 48px rgba(0,0,0,.24)!important;
-}
-.notifications-page{
-  width:100%!important;max-width:none!important;min-height:100dvh!important;height:100%!important;
-  margin:0!important;padding:28px 42px 34px!important;background:#0b0f12!important;color:#f5f7fa!important;
-  overflow-y:auto!important;overflow-x:hidden!important;
-}
-.notifications-drawer-page{padding:26px 42px 30px!important;}
-.notifications-center-head{
-  width:100%!important;max-width:none!important;min-height:52px!important;height:52px!important;
-  margin:0 0 14px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
-  gap:12px!important;position:relative!important;
-}
-.notifications-center-head h1{font-size:25px!important;font-weight:800!important;letter-spacing:-.55px!important;margin:0!important;color:#f7f8fa!important;flex:1!important;}
-.notifications-mobile-title,.notifications-mobile-back{display:none!important;}
-.notifications-close,.notifications-mobile-back{
-  flex:0 0 32px!important;width:32px!important;height:32px!important;display:flex!important;align-items:center!important;justify-content:center!important;
-  color:#f5f7fa!important;background:transparent!important;border:0!important;border-radius:50%!important;padding:0!important;
-}
-.notifications-close svg,.notifications-mobile-back svg{width:22px!important;height:22px!important;}
-.notifications-refresh{flex:0 0 34px!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;border:0!important;background:transparent!important;border-radius:50%!important;color:#f5f7fa!important;}
-.notifications-refresh svg{width:21px!important;height:21px!important;}
-.notification-tabs{width:100%!important;max-width:none!important;margin:0 0 13px!important;display:flex!important;gap:8px!important;overflow-x:auto!important;scrollbar-width:none!important;}
-.notification-tabs::-webkit-scrollbar{display:none!important;}
-.notification-tabs button{height:36px!important;min-height:36px!important;padding:0 15px!important;border-radius:999px!important;border:1px solid #41464c!important;background:transparent!important;color:#f2f4f7!important;font-size:12px!important;font-weight:700!important;}
-.notification-tabs button.active{background:#252a30!important;color:#fff!important;border-color:#252a30!important;}
-.notification-feed,.notification-request-center{width:100%!important;max-width:none!important;margin:0!important;}
-.notification-group{margin:0 0 20px!important;}
-.notification-group h2{font-size:15px!important;font-weight:800!important;line-height:1.2!important;margin:0 0 12px!important;color:#f5f7fa!important;}
-.notification-group-list{width:100%!important;}
-.notification-swipe-shell{position:relative!important;overflow:hidden!important;width:100%!important;isolation:isolate!important;}
-.notification-swipe-actions{position:absolute!important;left:0!important;top:0!important;bottom:0!important;width:166px!important;display:flex!important;align-items:stretch!important;gap:5px!important;padding:8px 4px!important;opacity:0!important;pointer-events:none!important;z-index:0!important;}
-.notification-swipe-shell.is-swiped .notification-swipe-actions{opacity:1!important;pointer-events:auto!important;}
-.notification-swipe-actions button{flex:1!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;border:0!important;border-radius:10px!important;color:#fff!important;font-size:11px!important;font-weight:750!important;}
-.notification-swipe-delete{background:#e23d4f!important;}
-.notification-swipe-cancel{background:#343a42!important;}
-.notification-swipe-actions svg{width:17px!important;height:17px!important;}
-.notification-card{
-  position:relative!important;z-index:1!important;width:100%!important;min-height:70px!important;margin:0!important;padding:9px 0!important;
-  display:flex!important;align-items:center!important;gap:11px!important;text-align:left!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.11)!important;
-  border-radius:0!important;background:#0b0f12!important;color:#f5f7fa!important;box-shadow:none!important;
-  transform:translateX(0);transition:transform .22s ease!important;touch-action:pan-y!important;cursor:pointer!important;
-}
-.notification-swipe-shell.is-swiped .notification-card{transform:translateX(166px)!important;}
-.notification-card:hover{background:#0b0f12!important;}
-.notification-card .avatar{flex:0 0 48px!important;width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;}
-.notification-copy{flex:1 1 auto!important;min-width:0!important;display:flex!important;flex-direction:column!important;gap:2px!important;}
-.notification-copy>span{display:block!important;color:#f5f7fa!important;font-size:13px!important;line-height:1.3!important;overflow-wrap:anywhere!important;}
-.notification-copy .profile-username-link{display:inline!important;color:#fff!important;font-weight:800!important;}
-.notification-copy small{color:#9299a4!important;font-size:11px!important;}
-.notification-copy .notification-inline-time{display:inline!important;white-space:nowrap!important;margin-left:3px!important;color:#9299a4!important;font-size:11px!important;}
-.notification-detail-time{display:none!important;}
-.notification-thumb{flex:0 0 48px!important;width:48px!important;height:48px!important;overflow:hidden!important;border-radius:7px!important;background:#1c2228!important;display:flex!important;align-items:center!important;justify-content:center!important;color:#aaa!important;}
-.notification-thumb img{width:100%!important;height:100%!important;object-fit:cover!important;}
-.notification-center-state{min-height:190px!important;border:0!important;border-radius:0!important;background:transparent!important;}
-.notification-request-row{border:0!important;border-bottom:1px solid rgba(255,255,255,.11)!important;border-radius:0!important;background:transparent!important;padding:12px 0!important;}
-
-@media(max-width:700px){
-  .notifications-drawer-backdrop{display:none!important;}
-  .notifications-page{width:100%!important;max-width:none!important;min-height:calc(100dvh - 57px)!important;height:auto!important;margin:0!important;padding:8px 14px 86px!important;background:#0b0f12!important;}
-  .notifications-center-head{height:44px!important;min-height:44px!important;margin:0 0 8px!important;gap:8px!important;}
-  .notifications-center-head h1{font-size:16px!important;text-align:left!important;letter-spacing:0!important;}
-  .notifications-desktop-title{display:none!important;}
-  .notifications-mobile-title{display:inline!important;}
-  .notifications-mobile-back{display:flex!important;flex:0 0 36px!important;width:36px!important;height:36px!important;border-radius:50%!important;background:#20252b!important;}
-  .notifications-mobile-back svg{transform:rotate(180deg)!important;width:20px!important;height:20px!important;}
-  .notifications-close{display:none!important;}
-  .notifications-refresh{flex:0 0 34px!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;}
-  .notification-tabs{width:calc(100% + 28px)!important;margin:0 -14px 14px!important;padding:0 14px 2px!important;gap:7px!important;}
-  .notification-tabs button{height:30px!important;min-height:30px!important;padding:0 12px!important;border-radius:7px!important;font-size:10px!important;background:#252a30!important;border-color:#252a30!important;}
-  .notification-tabs button.active{background:#f5f6f7!important;color:#111!important;border-color:#f5f6f7!important;}
-  .notification-group{margin-bottom:17px!important;}
-  .notification-group h2{font-size:12px!important;margin-bottom:8px!important;}
-  .notification-card{min-height:67px!important;padding:8px 0!important;gap:9px!important;}
-  .notification-card .avatar{flex:0 0 46px!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;}
-  .notification-copy>span{font-size:11px!important;line-height:1.28!important;}
-  .notification-copy .notification-inline-time{font-size:10px!important;}
-  .notification-thumb{flex:0 0 38px!important;width:38px!important;height:38px!important;border-radius:5px!important;}
-  .notification-swipe-actions{width:150px!important;}
-  .notification-swipe-shell.is-swiped .notification-card{transform:translateX(150px)!important;}
-  .notification-swipe-actions button{font-size:10px!important;}
-  .notification-request-row{display:grid!important;grid-template-columns:44px minmax(0,1fr)!important;padding:10px 0!important;gap:8px!important;}
-  .notification-request-actions{grid-column:2!important;display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;}
-}
-
-
-/* Notification actions: swipe only reveals the three-dot menu. Deletion always requires confirmation by menu choice. */
-.notification-swipe-shell{position:relative!important;overflow:hidden!important;width:100%!important;isolation:isolate!important;touch-action:pan-y!important;}
-.notification-swipe-reveal{position:absolute!important;z-index:0!important;right:0!important;top:0!important;bottom:0!important;width:58px!important;display:flex!important;align-items:center!important;justify-content:center!important;opacity:0!important;pointer-events:none!important;background:transparent!important;}
-.notification-swipe-shell.is-swiped .notification-swipe-reveal{opacity:1!important;pointer-events:auto!important;}
-.notification-card{position:relative!important;z-index:1!important;transform:translateX(0)!important;transition:transform .2s ease!important;touch-action:pan-y!important;}
-.notification-card.is-swiped{transform:translateX(-58px)!important;}
-.notification-more-button{width:42px!important;height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;border:0!important;border-radius:50%!important;background:#252a30!important;color:#f5f7fa!important;}
-.notification-more-button:hover{background:#343a42!important;}
-.notification-options-menu{position:absolute!important;z-index:5!important;right:5px!important;top:50%!important;transform:translateY(-50%)!important;width:142px!important;padding:5px!important;border:1px solid #343a42!important;border-radius:12px!important;background:#20252b!important;box-shadow:0 10px 28px rgba(0,0,0,.38)!important;display:flex!important;flex-direction:column!important;gap:3px!important;}
-.notification-options-menu button{width:100%!important;min-height:36px!important;display:flex!important;align-items:center!important;gap:9px!important;padding:8px 10px!important;border:0!important;border-radius:8px!important;text-align:left!important;background:transparent!important;color:#f5f7fa!important;font-size:12px!important;font-weight:650!important;}
-.notification-options-menu button:hover{background:#343a42!important;}
-.notification-options-menu .notification-option-delete{color:#ff6878!important;}
-.notification-swipe-shell.is-swiped .notification-card:hover{background:#0b0f12!important;}
-@media(max-width:700px){
- .notification-swipe-reveal{width:52px!important;}
- .notification-card.is-swiped{transform:translateX(-52px)!important;}
- .notification-more-button{width:38px!important;height:38px!important;}
- .notification-options-menu{right:2px!important;width:132px!important;}
-}
-
-/* Final notification interaction: tap a row to expand Delete / Cancel inline.
-   No swipe gesture, no three-dot button, and no separator lines between rows. */
-.notification-swipe-shell{
-  position:relative!important;display:block!important;width:100%!important;overflow:visible!important;
-  isolation:auto!important;touch-action:auto!important;margin:0!important;padding:0!important;
-}
-.notification-card{
-  position:relative!important;z-index:auto!important;display:flex!important;width:100%!important;
-  min-height:70px!important;margin:0!important;padding:10px 0!important;transform:none!important;
-  border:0!important;border-bottom:0!important;border-radius:0!important;outline:0!important;
-  background:transparent!important;color:#f5f7fa!important;box-shadow:none!important;
-  text-align:left!important;cursor:pointer!important;transition:background .15s ease!important;
-}
-.notification-card:hover,.notification-card:focus-visible{background:rgba(255,255,255,.035)!important;}
-.notification-swipe-reveal,.notification-swipe-actions{display:none!important;}
-.notification-inline-actions{
-  display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;
-  width:100%!important;padding:0 0 10px 58px!important;margin:0!important;border:0!important;
-  background:transparent!important;
-}
-.notification-inline-actions button{
-  min-width:88px!important;min-height:34px!important;padding:7px 14px!important;border:0!important;
-  border-radius:8px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
-  gap:7px!important;font-size:12px!important;font-weight:750!important;cursor:pointer!important;
-}
-.notification-inline-actions .notification-option-delete{background:#e23d4f!important;color:#fff!important;}
-.notification-inline-actions .notification-option-cancel{background:#252a30!important;color:#f5f7fa!important;}
-.notification-inline-actions button:hover{filter:brightness(1.08)!important;}
-.notification-copy{min-width:0!important;}
-.notification-feed .notification-swipe-shell+.notification-swipe-shell{border:0!important;margin-top:0!important;}
-.notification-feed .notification-card,.notification-feed .notification-swipe-shell,
-.notification-feed .notification-copy,.notification-feed .notification-group-list{border-bottom:0!important;}
-@media(max-width:700px){
-  .notification-card{min-height:66px!important;padding:8px 0!important;}
-  .notification-inline-actions{padding:0 0 9px 55px!important;gap:7px!important;}
-  .notification-inline-actions button{min-height:32px!important;min-width:82px!important;font-size:11px!important;}
-}
-
-
-/* ReelsGo profile QR / scanner interface. Additive styles only. */
-.rg-profile-qr-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:0;background:#09132c}
-.rg-profile-qr-screen{position:relative;width:100%;height:100%;min-height:100dvh;overflow:auto;color:#fff;background:radial-gradient(ellipse at 18% 12%,#174d8b 0%,transparent 42%),linear-gradient(135deg,#10213f 0%,#252a75 56%,#111c49 100%);display:flex;flex-direction:column}
-.rg-profile-qr-topbar{height:82px;flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:calc(env(safe-area-inset-top) + 12px) 18px 10px}
-.rg-qr-round-button{width:42px;height:42px;border-radius:50%;background:#08152b66;border:1px solid #ffffff24;color:#fff;display:flex;align-items:center;justify-content:center}
-.rg-qr-round-button:last-child{justify-self:end}
-.rg-qr-round-button svg{width:21px;height:21px}
-.rg-qr-colour-button{justify-self:center;display:flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid #ffffff40;border-radius:999px;background:#15284c80;color:#fff;font-size:11px;letter-spacing:.12em}
-.rg-profile-qr-content{width:min(100%,390px);margin:auto;display:flex;flex-direction:column;align-items:center;padding:14px 24px 42px}
-.rg-profile-qr-card{width:min(100%,310px);padding:22px 18px 18px;background:#fff;color:#315bff;border-radius:18px;box-shadow:0 18px 55px #0002;display:flex;align-items:center;flex-direction:column}
-.rg-profile-qr-image-wrap{position:relative;width:100%;max-width:240px;aspect-ratio:1;background:#fff;display:flex;align-items:center;justify-content:center}
-.rg-profile-qr-image-wrap img{width:100%;height:100%;object-fit:contain;display:block}
-.rg-profile-qr-center-mark{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border:5px solid white;border-radius:13px;background:#fff;color:#386dff;display:flex;align-items:center;justify-content:center}
-.rg-profile-qr-center-mark svg{width:38px;height:38px;stroke-width:2.4}
-.rg-profile-qr-username{margin-top:14px;font-size:clamp(17px,4vw,21px);font-weight:500;letter-spacing:-.4px;text-align:center;overflow-wrap:anywhere}
-.rg-profile-qr-actions{width:min(100%,310px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:9px}
-.rg-profile-qr-actions button{min-height:66px;background:#fff;color:#111827;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px 3px}
-.rg-profile-qr-actions button svg{width:21px;height:21px;stroke-width:1.8}
-.rg-profile-qr-actions button span{font-size:10px;white-space:nowrap}
-.rg-profile-qr-pagination{margin-top:15px;display:flex;align-items:center;flex-direction:column;color:#e7eaff;font-size:11px;gap:5px}
-.rg-profile-qr-pagination .rg-qr-arrow{font-size:28px;font-weight:300;line-height:1}
-.rg-profile-qr-pagination p{margin-top:5px;font-size:12px;text-align:center}
-.rg-profile-qr-screen.is-scanner{background:linear-gradient(160deg,#0b1225,#182e63)}
-.rg-qr-scanner-content{width:min(100%,460px);margin:auto;padding:12px 22px 35px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
-.rg-qr-scanner-content h2{font-size:22px;font-weight:700}
-.rg-qr-scanner-content>p{font-size:13px;color:#d7def6;line-height:1.5}
-.rg-qr-camera-frame{position:relative;width:min(78vw,320px);aspect-ratio:1;border-radius:24px;overflow:hidden;background:#050a17;margin:10px 0}
-.rg-qr-camera-frame video{width:100%;height:100%;object-fit:cover}
-.rg-qr-scan-corner{position:absolute;width:42px;height:42px;border-color:#fff;border-style:solid}
-.rg-qr-scan-corner.top-left{top:18px;left:18px;border-width:4px 0 0 4px;border-radius:12px 0 0}
-.rg-qr-scan-corner.top-right{top:18px;right:18px;border-width:4px 4px 0 0;border-radius:0 12px 0 0}
-.rg-qr-scan-corner.bottom-left{bottom:18px;left:18px;border-width:0 0 4px 4px;border-radius:0 0 0 12px}
-.rg-qr-scan-corner.bottom-right{bottom:18px;right:18px;border-width:0 4px 4px 0;border-radius:0 0 12px}
-.rg-qr-camera-error{max-width:350px!important;color:#fff!important;background:#ffffff18;padding:10px 12px;border-radius:10px}
-.rg-qr-manual-form{width:min(100%,360px);display:flex;gap:7px}
-.rg-qr-manual-form input{min-width:0;flex:1;border:1px solid #ffffff36;background:#08152b80;color:#fff;border-radius:10px;padding:11px;font-size:13px}
-.rg-qr-manual-form input::placeholder{color:#b9c3df}
-.rg-qr-manual-form button{border-radius:10px;padding:0 12px;background:#fff;color:#14244b;font-size:12px;font-weight:700}
-.rg-share-profile-trigger{white-space:nowrap}
-@media(min-width:701px){.rg-profile-qr-overlay{padding:0}.rg-profile-qr-screen{max-width:100%;}.rg-profile-qr-content{padding-top:20px;padding-bottom:30px}.rg-profile-qr-card{width:310px}.rg-profile-qr-actions{width:310px}}
-@media(max-width:700px){.rg-profile-qr-topbar{height:76px;padding-left:16px;padding-right:16px}.rg-profile-qr-content{padding:10px 24px 34px}.rg-profile-qr-card{width:min(100%,310px);padding:20px 17px 17px}.rg-profile-qr-image-wrap{max-width:238px}.rg-profile-qr-actions{width:min(100%,310px)}.rg-profile-qr-pagination{margin-top:14px}.rg-profile-qr-username{font-size:19px}.rg-share-profile-trigger{flex:1}}
-
-
-/* Profile actions sit below the profile details, matching the supplied reference. */
-.rg-profile-action-row{
-  width:100%;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  margin:0 0 22px;
-  padding:0 14px;
-}
-.rg-profile-action-button{
-  min-height:42px;
-  width:100%;
-  border-radius:9px;
-  justify-content:center;
-  gap:8px;
-  white-space:nowrap;
-}
-.rg-profile-action-button svg{width:16px;height:16px;flex:none}
-@media(max-width:700px){
-  .rg-profile-action-row{padding:0 4px;margin:0 0 18px;gap:5px}
-  .rg-profile-action-button{min-height:38px;padding:8px 10px;font-size:12px}
-}
-
-
-/* ReelsGo QR refresh: colorful palettes + browser-compatible scanning fallback */
-.rg-profile-qr-screen{transition:background .45s ease;background-size:cover;background-attachment:fixed}
-.rg-profile-qr-card{color:var(--rg-qr-accent,#6d35d4);box-shadow:0 24px 70px #080b242e,0 2px 0 #ffffffaa inset;}
-.rg-profile-qr-center-mark{color:var(--rg-qr-accent,#6d35d4);box-shadow:0 0 0 2px #fff}
-.rg-profile-qr-username{color:var(--rg-qr-accent,#6d35d4)}
-.rg-qr-card-caption{margin-top:7px;font-size:8px;font-weight:800;letter-spacing:.19em;color:#777;}
-.rg-qr-colour-button{background:#ffffff20;backdrop-filter:blur(16px);font-weight:800;}
-.rg-profile-qr-actions button{box-shadow:0 8px 24px #0002;transition:transform .18s ease,box-shadow .18s ease;}
-.rg-profile-qr-actions button:active{transform:scale(.97)}
-.rg-qr-palette-dots{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:15px;padding:7px 12px;border:1px solid #ffffff38;border-radius:999px;background:#11182728;backdrop-filter:blur(12px)}
-.rg-qr-palette-dots button{width:18px;height:18px;border:2px solid #ffffff80;border-radius:50%;box-shadow:0 2px 8px #0002;}
-.rg-qr-palette-dots button.active{outline:2px solid #fff;outline-offset:3px;transform:scale(1.12)}
-.rg-qr-scanner-label{justify-self:center;font-size:10px;letter-spacing:.18em;font-weight:800;color:#f3f4ff}
-.rg-qr-hidden-canvas,.rg-qr-file-input{display:none!important}
-.rg-qr-scanner-alternatives{display:flex;justify-content:center;}
-.rg-qr-scanner-alternatives button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid #ffffff55;border-radius:999px;background:#ffffff18;color:#fff;font-size:13px;font-weight:700;}
-.rg-qr-scanner-alternatives button:disabled{opacity:.65}
-.rg-qr-scanner-footnote{max-width:360px;color:#cbd5e1;font-size:11px;line-height:1.45;text-align:center}
-.rg-qr-camera-frame video{object-fit:cover;transform:translateZ(0)}
-@media(max-width:700px){
- .rg-profile-qr-content{padding-top:8px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
- .rg-profile-qr-card{box-shadow:0 22px 65px #0003,0 2px 0 #ffffffaa inset}
- .rg-qr-palette-dots{margin-top:13px}
- .rg-qr-scanner-content{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
-}
-
-
-/* ===== ReelsGo messages: Instagram-inspired mobile inbox and chat customization ===== */
-.messages-page .messages-instagram-head { color:#f8fafc; }
-.messages-page .conversation-name-line { display:flex; align-items:center; gap:5px; min-width:0; }
-.messages-page .conversation-username { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#f5f7fb; font-size:13px; font-weight:650; }
-.messages-page .conversation-username.is-unread { font-weight:800; }
-.messages-page .conversation-options-button { width:30px; height:30px; }
-.messages-page .conversation-options-button svg { width:19px; height:19px; }
-.chat-customize-button { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:50%; background:transparent; color:#f5f5f7; }
-.chat-customize-button:hover { background:#272b32; }
-.chat-layout.instagram-chat-layout { --rg-chat-accent:#c026d3; --rg-chat-wallpaper:none; }
-.chat-layout.instagram-chat-layout .chat-messages.instagram-chat-messages { background-color:#090d10; background-image:linear-gradient(rgba(8,12,16,.82),rgba(8,12,16,.82)),var(--rg-chat-wallpaper); background-size:cover; background-position:center; }
-.chat-layout.instagram-chat-layout .bubble.mine { background:var(--rg-chat-accent)!important; }
-.rg-chat-customize-overlay { position:fixed; inset:0; z-index:1600; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(0,0,0,.66); backdrop-filter:blur(8px); }
-.rg-chat-customize-panel { width:min(100%,440px); max-height:min(84vh,760px); overflow:auto; border:1px solid #30343c; border-radius:24px; background:#12151a; color:#f8fafc; padding:20px; box-shadow:0 25px 90px #0009; }
-.rg-chat-customize-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:18px; border-bottom:1px solid #292d34; }
-.rg-chat-customize-head>div { display:flex; flex-direction:column; gap:5px; }
-.rg-chat-customize-head b { font-size:21px; }
-.rg-chat-customize-head span,.rg-chat-customize-section p { color:#9ca3af; font-size:12px; }
-.rg-chat-customize-head>button { width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:#242830;color:#f5f5f7; }
-.rg-chat-customize-section { padding:19px 0; border-bottom:1px solid #292d34; }
-.rg-chat-customize-section> b { display:block; font-size:15px; }
-.rg-chat-customize-section p { margin-top:5px; line-height:1.45; }
-.rg-chat-theme-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:15px; }
-.rg-chat-theme-grid button { display:flex; flex-direction:column; align-items:center; gap:7px; padding:9px 4px; border:1px solid transparent; border-radius:13px; background:#1d2128; color:#d9dde5; font-size:11px; }
-.rg-chat-theme-grid button.active { border-color:#f5f5f7; background:#282c35; }
-.rg-chat-theme-grid i { display:block; width:30px; height:30px; border-radius:50%; box-shadow:inset 0 0 0 2px #ffffff25; }
-.rg-chat-gallery-input { display:none; }
-.rg-chat-browse-gallery { display:flex; align-items:center; gap:12px; width:100%; margin-top:13px; padding:13px; border-radius:14px; background:#20242c; color:#f8fafc; text-align:left; }
-.rg-chat-browse-gallery>span { display:flex; flex:1; flex-direction:column; gap:4px; }
-.rg-chat-browse-gallery small { color:#9ca3af; font-size:11px; }
-.rg-chat-wallpaper-preview { height:95px; margin-top:12px; border-radius:13px; background-size:cover; background-position:center; position:relative; overflow:hidden; }
-.rg-chat-wallpaper-preview button { position:absolute; right:8px; bottom:8px; border-radius:999px; padding:7px 10px; color:#fff; background:#000b; font-size:11px; }
-.rg-chat-customize-done { width:100%; min-height:44px; margin-top:17px; border-radius:13px; background:linear-gradient(135deg,#c026d3,#7c3aed); color:#fff; font-weight:750; }
-@media (max-width:700px) {
-  .messages-page:not(.is-mobile-chat) { width:100%; min-height:calc(100dvh - 60px); padding:8px 5px calc(86px + env(safe-area-inset-bottom)); background:#080d10; color:#f5f7fb; }
-  .messages-page .messages-instagram-head { padding:7px 10px 10px; margin:0; min-height:42px; }
-  .messages-page .messages-account-title b { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:17px; color:#f5f7fb; }
-  .messages-page .messages-compose-button { width:36px; height:36px; color:#f5f7fb; }
-  .messages-page .messages-search-bar { min-height:40px; height:40px; margin:3px 8px 12px; padding:0 12px; border:0; border-radius:999px; background:#22272d; color:#a8b0ba; }
-  .messages-page .messages-search-bar input { color:#f5f7fb; font-size:13px; }
-  .messages-page .messages-search-bar input::placeholder { color:#a5abb5; }
-  .messages-page .messages-notes-section { padding:0 0 12px; margin:0; }
-  .messages-page .messages-notes-header { display:none; }
-  .messages-page .messages-notes-scroll { gap:11px; padding:2px 5px 10px; }
-  .messages-page .message-note-card { min-width:70px; width:70px; color:#f5f7fb; }
-  .messages-page .message-note-avatar,.messages-page .message-note-avatar-wrap { width:58px; height:58px; }
-  .messages-page .message-note-card>b { margin-top:5px; color:#f5f7fb; font-size:10px; }
-  .messages-page .message-note-card>span { color:#9ca3af; font-size:9px; }
-  .messages-page .message-note-bubble { background:#242930; border:1px solid #343a43; color:#e5e7eb; box-shadow:none; }
-  .messages-page .notes-empty { min-width:190px; color:#9ca3af; }
-  .messages-page .instagram-chat-layout { display:flex; flex-direction:column; min-height:0; height:auto; border:0; border-radius:0; background:#080d10; box-shadow:none; overflow:visible; }
-  .messages-page .instagram-conversation-list { width:100%; min-width:0; border:0; background:#080d10; }
-  .messages-page .conversation-list-title { height:38px; padding:0 9px 4px; border:0; background:transparent; }
-  .messages-page .conversation-list-title b { font-size:17px; font-weight:750; color:#f8fafc; }
-  .messages-page .conversation-list-title .messages-requests-button { color:#aeb5c0; font-size:11px; }
-  .messages-page .conversation-scroll { max-height:none; overflow:visible; }
-  .messages-page .conversation-item-shell { min-height:68px; border:0; background:transparent; }
-  .messages-page .conversation-item { min-height:68px; padding:7px 39px 7px 7px; gap:10px; border:0; border-radius:0; background:transparent; color:#f5f7fb; }
-  .messages-page .conversation-item:hover,.messages-page .conversation-item.active { background:#11161b; box-shadow:none; }
-  .messages-page .conversation-avatar-wrap .avatar { width:48px!important; height:48px!important; min-width:48px!important; min-height:48px!important; }
-  .messages-page .conversation-copy b { font-size:12px; color:#f5f7fb; }
-  .messages-page .conversation-copy span { margin-top:3px; color:#9ca3af; font-size:10px; }
-  .messages-page .conversation-copy small { font-size:9px; color:#737d89; }
-  .messages-page .conversation-options-wrap { top:18px; right:3px; }
-  .messages-page .conversation-options-button { width:30px; height:30px; color:#8f98a5; }
-  .messages-page .conversation-options-menu { right:4px; top:33px; min-width:190px; }
-  .messages-page .instagram-chat-placeholder { display:none; }
-  .messages-page.is-mobile-chat { position:fixed; inset:0; z-index:130; width:100%; height:100dvh; min-height:0; padding:0 0 env(safe-area-inset-bottom); overflow:hidden; background:#080d10; }
-  .messages-page.is-mobile-chat .messages-instagram-head,.messages-page.is-mobile-chat .messages-search-bar,.messages-page.is-mobile-chat .messages-notes-section { display:none; }
-  .messages-page.is-mobile-chat .instagram-chat-layout { display:block!important; width:100%; height:100%; min-height:0; }
-  .messages-page.is-mobile-chat .instagram-conversation-list { display:none; }
-  .messages-page.is-mobile-chat .instagram-chat { display:flex!important; flex-direction:column; width:100%; height:100%; min-height:0; }
-  .messages-page.is-mobile-chat .instagram-chat-head { min-height:58px; height:58px; padding:7px 10px; gap:8px; background:#0b0f13; border-bottom:1px solid #191f26; }
-  .messages-page.is-mobile-chat .chat-profile-open .avatar { width:34px!important; height:34px!important; min-width:34px!important; min-height:34px!important; }
-  .messages-page.is-mobile-chat .chat-profile-title b { font-size:13px; color:#f8fafc; }
-  .messages-page.is-mobile-chat .chat-profile-title span { display:none; }
-  .messages-page.is-mobile-chat .chat-customize-button { width:32px; height:32px; flex-basis:32px; }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1; min-height:0; padding:14px 10px; overflow-y:auto; }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input { flex:0 0 56px; height:56px; padding:7px 9px; background:#11161b; border-top:1px solid #222831; }
-  .messages-page.is-mobile-chat .chat-input input { background:#20252c; color:#f8fafc; }
-  .messages-page.is-mobile-chat .bottom-nav { display:none!important; }
-  .rg-chat-customize-overlay { align-items:flex-end; padding:0; }
-  .rg-chat-customize-panel { width:100%; max-height:88dvh; padding:19px 18px calc(18px + env(safe-area-inset-bottom)); border-radius:24px 24px 0 0; }
-}
-
-
-/* ReelsGo messaging correction: flat Instagram-style inbox, chat details screen, visible wallpaper */
-.messages-page .conversation-item-shell,
-.messages-page .conversation-item,
-.messages-page .conversation-list-title,
-.messages-page .instagram-conversation-list,
-.messages-page .conversation-scroll { border:0 !important; box-shadow:none !important; }
-.messages-page .conversation-item-shell { background:transparent !important; border-radius:0 !important; margin:0 !important; }
-.messages-page .conversation-item { background:transparent !important; border-radius:0 !important; outline:0 !important; }
-.messages-page .conversation-item:hover,
-.messages-page .conversation-item.active { background:transparent !important; }
-.messages-page .conversation-item-shell::before,
-.messages-page .conversation-item-shell::after,
-.messages-page .conversation-item::before,
-.messages-page .conversation-item::after { display:none !important; }
-.messages-page .chat-profile-title-button { display:flex; flex:1; min-width:0; flex-direction:column; align-items:flex-start; justify-content:center; text-align:left; border:0; padding:0; background:transparent; color:inherit; cursor:pointer; }
-.messages-page .chat-profile-title-button b { overflow:hidden; max-width:100%; text-overflow:ellipsis; white-space:nowrap; }
-.chat-layout.instagram-chat-layout .chat-messages.instagram-chat-messages {
-  background-color:#090d10 !important;
-  background-image:linear-gradient(rgba(8,12,16,.18),rgba(8,12,16,.24)),var(--rg-chat-wallpaper) !important;
-  background-size:cover !important;
-  background-position:center !important;
-  background-repeat:no-repeat !important;
-  background-attachment:local;
-}
-.rg-chat-details-screen { position:fixed; inset:0; z-index:1450; overflow-y:auto; background:#080d10; color:#f8fafc; padding:calc(14px + env(safe-area-inset-top)) 0 calc(24px + env(safe-area-inset-bottom)); }
-.rg-chat-details-topbar { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:42px; }
-.rg-chat-details-topbar>button,.rg-chat-details-top-actions button { width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:#20252b;color:#f8fafc; }
-.rg-chat-details-topbar>button svg { width:22px;height:22px; }
-.rg-chat-details-top-actions { display:flex;gap:8px; }
-.rg-chat-details-profile { display:flex;align-items:center;flex-direction:column;padding:14px 18px 20px; }
-.rg-chat-details-profile>.avatar { width:92px!important;height:92px!important;min-width:92px!important;min-height:92px!important;border-radius:50%; }
-.rg-chat-details-profile h2 { margin-top:12px;font-size:20px;font-weight:750; }
-.rg-chat-details-profile p { margin-top:3px;color:#a5adb8;font-size:12px; }
-.rg-chat-details-actions { display:flex;align-items:flex-start;justify-content:center;gap:clamp(28px,10vw,54px);width:100%;margin-top:20px; }
-.rg-chat-details-actions button { display:flex;align-items:center;flex-direction:column;gap:8px;background:transparent;color:#f8fafc;font-size:11px; }
-.rg-chat-details-actions button svg { width:23px;height:23px; }
-.rg-chat-details-actions button:first-child svg { color:#f0abfc; }
-.rg-chat-details-tabs { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #222831;margin-top:8px; }
-.rg-chat-details-tabs button { display:grid;place-items:center;height:48px;background:transparent;color:#9ca3af;border-bottom:2px solid transparent; }
-.rg-chat-details-tabs button.active { color:#f8fafc;border-bottom-color:#f8fafc; }
-.rg-chat-details-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px; }
-.rg-chat-details-tile { position:relative;aspect-ratio:1/1;overflow:hidden;background:#20252b;color:#e5e7eb; }
-.rg-chat-details-tile img,.rg-chat-details-tile video { display:block;width:100%;height:100%;object-fit:cover; }
-.rg-chat-details-tile i { position:absolute;right:8px;top:8px;color:#fff;filter:drop-shadow(0 1px 4px #000); }
-.rg-chat-details-status { min-height:140px;display:grid;place-items:center;padding:24px;color:#9ca3af;font-size:13px; }
-@media (min-width:701px) { .rg-chat-details-screen { left:50%; right:auto; width:min(100%,520px); transform:translateX(-50%); border-left:1px solid #252a31;border-right:1px solid #252a31; } }
-@media (max-width:700px) {
- .messages-page .conversation-item-shell { min-height:66px !important; }
- .messages-page .conversation-item { min-height:66px !important; padding:6px 38px 6px 7px !important; }
- .messages-page .conversation-item:hover,.messages-page .conversation-item.active { background:transparent !important; }
- .rg-chat-details-screen { padding-top:calc(10px + env(safe-area-inset-top)); }
- .rg-chat-details-profile { padding-top:12px;padding-bottom:18px; }
- .rg-chat-details-grid { gap:2px; }
-}
-
-
-/* Final chat polish: no auto-keyboard, no requests shortcut, no panel divider lines. */
-.messages-page .conversation-list-title { border:0 !important; box-shadow:none !important; }
-.messages-page .conversation-list-title .messages-requests-button { display:none !important; }
-.messages-page .instagram-chat-head { border-bottom:0 !important; box-shadow:none !important; }
-.messages-page .chat-input.instagram-chat-input { border-top:0 !important; box-shadow:none !important; }
-.messages-page .instagram-chat-layout,
-.messages-page .instagram-conversation-list,
-.messages-page .instagram-chat,
-.messages-page .instagram-chat-messages { border:0 !important; outline:0 !important; box-shadow:none !important; }
-.messages-page .conversation-item-shell + .conversation-item-shell { border-top:0 !important; }
-.rg-chat-customize-overlay { z-index:2147483000 !important; }
-.rg-chat-customize-panel { position:relative; z-index:2147483001; }
-body:has(.rg-chat-customize-overlay) .bottom-nav,
-body:has(.rg-chat-customize-overlay) .glass-bottom-nav,
-body:has(.rg-chat-customize-overlay) .mobile-bottom-nav { display:none !important; }
-@media (max-width:700px) {
- .messages-page.is-mobile-chat .instagram-chat-head { border-bottom:0 !important; }
- .messages-page.is-mobile-chat .chat-input.instagram-chat-input { border-top:0 !important; }
- .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { border:0 !important; }
-}
-
-
-/* Mobile chat viewport: keep the conversation full-screen and let the on-screen
-   keyboard resize the visible chat area instead of covering the composer. */
-@media (max-width:700px) {
-  .messages-page.is-mobile-chat {
-    position:fixed !important;
-    top:0 !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:auto !important;
-    width:100% !important;
-    height:var(--rg-visual-viewport-height, 100dvh) !important;
-    min-height:0 !important;
-    max-height:var(--rg-visual-viewport-height, 100dvh) !important;
-    padding:env(safe-area-inset-top) 0 0 !important;
-    overflow:hidden !important;
-    box-sizing:border-box !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat-layout {
-    display:block !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    overflow:hidden !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat {
-    display:flex !important;
-    flex-direction:column !important;
-    height:100% !important;
-    min-height:0 !important;
-    max-height:100% !important;
-    overflow:hidden !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat-head { flex:0 0 58px !important; }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
-    flex:1 1 auto !important;
-    min-height:0 !important;
-    overflow-y:auto !important;
-    overscroll-behavior:contain;
-    -webkit-overflow-scrolling:touch;
-  }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    flex:0 0 48px !important;
-    min-height:48px !important;
-    height:48px !important;
-    padding-bottom:max(5px, env(safe-area-inset-bottom)) !important;
-    box-sizing:border-box !important;
-  }
-  .messages-page.is-mobile-chat .chat-message-field input {
-    font-size:16px !important; /* prevents iOS auto-zoom when tapping Message */
-    min-width:0;
-  }
-}
-
-
-/* ReelsGo mobile direct-chat correction: no inbox search/notes/nav while a chat is open; keep the composer visible and usable. */
-@media (max-width:700px) {
-  .messages-page.is-mobile-chat .messages-instagram-head,
-  .messages-page.is-mobile-chat .messages-search-bar,
-  .messages-page.is-mobile-chat .messages-notes-section,
-  .messages-page.is-mobile-chat .conversation-list,
-  .messages-page.is-mobile-chat .bottom-nav,
-  .messages-page.is-mobile-chat .mobile-bottom-nav,
-  .messages-page.is-mobile-chat .glass-bottom-nav { display:none !important; }
-  .messages-page.is-mobile-chat { position:fixed !important; inset:0 !important; width:100vw !important; height:var(--rg-visual-viewport-height, 100dvh) !important; max-height:var(--rg-visual-viewport-height, 100dvh) !important; min-height:0 !important; padding:env(safe-area-inset-top) 0 0 !important; margin:0 !important; overflow:hidden !important; background:#080d10 !important; z-index:130 !important; }
-  .messages-page.is-mobile-chat .instagram-chat-layout { display:block !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; box-shadow:none !important; overflow:hidden !important; }
-  .messages-page.is-mobile-chat .instagram-chat { display:flex !important; flex-direction:column !important; width:100% !important; height:100% !important; max-height:100% !important; min-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; border-radius:0 !important; overflow:hidden !important; background:#080d10 !important; }
-  .messages-page.is-mobile-chat .instagram-chat-head { flex:0 0 58px !important; height:58px !important; min-height:58px !important; padding:6px 10px !important; border:0 !important; background:#080d10 !important; }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages { flex:1 1 auto !important; min-height:0 !important; width:100% !important; padding:12px 10px !important; margin:0 !important; border:0 !important; overflow-x:hidden !important; overflow-y:auto !important; background-color:#080d10 !important; background-image:var(--rg-chat-wallpaper) !important; background-size:cover !important; background-position:center center !important; background-repeat:no-repeat !important; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input { position:relative !important; z-index:2 !important; display:flex !important; flex:0 0 auto !important; align-items:center !important; gap:5px !important; width:100% !important; min-width:0 !important; min-height:54px !important; height:auto !important; margin:0 !important; padding:6px 8px calc(6px + env(safe-area-inset-bottom)) !important; border:0 !important; border-radius:0 !important; background:#080d10 !important; box-shadow:none !important; box-sizing:border-box !important; }
-  .messages-page.is-mobile-chat .chat-message-field { display:flex !important; flex:1 1 0 !important; min-width:0 !important; width:auto !important; }
-  .messages-page.is-mobile-chat .chat-message-field > input { display:block !important; visibility:visible !important; opacity:1 !important; width:100% !important; min-width:0 !important; height:42px !important; padding:0 42px 0 13px !important; border:1px solid #262b32 !important; border-radius:22px !important; outline:none !important; background:#191e24 !important; color:#f8fafc !important; font-size:16px !important; line-height:42px !important; box-sizing:border-box !important; }
-  .messages-page.is-mobile-chat .chat-message-field > input::placeholder { color:#9aa2ad !important; opacity:1 !important; }
-  .messages-page.is-mobile-chat .chat-attach-button,
-  .messages-page.is-mobile-chat .chat-smile-button,
-  .messages-page.is-mobile-chat .chat-send-button { flex:0 0 34px !important; width:34px !important; min-width:34px !important; height:38px !important; min-height:38px !important; padding:0 !important; color:#e8edf4 !important; }
-  .messages-page.is-mobile-chat .chat-back-button { display:flex !important; flex:0 0 34px !important; }
-  .messages-page.is-mobile-chat .reelsgo-emoji-picker { z-index:10 !important; bottom:calc(100% + 6px) !important; }
-}
-
-/* Hide the app-wide bottom navigation only while a mobile conversation is open.
-   The chat back button clears .is-mobile-chat, so navigation returns to the inbox. */
-@media (max-width:700px) {
-  body:has(.messages-page.is-mobile-chat) .bottom-nav,
-  body:has(.messages-page.is-mobile-chat) .glass-bottom-nav,
-  body:has(.messages-page.is-mobile-chat) .mobile-bottom-nav,
-  body:has(.messages-page.is-mobile-chat) nav[aria-label="Bottom navigation"] {
-    display:none !important;
-    visibility:hidden !important;
-    pointer-events:none !important;
-  }
-  body:has(.messages-page.is-mobile-chat) {
-    overflow:hidden !important;
-  }
-}
-
-
-/* Final mobile chat viewport + wallpaper fix (2026-10-14).
-   Keep the selected wallpaper visible across the entire message pane; do not
-   tint it with a dark gradient. Resize only the chat container when the keyboard opens. */
-@media (max-width:700px) {
-  .messages-page.is-mobile-chat {
-    box-sizing:border-box !important;
-    height:var(--rg-visual-viewport-height, 100dvh) !important;
-    max-height:var(--rg-visual-viewport-height, 100dvh) !important;
-    overflow:hidden !important;
-    background:#080d10 !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat,
-  .messages-page.is-mobile-chat .instagram-chat-layout {
-    box-sizing:border-box !important;
-    height:100% !important;
-    max-height:100% !important;
-    min-height:0 !important;
-  }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
-    flex:1 1 0 !important;
-    min-height:0 !important;
-    background-color:#080d10 !important;
-    background-image:var(--rg-chat-wallpaper) !important;
-    background-size:cover !important;
-    background-position:center center !important;
-    background-repeat:no-repeat !important;
-    background-attachment:scroll !important;
-  }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    flex:0 0 auto !important;
-    min-height:54px !important;
-    height:auto !important;
-    padding-bottom:max(6px, env(safe-area-inset-bottom)) !important;
-    background:#080d10 !important;
-  }
-}
-
-
-/* FINAL MOBILE CHAT: one continuous wallpaper, no stacked black panels/borders. */
-@media (max-width: 700px) {
-  .messages-page.is-mobile-chat,
-  .messages-page.is-mobile-chat .instagram-chat-layout,
-  .messages-page.is-mobile-chat .instagram-chat {
-    border: 0 !important;
-    outline: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-  }
-  .messages-page.is-mobile-chat {
-    background: transparent !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat-layout {
-    background: transparent !important;
-  }
-  /* The wallpaper belongs to the entire chat shell, not just the messages pane. */
-  .messages-page.is-mobile-chat .instagram-chat {
-    position: relative !important;
-    isolation: isolate !important;
-    background-color: #080d10 !important;
-    background-image: var(--rg-chat-wallpaper) !important;
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat-head,
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages,
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow: none !important;
-  }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
-    background-image: none !important;
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    flex: 0 0 auto !important;
-    min-height: 52px !important;
-    height: auto !important;
-    padding: 5px 8px calc(5px + env(safe-area-inset-bottom)) !important;
-    position: relative !important;
-    z-index: 3 !important;
-  }
-  .messages-page.is-mobile-chat .chat-message-field > input {
-    background: rgba(25, 30, 36, .72) !important;
-    border: 0 !important;
-    box-shadow: none !important;
-  }
-}
-
-
-/* Follow-back action and grouped like notifications */
-.notification-swipe-shell{position:relative;}
-.notification-followback{
-  flex:0 0 auto!important;
-  align-self:center!important;
-  margin:0 4px 0 8px!important;
-  min-width:94px!important;
-  height:34px!important;
-  padding:0 13px!important;
-  border-radius:9px!important;
-  background:#4f5df5!important;
-  color:#fff!important;
-  font-size:12px!important;
-  font-weight:750!important;
-  white-space:nowrap!important;
-}
-.notification-followback:disabled{opacity:.72!important;}
-.notification-followback.is-following{background:#252a30!important;color:#f5f7fa!important;}
-.notification-avatar-stack{
-  flex:0 0 48px!important;
-  width:48px!important;
-  height:48px!important;
-  display:flex!important;
-  align-items:center!important;
-  padding-left:0!important;
-  overflow:visible!important;
-}
-.notification-avatar-stack>span{display:block!important;flex:0 0 38px!important;width:38px!important;height:38px!important;border-radius:50%!important;border:2px solid #0b0f12!important;overflow:hidden!important;}
-.notification-avatar-stack .avatar{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
-@media(max-width:700px){
-  .notification-followback{min-width:82px!important;height:32px!important;padding:0 9px!important;font-size:11px!important;}
-  .notification-avatar-stack{flex-basis:43px!important;width:43px!important;}
-  .notification-avatar-stack>span{flex-basis:34px!important;width:34px!important;height:34px!important;}
-  .notification-avatar-stack .avatar{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;}
-}
-
-
-/* Profile navigation and notification actions: keep the profile click independent from chat state. */
-.notification-swipe-shell { position:relative; }
-.notification-options-trigger {
-  flex:0 0 34px; width:34px; height:38px; align-self:center; display:flex;
-  align-items:center; justify-content:center; border-radius:50%;
-  background:transparent; color:var(--muted,#9298a3); position:absolute;
-  right:2px; top:50%; transform:translateY(-50%); z-index:3;
-}
-.notification-options-trigger:hover { background:rgba(255,255,255,.08); color:var(--text,#f5f7fa); }
-.notification-swipe-shell .notification-card { padding-right:42px !important; }
-.notification-swipe-shell .notification-copy { min-width:0; }
-
-
-/* ReelsGo notification refresh: Instagram-inspired, clean mobile layout */
-.notifications-page{background:#080b0f!important;color:#f5f7fa!important;}
-.notifications-center-head{display:grid!important;grid-template-columns:40px 1fr 40px!important;align-items:center!important;gap:8px!important;}
-.notifications-center-head h1{text-align:center!important;font-size:20px!important;}
-.notifications-back{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:transparent;color:#f5f7fa;}
-.notifications-back:hover{background:#1b2026;}
-.notification-follow-request-summary{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:18px 0 20px;background:transparent;color:#f5f7fa;border-bottom:1px solid #292d32;margin:8px 0 20px;}
-.notification-follow-request-summary>span:nth-child(2){display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;}
-.notification-follow-request-summary b{font-size:15px;font-weight:750;}
-.notification-follow-request-summary small{font-size:14px;color:#aeb4bd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.notification-follow-request-summary i{width:10px;height:10px;border-radius:50%;background:#536dff;flex:none;}
-.notification-follow-request-summary>svg{color:#9ca3af;flex:none;}
-.notification-request-avatar{display:flex;flex:none;}
-.notification-request-avatar .avatar{border:1px solid #d946ef;}
-@media(max-width:700px){
-  .notifications-page{min-height:calc(100dvh - 57px)!important;padding:8px 10px 88px!important;background:#080b0f!important;}
-  .notifications-center-head{position:sticky!important;top:57px!important;z-index:15!important;height:48px!important;margin:0 -2px 8px!important;background:#080b0f!important;}
-  .notifications-center-head h1{font-size:18px!important;}
-  .notifications-center-head .notifications-refresh{width:38px!important;height:38px!important;}
-  .notification-tabs{display:none!important;}
-  .notification-follow-request-summary{padding:16px 0 18px!important;margin:0 0 18px!important;gap:12px!important;}
-  .notification-feed .notification-swipe-shell{border:0!important;margin:0!important;}
-  .notification-feed .notification-card{background:transparent!important;border:0!important;border-radius:0!important;min-height:76px!important;padding:10px 38px 10px 0!important;margin:0!important;box-shadow:none!important;}
-  .notification-feed .notification-card:hover{background:transparent!important;}
-  .notification-copy{font-size:14px!important;line-height:1.35!important;}
-  .notification-copy small{font-size:11px!important;color:#8e959f!important;}
-  .notification-options-trigger{right:0!important;}
-  .notification-followback{margin-left:auto!important;}
-}
-
-
-/* Notification screen: compact Instagram-inspired activity feed */
-.notifications-center-head{
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  position:relative!important;min-height:44px!important;margin:0 0 10px!important;
-  padding:0 42px!important;background:transparent!important;border:0!important;
-}
-.notifications-center-head h1{font-size:19px!important;font-weight:750!important;text-align:center!important;margin:0!important;}
-.notifications-center-head .notifications-refresh{position:absolute!important;right:0!important;top:50%!important;transform:translateY(-50%)!important;color:#f5f7fa!important;background:transparent!important;}
-.notifications-back{display:none!important;}
-.notification-follow-request-summary{display:none!important;}
-.notification-tabs{display:flex!important;gap:7px!important;overflow-x:auto!important;white-space:nowrap!important;scrollbar-width:none!important;margin:0 -2px 18px!important;padding:0 2px 2px!important;border:0!important;}
-.notification-tabs::-webkit-scrollbar{display:none!important;}
-.notification-tabs button{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:6px!important;padding:8px 13px!important;min-height:32px!important;border:1px solid #30343a!important;border-radius:9px!important;background:#202329!important;color:#f5f7fa!important;font-size:11px!important;font-weight:600!important;}
-.notification-tabs button.active{background:#f5f6f7!important;color:#101216!important;border-color:#f5f6f7!important;}
-.notification-tabs .notification-tab-count{font-size:10px!important;}
-.notification-time-section{margin:0 0 15px!important;}
-.notification-time-heading{font-size:14px!important;font-weight:750!important;margin:12px 0 8px!important;color:#f5f7fa!important;}
-.notification-feed .notification-swipe-shell{display:flex!important;align-items:center!important;gap:8px!important;position:relative!important;border:0!important;border-radius:0!important;margin:0!important;padding:2px 0!important;min-width:0!important;}
-.notification-feed .notification-card{display:flex!important;align-items:center!important;gap:10px!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;min-height:65px!important;padding:8px 0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;text-align:left!important;}
-.notification-feed .notification-card:hover{background:transparent!important;}
-.notification-feed .notification-card>.avatar{width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;}
-.notification-copy{display:flex!important;flex:1 1 auto!important;min-width:0!important;flex-direction:column!important;gap:3px!important;font-size:12px!important;line-height:1.35!important;color:#f4f5f7!important;overflow-wrap:anywhere!important;}
-.notification-copy>span{display:block!important;}
-.notification-copy .profile-username-link{font-weight:650!important;}
-.notification-copy small{display:block!important;font-size:10px!important;line-height:1.3!important;color:#89919b!important;margin-top:1px!important;}
-.notification-options-trigger{position:static!important;transform:none!important;order:3!important;flex:0 0 25px!important;width:25px!important;height:32px!important;margin-left:0!important;color:#8c939d!important;}
-.notification-swipe-shell .notification-card{padding-right:0!important;}
-.notification-followback{position:static!important;order:2!important;flex:0 0 auto!important;align-self:center!important;min-width:78px!important;height:31px!important;padding:0 10px!important;margin:0!important;border-radius:7px!important;background:#4b5fff!important;color:#fff!important;font-size:10px!important;font-weight:700!important;white-space:nowrap!important;}
-.notification-followback.is-following{background:#24282e!important;color:#c5cad2!important;}
-.notification-inline-actions{position:absolute!important;right:4px!important;top:calc(100% - 2px)!important;z-index:8!important;}
-.notification-request-center .notification-request-row{border:0!important;border-bottom:0!important;}
-@media(max-width:700px){
-  .notifications-page{padding:8px 10px 88px!important;min-height:calc(100dvh - 57px)!important;background:#080b0f!important;color:#f5f7fa!important;}
-  .notifications-center-head{position:relative!important;top:auto!important;height:42px!important;margin:0 0 7px!important;padding:0 38px!important;}
-  .notifications-center-head h1{font-size:17px!important;}
-  .notifications-center-head .notifications-refresh{width:32px!important;height:32px!important;}
-  .notification-tabs{margin-bottom:14px!important;gap:6px!important;}
-  .notification-tabs button{padding:7px 11px!important;min-height:30px!important;font-size:10px!important;}
-  .notification-time-heading{font-size:13px!important;margin:13px 0 7px!important;}
-  .notification-feed .notification-card{min-height:62px!important;gap:9px!important;padding:7px 0!important;}
-  .notification-feed .notification-card>.avatar{width:43px!important;height:43px!important;min-width:43px!important;min-height:43px!important;}
-  .notification-copy{font-size:11px!important;line-height:1.32!important;}
-  .notification-copy small{font-size:9px!important;}
-  .notification-followback{min-width:76px!important;height:29px!important;padding:0 8px!important;font-size:10px!important;}
-  .notification-options-trigger{flex-basis:22px!important;width:22px!important;height:30px!important;}
-  .notification-avatar-stack{flex-basis:43px!important;width:43px!important;}
-}
-@media(max-width:360px){
-  .notification-feed .notification-card>.avatar{width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;}
-  .notification-copy{font-size:10px!important;}
-  .notification-followback{min-width:68px!important;font-size:9px!important;padding:0 6px!important;}
-}
-
-
-/* ReelsGo chat media attachments: images and videos sent directly in messages. */
-.messages-page .chat-attached-media { display:flex; flex-direction:column; gap:7px; max-width:min(260px, 68vw); margin:2px 0 5px; }
-.messages-page .chat-attached-media img,
-.messages-page .chat-attached-media video { display:block; width:auto; max-width:100%; max-height:360px; border-radius:12px; object-fit:contain; background:#050608; }
-.messages-page .chat-attached-media img { cursor:zoom-in; }
-.messages-page .chat-attached-media a { display:block; max-width:100%; }
-.messages-page .chat-attached-caption { margin:2px 2px 4px; color:inherit; overflow-wrap:anywhere; font-size:inherit; line-height:1.4; }
-.messages-page .chat-attachment-file-input { display:none !important; }
-.messages-page .chat-attach-button:disabled { opacity:.5; cursor:wait; }
-@media (max-width:700px) {
-  .messages-page.is-mobile-chat .chat-attached-media { max-width:min(250px, 72vw); }
-  .messages-page.is-mobile-chat .chat-attached-media img,
-  .messages-page.is-mobile-chat .chat-attached-media video { max-height:42dvh; }
-}
-
-
-/* ReelsGo Studio — professional account setup flow */
-.edit-profile-professional{display:flex;align-items:center;justify-content:space-between;gap:16px;cursor:pointer}
-.edit-profile-professional svg{width:21px;height:21px;flex:0 0 auto}
-.pro-setup-overlay{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,5,12,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);animation:proSetupFade .18s ease-out}
-.pro-setup-panel{width:min(100%,620px);max-height:min(92dvh,940px);overflow:auto;position:relative;border:1px solid rgba(160,180,255,.22);border-radius:30px;background:radial-gradient(ellipse at 12% 0%,rgba(104,76,255,.2),transparent 42%),radial-gradient(ellipse at 100% 70%,rgba(0,226,200,.1),transparent 38%),#0b0e16;color:#f8f9ff;box-shadow:0 30px 120px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.06)}
-.pro-setup-header{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 60px;align-items:center;gap:12px;padding:18px 22px;background:rgba(11,14,22,.82);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
-.pro-setup-icon-button{width:42px;height:42px;border-radius:15px;border:1px solid rgba(255,255,255,.1);background:#171b28;color:#fff;display:grid;place-items:center;cursor:pointer}
-.pro-setup-icon-button svg{width:19px;height:19px}
-.pro-setup-progress{display:flex;gap:6px;justify-content:center}.pro-setup-progress span{height:4px;flex:1;max-width:60px;border-radius:20px;background:#292e3e;transition:background .2s}.pro-setup-progress span.active{background:linear-gradient(90deg,#7c5cff,#25e0c0)}
-.pro-setup-skip{background:none;border:0;color:#aab3c9;font-size:13px;cursor:pointer}
-.pro-setup-content{padding:26px clamp(20px,5vw,42px) 34px;display:flex;flex-direction:column;gap:15px}
-.pro-setup-orb{width:94px;height:94px;margin:2px auto 3px;position:relative;display:grid;place-items:center;border-radius:30px;background:linear-gradient(145deg,#7b5cff,#202b55 55%,#00d9bf);box-shadow:0 0 50px rgba(105,87,255,.28),inset 0 1px 1px rgba(255,255,255,.55);transform:rotate(-5deg)}.pro-setup-orb b{font-size:43px;font-weight:900;font-style:italic;text-shadow:0 3px 15px rgba(0,0,0,.4)}.pro-setup-orb span,.pro-setup-orb i{position:absolute;font-style:normal;font-size:22px}.pro-setup-orb span{top:8px;right:13px}.pro-setup-orb i{bottom:7px;left:12px}
-.pro-setup-eyebrow{margin:0;color:#8e9cff;font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
-.pro-setup-content h2{font-size:clamp(27px,5vw,38px);line-height:1.1;letter-spacing:-.04em;margin:0;font-weight:800;background:linear-gradient(100deg,#fff 20%,#b9c6ff 60%,#77f0dc);background-clip:text;-webkit-background-clip:text;color:transparent}
-.pro-setup-lede{margin:0;color:#aab2c7;font-size:14px;line-height:1.65;max-width:470px}
-.pro-setup-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:7px 0}.pro-setup-feature-grid article{min-height:105px;border:1px solid rgba(170,184,255,.13);border-radius:19px;padding:16px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));display:flex;flex-direction:column;gap:7px}.pro-setup-feature-grid article>span{color:#9b8bff;font-size:23px}.pro-setup-feature-grid b{font-size:13px}.pro-setup-feature-grid small{font-size:11px;color:#8d97af}
-.pro-setup-primary{width:100%;min-height:52px;border:0;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(105deg,#7957ff,#526dff 52%,#18cdb9);color:#fff;font-size:14px;font-weight:800;box-shadow:0 10px 28px rgba(89,91,255,.22);cursor:pointer;transition:transform .18s,filter .18s}.pro-setup-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}.pro-setup-primary:disabled{opacity:.6;cursor:wait}.pro-setup-primary svg{width:18px;height:18px}
-.pro-setup-footnote{font-size:10px;color:#727d96;text-align:center;line-height:1.55;margin:0}
-.pro-setup-choice-list{display:grid;gap:10px;margin:4px 0}.pro-setup-choice{display:grid;grid-template-columns:48px 1fr 22px;align-items:center;gap:13px;text-align:left;padding:16px;border-radius:19px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);color:#f7f8ff;cursor:pointer}.pro-setup-choice.selected{border-color:#8373ff;background:linear-gradient(100deg,rgba(112,88,255,.18),rgba(25,209,188,.06));box-shadow:inset 0 0 0 1px rgba(133,116,255,.18)}.pro-setup-choice-icon{width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#6d56e9,#152f4b);display:grid;place-items:center;font-size:23px}.pro-setup-choice b,.pro-setup-choice small{display:block}.pro-setup-choice b{font-size:14px;margin-bottom:5px}.pro-setup-choice small{font-size:11px;color:#9ca6bd;line-height:1.45}.pro-setup-choice i{font-style:normal;color:#b2a8ff;font-size:20px}
-.pro-setup-label{display:flex;justify-content:space-between;gap:12px;color:#dce2f4;font-size:12px;font-weight:700;margin-top:5px}.pro-setup-label span{color:#7f8aa4;font-size:10px;font-weight:500}.pro-setup-select,.pro-setup-input{width:100%;min-height:48px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:#141927;color:#f5f7ff;padding:0 14px;outline:none;font:inherit;font-size:13px}.pro-setup-select:focus,.pro-setup-input:focus{border-color:#8c7cff;box-shadow:0 0 0 3px rgba(126,99,255,.13)}
-.pro-setup-goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:4px 0}.pro-setup-goal{position:relative;min-height:124px;display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:15px 13px;border:1px solid rgba(255,255,255,.1);border-radius:17px;background:rgba(255,255,255,.025);color:#f7f8ff;cursor:pointer}.pro-setup-goal.selected{border-color:rgba(111,226,214,.7);background:linear-gradient(145deg,rgba(105,88,255,.16),rgba(13,213,190,.07))}.pro-setup-goal>span{font-size:23px;color:#9e91ff}.pro-setup-goal b{font-size:12px;padding-right:16px}.pro-setup-goal small{font-size:10px;color:#8d98b1;line-height:1.4}.pro-setup-goal i{position:absolute;right:12px;top:12px;width:20px;height:20px;border-radius:7px;border:1px solid #414a62;display:grid;place-items:center;font-size:12px;font-style:normal;color:#fff}.pro-setup-goal.selected i{border-color:#6de2d2;background:#2e9e9d}
-.pro-setup-public-toggle{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:rgba(255,255,255,.025);color:#fff;text-align:left;cursor:pointer}.pro-setup-public-toggle b,.pro-setup-public-toggle small{display:block}.pro-setup-public-toggle b{font-size:12px}.pro-setup-public-toggle small{font-size:10px;color:#8d98b1;margin-top:5px;line-height:1.4}.pro-setup-public-toggle i{width:24px;height:24px;flex:0 0 24px;border:1px solid #424a62;border-radius:8px;display:grid;place-items:center;font-style:normal}.pro-setup-public-toggle.on i{background:#4c7aff;border-color:#4c7aff}.pro-setup-summary{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:linear-gradient(100deg,rgba(122,91,255,.15),rgba(31,217,193,.07));border:1px solid rgba(133,123,255,.18)}.pro-setup-summary>span{font-size:25px;color:#b0a2ff}.pro-setup-summary div{flex:1}.pro-setup-summary b,.pro-setup-summary small{display:block}.pro-setup-summary b{font-size:12px}.pro-setup-summary small{font-size:10px;color:#929db5;margin-top:4px}.pro-setup-summary svg{color:#73ead7;width:20px}
-@keyframes proSetupFade{from{opacity:0;transform:scale(.99)}to{opacity:1;transform:scale(1)}}
-@media(max-width:600px){.pro-setup-overlay{padding:0;align-items:stretch}.pro-setup-panel{width:100%;max-height:100dvh;height:100dvh;border-radius:0;border:0}.pro-setup-header{padding:12px 16px}.pro-setup-content{padding:22px 20px calc(26px + env(safe-area-inset-bottom));gap:14px}.pro-setup-content h2{font-size:30px}.pro-setup-orb{width:78px;height:78px;border-radius:25px}.pro-setup-orb b{font-size:36px}.pro-setup-feature-grid article{min-height:94px;padding:13px}.pro-setup-goal{min-height:118px;padding:12px 10px}.pro-setup-goal b{font-size:11px}}
-
-/* Professional profile dashboard: visible only while accountType === professional. */
-.rg-pro-dashboard{margin:18px 0 22px;padding:18px;border:1px solid rgba(132,145,255,.2);border-radius:20px;background:linear-gradient(145deg,rgba(79,92,255,.12),rgba(11,17,25,.96) 52%,rgba(17,196,176,.06));box-shadow:0 12px 34px rgba(0,0,0,.12);color:var(--text,#f7f8fb)}
-.rg-pro-dashboard-heading{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.rg-pro-dashboard-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(140deg,#7867ff,#24cbb7);color:#fff;flex:none}
-.rg-pro-dashboard-heading>div:nth-child(2){min-width:0;flex:1}
-.rg-pro-dashboard-heading b,.rg-pro-dashboard-heading small{display:block}
-.rg-pro-dashboard-heading b{font-size:16px;font-weight:800;letter-spacing:-.02em}
-.rg-pro-dashboard-heading small{margin-top:4px;color:#a9b2c2;font-size:11px;overflow-wrap:anywhere}
-.rg-pro-live-pill{border:1px solid rgba(79,226,190,.28);background:rgba(36,203,183,.1);color:#78ecd8;padding:5px 8px;border-radius:99px;font-size:9px;font-weight:800;letter-spacing:.08em}
-.rg-pro-insight-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:13px}
-.rg-pro-insight-strip>div{padding:12px;border-radius:13px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.055)}
-.rg-pro-insight-strip small,.rg-pro-insight-strip b{display:block}
-.rg-pro-insight-strip small{font-size:10px;color:#aab2c0}
-.rg-pro-insight-strip b{font-size:20px;margin-top:4px;letter-spacing:-.03em}
-.rg-pro-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.rg-pro-tool{position:relative;min-width:0;min-height:83px;display:grid;grid-template-columns:30px minmax(0,1fr) 16px;grid-template-rows:auto auto;align-items:center;column-gap:8px;row-gap:4px;text-align:left;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.035);color:inherit;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
-.rg-pro-tool:hover{background:rgba(105,118,255,.1);border-color:rgba(135,145,255,.28);transform:translateY(-1px)}
-.rg-pro-tool>span{grid-row:1/3;display:grid;place-items:center;width:29px;height:29px;border-radius:10px;background:rgba(118,106,255,.16);color:#b9b0ff;font-size:18px}
-.rg-pro-tool>b{font-size:12px;line-height:1.25;overflow-wrap:anywhere}
-.rg-pro-tool>small{grid-column:2/4;color:#929daf;font-size:10px;line-height:1.35}
-.rg-pro-tool>svg{grid-column:3;grid-row:1;color:#7d8798}
-.rg-pro-dashboard-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.08)}
-.rg-pro-dashboard-footer>span{max-width:390px;color:#8994a7;font-size:10px;line-height:1.5}
-.rg-pro-dashboard-footer button{flex:none;padding:9px 12px;border:1px solid rgba(255,255,255,.13);border-radius:11px;background:rgba(255,255,255,.05);color:#d7dcff;font-size:11px;font-weight:750;cursor:pointer}
-.rg-pro-category-label{margin-top:3px;color:#a8b2c4;font-size:12px;font-weight:600}
-.rg-pro-public-contact{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
-.rg-pro-public-contact span{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;background:rgba(255,255,255,.055);color:#c4ccda;font-size:11px;overflow-wrap:anywhere}
-.rg-pro-detail-backdrop{position:fixed;inset:0;z-index:10070;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.64);backdrop-filter:blur(12px)}
-.rg-pro-detail-sheet{position:relative;width:min(100%,430px);padding:28px;border:1px solid rgba(155,164,255,.2);border-radius:24px;background:linear-gradient(145deg,#171b2a,#0c1118 72%);box-shadow:0 24px 90px rgba(0,0,0,.5);color:#f6f7fb}
-.rg-pro-detail-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:24px;cursor:pointer}
-.rg-pro-detail-symbol{display:grid;place-items:center;width:48px;height:48px;margin-bottom:16px;border-radius:16px;background:linear-gradient(145deg,#7b66ff,#19cbb8);font-size:23px}
-.rg-pro-detail-sheet h2{margin:0 36px 10px 0;font-size:24px;letter-spacing:-.03em}
-.rg-pro-detail-sheet p{color:#b1bac9;font-size:13px;line-height:1.65}
-.rg-pro-detail-note{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:rgba(255,255,255,.035);font-size:11px!important}
-.rg-pro-detail-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:16px 0}
-.rg-pro-detail-stats>div{padding:12px 8px;border-radius:12px;background:rgba(255,255,255,.05);text-align:center}
-.rg-pro-detail-stats b,.rg-pro-detail-stats small{display:block}
-.rg-pro-detail-stats b{font-size:20px}
-.rg-pro-detail-stats small{margin-top:4px;color:#a6afbe;font-size:9px}
-.rg-pro-detail-primary{width:100%;min-height:44px;margin-top:12px;border:0;border-radius:12px;background:linear-gradient(100deg,#7865ff,#4e79ff);color:#fff;font-weight:800;cursor:pointer}
-@media(max-width:700px){.rg-pro-dashboard{margin:14px 0 18px;padding:14px;border-radius:17px}.rg-pro-dashboard-heading b{font-size:14px}.rg-pro-insight-strip>div{padding:10px}.rg-pro-insight-strip b{font-size:18px}.rg-pro-tools-grid{gap:7px}.rg-pro-tool{padding:10px;min-height:78px;grid-template-columns:25px minmax(0,1fr) 13px;column-gap:6px}.rg-pro-tool>span{width:25px;height:25px;font-size:16px}.rg-pro-tool>b{font-size:11px}.rg-pro-tool>small{font-size:9px}.rg-pro-dashboard-footer{align-items:stretch;flex-direction:column}.rg-pro-dashboard-footer button{align-self:flex-start}.rg-pro-detail-sheet{padding:24px 20px}}
-
-
-/* Instagram-like professional account setup flow: restrained dark UI and blue CTA */
-.pro-ig-panel{width:min(100%,620px);height:min(100dvh,980px);max-height:100dvh;display:flex;flex-direction:column;overflow:hidden;border:0;border-radius:0;background:#0b0f12;color:#f5f5f5;box-shadow:none}
-.pro-ig-header{flex:0 0 auto;display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center;padding:16px 20px 10px;background:#0b0f12;border:0;backdrop-filter:none}
-.pro-ig-header h1{margin:0;text-align:center;font-size:15px;font-weight:700;color:#f5f5f5;white-space:nowrap}
-.pro-ig-header-spacer{width:44px;height:44px}
-.pro-ig-back{width:44px;height:44px;border-radius:50%;background:#24282c;border:1px solid #34393d;color:#fff;display:grid;place-items:center;visibility:visible;opacity:1}
-.pro-ig-back svg{width:25px;height:25px;stroke-width:1.8}
-.pro-ig-intro-scroll,.pro-ig-choice-scroll,.pro-ig-category-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:12px 30px 28px}
-.pro-ig-avatar{display:flex;justify-content:center;align-items:center;margin:28px auto 36px}
-.pro-ig-avatar>div{width:148px;height:148px;border-radius:50%;overflow:hidden}
-.pro-ig-intro-scroll h2,.pro-ig-choice-scroll h2,.pro-ig-category-scroll h2{font-size:clamp(26px,4vw,34px);line-height:1.13;letter-spacing:-.025em;font-weight:750;margin:0 0 24px;color:#f5f5f5;background:none;-webkit-text-fill-color:initial}
-.pro-ig-intro-scroll h2{margin-bottom:26px}
-.pro-ig-benefits{display:flex;flex-direction:column;gap:28px;margin:0 0 18px}
-.pro-ig-benefits article{display:grid;grid-template-columns:44px 1fr;gap:20px;align-items:start}
-.pro-ig-benefit-icon{width:38px;height:38px;color:#f5f5f5;margin-top:2px}
-.pro-ig-benefits b{font-size:17px;font-weight:700;display:block;margin:0 0 5px}
-.pro-ig-benefits p{font-size:15px;line-height:1.38;color:#a8adb3;margin:0}
-.pro-ig-footer{flex:0 0 auto;padding:22px 30px calc(24px + env(safe-area-inset-bottom));border-top:1px solid #202428;background:#0b0f12}
-.pro-ig-primary{background:#405cf5!important;color:#fff!important;box-shadow:none!important;border:0!important;border-radius:12px!important;min-height:58px;font-size:16px;font-weight:650}
-.pro-ig-primary:hover{filter:brightness(1.06);transform:none}
-.pro-ig-choice-scroll{display:flex;flex-direction:column;justify-content:center;padding-top:28px;padding-bottom:35px}
-.pro-ig-choice-scroll h2{margin-bottom:44px;max-width:540px}
-.pro-ig-type-list{display:flex;flex-direction:column;gap:16px}
-.pro-ig-type{width:100%;display:grid;grid-template-columns:1fr 30px;gap:18px;align-items:center;text-align:left;padding:22px 20px;border:1px solid #292e33;border-radius:15px;background:#181c20;color:#f5f5f5;min-height:108px}
-.pro-ig-type.selected{border-color:#343a40;background:#181c20}
-.pro-ig-type b{display:block;font-size:18px;margin-bottom:7px;font-weight:700}
-.pro-ig-type small{display:block;color:#92989e;font-size:14px;line-height:1.4}
-.pro-ig-type>i,.pro-ig-category-option>i{width:26px;height:26px;border-radius:50%;border:2px solid #969da5;display:grid;place-items:center;font-style:normal;justify-self:end}
-.pro-ig-type.selected>i,.pro-ig-category-option>i.selected{border:2px solid #f5f5f5}
-.pro-ig-type>i span,.pro-ig-category-option>i.selected span{display:block;width:14px;height:14px;border-radius:50%;background:#f5f5f5}
-.pro-ig-category-scroll{padding-top:26px;padding-bottom:20px}
-.pro-ig-category-scroll h2{margin-bottom:10px}
-.pro-ig-category-lede{margin:0 0 36px;font-size:15px;line-height:1.4;color:#e0e3e6}
-.pro-ig-display-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px;font-size:16px}
-.pro-ig-switch{width:54px;height:32px;flex:0 0 54px;border:0;border-radius:99px;background:#3a3f44;padding:3px;display:flex;align-items:center;justify-content:flex-start}
-.pro-ig-switch i{display:block;width:26px;height:26px;background:#f5f5f5;border-radius:50%;transition:transform .15s}
-.pro-ig-switch.on{background:#f5f5f5;justify-content:flex-end}
-.pro-ig-switch.on i{background:#101316}
-.pro-ig-search{display:flex;align-items:center;gap:10px;background:#24292e;border-radius:13px;padding:0 14px;height:54px;margin-bottom:26px;color:#aab0b6}
-.pro-ig-search svg{width:23px;height:23px;flex:0 0 auto}
-.pro-ig-search input{width:100%;border:0;outline:0;background:transparent;color:#f5f5f5;font:inherit;font-size:16px;min-width:0}
-.pro-ig-search input::placeholder{color:#a4aab0}
-.pro-ig-category-scroll h3{font-size:16px;margin:0 0 8px;font-weight:700;color:#f5f5f5}
-.pro-ig-category-list{display:flex;flex-direction:column}
-.pro-ig-category-option{width:100%;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:16px;border:0;border-bottom:1px solid transparent;background:transparent;color:#f5f5f5;text-align:left;padding:8px 4px;font-size:16px}
-.pro-ig-category-option>i{width:26px;height:26px;flex:0 0 26px}
-.pro-ig-category-option>i.selected span{width:14px;height:14px}
-.pro-ig-no-results{color:#aab0b6;font-size:14px;padding:16px 4px}
-.pro-ig-category-footer{padding-top:16px;padding-bottom:calc(14px + env(safe-area-inset-bottom));text-align:center}
-.pro-ig-category-footer p{font-size:12px;line-height:1.4;color:#a0a6ad;margin:12px 4px 0}
-.pro-ig-category-footer p span{color:#9db5ff;font-weight:600}
-@media(max-width:600px){.pro-setup-overlay{padding:0;align-items:stretch;background:#0b0f12;backdrop-filter:none}.pro-ig-panel{width:100%;height:100dvh;max-height:100dvh;border-radius:0}.pro-ig-header{padding:calc(10px + env(safe-area-inset-top)) 16px 8px;grid-template-columns:42px 1fr 42px}.pro-ig-back{width:38px;height:38px}.pro-ig-header h1{font-size:14px}.pro-ig-intro-scroll,.pro-ig-choice-scroll,.pro-ig-category-scroll{padding-left:26px;padding-right:26px}.pro-ig-avatar{margin-top:42px;margin-bottom:48px}.pro-ig-avatar>div{width:132px;height:132px}.pro-ig-intro-scroll h2,.pro-ig-choice-scroll h2,.pro-ig-category-scroll h2{font-size:29px}.pro-ig-benefits{gap:26px}.pro-ig-benefits article{grid-template-columns:42px 1fr;gap:16px}.pro-ig-benefit-icon{width:36px;height:36px}.pro-ig-benefits b{font-size:16px}.pro-ig-benefits p{font-size:14px}.pro-ig-footer{padding:18px 22px calc(22px + env(safe-area-inset-bottom))}.pro-ig-primary{min-height:58px}.pro-ig-choice-scroll h2{margin-bottom:42px}.pro-ig-type{min-height:106px;padding:19px 16px}.pro-ig-type b{font-size:17px}.pro-ig-type small{font-size:13px}.pro-ig-category-scroll{padding-top:24px}.pro-ig-category-lede{font-size:14px;margin-bottom:32px}.pro-ig-category-option{font-size:15px;min-height:55px}.pro-ig-category-footer{padding:14px 18px calc(16px + env(safe-area-inset-bottom))}}
-
-/* Minimal Instagram-style professional dashboard, opened from the profile. */
-.rg-pro-dashboard-entry{margin:10px 0 14px;width:100%;}
-.rg-pro-dashboard-entry-button{display:flex;align-items:center;gap:12px;width:100%;padding:12px 2px;border:0;border-radius:0;background:transparent;color:var(--text,#f5f5f5);text-align:left;cursor:pointer;}
-.rg-pro-entry-icon{width:34px;height:34px;display:grid;place-items:center;flex:none;color:var(--text,#f5f5f5);}
-.rg-pro-entry-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;}
-.rg-pro-entry-copy b{font-size:14px;font-weight:650;}
-.rg-pro-entry-copy small{font-size:11px;color:#9ba1a9;}
-.rg-pro-dashboard-entry-button>svg{color:#aeb4bc;}
-.rg-pro-dashboard-sheet{width:min(100%,480px);max-height:min(88dvh,820px);padding:24px 0 18px;overflow:hidden;border:0;border-radius:0;background:#0b0f12;box-shadow:none;display:flex;flex-direction:column;}
-.rg-pro-dashboard-sheet>h2{padding:0 18px 12px;margin:0;font-size:18px;letter-spacing:0;text-align:center;}
-.rg-pro-dashboard-sheet .rg-pro-detail-close{top:12px;left:12px;right:auto;width:32px;height:32px;border-radius:50%;background:#252a2e;font-size:23px;}
-.rg-pro-dashboard-scroll{overflow:auto;overscroll-behavior:contain;padding:0 0 max(12px,env(safe-area-inset-bottom));}
-.rg-pro-dashboard-group{padding:0 0 10px;margin:0 0 10px;border-bottom:1px solid #202428;}
-.rg-pro-dashboard-group h3{display:flex;align-items:center;justify-content:space-between;margin:12px 16px 8px;font-size:12px;font-weight:700;}
-.rg-pro-dashboard-group h3 small{font-size:10px;color:#9ca3ad;font-weight:400;}
-.rg-pro-dashboard-group h3 button{border:0;background:none;color:#6175ff;font-size:11px;cursor:pointer;}
-.rg-pro-dashboard-row{display:flex;align-items:center;gap:12px;width:100%;min-height:42px;padding:10px 16px;border:0;background:transparent;color:#f1f3f5;text-align:left;font-size:12px;cursor:pointer;}
-.rg-pro-dashboard-row:active{background:#171b1f;}
-.rg-pro-dashboard-row>span:first-child:not(.rg-pro-row-icon){flex:1;}
-.rg-pro-dashboard-row>b{font-size:12px;font-weight:500;}
-.rg-pro-dashboard-row>svg:last-child{flex:none;color:#929aa3;}
-.rg-pro-dashboard-tool-row{min-height:46px;}
-.rg-pro-row-icon{display:grid;place-items:center;width:22px;flex:none;color:#f0f2f4;font-size:19px;}
-.rg-pro-row-text{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px;}
-.rg-pro-row-text b{font-size:12px;font-weight:450;}
-.rg-pro-row-text small{color:#9ba2ab;font-size:10px;line-height:1.35;}
-.rg-pro-dashboard-row em{padding:5px 10px;border-radius:99px;background:#4d5fff;color:white;font-size:9px;font-style:normal;}
-.rg-pro-switch-personal{display:block;width:100%;padding:15px 16px;border:0;background:transparent;color:#9ab4ff;text-align:left;font-size:12px;cursor:pointer;}
-.rg-pro-dashboard-disclaimer{margin:0;padding:0 16px 12px;color:#858d97;font-size:10px;line-height:1.45;}
-.rg-pro-detail-back{display:flex;align-items:center;gap:9px;margin:0 16px 16px;padding:4px 0;border:0;background:transparent;color:#f5f5f5;font-size:25px;cursor:pointer;}
-.rg-pro-detail-back span{font-size:11px;color:#aeb4bc;}
-.rg-pro-dashboard-sheet:not(:has(.rg-pro-dashboard-scroll))>h2{padding:0 22px 12px 54px;text-align:left;}
-.rg-pro-dashboard-sheet .rg-pro-detail-primary{flex:none;width:calc(100% - 32px);margin:8px 16px 0;min-height:42px;border-radius:7px;background:#4d5fff;}
-@media(max-width:600px){.rg-pro-dashboard-sheet{width:100%;height:100dvh;max-height:100dvh;border-radius:0;padding-top:calc(16px + env(safe-area-inset-top));}.rg-pro-dashboard-scroll{flex:1;}.rg-pro-dashboard-entry-button{padding:10px 0;}}
-
-
-/* Dashboard navigation/header correction: visible back arrow and profile placement. */
-.rg-pro-dashboard-entry{order:3;position:relative;clear:both;margin:8px 0 14px;width:100%;}
-.rg-profile-action-row{order:2;position:relative;}
-.rg-pro-sheet-header{display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:8px;min-height:48px;padding:0 14px 10px;border-bottom:1px solid #202428;flex:none;}
-.rg-pro-sheet-header h2{min-width:0!important;margin:0!important;padding:0!important;text-align:center!important;font-size:14px!important;font-weight:650;letter-spacing:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.rg-pro-sheet-back,.rg-pro-sheet-settings{display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:50%;background:#252a2e;color:#f5f5f5;cursor:pointer;}
-.rg-pro-sheet-back:focus-visible,.rg-pro-sheet-settings:focus-visible{outline:2px solid #d8dce1;outline-offset:2px;}
-.rg-pro-sheet-right-spacer{width:38px;height:38px;display:block;}
-.rg-pro-dashboard-sheet .rg-pro-dashboard-scroll{flex:1;min-height:0;}
-.rg-pro-dashboard-sheet .rg-pro-dashboard-group{padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid #202428;}
-.rg-pro-dashboard-sheet .rg-pro-dashboard-row{border-radius:0;}
-.rg-pro-dashboard-sheet .rg-pro-dashboard-row em{background:#4d5fff;}
-@media(max-width:600px){.rg-pro-dashboard-sheet{padding-top:calc(8px + env(safe-area-inset-top));}.rg-pro-sheet-header{padding-top:2px;padding-bottom:9px;}.rg-pro-dashboard-entry-button{padding:10px 4px;}.rg-pro-dashboard-entry-button .rg-pro-entry-icon{display:none;}.rg-pro-entry-copy b{font-size:14px;}.rg-pro-dashboard-sheet .rg-pro-dashboard-row{min-height:43px;padding-left:16px;padding-right:16px;}}
-
-
-/* Professional dashboard functional backend panels */
-.rg-pro-tool-form{padding:14px 16px 18px;border-top:1px solid rgba(255,255,255,.08);color:#f5f5f5}
-.rg-pro-tool-form>p{font-size:13px;line-height:1.5;color:#aeb4bd;margin:0 0 14px}
-.rg-pro-tool-form form{display:grid;gap:12px}
-.rg-pro-tool-form label{display:grid;gap:7px;font-size:13px;color:#d9dce2}
-.rg-pro-tool-form input:not([type=checkbox]),.rg-pro-tool-form textarea{width:100%;box-sizing:border-box;background:#1d2025;color:#f5f5f5;border:1px solid #353941;border-radius:9px;padding:12px;font:inherit;outline:none}
-.rg-pro-tool-form input:focus,.rg-pro-tool-form textarea:focus{border-color:#7888ff}
-.rg-pro-tool-form textarea{min-height:88px;resize:vertical}
-.rg-pro-tool-toggle{display:flex!important;align-items:center;grid-template-columns:20px 1fr;gap:10px!important}
-.rg-pro-tool-toggle input{accent-color:#5265ff;width:18px;height:18px}
-.rg-pro-saved-replies{display:grid;gap:10px;margin-top:16px}
-.rg-pro-saved-replies article{background:#15181d;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px}
-.rg-pro-saved-replies article b{font-size:13px}
-.rg-pro-saved-replies article p{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;color:#c6cbd3}
-.rg-pro-saved-replies article button{border:0;border-radius:7px;padding:7px 12px;background:#292d33;color:#fff;cursor:pointer}
-.rg-pro-detail-section-title{margin:18px 16px 8px;font-size:14px}
-.rg-pro-daily-list{padding:0 16px;display:grid;gap:0}
-.rg-pro-daily-list>div{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;min-height:38px;border-bottom:1px solid rgba(255,255,255,.07);font-size:11px;color:#c8cdd5}
-.rg-pro-daily-list>div span:first-child{color:#929aa6}
-.rg-pro-detail-note{margin:12px 16px!important}
-
-
-/* Professional dashboard: data-first panels and practical tool controls */
-.rg-pro-panel-intro{color:#aeb6c2;font-size:13px;line-height:1.55;margin:4px 0 18px}
-.rg-pro-data-section{margin:20px 0 8px}
-.rg-pro-data-section>h3{font-size:14px;color:#f3f5f7;margin:0 0 12px;font-weight:750}
-.rg-pro-metric{min-width:0;display:flex;flex-direction:column;gap:5px;padding:13px 12px;border:1px solid #303640;border-radius:12px;background:#171b20}
-.rg-pro-metric>b{font-size:21px;line-height:1.15;color:#f6f7f8;font-variant-numeric:tabular-nums}
-.rg-pro-metric>small{font-size:11px;line-height:1.3;color:#a5adb9}
-.rg-pro-detail-stats:has(.rg-pro-metric){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}
-.rg-pro-detail-stats:has(.rg-pro-metric) .rg-pro-metric{margin:0}
-.rg-pro-empty-state{font-size:13px;line-height:1.6;color:#aab2bd;border:1px dashed #3a414b;background:#171b20;border-radius:12px;padding:14px;margin:8px 0}
-.rg-pro-daily-list{display:flex;flex-direction:column;gap:0;border:1px solid #2d333c;border-radius:12px;overflow:hidden}
-.rg-pro-daily-list>div{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px;border-bottom:1px solid #292f37;font-size:12px;color:#cbd1da}
-.rg-pro-daily-list>div:last-child{border-bottom:0}
-.rg-pro-daily-list b{color:#f0f2f5;font-weight:650}
-.rg-pro-content-performance{display:flex;flex-direction:column;gap:8px}
-.rg-pro-content-performance article{padding:13px;border:1px solid #303640;background:#171b20;border-radius:12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.rg-pro-content-performance article>div{display:flex;flex-direction:column;gap:5px;min-width:0}
-.rg-pro-content-performance b{font-size:13px;color:#f3f5f7}
-.rg-pro-content-performance small,.rg-pro-content-performance>article>span{font-size:11px;line-height:1.45;color:#aab2bd}
-.rg-pro-recap-lines{padding:12px 14px;border-radius:12px;background:#171b20;border:1px solid #303640}
-.rg-pro-recap-lines p{font-size:13px;color:#c5ccd6;margin:8px 0}
-.rg-pro-field{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:650;color:#dce1e8;margin:14px 0}
-.rg-pro-field input,.rg-pro-field textarea{width:100%;box-sizing:border-box;background:#171b20;color:#f5f6f7;border:1px solid #363e49;border-radius:10px;padding:11px 12px;font:inherit;font-weight:400;outline:none}
-.rg-pro-field input:focus,.rg-pro-field textarea:focus{border-color:#8299b9}
-.rg-pro-field textarea{resize:vertical;min-height:74px}
-.rg-pro-toggle{display:flex;align-items:flex-start;gap:10px;margin:14px 0;color:#d3d9e1;font-size:13px;line-height:1.5}
-.rg-pro-toggle input{accent-color:#dce4ef;width:16px;height:16px;margin-top:2px;flex:none}
-.rg-pro-integration-status{display:flex;flex-direction:column;gap:5px;margin:15px 0;padding:14px;border-radius:12px;background:#211d17;border:1px solid #55452d}
-.rg-pro-integration-status b{font-size:13px;color:#f2e4c8}
-.rg-pro-integration-status span{font-size:12px;color:#e6b96d;font-weight:750}
-.rg-pro-integration-status small{font-size:12px;line-height:1.5;color:#b9aa91}
-.rg-pro-status-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #2b3139;font-size:13px;color:#d7dce3}
-.rg-pro-status-row:last-child{border-bottom:0}
-.rg-pro-status-row b{font-size:11px}
-.rg-pro-status-row .is-ok{color:#8ed7a6}
-.rg-pro-status-row .is-missing{color:#e8bd79}
-.rg-pro-idea-list,.rg-pro-resource-list{display:flex;flex-direction:column;gap:8px}
-.rg-pro-idea-list article{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:11px;background:#171b20;border:1px solid #303640}
-.rg-pro-idea-list article>span{font-size:12px;font-weight:800;color:#9eacc0}
-.rg-pro-idea-list p,.rg-pro-resource-list p{font-size:13px;line-height:1.5;color:#c4cbd5;margin:0}
-.rg-pro-resource-list article{padding:12px;border-radius:11px;background:#171b20;border:1px solid #303640}
-.rg-pro-resource-list b{display:block;color:#f1f3f6;font-size:13px;margin-bottom:6px}
-.rg-pro-tool-form form{display:flex;flex-direction:column;gap:2px}
-.rg-pro-tool-form .rg-pro-detail-primary,.rg-pro-detail-primary{margin-top:12px}
-@media(max-width:520px){
- .rg-pro-detail-stats:has(.rg-pro-metric){grid-template-columns:repeat(2,minmax(0,1fr))}
- .rg-pro-daily-list>div{grid-template-columns:1fr auto;gap:7px}
- .rg-pro-daily-list>div span:last-child{grid-column:2}
- .rg-pro-content-performance article{align-items:flex-start;flex-direction:column}
-}
-
-
-/* FINAL professional dashboard layout correction: compact profile card + true full-screen page. */
-.rg-pro-dashboard-entry {
-  display: block !important;
-  width: 100% !important;
-  margin: 10px 0 14px !important;
-  padding: 0 !important;
-  order: 3;
-}
-.rg-pro-dashboard-entry-button {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px !important;
-  width: 100% !important;
-  min-height: 60px !important;
-  padding: 11px 14px !important;
-  border: 1px solid #dedfe2 !important;
-  border-radius: 10px !important;
-  background: #eeeeef !important;
-  color: #202124 !important;
-  text-align: left !important;
-  box-shadow: none !important;
-}
-.rg-pro-entry-copy { display:flex !important; flex:1 !important; min-width:0 !important; flex-direction:column !important; gap:4px !important; }
-.rg-pro-entry-copy b { color:#202124 !important; font-size:14px !important; font-weight:700 !important; }
-.rg-pro-entry-copy small { color:#656970 !important; font-size:11px !important; line-height:1.35 !important; }
-.rg-pro-dashboard-entry-button > svg { color:#646970 !important; flex:none !important; }
-.rg-pro-detail-backdrop {
-  position:fixed !important;
-  inset:0 !important;
-  z-index:10070 !important;
-  display:block !important;
-  width:100vw !important;
-  height:100dvh !important;
-  max-width:none !important;
-  max-height:none !important;
-  padding:0 !important;
-  margin:0 !important;
-  overflow:hidden !important;
-  background:#0b0f12 !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-.rg-pro-dashboard-sheet {
-  position:relative !important;
-  inset:auto !important;
-  display:flex !important;
-  flex-direction:column !important;
-  width:100vw !important;
-  max-width:none !important;
-  height:100dvh !important;
-  max-height:100dvh !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:calc(8px + env(safe-area-inset-top)) 0 env(safe-area-inset-bottom) !important;
-  overflow:hidden !important;
-  border:0 !important;
-  border-radius:0 !important;
-  box-shadow:none !important;
-  background:#0b0f12 !important;
-  color:#f5f5f5 !important;
-}
-.rg-pro-sheet-header {
-  display:grid !important;
-  grid-template-columns:42px minmax(0,1fr) 42px !important;
-  align-items:center !important;
-  gap:8px !important;
-  flex:none !important;
-  min-height:54px !important;
-  margin:0 !important;
-  padding:2px 12px 9px !important;
-  border:0 !important;
-  border-bottom:1px solid #24282d !important;
-  background:#0b0f12 !important;
-}
-.rg-pro-sheet-header h2 {
-  min-width:0 !important;
-  margin:0 !important;
-  padding:0 !important;
-  color:#f5f5f5 !important;
-  text-align:center !important;
-  font-size:15px !important;
-  font-weight:650 !important;
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-}
-.rg-pro-sheet-back, .rg-pro-sheet-settings {
-  display:grid !important;
-  place-items:center !important;
-  width:38px !important;
-  height:38px !important;
-  border:0 !important;
-  border-radius:50% !important;
-  background:transparent !important;
-  color:#f5f5f5 !important;
-  cursor:pointer !important;
-}
-.rg-pro-sheet-back { justify-self:start !important; }
-.rg-pro-sheet-settings { justify-self:end !important; }
-.rg-pro-dashboard-scroll {
-  flex:1 1 auto !important;
-  min-height:0 !important;
-  width:100% !important;
-  overflow-y:auto !important;
-  overscroll-behavior:contain !important;
-  padding:0 0 max(12px,env(safe-area-inset-bottom)) !important;
-}
-.rg-pro-dashboard-group { padding-bottom:8px !important; margin:0 0 8px !important; border-bottom:1px solid #24282d !important; }
-.rg-pro-dashboard-group h3 { margin:14px 18px 8px !important; font-size:13px !important; }
-.rg-pro-dashboard-row { min-height:46px !important; padding:11px 18px !important; border-radius:0 !important; }
-.rg-pro-dashboard-tool-row { min-height:48px !important; }
-.rg-pro-detail-backdrop .rg-pro-detail-primary { flex:none !important; width:calc(100% - 32px) !important; margin:12px 16px max(12px,env(safe-area-inset-bottom)) !important; }
-@media (min-width:601px) {
-  .rg-pro-dashboard-sheet { padding-top:8px !important; }
-  .rg-pro-sheet-header { padding-left:24px !important; padding-right:24px !important; }
-  .rg-pro-dashboard-scroll { padding-left:max(0px,calc((100vw - 900px)/2)) !important; padding-right:max(0px,calc((100vw - 900px)/2)) !important; }
-  .rg-pro-dashboard-group h3 { margin-left:24px !important; margin-right:24px !important; }
-  .rg-pro-dashboard-row { padding-left:24px !important; padding-right:24px !important; }
-}
-
-/* Compact Professional Dashboard entry — match Edit profile / Share profile buttons. */
-.rg-pro-dashboard-entry {
-  width: 100% !important;
-  margin: 0 0 14px !important;
-  padding: 0 4px !important;
-}
-.rg-pro-dashboard-entry-button {
-  min-height: 38px !important;
-  height: 38px !important;
-  padding: 7px 11px !important;
-  gap: 8px !important;
-  border: 0 !important;
-  border-radius: 9px !important;
-  background: #eef0f3 !important;
-  color: #222 !important;
-  box-shadow: none !important;
-}
-.rg-pro-entry-icon {
-  width: 20px !important;
-  height: 20px !important;
-  color: #333 !important;
-}
-.rg-pro-entry-icon svg { width: 16px !important; height: 16px !important; }
-.rg-pro-entry-copy { gap: 0 !important; }
-.rg-pro-entry-copy b {
-  color: #222 !important;
-  font-size: 12px !important;
-  line-height: 1.25 !important;
-  font-weight: 700 !important;
-}
-.rg-pro-entry-copy small { display: none !important; }
-.rg-pro-dashboard-entry-button > svg { width: 16px !important; height: 16px !important; color: #555 !important; }
-@media (max-width:700px) {
-  .rg-pro-dashboard-entry { padding: 0 !important; margin-bottom: 12px !important; }
-  .rg-pro-dashboard-entry-button { min-height: 36px !important; height: 36px !important; padding: 6px 10px !important; }
-}
-
-
-/* Final targeted updates: preserve dashboard position; use the compact dark-grey card shown in the profile reference. */
-.rg-pro-dashboard-entry-button,
-.rg-pro-dashboard-entry-button:hover,
-.rg-pro-dashboard-entry-button:focus-visible {
-  min-height: 56px !important;
-  height: 56px !important;
-  padding: 8px 12px !important;
-  background: #2b3036 !important;
-  background-color: #2b3036 !important;
-  color: #f5f6f7 !important;
-  border: 0 !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-}
-.rg-pro-entry-copy { gap: 2px !important; }
-.rg-pro-entry-copy b { color: #f5f6f7 !important; font-size: 12px !important; line-height: 1.25 !important; }
-.rg-pro-entry-copy small { display: block !important; color: #aeb4bc !important; font-size: 10px !important; line-height: 1.25 !important; }
-.rg-pro-dashboard-entry-button > svg { color: #aeb4bc !important; }
-@media (max-width:700px) {
-  .rg-pro-dashboard-entry-button { min-height: 56px !important; height: 56px !important; padding: 8px 12px !important; }
-}
-.reels-page .reels-mobile-actions button[aria-label="Download Reel"],
-.reels-page .reels-desktop-actions button[aria-label="Download Reel"] {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  color: inherit;
-}
-.reels-page .reels-mobile-actions button[aria-label="Download Reel"] small,
-.reels-page .reels-desktop-actions button[aria-label="Download Reel"] small {
-  display: block;
-  font-size: 10px;
-  line-height: 1.1;
-}
-
-
-/* Messages inbox layout: Instagram-inspired Notes + Primary/General/Requests tabs. */
-.messages-inbox-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 12px;padding:0 2px;}
-.messages-inbox-tabs button{height:38px;border-radius:9px;background:#24292e;color:#e7e9ed;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;}
-.messages-inbox-tabs button.active{background:#f8fafc;color:#171a1f;}
-.messages-inbox-tabs button span{display:inline-flex;min-width:18px;height:18px;padding:0 5px;align-items:center;justify-content:center;border-radius:999px;background:#ed4956;color:#fff;font-size:10px;}
-@media(max-width:700px){
- .messages-page:not(.is-mobile-chat){width:100%!important;max-width:none!important;min-height:calc(100dvh - 68px);padding:8px 10px 80px!important;margin:0!important;background:#080d10!important;color:#f7f8fa!important;}
- .messages-page:not(.is-mobile-chat) .messages-instagram-head,.messages-page:not(.is-mobile-chat) .messages-search-bar{display:none!important;}
- .messages-page:not(.is-mobile-chat) .messages-notes-section{background:transparent!important;border:0!important;border-radius:0!important;padding:0 0 10px!important;margin:0!important;}
- .messages-page:not(.is-mobile-chat) .messages-notes-header{display:none!important;}
- .messages-page:not(.is-mobile-chat) .messages-notes-scroll{gap:14px;padding:0 2px 4px!important;}
- .messages-page:not(.is-mobile-chat) .message-note-card{min-width:82px!important;width:82px!important;color:#e9edf2!important;}
- .messages-page:not(.is-mobile-chat) .message-note-card>span{color:#aab1bc!important;}
- .messages-page:not(.is-mobile-chat) .messages-inbox-tabs{margin-top:2px;margin-bottom:9px;gap:7px;}
- .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button{height:36px;font-size:11px;}
- .messages-page:not(.is-mobile-chat) .instagram-chat-layout{display:block!important;min-height:0!important;height:auto!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important;}
- .messages-page:not(.is-mobile-chat) .instagram-conversation-list{display:flex!important;width:100%!important;min-width:0!important;border:0!important;background:transparent!important;}
- .messages-page:not(.is-mobile-chat) .conversation-list-title{display:none!important;}
- .messages-page:not(.is-mobile-chat) .conversation-scroll{max-height:none!important;overflow:visible!important;}
- .messages-page:not(.is-mobile-chat) .conversation-item-shell{background:transparent!important;border:0!important;}
- .messages-page:not(.is-mobile-chat) .conversation-item{min-height:64px!important;padding:9px 3px!important;background:transparent!important;color:#f7f8fa!important;border:0!important;}
- .messages-page:not(.is-mobile-chat) .conversation-copy b,.messages-page:not(.is-mobile-chat) .conversation-username{color:#f7f8fa!important;}
- .messages-page:not(.is-mobile-chat) .conversation-preview,.messages-page:not(.is-mobile-chat) .conversation-copy small{color:#9ea6b2!important;}
- .messages-page:not(.is-mobile-chat) .conversation-options-button{color:#aab1bc!important;}
- .messages-page:not(.is-mobile-chat) .instagram-chat{display:none!important;}
- .messages-page:not(.is-mobile-chat) .chat-empty-list{min-height:170px;background:transparent!important;color:#aab1bc!important;}
-}
-
-/* Final inbox correction: restore search + compose controls, keep the inbox flat black. */
-@media (max-width:700px) {
-  .messages-page:not(.is-mobile-chat) .messages-instagram-head,
-  .messages-page:not(.is-mobile-chat) .messages-search-bar {
-    display:flex !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-instagram-head {
-    height:34px !important;
-    min-height:34px !important;
-    margin:0 0 5px !important;
-    padding:0 4px !important;
-    justify-content:space-between !important;
-    background:#000 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-account-title b {
-    color:#f7f8fa !important;
-    font-size:16px !important;
-    line-height:1 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-account-chevron {
-    width:14px !important;
-    height:14px !important;
-    color:#f7f8fa !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-compose-button {
-    display:flex !important;
-    width:32px !important;
-    height:32px !important;
-    padding:0 !important;
-    color:#f7f8fa !important;
-    background:transparent !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-compose-button svg {
-    width:21px !important;
-    height:21px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-search-bar {
-    width:100% !important;
-    height:36px !important;
-    min-height:36px !important;
-    margin:0 0 7px !important;
-    padding:0 11px !important;
-    gap:8px !important;
-    border:0 !important;
-    border-radius:8px !important;
-    background:#171717 !important;
-    box-shadow:none !important;
-    backdrop-filter:none !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-search-bar > svg {
-    width:16px !important;
-    height:16px !important;
-    color:#a6a6a6 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-search-bar input {
-    color:#fff !important;
-    font-size:13px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-search-bar input::placeholder { color:#9b9b9b !important; }
-  .messages-page:not(.is-mobile-chat) .messages-notes-section {
-    background:#000 !important;
-    padding-top:0 !important;
-    padding-bottom:7px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs {
-    gap:6px !important;
-    margin:0 0 6px !important;
-    padding:0 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button {
-    height:30px !important;
-    border-radius:7px !important;
-    font-size:10px !important;
-    background:#24272b !important;
-    color:#e7e9ed !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button.active {
-    background:#f8fafc !important;
-    color:#171a1f !important;
-  }
-  .messages-page:not(.is-mobile-chat) .instagram-chat-layout,
-  .messages-page:not(.is-mobile-chat) .instagram-conversation-list,
-  .messages-page:not(.is-mobile-chat) .conversation-scroll,
-  .messages-page:not(.is-mobile-chat) .conversation-item-shell,
-  .messages-page:not(.is-mobile-chat) .conversation-item {
-    background:#000 !important;
-    border:0 !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-item-shell {
-    min-height:62px !important;
-    height:auto !important;
-    margin:0 !important;
-    padding:0 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-item {
-    min-height:62px !important;
-    height:auto !important;
-    padding:6px 3px !important;
-    gap:10px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-item:hover,
-  .messages-page:not(.is-mobile-chat) .conversation-item.active,
-  .messages-page:not(.is-mobile-chat) .conversation-item-shell.active {
-    background:#000 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-item .avatar,
-  .messages-page:not(.is-mobile-chat) .conversation-avatar-wrap .avatar {
-    width:42px !important;
-    height:42px !important;
-    min-width:42px !important;
-    min-height:42px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-copy b,
-  .messages-page:not(.is-mobile-chat) .conversation-username {
-    color:#f5f5f5 !important;
-    font-size:12px !important;
-    line-height:1.2 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-copy span,
-  .messages-page:not(.is-mobile-chat) .conversation-preview {
-    color:#9b9b9b !important;
-    font-size:10px !important;
-    line-height:1.2 !important;
-    margin-top:3px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-copy small {
-    color:#777 !important;
-    font-size:9px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .conversation-options-wrap { background:transparent !important; }
-  .messages-page:not(.is-mobile-chat) .conversation-options-button { color:#888 !important; }
-  /* Open conversation: remove grey panels and keep one seamless black canvas. */
-  .messages-page.is-mobile-chat,
-  .messages-page.is-mobile-chat .instagram-chat-layout,
-  .messages-page.is-mobile-chat .instagram-chat,
-  .messages-page.is-mobile-chat .instagram-chat-head,
-  .messages-page.is-mobile-chat .instagram-chat-messages,
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    background:#000 !important;
-    border:0 !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-  }
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages {
-    background-color:#000 !important;
-    background-image:none !important;
-  }
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input input {
-    background:#000 !important;
-    border:1px solid #343434 !important;
-    border-radius:22px !important;
-    color:#fff !important;
-  }
-  .messages-page.is-mobile-chat .message-line .bubble:not(.mine) {
-    background:#171717 !important;
-    color:#f5f5f5 !important;
-    border:0 !important;
-  }
-}
-
-
-/* Final requested inbox colour fix: keep the entire messages screen pure black.
-   Only the Primary / General / Requests tab buttons retain their existing colours. */
-@media (max-width:700px) {
-  body:has(.messages-page:not(.is-mobile-chat)),
-  .app:has(.messages-page:not(.is-mobile-chat)),
-  .main:has(.messages-page:not(.is-mobile-chat)),
-  .page:has(.messages-page:not(.is-mobile-chat)),
-  .messages-page:not(.is-mobile-chat),
-  .messages-page:not(.is-mobile-chat) > *,
-  .messages-page:not(.is-mobile-chat) .messages-notes-section,
-  .messages-page:not(.is-mobile-chat) .messages-notes-scroll,
-  .messages-page:not(.is-mobile-chat) .instagram-chat-layout,
-  .messages-page:not(.is-mobile-chat) .instagram-conversation-list,
-  .messages-page:not(.is-mobile-chat) .conversation-scroll,
-  .messages-page:not(.is-mobile-chat) .conversation-item-shell,
-  .messages-page:not(.is-mobile-chat) .conversation-item,
-  .messages-page:not(.is-mobile-chat) .chat-empty-list {
-    background-color:#000 !important;
-    background-image:none !important;
-    box-shadow:none !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-search-bar {
-    background:#171717 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button {
-    background:#24272b !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button.active {
-    background:#f8fafc !important;
-  }
-}
-
-
-/* Targeted wallpaper visibility fix (2026-10-16).
-   Keep the existing UI unchanged; let the selected gallery photo render on the chat
-   shell and keep the header, message list, and composer transparent over it. */
-.chat-layout.instagram-chat-layout {
-  background-image: var(--rg-chat-wallpaper, none) !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-}
-.chat-layout.instagram-chat-layout .chat.instagram-chat {
-  background-color: transparent !important;
-  background-image: var(--rg-chat-wallpaper, none) !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-}
-.chat-layout.instagram-chat-layout .chat-messages.instagram-chat-messages {
-  background-color: transparent !important;
-  background-image: var(--rg-chat-wallpaper, none) !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-}
-@media (max-width: 700px) {
-  .messages-page.is-mobile-chat .instagram-chat-layout {
-    background-color: #000 !important;
-    background-image: none !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat {
-    background-color: #000 !important;
-    background-image: var(--rg-chat-wallpaper, none) !important;
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-  }
-  .messages-page.is-mobile-chat .instagram-chat-head,
-  .messages-page.is-mobile-chat .chat-messages.instagram-chat-messages,
-  .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
-    background-color: transparent !important;
-    background-image: none !important;
-  }
-}
-
-/* Home feed refresh: compact Instagram-inspired mobile header and post actions. */
-@media (max-width:700px) {
-  .mobile-header.mobile-header-home {
-    display:grid !important;
-    grid-template-columns:42px minmax(0,1fr) auto !important;
-    align-items:center !important;
-    gap:8px !important;
-    padding:0 12px !important;
-    background:#080d10 !important;
-    border-bottom:1px solid rgba(255,255,255,.08) !important;
-  }
-  .mobile-home-create {
-    width:38px !important;height:40px !important;display:flex !important;align-items:center !important;justify-content:flex-start !important;
-    background:transparent !important;color:#f7f8fa !important;
-  }
-  .mobile-home-create svg { width:23px !important;height:23px !important; }
-  .mobile-header.mobile-header-home .mobile-brand-centered {
-    justify-self:center !important;min-width:0 !important;width:auto !important;max-width:100% !important;
-    display:flex !important;align-items:center !important;justify-content:center !important;padding:0 !important;
-    background:transparent !important;color:#fff !important;
-  }
-  .mobile-header.mobile-header-home .mobile-brand-wordmark { max-width:155px !important; }
-  .mobile-header.mobile-header-home .mobile-header-actions { display:flex !important;align-items:center !important;gap:2px !important; }
-  .mobile-header.mobile-header-home .mobile-header-actions button { width:34px !important;height:40px !important;color:#f7f8fa !important; }
-  .mobile-header.mobile-header-home .mobile-header-actions svg { width:23px !important;height:23px !important; }
-  .feed-page { padding:0 !important; }
-  .feed-page .home-layout { display:block !important; }
-  .feed-page .home-feed-column { width:100% !important;min-width:0 !important; }
-  .feed-page .page-heading { display:none !important; }
-  .feed-page .stories-card { border:0 !important;border-radius:0 !important;background:#080d10 !important;margin:0 !important;padding:10px 8px 12px !important;gap:12px !important; }
-  .feed-page .story { min-width:72px !important;max-width:78px !important;color:#f5f7fa !important; }
-  .feed-page .story-ring,.feed-page .story-placeholder { width:70px !important;height:70px !important; }
-  .feed-page .story>span { color:#d7dbe2 !important;font-size:10px !important; }
-  .feed-page .quick-create { display:none !important; }
-  .feed-page .post-card { border:0 !important;border-radius:0 !important;box-shadow:none !important;background:#080d10 !important;color:#f7f8fa !important;margin:0 0 13px !important;overflow:hidden !important; }
-  .feed-page .post-head { padding:9px 10px !important;min-height:54px !important; }
-  .feed-page .post-user { gap:8px !important; }
-  .feed-page .post-user .avatar { width:34px !important;height:34px !important;min-width:34px !important;min-height:34px !important; }
-  .feed-page .post-user span { color:#b7bdc7 !important; }
-  .feed-page .post-media-button { display:block !important;width:100% !important;position:relative !important;background:#000 !important; }
-  .feed-page .post-media { width:100% !important;max-height:none !important;aspect-ratio:auto !important;max-width:100% !important;object-fit:contain !important;background:#000 !important; }
-  .feed-page .actions { display:flex !important;justify-content:space-between !important;padding:2px 7px 0 !important;background:#080d10 !important; }
-  .feed-page .actions>div { display:flex !important;align-items:center !important;gap:0 !important; }
-  .feed-page .actions button { width:38px !important;height:38px !important;color:#f7f8fa !important; }
-  .feed-page .actions button svg { width:23px !important;height:23px !important; }
-  .feed-page .actions button.liked { color:#ff375f !important; }
-  .feed-page .post-body { padding:0 12px 12px !important;font-size:12px !important;background:#080d10 !important;color:#f5f7fa !important; }
-  .feed-page .post-likes-link { color:#f5f7fa !important;font-size:12px !important;font-weight:800 !important;margin:0 0 3px !important; }
-  .feed-page .post-body>p { margin-top:4px !important;line-height:1.4 !important; }
-  .feed-page .comments-link { color:#8e96a3 !important;margin-top:5px !important; }
-  .feed-page .suggestions-rail { display:none !important; }
-}
-
-/* Post likes and comments use the same bottom-sheet interaction as the reference screenshot. */
-.post-likes-sheet-backdrop,.post-comments-sheet-backdrop {
-  position:fixed;inset:0;z-index:2200;display:flex;align-items:flex-end;justify-content:center;
-  background:rgba(0,0,0,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-}
-.post-likes-sheet,.post-comments-sheet {
-  position:relative;width:min(100%,620px);height:min(72dvh,720px);max-height:calc(100dvh - env(safe-area-inset-top));
-  display:flex;flex-direction:column;overflow:hidden;color:#f6f7f9;background:#171b1f;
-  border:1px solid rgba(255,255,255,.08);border-bottom:0;border-radius:22px 22px 0 0;
-  box-shadow:0 -18px 70px rgba(0,0,0,.32);
-}
-.post-sheet-header { position:relative;flex:0 0 54px;min-height:54px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.045); }
-.post-sheet-handle { position:absolute;top:7px;left:calc(50% - 20px);width:40px;height:4px;border-radius:10px;background:#a0a5ad; }
-.post-sheet-header h2 { margin:9px 0 0;font-size:14px;font-weight:750;color:#f7f8fa; }
-.post-sheet-header>button { position:absolute;right:12px;top:9px;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:transparent;color:#f5f7fa; }
-.post-sheet-header>button svg { width:20px;height:20px; }
-.post-likes-sheet-list,.post-comments-sheet-list { flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 14px 18px; }
-.post-likes-user-row,.post-comment-row { display:flex;align-items:center;gap:11px;padding:9px 1px;min-width:0; }
-.post-likes-user-row>div { min-width:0;display:flex;flex-direction:column;gap:3px; }
-.post-likes-user-row b,.post-comment-copy b { color:#f5f7fa;font-size:13px; }
-.post-likes-user-row small { color:#a6adb8;font-size:11px; }
-.post-sheet-status { text-align:center;color:#a8aeb7;font-size:13px;padding:28px 10px; }
-.post-comments-empty { min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center; }
-.post-comments-empty b { color:#f5f7fa;font-size:17px;font-weight:750; }
-.post-comments-empty span { color:#9ba2ad;font-size:12px; }
-.post-comment-copy { flex:1;min-width:0;display:flex;flex-direction:column;gap:7px; }
-.post-comment-copy>div { display:block;line-height:1.45;font-size:12px;overflow-wrap:anywhere; }
-.post-comment-copy>div .profile-username-link { margin-right:7px; }
-.post-comment-copy>div>span { color:#f2f4f7; }
-.post-comment-copy>small { color:#929aa5;font-size:10px; }
-.post-comment-composer-wrap { flex:0 0 auto;border-top:1px solid rgba(255,255,255,.06);padding:8px 12px calc(10px + env(safe-area-inset-bottom));background:#171b1f; }
-.post-comment-emoji-row { display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 0 9px; }
-.post-comment-emoji-row button { background:transparent;color:#fff;font-size:20px;padding:2px 0; }
-.post-comment-composer { display:flex;align-items:center;gap:8px;min-height:42px; }
-.post-comment-composer input { flex:1;min-width:0;height:40px;padding:0 12px;border:1px solid #343941;border-radius:22px;background:#171b1f;color:#f6f7f9;font-size:12px; }
-.post-comment-composer input::placeholder { color:#a0a7b2; }
-.post-comment-gif { flex:0 0 28px;width:28px;height:28px;border:1px solid #a7adb6;border-radius:5px;background:transparent;color:#f7f8fa;font-size:9px;font-weight:850; }
-.post-comment-submit { background:transparent;color:#8ab4f8;font-size:12px;font-weight:750;padding:8px 2px; }
-.post-comment-submit:disabled { opacity:.35; }
-@media(max-width:700px) {
-  .post-likes-sheet-backdrop,.post-comments-sheet-backdrop { align-items:flex-end;padding:0;background:rgba(0,0,0,.48);backdrop-filter:none;-webkit-backdrop-filter:none; }
-  .post-likes-sheet,.post-comments-sheet { width:100%;height: min(72dvh,760px);max-height:calc(100dvh - env(safe-area-inset-top));border:0;border-radius:22px 22px 0 0; }
-  .post-comments-sheet { height:min(72dvh,760px); }
-  body:has(.post-comments-sheet-backdrop) .bottom-nav,body:has(.post-likes-sheet-backdrop) .bottom-nav { display:none !important; }
-}
-
-/* Final home-screen adjustment: keep the existing header/story placement and
-   remove the author/song strip between Stories and the post media on mobile. */
-@media (max-width:700px) {
-  .mobile-header.mobile-header-home {
-    height: calc(61px + env(safe-area-inset-top, 0px)) !important;
-    min-height: calc(61px + env(safe-area-inset-top, 0px)) !important;
-    box-sizing: border-box !important;
-    padding-bottom: 0 !important;
-  }
-  .mobile-header.mobile-header-home > .mobile-home-create,
-  .mobile-header.mobile-header-home > .mobile-brand-centered,
-  .mobile-header.mobile-header-home > .mobile-header-actions {
-    transform: translateY(14px) !important;
-  }
-  .mobile-header.mobile-header-home > .mobile-brand-centered {
-    grid-column: 2 !important;
-    justify-self: center !important;
-    align-self: center !important;
-  }
-  .mobile-header.mobile-header-home > .mobile-home-create {
-    grid-column: 1 !important;
-    justify-self: start !important;
-  }
-  .mobile-header.mobile-header-home > .mobile-header-actions {
-    grid-column: 3 !important;
-    justify-self: end !important;
-  }
-  .main:has(.feed-page) {
-    padding-top: calc(57px + env(safe-area-inset-top, 0px)) !important;
-  }
-  .feed-page .stories-card {
-    margin-top: 0 !important;
-    padding-top: 5px !important;
-  }
-  .feed-page .post-head {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    min-height: 48px !important;
-    padding: 7px 10px !important;
-    margin: 0 !important;
-  }
-}
-
-
-/* Instagram-like message inbox filters bottom sheet */
-.messages-folder-controls{display:flex;align-items:center;gap:8px;margin:0 0 10px;}
-.messages-filter-trigger{width:43px;height:38px;flex:0 0 43px;display:flex;align-items:center;justify-content:center;gap:3px;border:1px solid #2c3137;border-radius:11px;background:#101316;color:#f2f4f7;}
-.messages-filter-trigger.has-active-filters{border-color:#e1306c;color:#ff5c91;}
-.messages-folder-controls .messages-inbox-tabs{flex:1;min-width:0;margin:0!important;}
-.messages-filter-overlay{position:fixed;inset:0;z-index:12000;background:rgba(0,0,0,.62);display:flex;align-items:flex-end;justify-content:center;}
-.messages-filter-sheet{width:100%;max-width:560px;max-height:min(60dvh,430px);overflow:auto;background:#181b1e;color:#f5f6f7;border-radius:26px 26px 0 0;padding:8px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -12px 44px #0005;}
-.messages-filter-grabber{width:28px;height:3px;border-radius:99px;background:#aeb4bc;margin:0 auto 14px;}
-.messages-filter-sheet h2{font-size:13px;font-weight:750;margin:0 0 9px;}
-.messages-filter-option{display:flex;align-items:center;gap:12px;width:100%;min-height:37px;padding:4px 0;background:transparent;color:#f1f3f5;text-align:left;}
-.messages-filter-option-icon{width:19px;height:22px;display:flex;align-items:center;justify-content:center;color:#f1f3f5;flex:none;}
-.messages-filter-option>span:nth-child(2){flex:1;font-size:13px;}
-.messages-filter-option i{width:20px;height:20px;border:1.5px solid #9aa1a9;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;flex:none;}
-.messages-filter-option i.checked{background:#fff;border-color:#fff;color:#17191c;}
-.messages-filter-see-more{padding:6px 0 10px;background:transparent;color:#b6bec8;font-size:11px;}
-.messages-filter-divider{height:1px;background:#272b30;margin:4px -16px 0;}
-.messages-filter-folders-heading{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 0;background:transparent;color:#f4f5f6;text-align:left;font-size:13px;}
-.messages-filter-folders-heading svg{width:17px;height:17px;transition:transform .15s;}
-.messages-filter-folders-heading svg.expanded{transform:rotate(90deg);}
-.messages-filter-folders{display:grid;gap:2px;padding:0 0 10px;}
-.messages-filter-folders button{display:flex;justify-content:space-between;align-items:center;padding:9px 0;background:transparent;color:#d8dde3;text-align:left;font-size:12px;}
-.messages-filter-folders button span{color:#9ba3ad;}
-.messages-filter-footer{display:flex;justify-content:space-between;gap:10px;padding-top:10px;border-top:1px solid #272b30;}
-.messages-filter-footer button{padding:9px 13px;border-radius:9px;background:transparent;color:#f1f3f5;font-size:12px;font-weight:700;}
-.messages-filter-footer button:last-child{background:#f5f6f7;color:#16191c;min-width:84px;}
-@media(max-width:700px){.messages-folder-controls{gap:7px;margin:0 0 7px!important}.messages-filter-trigger{height:30px;width:37px;flex-basis:37px;border-radius:8px;background:#101316}.messages-folder-controls .messages-inbox-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.messages-folder-controls .messages-inbox-tabs button{height:30px!important;font-size:10px!important}.messages-filter-sheet{max-height:min(60dvh,430px);padding:8px 16px calc(12px + env(safe-area-inset-bottom));}.messages-filter-option{min-height:37px;padding:4px 0;}.messages-filter-footer{position:sticky;bottom:0;background:#181b1e;}}
-
-
-/* Final compact pill-style inbox tabs: keep the controls to 75% of the mobile screen. */
-@media (max-width: 700px) {
-  .messages-folder-controls {
-    width: 75vw !important;
-    max-width: 310px !important;
-    min-width: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    margin: 0 0 7px !important;
-  }
-  .messages-filter-trigger {
-    width: 29px !important;
-    height: 26px !important;
-    flex: 0 0 29px !important;
-    gap: 2px !important;
-    border: 1px solid #30343a !important;
-    border-radius: 999px !important;
-    background: #111417 !important;
-    padding: 0 !important;
-  }
-  .messages-filter-trigger svg:first-child { width: 13px !important; height: 13px !important; }
-  .messages-filter-trigger svg:last-child { width: 10px !important; height: 10px !important; }
-  .messages-folder-controls .messages-inbox-tabs {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 4px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .messages-folder-controls .messages-inbox-tabs button {
-    min-width: 0 !important;
-    width: 100% !important;
-    height: 26px !important;
-    padding: 0 5px !important;
-    border: 1px solid #292e33 !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    color: #d8dce1 !important;
-    font-size: 9px !important;
-    line-height: 1 !important;
-    font-weight: 500 !important;
-    white-space: nowrap !important;
-    gap: 3px !important;
-  }
-  .messages-folder-controls .messages-inbox-tabs button.active {
-    background: #292e33 !important;
-    border-color: #292e33 !important;
-    color: #fff !important;
-  }
-  .messages-folder-controls .messages-inbox-tabs button span {
-    min-width: 13px !important;
-    height: 13px !important;
-    padding: 0 3px !important;
-    font-size: 8px !important;
-    line-height: 13px !important;
-  }
-}
-
-/* Public profile options sheet and profile actions (Instagram-style dark UI). */
-.rg-public-profile-topbar{display:flex;align-items:center;gap:16px;min-height:52px;margin:-12px -2px 12px;padding:0 2px;color:#f5f5f5;}
-.rg-public-profile-topbar>button{width:38px;height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;background:transparent;color:inherit;border-radius:50%;}
-.rg-public-profile-topbar>button:hover{background:#ffffff12;}
-.rg-public-profile-topbar>strong{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px;font-weight:750;}
-.rg-public-profile-topbar .rg-public-profile-topbar-spacer{flex:1;}
-.rg-public-profile-more{display:flex!important;}
-.rg-public-profile-display-name{font-size:16px!important;margin:0 0 7px;}
-.rg-public-profile-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 48px;gap:8px;margin:10px 0 18px;}
-.rg-public-profile-actions button{min-width:0;min-height:43px;border-radius:10px!important;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:700;}
-.rg-public-profile-actions svg{width:18px;height:18px;}
-.rg-profile-options-backdrop,.rg-profile-info-backdrop{position:fixed;inset:0;z-index:240;background:rgba(0,0,0,.62);display:flex;align-items:flex-end;justify-content:center;padding:0 14px max(12px,env(safe-area-inset-bottom));}
-.rg-profile-options-sheet{width:min(100%,680px);max-height:78dvh;overflow:auto;background:#181b1e;border:1px solid #25292d;border-radius:25px 25px 18px 18px;box-shadow:0 22px 80px #0008;padding:8px 0 0;overscroll-behavior:contain;}
-.rg-profile-options-handle,.rg-profile-info-handle{width:38px;height:4px;border-radius:999px;background:#777e86;margin:0 auto 8px;}
-.rg-profile-options-sheet button{width:100%;min-height:59px;padding:12px 18px;display:flex;align-items:center;justify-content:center;background:transparent;color:#f3f4f6;border-top:1px solid #282c30;text-align:center;font-size:16px;font-weight:450;}
-.rg-profile-options-sheet button:first-of-type{border-top:0;}
-.rg-profile-options-sheet button.danger{color:#ff5b83;}
-.rg-profile-options-sheet button:disabled,.rg-profile-options-cancel:disabled{opacity:.5;}
-.rg-profile-options-sheet button:active,.rg-profile-options-cancel:active{background:#ffffff0c;}
-.rg-profile-options-cancel{width:min(100%,680px);min-height:58px;margin-top:10px;border-radius:18px;background:#181b1e;color:#f4f5f6;font-size:16px;font-weight:600;}
-.rg-profile-info-backdrop{align-items:center;padding:18px;}
-.rg-profile-info-card{width:min(100%,420px);max-height:85dvh;overflow:auto;border:1px solid #2b3035;border-radius:22px;background:#181b1e;color:#f5f6f7;padding:22px;box-shadow:0 22px 80px #0008;}
-.rg-profile-info-icon{display:flex;justify-content:center;color:#d8dde3;margin:4px 0 12px;}
-.rg-profile-info-card h2{text-align:center;font-size:19px;margin-bottom:6px;}
-.rg-profile-info-username{text-align:center;color:#aab1ba;font-size:13px;margin-bottom:20px;}
-.rg-profile-info-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid #2a2f34;font-size:13px;}
-.rg-profile-info-row span{color:#aab1ba;}.rg-profile-info-row b{text-align:right;}
-.rg-profile-info-done,.rg-profile-info-secondary{width:100%;min-height:43px;border-radius:11px;background:#f4f5f6;color:#16191c;font-weight:750;margin-top:16px;}
-.rg-profile-info-secondary{background:#2a2f34;color:#f5f6f7;margin-top:8px;}
-.rg-shared-activity-list{display:grid;gap:0;border-top:1px solid #2a2f34;}
-.rg-shared-activity-list>div{display:flex;flex-direction:column;gap:5px;padding:13px 0;border-bottom:1px solid #2a2f34;font-size:13px;}
-.rg-shared-activity-list small{color:#9ba3ad;}
-.rg-profile-action-toast{position:fixed;z-index:230;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100vw - 30px);display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #30363d;border-radius:999px;background:#1a1d20;color:#f5f5f5;box-shadow:0 8px 28px #0006;font-size:12px;}
-.rg-profile-action-toast button{display:flex;align-items:center;justify-content:center;background:transparent;color:inherit;}
-@media(max-width:700px){
- .rg-public-profile-topbar{position:relative;margin:-4px -10px 8px;padding:0 10px;min-height:48px;gap:10px;}
- .rg-public-profile-topbar>button{width:34px;height:34px;flex-basis:34px;}
- .rg-public-profile-topbar>strong{font-size:16px;}
- .rg-public-profile-display-name{font-size:14px!important;}
- .rg-public-profile-actions{gap:6px;margin:10px 0 15px;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px;}
- .rg-public-profile-actions button{min-height:38px;font-size:12px;padding:0 5px;}
- .rg-profile-options-backdrop{padding:0 12px max(10px,env(safe-area-inset-bottom));}
- .rg-profile-options-sheet{border-radius:24px 24px 16px 16px;max-height:78dvh;}
- .rg-profile-options-sheet button{min-height:51px;font-size:15px;padding:10px 14px;}
- .rg-profile-options-cancel{min-height:52px;margin-top:8px;border-radius:16px;font-size:15px;}
-}
-
-/* Match the reference inbox controls: softly rounded rectangular tabs, not sharp boxes. */
-@media(max-width:700px){
- .messages-folder-controls{width:100%!important;max-width:none!important;display:flex!important;align-items:center!important;gap:9px!important;margin:0 0 12px!important;padding:0 2px!important;}
- .messages-filter-trigger{width:54px!important;height:48px!important;flex:0 0 54px!important;border-radius:14px!important;background:#090b0d!important;border:1px solid #292e33!important;}
- .messages-filter-trigger svg:first-child{width:19px!important;height:19px!important;}
- .messages-filter-trigger svg:last-child{width:13px!important;height:13px!important;}
- .messages-folder-controls .messages-inbox-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;flex:1 1 auto!important;min-width:0!important;}
- .messages-folder-controls .messages-inbox-tabs button{height:48px!important;min-width:0!important;border-radius:13px!important;padding:0 8px!important;font-size:12px!important;font-weight:550!important;border:1px solid #24282c!important;background:#24282c!important;color:#f0f2f5!important;}
- .messages-folder-controls .messages-inbox-tabs button.active{background:#f7f8fa!important;color:#151719!important;border-color:#e7e9ec!important;}
- .messages-folder-controls .messages-inbox-tabs button span{min-width:16px!important;height:16px!important;font-size:9px!important;line-height:16px!important;}
-}
-@media(max-width:700px){.mobile-header.mobile-header-profile{display:none!important}.main.main-public-profile{padding-top:0!important}.main.main-public-profile .page.profile-page{padding-top:calc(env(safe-area-inset-top) + 8px)!important;}}
-
-/* Final screenshot match: compact Instagram-style inbox controls, not large cards. */
-@media (max-width: 700px) {
-  .messages-page:not(.is-mobile-chat) .messages-folder-controls {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    width: 75vw !important;
-    max-width: 260px !important;
-    min-width: 0 !important;
-    gap: 6px !important;
-    margin: 0 0 10px 0 !important;
-    padding: 0 2px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-filter-trigger {
-    width: 43px !important;
-    height: 28px !important;
-    min-width: 43px !important;
-    flex: 0 0 43px !important;
-    padding: 0 !important;
-    gap: 2px !important;
-    border: 1px solid #30353b !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    color: #e8ebef !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-filter-trigger svg:first-child {
-    width: 13px !important;
-    height: 13px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-filter-trigger svg:last-child {
-    width: 10px !important;
-    height: 10px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs {
-    display: flex !important;
-    flex: 1 1 auto !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    min-width: 0 !important;
-    gap: 5px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button {
-    display: inline-flex !important;
-    flex: 0 1 auto !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: auto !important;
-    min-width: 0 !important;
-    height: 27px !important;
-    padding: 0 9px !important;
-    border: 1px solid #292e33 !important;
-    border-radius: 999px !important;
-    background: transparent !important;
-    color: #e4e7eb !important;
-    font-size: 9px !important;
-    line-height: 1 !important;
-    font-weight: 500 !important;
-    white-space: nowrap !important;
-    gap: 3px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button.active {
-    background: #292e33 !important;
-    border-color: #292e33 !important;
-    color: #fff !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-folder-controls .messages-inbox-tabs button span {
-    min-width: 13px !important;
-    width: 13px !important;
-    height: 13px !important;
-    padding: 0 !important;
-    border-radius: 50% !important;
-    font-size: 8px !important;
-    line-height: 13px !important;
-  }
-  .messages-page:not(.is-mobile-chat) .messages-inbox-tabs button:focus-visible,
-  .messages-page:not(.is-mobile-chat) .messages-filter-trigger:focus-visible {
-    outline: 2px solid #aab4ff !important;
-    outline-offset: 2px !important;
-  }
-}
-
-
-/* Profile options must cover the whole viewport and sit above the mobile nav. */
-.rg-profile-options-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 10000 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  padding: 0 14px max(12px, env(safe-area-inset-bottom)) !important;
-  background: rgba(0, 0, 0, .62) !important;
-}
-.rg-profile-options-sheet {
-  width: min(100%, 680px) !important;
-  flex: 0 1 auto !important;
-  max-height: min(78dvh, 820px) !important;
-  margin: 0 auto !important;
-}
-.rg-profile-options-cancel {
-  display: block !important;
-  width: min(100%, 680px) !important;
-  flex: 0 0 auto !important;
-  margin: 10px auto 0 !important;
-}
-body:has(.rg-profile-options-backdrop) .bottom-nav,
-body:has(.rg-profile-options-backdrop) .glass-bottom-nav,
-body:has(.rg-profile-options-backdrop) .mobile-bottom-nav {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-@media (max-width: 700px) {
-  .rg-profile-options-backdrop { padding: 0 14px max(10px, env(safe-area-inset-bottom)) !important; }
-  .rg-profile-options-sheet { width: 100% !important; max-height: 78dvh !important; border-radius: 25px 25px 18px 18px !important; }
-  .rg-profile-options-sheet button { min-height: 51px !important; font-size: 15px !important; }
-  .rg-profile-options-cancel { min-height: 52px !important; border-radius: 18px !important; }
-}
-
-
-/* Story viewers screen: Instagram-inspired layout, without an Insights tab. */
-.story-viewers-screen{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;background:#0b0e11;color:#f7f8fa;overflow:hidden;}
-.story-viewers-screen-top{height:61%;min-height:300px;max-height:470px;position:relative;display:flex;align-items:flex-start;justify-content:center;padding:18px 24px 0;background:#0b0e11;flex:0 0 auto;}
-.story-viewers-settings,.story-viewers-close{position:absolute;top:calc(20px + env(safe-area-inset-top));width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:transparent;color:#f7f8fa;border-radius:50%;}
-.story-viewers-settings{left:20px}.story-viewers-close{right:20px}.story-viewers-settings svg,.story-viewers-close svg{width:30px;height:30px;stroke-width:1.8}
-.story-viewer-thumbnails{display:flex;align-items:center;gap:9px;margin-top:55px;height:235px;max-width:100%;}
-.story-thumb-card{position:relative;width:134px;height:235px;border-radius:16px;overflow:hidden;padding:0;background:#171a1f;border:2px solid transparent;flex:0 0 auto;}
-.story-thumb-card.selected{border-color:#fff;box-shadow:0 5px 22px #0007}.story-thumb-card img,.story-thumb-card video,.story-thumb-card>span{width:100%;height:100%;object-fit:cover;display:flex;align-items:center;justify-content:center;color:#fff;overflow:hidden;}
-.story-thumb-card small{position:absolute;bottom:8px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:5px;color:#fff;font-size:13px;text-shadow:0 1px 5px #000;background:linear-gradient(transparent,#0008);padding:18px 0 0;}
-.story-thumb-add{width:104px;height:185px;border-radius:15px;background:#020304;color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
-.story-thumb-add svg{width:42px;height:42px;stroke-width:1.8}
-.story-viewers-tabs{height:62px;flex:0 0 62px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-top:1px solid #ffffff08;border-bottom:1px solid #ffffff12;background:#171a1d;}
-.story-viewers-tab-active{height:100%;min-width:86px;display:flex;align-items:center;justify-content:center;gap:11px;color:#7898ff;border-bottom:3px solid #7898ff;font-size:15px;}
-.story-viewers-tab-active svg{width:28px;height:28px}.story-viewers-delete{width:44px;height:44px;background:transparent;color:#f7f8fa;display:flex;align-items:center;justify-content:center}.story-viewers-delete svg{width:29px;height:29px;stroke-width:1.8}
-.story-viewers-screen-list{flex:1;min-height:0;max-height:none!important;height:auto!important;overflow-y:auto;padding:10px 22px 20px!important;background:#171a1d!important;}
-.story-viewers-screen .story-viewer-row{min-height:78px;gap:13px;padding:10px 6px!important;position:relative;overflow:visible;}
-.story-viewers-screen .story-viewer-user-info{flex:1;min-width:0}.story-viewers-screen .story-viewer-user-info b,.story-viewers-screen .profile-username-link{font-size:14px;color:#f7f8fa!important;font-weight:700;}
-.story-viewers-screen .story-viewer-user-info span{font-size:11px;color:#a6abb4!important}.story-viewers-screen .story-viewer-row>small{font-size:10px;color:#9da3ad!important;}
-.story-viewer-more,.story-viewer-message{position:relative;z-index:2;width:38px;height:42px;display:flex;align-items:center;justify-content:center;color:#f7f8fa;background:transparent;flex:0 0 38px;}
-.story-viewer-more svg,.story-viewer-message svg{width:27px;height:27px;stroke-width:1.9}.story-viewer-message svg{width:25px;height:25px}
-.story-viewer-menu-backdrop{position:fixed;inset:0;z-index:48;background:transparent;cursor:default;}
-.story-viewer-action-sheet{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:49;width:min(92%,480px);border-radius:27px;background:#191c1f;border:1px solid #ffffff0d;box-shadow:0 18px 70px #000b;overflow:hidden;padding:8px 0 0;animation:storyViewerMenuIn .18s ease-out;}
-.story-viewer-action-user{display:flex;align-items:center;flex-direction:column;gap:12px;padding:18px 14px 22px;border-bottom:1px solid #ffffff0d}.story-viewer-action-user b{font-size:15px;color:#f7f8fa;}
-.story-viewer-action-sheet>button{width:100%;min-height:66px;padding:12px 16px;background:transparent;color:#f4f5f7;font-size:15px;border-bottom:1px solid #ffffff0b;}
-.story-viewer-action-sheet>button:hover{background:#ffffff0a}.story-viewer-action-sheet>button.danger{color:#ff626d}.story-viewers-cancel{flex:0 0 auto;margin:8px 14px calc(10px + env(safe-area-inset-bottom));min-height:62px;border-radius:22px;background:#191c1f;color:#f7f8fa;font-size:15px;}
-.story-viewer-notice{position:absolute;z-index:45;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:max-content;max-width:90%;padding:10px 14px;border-radius:12px;background:#252a30;color:#f7f8fa;font-size:12px;text-align:center;box-shadow:0 8px 30px #0006;}
-@keyframes storyViewerMenuIn{from{opacity:.6;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
-@media(max-width:700px){.story-viewers-screen-top{height:40%;min-height:285px;max-height:380px;padding:0 14px}.story-viewers-settings,.story-viewers-close{top:calc(16px + env(safe-area-inset-top));}.story-viewers-settings{left:12px}.story-viewers-close{right:12px}.story-viewer-thumbnails{margin-top:calc(55px + env(safe-area-inset-top));height:min(31vh,235px);}.story-thumb-card{width:min(36vw,134px);height:min(31vh,235px);}.story-thumb-add{width:min(28vw,104px);height:min(25vh,185px)}.story-viewers-tabs{padding:0 24px}.story-viewers-screen-list{padding:8px 18px calc(12px + env(safe-area-inset-bottom))!important}.story-viewers-screen .story-viewer-row{min-height:78px}.story-viewer-action-sheet{bottom:calc(12px + env(safe-area-inset-bottom));width:calc(100% - 28px)}.story-viewer-action-sheet>button{min-height:66px}.story-viewers-cancel{margin-bottom:calc(10px + env(safe-area-inset-bottom));}}
-
-
-/* Story controls appear on open and can be toggled by tapping the story media. */
-.story-viewer .story-viewer-top,
-.story-viewer .story-progress,
-.story-viewer .story-viewers-button {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .18s ease, visibility .18s ease;
-}
-.story-viewer.story-controls-hidden .story-viewer-top,
-.story-viewer.story-controls-hidden .story-progress,
-.story-viewer.story-controls-hidden .story-viewers-button {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.story-viewer.story-controls-hidden .story-viewer-content {
-  cursor: pointer;
-}
-
-
-/* Story viewer navigation: full-screen overlay above app navigation. */
-.story-viewer{z-index:99999!important;inset:0!important;padding:0!important;background:#050608!important;touch-action:pan-y;}
-.story-viewer-content{position:relative;height:100dvh!important;width:min(100vw,520px)!important;max-height:100dvh!important;border-radius:0!important;flex:0 1 auto;}
-.story-viewer-content img,.story-viewer-content video{object-fit:contain!important;}
-.story-viewer-top{top:calc(12px + env(safe-area-inset-top))!important;left:16px!important;right:16px!important;}
-.story-viewer-top-actions{position:relative;z-index:8;}
-.story-tap-zone{position:absolute;top:12%;bottom:12%;width:38%;z-index:4;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;}
-.story-tap-left{left:0;}
-.story-tap-right{right:0;}
-.story-viewers-button{z-index:7!important;bottom:calc(18px + env(safe-area-inset-bottom))!important;}
-.story-viewers-screen{z-index:20!important;}
-body.reelsgo-story-open{overflow:hidden!important;}
-body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.reelsgo-story-open .sidebar{visibility:hidden!important;pointer-events:none!important;}
-@media(max-width:700px){.story-viewer{align-items:center!important;padding:0!important}.story-viewer-content{width:100vw!important;height:100dvh!important;max-height:100dvh!important}.story-viewer-top{top:calc(12px + env(safe-area-inset-top))!important}.story-tap-zone{top:14%;bottom:12%;width:35%;}.story-viewers-button{bottom:calc(16px + env(safe-area-inset-bottom))!important;}}
-
-/* Story composer controls modeled on the requested Instagram-style editor. */
-.story-publish-page{position:relative;overflow:hidden}
-.story-editor-toolbar{position:absolute;z-index:30;right:10px;top:92px;display:flex;flex-direction:column;gap:7px;max-height:calc(100% - 245px);overflow-y:auto;scrollbar-width:none;padding:2px 0}
-.story-editor-toolbar::-webkit-scrollbar{display:none}
-.story-editor-toolbar button{display:flex;align-items:center;justify-content:flex-end;gap:9px;border:0;background:transparent;color:#fff;padding:0;min-height:43px;cursor:pointer;text-shadow:0 1px 4px #000}
-.story-editor-toolbar button span{width:43px;height:43px;flex:0 0 43px;border-radius:50%;display:grid;place-items:center;background:rgba(39,40,47,.82);font-size:25px;font-weight:500;box-shadow:0 3px 12px #0003}
-.story-editor-toolbar button b{font-size:12px;font-weight:600;max-width:120px;text-align:right}
-.story-editor-more{position:absolute;z-index:42;right:10px;top:calc(92px + 10 * 50px);width:43px;height:43px;border:0;border-radius:50%;background:rgba(39,40,47,.86);color:#fff;display:grid;place-items:center}
-.story-editor-more-menu{position:absolute;z-index:60;right:58px;top:calc(92px + 10 * 50px);width:min(260px,calc(100% - 82px));padding:7px;border:1px solid #ffffff20;border-radius:22px;background:rgba(38,39,45,.97);box-shadow:0 16px 45px #0008;backdrop-filter:blur(18px)}
-.story-editor-more-menu button{width:100%;min-height:56px;display:flex;align-items:center;gap:13px;padding:12px;border:0;border-radius:13px;background:transparent;color:#fff;text-align:left;font-size:14px}
-.story-editor-more-menu button+button{border-top:1px solid #ffffff12}
-.story-editor-more-menu button:hover{background:#ffffff12}
-.story-viewers-screen{position:fixed!important;inset:0!important;z-index:100000!important;width:100vw!important;height:100dvh!important;max-height:none!important;border-radius:0!important}
-.story-viewer-viewers-open .story-viewer-content{visibility:hidden!important;pointer-events:none!important}
-.story-viewer-viewers-open .story-viewers-screen{display:flex!important}
-.share-person b{font-size:12px!important;color:#fff!important}
-.share-person>span{display:none!important}
-@media(max-width:700px){
- .story-publish-page .publish-scroll-area{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
- .story-editor-toolbar{right:8px;top:86px;gap:5px;max-height:calc(100% - 230px)}
- .story-editor-toolbar button{min-height:39px;gap:7px}
- .story-editor-toolbar button span{width:39px;height:39px;flex-basis:39px;font-size:22px}
- .story-editor-toolbar button b{font-size:10px;max-width:105px}
- .story-editor-more{top:calc(86px + 10 * 44px);width:39px;height:39px}
- .story-editor-more-menu{top:calc(86px + 10 * 44px);right:54px}
- .story-viewers-screen-top{height:36%!important;min-height:235px!important;max-height:330px!important}
-}
-
-
-/* All ten share actions stay on one horizontal row; swipe sideways on narrow screens. */
-.share-sheet .share-shortcuts-all {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  align-items: flex-start !important;
-  justify-content: flex-start !important;
-  gap: 10px !important;
-  width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none !important;
-  padding: 12px 2px 8px !important;
-  margin: 12px 0 0 !important;
-  border-top: 1px solid rgba(255,255,255,.12) !important;
-}
-.share-sheet .share-shortcuts-all::-webkit-scrollbar { display: none !important; }
-.share-sheet .share-shortcuts-all > button {
-  flex: 0 0 68px !important;
-  width: 68px !important;
-  min-width: 68px !important;
-  max-width: 68px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 7px !important;
-  padding: 2px 0 !important;
-  background: transparent !important;
-  color: #f5f5f7 !important;
-}
-.share-sheet .share-shortcuts-all .share-shortcut-icon {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  border-radius: 50% !important;
-  font-size: 25px !important;
-}
-.share-sheet .share-shortcuts-all .share-social-app-icon {
-  border-radius: 14px !important;
-  font-weight: 800 !important;
-  box-shadow: 0 4px 14px rgba(0,0,0,.18);
-}
-.share-sheet .share-shortcuts-all button b {
-  display: block !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  font-size: 9px !important;
-  font-weight: 500 !important;
-  line-height: 1.15 !important;
-  text-align: center !important;
-  white-space: normal !important;
-  overflow-wrap: anywhere !important;
-}
-
-
-/* Story group navigation: tap left for previous, right for next. */
-.story-viewer { isolation: isolate; }
-.story-tap-zone {
-  position: absolute;
-  top: 64px;
-  bottom: 0;
-  width: 50%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  z-index: 1;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.story-tap-zone-left { left: 0; }
-.story-tap-zone-right { right: 0; }
-.story-viewer-top { z-index: 6; }
-.story-progress-segments {
-  display: flex;
-  gap: 4px;
-  z-index: 7;
-}
-.story-progress-segments span {
-  display: block;
-  flex: 1 1 0;
-  width: auto;
-  height: 100%;
-  background: rgba(255,255,255,.38);
-  border-radius: 99px;
-}
-.story-progress-segments span.completed,
-.story-progress-segments span.current { background: #fff; }
-.story-viewers-button,
-.story-viewers-screen { z-index: 8; }
-@media (max-width: 700px) {
-  .story-tap-zone { top: 58px; }
+
+const verificationStatusCache = new Map();
+
+function normalizeReelsGoPhone(value) {
+  let phone = String(value || "")
+    .trim()
+    .replace(/[\s().-]/g, "");
+
+  if (/^[6-9]\d{9}$/.test(phone)) {
+    phone = `+91${phone}`;
+  }
+
+  if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+    throw new Error(
+      "Enter a valid phone number. Example: +919876543210."
+    );
+  }
+
+  return phone;
+}
+
+function VerifiedBadge({ userId, title = "Verified on ReelsGo" }) {
+  const [verified, setVerified] = useState(
+    () => userId ? verificationStatusCache.get(String(userId)) === true : false
+  );
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const id = String(userId);
+    let cancelled = false;
+
+    async function loadStatus(force = false) {
+      if (!force && verificationStatusCache.has(id)) {
+        if (!cancelled) {
+          setVerified(verificationStatusCache.get(id) === true);
+        }
+        return;
+      }
+
+      try {
+        const data = await api(`/verification/status/${id}`);
+        const isVerified = Boolean(data?.verified);
+        verificationStatusCache.set(id, isVerified);
+        if (!cancelled) setVerified(isVerified);
+      } catch {
+        verificationStatusCache.set(id, false);
+        if (!cancelled) setVerified(false);
+      }
+    }
+
+    loadStatus();
+
+    const refresh = () => {
+      verificationStatusCache.delete(id);
+      loadStatus(true);
+    };
+
+    window.addEventListener("reelsgo-verification-updated", refresh);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("reelsgo-verification-updated", refresh);
+    };
+  }, [userId]);
+
+  if (!verified) return null;
+
+  return (
+    <span
+      className="verified-badge"
+      title={title}
+      aria-label={title}
+      role="img"
+    >
+      <BadgeCheck />
+    </span>
+  );
+}
+
+function PhoneVerificationModal({ onClose, onVerified }) {
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (loading) return;
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const normalizedPhone = normalizeReelsGoPhone(phone);
+
+      const data = await api("/verification/phone/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ phone: normalizedPhone })
+      });
+
+      const currentUser = getUser();
+
+      if (currentUser?._id) {
+        verificationStatusCache.set(String(currentUser._id), true);
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("reelsgo-verification-updated")
+      );
+
+      setSuccess(true);
+      onVerified?.(data);
+    } catch (err) {
+      setError(err?.message || "Unable to save phone number.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div
+      className="verification-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !loading) onClose();
+      }}
+    >
+      <div
+        className="verification-card"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="verification-head">
+          <div className="verification-icon">
+            <BadgeCheck />
+          </div>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={onClose}
+            disabled={loading}
+            aria-label="Close verification"
+          >
+            <X />
+          </button>
+        </div>
+
+        {success ? (
+          <>
+            <h2>Blue tick activated</h2>
+            <p>
+              Your phone number has been saved to your ReelsGo account.
+              Your blue tick is now active.
+            </p>
+            <div className="verification-success">
+              <BadgeCheck />
+              <span>Your account is now verified.</span>
+            </div>
+            <button
+              type="button"
+              className="primary full"
+              onClick={onClose}
+            >
+              Done
+            </button>
+          </>
+        ) : (
+          <>
+            <h2>Get your ReelsGo blue tick</h2>
+            <p>
+              Enter your phone number once. No OTP or SMS is required.
+              After saving, you cannot change the number.
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              <label className="verification-label">Phone number</label>
+              <input
+                className="verification-input"
+                type="tel"
+                value={phone}
+                placeholder="+91 9876543210"
+                autoComplete="tel"
+                inputMode="tel"
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={loading}
+              />
+              <small className="verification-hint">
+                Example: +919876543210
+              </small>
+
+              {error && (
+                <div className="verification-error" role="alert">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="primary full"
+                disabled={loading || !phone.trim()}
+              >
+                {loading ? "Saving..." : "Save number & get blue tick"}
+              </button>
+            </form>
+
+            <div className="verification-note">
+              <Shield />
+              <span>
+                One ReelsGo account can use only one phone number.
+                One phone number can be used for only one verified account.
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Avatar({ user, size = 42, className = "" }) {
+  const [failed, setFailed] = useState(false);
+  const src = user?.avatar && typeof user.avatar === "string" ? user.avatar : avatarUrl(user);
+  const initial = (user?.name || user?.username || "U").slice(0, 1).toUpperCase();
+  return (
+    <div className={`avatar ${className}`} style={{ width: size, height: size, minWidth: size, minHeight: size, aspectRatio: "1 / 1", borderRadius: "50%", overflow: "hidden" }}>
+      {!failed && src ? (
+        <img src={src} alt="" onError={() => setFailed(true)} style={{ width: "100%", height: "100%", minWidth: "100%", minHeight: "100%", maxWidth: "none", maxHeight: "none", aspectRatio: "1 / 1", objectFit: "cover", objectPosition: "center", borderRadius: "50%", display: "block" }} />
+      ) : (
+        <span>{initial}</span>
+      )}
+    </div>
+  );
+}
+
+
+function openUserProfile(userId) {
+  if (!userId) return;
+  window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: userId } }));
+}
+
+function UserLink({ user, className = "" }) {
+  const label = user?.username || user?.name || "User";
+  if (!user?._id) return <span className={className}>{label}</span>;
+  return (
+    <span
+      className={`profile-username-link ${className}`}
+      role="button"
+      tabIndex={0}
+      onClick={(e) => { e.stopPropagation(); openUserProfile(user._id); }}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); openUserProfile(user._id); } }}
+    >
+      {label}
+      <VerifiedBadge userId={user._id} />
+    </span>
+  );
+}
+
+
+/* ReelsGo responsive viewport guard */
+function ReelsGoViewport() {
+  useEffect(() => {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "viewport";
+      document.head.appendChild(meta);
+    }
+    meta.content =
+      "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover";
+  }, []);
+  return null;
+}
+
+function ReelsGoBranding() {
+  useEffect(() => {
+    document.title = "ReelsGo";
+    let icon = document.querySelector('link[data-reelsgo-favicon="true"]');
+    if (!icon) {
+      icon = document.createElement("link");
+      icon.rel = "icon";
+      icon.type = "image/png";
+      icon.dataset.reelsgoFavicon = "true";
+      document.head.appendChild(icon);
+    }
+    icon.remove();
+  }, []);
+  return null;
+}
+
+function ReelsGoLogo({ className = "" }) {
+  return <span className={`reelsgo-text-logo ${className}`}>REELSGO</span>;
+}
+
+
+function CalendarDaysFallback() {
+  return <Clock3 />;
+}
+
+
+function getProfileIdFromUrl() {
+  try { return new URLSearchParams(window.location.search).get("profile") || null; }
+  catch { return null; }
+}
+
+function getSharedPostIdFromPath(pathname = window.location.pathname) {
+  const match = pathname.match(/^\/post\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getSharedReelIdFromPath(pathname = window.location.pathname) {
+  const match = pathname.match(/^\/(?:reel|reels)\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function getSharedRouteFromPath(pathname = window.location.pathname) {
+  const postId = getSharedPostIdFromPath(pathname);
+  if (postId) return { type: "post", id: postId };
+  const reelId = getSharedReelIdFromPath(pathname);
+  if (reelId) return { type: "reel", id: reelId };
+  return null;
+}
+
+function SharedPostPage({ postId, user, onBack }) {
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadPost() {
+      setLoading(true);
+      setError("");
+      try {
+        let foundPost = null;
+        try {
+          const data = await api(`/posts/${encodeURIComponent(postId)}`);
+          foundPost = data?.post || data?.data?.post || data;
+          if (String(foundPost?._id || "") !== String(postId)) foundPost = null;
+        } catch {
+          // Some backend versions expose the feed but not GET /posts/:id.
+        }
+        if (!foundPost) {
+          const feed = await api("/posts");
+          foundPost = (feed?.posts || feed?.data?.posts || []).find(
+            item => String(item?._id) === String(postId)
+          );
+        }
+        if (!foundPost || !foundPost._id) {
+          throw new Error("This post could not be found, or the backend does not allow public access.");
+        }
+        if (!cancelled) setPost(foundPost);
+      } catch (err) {
+        if (!cancelled) setError(err?.message || "Unable to load this post.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    if (postId) loadPost();
+    else { setError("This post link is invalid."); setLoading(false); }
+    return () => { cancelled = true; };
+  }, [postId]);
+
+  if (loading) return <div className="page"><div className="empty">Loading post…</div></div>;
+  if (error || !post) return <div className="page"><button type="button" className="secondary" onClick={onBack}>Back to ReelsGo</button><div className="empty"><h2>Post unavailable</h2><p>{error || "This post could not be found."}</p></div></div>;
+  return <div className="page"><button type="button" className="secondary" onClick={onBack}>← Back to ReelsGo</button><Post post={post} user={user} onDeleted={onBack} /></div>;
+}
+
+function SharedReelPage({ reelId, onBack }) {
+  const [reel, setReel] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadReel() {
+      setLoading(true);
+      setError("");
+      try {
+        let foundReel = null;
+        try {
+          const data = await api(`/reels/${encodeURIComponent(reelId)}`);
+          foundReel = data?.reel || data?.data?.reel || data;
+          if (String(foundReel?._id || "") !== String(reelId)) foundReel = null;
+        } catch {
+          // Fall back to the existing reels feed route.
+        }
+        if (!foundReel) {
+          const feed = await api("/reels");
+          foundReel = (feed?.reels || feed?.data?.reels || []).find(
+            item => String(item?._id) === String(reelId)
+          );
+        }
+        if (!foundReel?._id) {
+          throw new Error("This Reel could not be found, or the backend does not allow public access.");
+        }
+        if (!cancelled) setReel(foundReel);
+      } catch (err) {
+        if (!cancelled) setError(err?.message || "Unable to load this Reel.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    if (reelId) loadReel();
+    else { setError("This Reel link is invalid."); setLoading(false); }
+    return () => { cancelled = true; };
+  }, [reelId]);
+
+  if (loading) return <div className="page"><div className="empty">Loading Reel…</div></div>;
+  if (error || !reel) return <div className="page"><button type="button" className="secondary" onClick={onBack}>Back to ReelsGo</button><div className="empty"><h2>Reel unavailable</h2><p>{error || "This Reel could not be found."}</p></div></div>;
+
+  const author = reel.author || {};
+  const mediaUrl = reel.mediaUrl ? `${SERVER}${reel.mediaUrl}` : "";
+  return (
+    <div className="page shared-reel-page" style={{ maxWidth: 760, margin: "0 auto", padding: "20px 14px" }}>
+      <button type="button" className="secondary" onClick={onBack} style={{ marginBottom: 16 }}>← Back to ReelsGo</button>
+      <article style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 14, justifyItems: "center" }}>
+        <div style={{ width: "min(100%, 430px)", overflow: "hidden", borderRadius: 18, background: "#080808", border: "1px solid rgba(128,128,128,.25)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 12, color: "inherit" }}>
+            <Avatar user={author} size={40} />
+            <div style={{ minWidth: 0 }}>
+              <strong>{author.username ? `@${author.username}` : author.name || "ReelsGo user"}</strong>
+              <div style={{ opacity: .7, fontSize: 12 }}>Reel on ReelsGo</div>
+            </div>
+          </div>
+          {mediaUrl ? <video src={mediaUrl} controls playsInline autoPlay loop style={{ display: "block", width: "100%", maxHeight: "72vh", objectFit: "contain", background: "#000" }} /> : <div className="empty">Reel video is unavailable.</div>}
+          <div style={{ padding: 14, color: "inherit", overflowWrap: "anywhere" }}>
+            <div>{reel.caption || "Watch this Reel on ReelsGo."}</div>
+            {reel.hashtags && <div style={{ opacity: .8, marginTop: 6 }}>{Array.isArray(reel.hashtags) ? reel.hashtags.join(" ") : reel.hashtags}</div>}
+            <button type="button" className="secondary" style={{ marginTop: 14 }} onClick={async () => {
+              const link = window.location.href;
+              try {
+                if (navigator.share) await navigator.share({ title: "ReelsGo Reel", text: reel.caption || "Check out this Reel on ReelsGo", url: link });
+                else { await navigator.clipboard.writeText(link); alert("Reel link copied."); }
+              } catch (e) {
+                if (e?.name !== "AbortError") alert("Unable to share. Please copy the link from your browser.");
+              }
+            }}><Link2 size={16} /> Share Reel</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(getUser());
+  const [token, setToken] = useState(getToken());
+  const [page, setPage] = useState(() => {
+    const shared = getSharedRouteFromPath();
+    return shared ? `shared-${shared.type}` : (getProfileIdFromUrl() ? "user-profile" : "home");
+  });
+  const [sharedPostId, setSharedPostId] = useState(() => getSharedPostIdFromPath());
+  const [sharedReelId, setSharedReelId] = useState(() => getSharedReelIdFromPath());
+  const [createOpen, setCreateOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
+  const [storyAutoPick, setStoryAutoPick] = useState(false);
+  const [reelOpen, setReelOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [feedRefresh, setFeedRefresh] = useState(0);
+  const [profileUserId, setProfileUserId] = useState(() => getProfileIdFromUrl());
+  const [openConversationId, setOpenConversationId] = useState(null);
+  const [openConversationData, setOpenConversationData] = useState(null);
+  const [verificationOpen, setVerificationOpen] = useState(false);
+  const [verificationAlert, setVerificationAlert] = useState(false);
+
+  useEffect(() => {
+    const syncRoute = () => {
+      const postId = getSharedPostIdFromPath();
+      const reelId = getSharedReelIdFromPath();
+      setSharedPostId(postId);
+      setSharedReelId(reelId);
+      const profileId = getProfileIdFromUrl();
+      setProfileUserId(profileId);
+      setPage(postId ? "shared-post" : reelId ? "shared-reel" : profileId ? "user-profile" : "home");
+    };
+    window.addEventListener("popstate", syncRoute);
+    return () => window.removeEventListener("popstate", syncRoute);
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    const openMessages = () => navigate("messages");
+    window.addEventListener("vk-open-messages", openMessages);
+    return () => window.removeEventListener("vk-open-messages", openMessages);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    const openSearch = () => navigate("search");
+    window.addEventListener("vk-open-search", openSearch);
+    return () => window.removeEventListener("vk-open-search", openSearch);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    const openStoryComposer = (event) => { setStoryAutoPick(Boolean(event?.detail?.openPicker)); setStoryOpen(true); };
+    window.addEventListener("reelsgo-open-story-composer", openStoryComposer);
+    return () => window.removeEventListener("reelsgo-open-story-composer", openStoryComposer);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    const openProfile = (event) => {
+      const id = event?.detail?.id;
+      if (!id) return;
+      const targetId = String(id);
+      const ownId = String(getUser()?._id || "");
+      setOpenConversationId(null);
+      setOpenConversationData(null);
+      setMenuOpen(false);
+      setSettingsOpen(false);
+      if (ownId && targetId === ownId) {
+        // A notification referring to the signed-in account must open its own profile.
+        setProfileUserId(null);
+        setPage("profile");
+      } else {
+        setProfileUserId(targetId);
+        setPage("user-profile");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    window.addEventListener("vk-open-profile", openProfile);
+    return () => window.removeEventListener("vk-open-profile", openProfile);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+    let running = false;
+    const refreshCurrentAccount = async () => {
+      if (running || document.visibilityState === "hidden") return;
+      running = true;
+      try {
+        const data = await api("/users/me");
+        const local = getUser() || {};
+        const nextUser = { ...data.user, accountType: local.accountType || localStorage.getItem("vk_account_type") || "personal", professionalProfile: local.professionalProfile || {} };
+        setUser(nextUser);
+        localStorage.setItem("vk_user", JSON.stringify(nextUser));
+        setFeedRefresh(value => value + 1);
+      } catch (error) {
+        if (/user not found/i.test(String(error?.message || ""))) {
+          localStorage.removeItem("vk_token");
+          localStorage.removeItem("vk_user");
+          localStorage.removeItem("vk_account_type");
+          setToken(null);
+          setUser(null);
+          setPage("home");
+        }
+      } finally { running = false; }
+    };
+    const timer = window.setInterval(refreshCurrentAccount, 60000);
+    window.addEventListener("focus", refreshCurrentAccount);
+    return () => { window.clearInterval(timer); window.removeEventListener("focus", refreshCurrentAccount); };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    api("/users/me")
+      .then(async d => {
+        // Professional account status is server-persisted so it survives a new
+        // browser/device and is not dependent on stale localStorage values.
+        let savedProfessional = null;
+        try { savedProfessional = JSON.parse(localStorage.getItem("vk_professional_profile") || "null"); } catch {}
+        const localUser = getUser();
+        let serverProfessional = null;
+        try {
+          const professionalResponse = await api("/professional/settings");
+          serverProfessional = professionalResponse?.configured === false ? null : (professionalResponse?.settings || null);
+        } catch (error) {
+          console.warn("Professional settings unavailable; using saved profile fallback.", error);
+        }
+        const sameLocalUser = String(localUser?._id || "") === String(d.user?._id || "");
+        const accountType = serverProfessional?.accountType
+          || d.user?.settings?.professionalAccount?.accountType
+          || (sameLocalUser ? (localUser?.accountType || localStorage.getItem("vk_account_type")) : null)
+          || "personal";
+        const professionalProfile = {
+          ...(sameLocalUser ? (localUser?.professionalProfile || {}) : {}),
+          ...(savedProfessional || {}),
+          ...(serverProfessional ? {
+            type: serverProfessional.accountType === "business" ? "Business" : "Creator",
+            category: serverProfessional.category || "Digital creator",
+            contact: serverProfessional.contact || {},
+            goals: savedProfessional?.goals || []
+          } : {})
+        };
+        const mergedUser = { ...d.user, accountType, professionalProfile };
+        setUser(mergedUser);
+        localStorage.setItem("vk_user", JSON.stringify(mergedUser));
+        localStorage.setItem("vk_account_type", mergedUser.accountType);
+        if (accountType === "professional" || accountType === "creator" || accountType === "business") {
+          localStorage.setItem("vk_professional_profile", JSON.stringify(professionalProfile));
+        }
+      })
+      .catch(() => {});
+  }, [token]);
+
+  function login(data) {
+    localStorage.setItem("vk_token", data.token);
+    localStorage.setItem("vk_user", JSON.stringify(data.user));
+    setToken(data.token);
+    setUser(data.user);
+    const postId = getSharedPostIdFromPath();
+    const reelId = getSharedReelIdFromPath();
+    setSharedPostId(postId);
+    setSharedReelId(reelId);
+    const profileId = getProfileIdFromUrl();
+    setProfileUserId(profileId);
+    setPage(postId ? "shared-post" : reelId ? "shared-reel" : profileId ? "user-profile" : "home");
+  }
+
+  function logout() {
+    localStorage.removeItem("vk_token");
+    localStorage.removeItem("vk_user");
+    setToken(null);
+    setUser(null);
+    setSettingsOpen(false);
+  }
+
+  const navigate = p => {
+    // Do not let a stale selected conversation keep the Messages screen active
+    // when navigating to Profile, Notifications, or another section.
+    if (p !== "messages") {
+      setOpenConversationId(null);
+      setOpenConversationData(null);
+    }
+    setPage(p);
+    if (p !== "user-profile" && getProfileIdFromUrl()) {
+      const cleanUrl = new URL(window.location.href); cleanUrl.searchParams.delete("profile");
+      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    }
+    if (p !== "user-profile") setProfileUserId(null);
+    if (p !== "shared-post" && p !== "shared-reel" && getSharedRouteFromPath()) {
+      window.history.pushState({}, "", "/");
+      setSharedPostId(null);
+      setSharedReelId(null);
+    }
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // The own-profile controls always open the signed-in ReelsGo profile,
+  // never the currently selected chat or another user's profile.
+  const openOwnProfile = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    setOpenConversationId(null);
+    setOpenConversationData(null);
+    setProfileUserId(null);
+    setPage("profile");
+    setMenuOpen(false);
+    setSettingsOpen(false);
+    if (getProfileIdFromUrl()) {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete("profile");
+      window.history.replaceState({}, "", cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Shared post/Reel links should open directly in a browser, even when the visitor
+  // is not logged in. Other sections still require authentication as before.
+  if (!token && sharedPostId) {
+    return <div className="shared-public-shell"><SharedPostPage postId={sharedPostId} user={user} onBack={() => { window.history.pushState({}, "", "/"); setSharedPostId(null); setPage("home"); }} /></div>;
+  }
+  if (!token && sharedReelId) {
+    return <div className="shared-public-shell"><SharedReelPage reelId={sharedReelId} onBack={() => { window.history.pushState({}, "", "/"); setSharedReelId(null); setPage("home"); }} /></div>;
+  }
+  if (!token) return <Auth onLogin={login} />;
+
+  return (
+    <>
+      <ReelsGoViewport />
+      <ReelsGoBranding />
+      <div className="app">
+      <aside className="sidebar">
+        <button className="brand" onClick={() => navigate("home")} aria-label="ReelsGo home">
+          <ReelsGoLogo className="brand-wordmark" />
+        </button>
+
+        <div className="sidebar-main-nav">
+          <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+          <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
+          <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+          <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+          <Nav icon={<Bell />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
+          <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
+          <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={openOwnProfile} />
+        </div>
+
+        <div className="nav-bottom">
+          <Nav icon={<Bookmark />} label="Saved" active={page === "saved"} onClick={() => navigate("saved")} />
+          <Nav icon={<Settings />} label="Settings" onClick={() => setSettingsOpen(true)} />
+          <Nav icon={<Menu />} label="More" onClick={() => setMenuOpen(true)} />
+        </div>
+      </aside>
+
+      <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""} ${page === "user-profile" ? "mobile-header-profile" : ""}`}>
+        {page === "home" ? (
+          <>
+            <button className="mobile-home-create" onClick={() => setCreateOpen(true)} aria-label="Create post"><PlusSquare /></button>
+            <button className="mobile-brand mobile-brand-centered" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
+            <div className="mobile-header-actions">
+              <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
+              <button onClick={() => setMenuOpen(true)} aria-label="More options"><Menu /></button>
+            </div>
+          </>
+        ) : (
+          <>
+            <button className="mobile-brand" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
+            <div className="mobile-header-actions">
+              <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
+              <button onClick={() => setMenuOpen(true)} aria-label="Menu"><Menu /></button>
+            </div>
+          </>
+        )}
+      </header>
+
+      {menuOpen && (
+        <div className="overlay" onClick={() => setMenuOpen(false)}>
+          <div className="mobile-menu" onClick={e => e.stopPropagation()}>
+            <div className="menu-user">
+              <Avatar user={user} size={48} />
+              <div><b>{user?.name}</b><span>@{user?.username}</span></div>
+              <button onClick={() => setMenuOpen(false)}><X /></button>
+            </div>
+            <button onClick={(event) => openOwnProfile(event)}><User /> Profile</button>
+            <button onClick={() => navigate("saved")}><Bookmark /> Saved</button>
+            <button onClick={() => { setMenuOpen(false); setSettingsOpen(true); }}><Settings /> Settings</button>
+            <button onClick={logout}><LogOut /> Logout</button>
+          </div>
+        </div>
+      )}
+
+      <main className={`main ${page === "user-profile" ? "main-public-profile" : ""}`}>
+        {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
+        {page === "shared-post" && <SharedPostPage postId={sharedPostId} user={user} onBack={() => navigate("home")} />}
+        {page === "shared-reel" && <SharedReelPage reelId={sharedReelId} onBack={() => navigate("home")} />}
+        {page === "search" && <SearchPage onBack={() => navigate("home")} onOpenProfile={(id) => { setProfileUserId(id); setPage("user-profile"); }} />}
+        {page === "user-profile" && profileUserId && <UserProfilePage userId={profileUserId} currentUser={user} onBack={() => navigate("search")} onMessage={async (id) => {
+          try {
+            if (!id) throw new Error("Could not find this user's profile ID. Please refresh the profile and try again.");
+            const d = await api("/messages/conversations", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ members: [String(id)] })
+            });
+            const conversation = d?.conversation;
+            if (!conversation?._id) throw new Error("The server did not return a conversation. Please check the messages API and try again.");
+            // Keep the returned conversation so MessagesPage can open it immediately,
+            // even if the inbox list has not refreshed yet.
+            setOpenConversationData(conversation);
+            setOpenConversationId(String(conversation._id));
+            setPage("messages");
+            setProfileUserId(null);
+            setMenuOpen(false);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } catch (e) { alert(e?.message || "Unable to start this conversation."); }
+        }} />}
+        {page === "reels" && <ReelsPage onCreate={() => setReelOpen(true)} />}
+        {page === "messages" && <MessagesPage openConversationId={openConversationId} openConversationData={openConversationData} />}
+        {page === "notifications" && <NotificationsPage onBack={() => navigate("home")} />}
+        {page === "saved" && <SavedPage user={user} />}
+        {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
+      </main>
+
+      <nav className="bottom-nav glass-bottom-nav">
+        <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+        <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+        <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={(event) => openOwnProfile(event)} aria-label="Profile">
+          <Avatar user={user} size={34} />
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
+      {storyOpen && <StoryComposer autoPick={storyAutoPick} onClose={() => { setStoryOpen(false); setStoryAutoPick(false); }} onDone={() => { setStoryOpen(false); setStoryAutoPick(false); setFeedRefresh(v => v + 1); }} />}
+      {reelOpen && <ReelComposer onClose={() => setReelOpen(false)} onDone={() => setReelOpen(false)} />}
+      {settingsOpen && (
+        <SettingsModal
+          user={user}
+          setUser={setUser}
+          onClose={() => setSettingsOpen(false)}
+          onLogout={logout}
+          onOpenVerification={() => {
+            setSettingsOpen(false);
+            setVerificationOpen(true);
+          }}
+        />
+      )}
+      {verificationOpen && (
+        <PhoneVerificationModal
+          onClose={() => setVerificationOpen(false)}
+          onVerified={() => {
+            setVerificationOpen(false);
+            setVerificationAlert(true);
+            window.setTimeout(() => setVerificationAlert(false), 4500);
+          }}
+        />
+      )}
+      {verificationAlert && (
+        <div className="verification-alert" role="alert" aria-live="polite">
+          <div className="verification-alert-icon">
+            <BadgeCheck />
+          </div>
+          <div className="verification-alert-copy">
+            <strong>Your profile has been verified!</strong>
+            <span>Congratulations! Your ReelsGo blue tick is now active.</span>
+          </div>
+          <button
+            type="button"
+            className="verification-alert-close"
+            onClick={() => setVerificationAlert(false)}
+            aria-label="Close verification alert"
+          >
+            <X />
+          </button>
+        </div>
+      )}
+      </div>
+    </>
+  );
+}
+
+function Nav({ icon, label, active, onClick }) {
+  return <button className={`nav ${active ? "active" : ""} ${label === "Messages" ? "messages-nav-item" : ""}`} onClick={onClick}><span>{icon}</span>{label}</button>;
+}
+
+function NavMobile({ icon, label, active, onClick }) {
+  return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
+}
+
+function AuthLogo({ className = "" }) {
+  return (
+    <img
+      src={reelsGoLogo}
+      alt="ReelsGo"
+      className={`auth-logo-image ${className}`}
+      draggable="false"
+    />
+  );
+}
+
+function Auth({ onLogin }) {
+  const [mode, setMode] = useState("login");
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const path = mode === "login" ? "/auth/login" : "/auth/register";
+      const body = mode === "login" ? { email: form.email, password: form.password } : form;
+      const d = await api(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      onLogin(d);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      <div className="auth-showcase">
+        <div className="auth-showcase-logo">
+          <AuthLogo className="auth-showcase-image" />
+        </div>
+        <h1>Share your world.</h1>
+        <p>Photos, Reels, Stories, messages and the people you care about — all in one social space.</p>
+        <div className="auth-pills"><span>Posts</span><span>Stories</span><span>Reels</span><span>Messages</span></div>
+      </div>
+
+      <form className="auth-card" onSubmit={submit}>
+        <div className="auth-logo">
+          <AuthLogo className="auth-page-image" />
+        </div>
+        <h2 className="auth-title">{mode === "login" ? "Log in" : "Create an account"}</h2>
+        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : "Join and start sharing."}</p>
+
+        {mode === "signup" && <>
+          <Field icon={<CircleUser />} placeholder="Full name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
+          <Field icon={<AtSign />} placeholder="Username" value={form.username} onChange={v => setForm({ ...form, username: v })} />
+        </>}
+
+        <Field icon={<Mail />} type="email" placeholder="Email address" value={form.email} onChange={v => setForm({ ...form, email: v })} />
+        <div className="password-field">
+          <Field icon={<KeyRound />} type={showPassword ? "text" : "password"} placeholder="Password" value={form.password} onChange={v => setForm({ ...form, password: v })} />
+          <button type="button" onClick={() => setShowPassword(v => !v)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+        </div>
+
+        {mode === "login" && <button type="button" className="forgot">Forgot password?</button>}
+        {error && <div className="error">{error}</div>}
+        <button className="primary auth-submit" disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}</button>
+
+        <div className="auth-divider"><span>OR</span></div>
+        <button type="button" className="secondary auth-switch" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}>
+          {mode === "login" ? "Create new account" : "Already have an account? Log in"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function Field({ icon, type = "text", placeholder, value, onChange }) {
+  return <div className="field-wrap"><span>{icon}</span><input type={type} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} /></div>;
+}
+
+function HomePage({ user, refreshKey, onCreate, onStory }) {
+  const [posts, setPosts] = useState([]);
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeStory, setActiveStory] = useState(null);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const [p, s] = await Promise.all([api("/posts"), api("/stories")]);
+      setPosts(p.posts || []);
+      setStories(s.stories || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { load(); }, [refreshKey]);
+
+  const authorId = (item) => String(item?.author?._id || item?.author || "");
+  const myStories = stories.filter(s => authorId(s) === String(user?._id));
+  const otherStories = stories.filter(s => authorId(s) !== String(user?._id));
+  const groupedOtherStories = Array.from(otherStories.reduce((groups, item) => {
+    const id = authorId(item);
+    if (!id) return groups;
+    if (!groups.has(id)) groups.set(id, []);
+    groups.get(id).push(item);
+    return groups;
+  }, new Map()).values());
+
+  async function openStory(story, group = [story]) {
+    const safeGroup = Array.from(new Map((group || [story]).filter(Boolean).map(item => [String(item._id), item])).values());
+    const selectedIndex = Math.max(0, safeGroup.findIndex(item => String(item._id) === String(story?._id)));
+    setActiveStory({ story, stories: safeGroup, initialIndex: selectedIndex });
+    try { await api(`/stories/${story._id}/view`, { method: "POST" }); } catch {}
+  }
+
+  const ownStoryGroup = myStories;
+  const ownStoryLatest = ownStoryGroup[ownStoryGroup.length - 1];
+
+  return (
+    <div className="page feed-page">
+      <div className="home-layout">
+        <section className="home-feed-column">
+          <div className="page-heading">
+            <button className="desktop-create" onClick={onCreate}><PlusSquare /> Create</button>
+          </div>
+
+          <div className="stories-card">
+            <button className="story own" onClick={() => ownStoryGroup.length ? openStory(ownStoryLatest, ownStoryGroup) : onStory()}>
+              <div className="story-ring">{ownStoryLatest?.mediaUrl ? (ownStoryLatest.kind === "video" ? <video src={`${SERVER}${ownStoryLatest.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${ownStoryLatest.mediaUrl}`} alt="" />) : <Avatar user={user} size={64} />}{!ownStoryGroup.length && <i>+</i>}</div>
+              <span>Your story</span>
+            </button>
+            {groupedOtherStories.map(group => {
+              const latest = group[group.length - 1];
+              const author = latest?.author || group[0]?.author;
+              const key = authorId(latest);
+              return (
+                <button className="story" key={key} onClick={() => openStory(latest, group)}>
+                  <div className="story-ring">
+                    {latest?.mediaUrl ? (latest.kind === "video" ? <video src={`${SERVER}${latest.mediaUrl}`} muted playsInline /> : <img src={`${SERVER}${latest.mediaUrl}`} alt="" />) : <div className="story-text-thumb">Aa</div>}
+                  </div>
+                  <UserLink user={author} className="story-username" />
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="quick-create">
+            <Avatar user={user} size={42} />
+            <button onClick={onCreate}>What's on your mind?</button>
+            <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
+          </div>
+
+          {loading ? <div className="empty">Loading feed...</div> :
+            posts.length ? posts.map(p => (
+              <Post
+                key={p._id}
+                post={p}
+                user={user}
+                onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
+              />
+            )) :
+            <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+
+          {activeStory && (
+            <StoryViewer
+              key={`${authorId(activeStory.story)}-${activeStory.story?._id}`}
+              story={activeStory.story}
+              stories={activeStory.stories}
+              initialIndex={activeStory.initialIndex}
+              onClose={() => setActiveStory(null)}
+              onDeleted={() => {
+                setActiveStory(null);
+                load();
+              }}
+            />
+          )}
+        </section>
+
+        <SuggestionsRail user={user} posts={posts} />
+      </div>
+    </div>
+  );
+}
+
+function SuggestionsRail({ user, posts }) {
+  const [people, setPeople] = useState([]);
+  const [following, setFollowing] = useState(new Set());
+  const [busyId, setBusyId] = useState("");
+  const [showAll, setShowAll] = useState(false);
+  const [followError, setFollowError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSuggestions() {
+      const map = new Map();
+      const currentFollowing = new Set();
+      const add = (person) => {
+        if (!person?._id || String(person._id) === String(user?._id)) return;
+        const id = String(person._id);
+        if (!map.has(id)) map.set(id, person);
+      };
+
+      // Reuse people already present in the feed, then supplement with
+      // the signed-in user's existing followers/following from the API.
+      for (const post of posts || []) add(post?.author);
+
+      if (user?._id) {
+        try {
+          const d = await api(`/follows/${user._id}/following`);
+          for (const item of (d.following || d.users || [])) {
+            const person = item?.user || item;
+            add(person);
+            if (person?._id) currentFollowing.add(String(person._id));
+          }
+        } catch {}
+
+        try {
+          const d = await api(`/follows/${user._id}/followers`);
+          for (const item of (d.followers || d.users || [])) add(item?.user || item);
+        } catch {}
+      }
+
+      if (!cancelled) {
+        setPeople(Array.from(map.values()));
+        setFollowing(currentFollowing);
+      }
+    }
+
+    loadSuggestions();
+    return () => { cancelled = true; };
+  }, [posts, user?._id]);
+
+  async function toggleFollow(person) {
+    const id = String(person?._id || "");
+    if (!id || busyId) return;
+    const isFollowing = following.has(id);
+    setBusyId(id);
+    setFollowError("");
+
+    // Update immediately for responsive UI, then roll back if the API fails.
+    setFollowing(prev => {
+      const next = new Set(prev);
+      if (isFollowing) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+    try {
+      await api(`/follows/${id}`, { method: isFollowing ? "DELETE" : "POST" });
+    } catch (e) {
+      setFollowing(prev => {
+        const next = new Set(prev);
+        if (isFollowing) next.add(id);
+        else next.delete(id);
+        return next;
+      });
+      setFollowError(e?.message || "Could not update follow status. Please try again.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  const visiblePeople = showAll ? people : people.slice(0, 6);
+
+  return (
+    <aside className="suggestions-rail">
+      <div className="rail-account">
+        <button type="button" className="rail-avatar-button" onClick={() => openUserProfile(user?._id)} aria-label="Open your profile">
+          <Avatar user={user} size={56} />
+        </button>
+        <div className="rail-account-info">
+          <UserLink user={user} className="rail-username" />
+          <span>{user?.name || "ReelsGo user"}</span>
+        </div>
+        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-switch-account"))}>Switch</button>
+      </div>
+
+      <div className="suggestions-title">
+        <b>Suggested for you</b>
+        <button type="button" onClick={() => setShowAll(value => !value)}>
+          {showAll ? "Show less" : "See all"}
+        </button>
+      </div>
+
+      {followError && <div className="suggestion-error" role="status">{followError}</div>}
+
+      <div className="suggestion-list">
+        {visiblePeople.map(person => {
+          const id = String(person._id);
+          const isFollowing = following.has(id);
+          const busy = busyId === id;
+          return (
+            <div className="suggestion-row" key={id}>
+              <button type="button" className="suggestion-avatar-button" onClick={() => openUserProfile(id)} aria-label={`Open ${person.username || person.name || "user"} profile`}>
+                <Avatar user={person} size={42} />
+              </button>
+              <div className="suggestion-copy">
+                <UserLink user={person} />
+                <span>{isFollowing ? "Following" : "Suggested for you"}</span>
+              </div>
+              <button
+                type="button"
+                className={isFollowing ? "following" : "follow"}
+                disabled={busy}
+                onClick={() => toggleFollow(person)}
+              >
+                {busy ? "…" : isFollowing ? "Following" : "Follow"}
+              </button>
+            </div>
+          );
+        })}
+        {!people.length && (
+          <div className="suggestion-empty">More people will appear here as ReelsGo discovers accounts.</div>
+        )}
+      </div>
+
+      <div className="rail-footer">
+        About · Help · Press · API · Jobs · Privacy · Terms<br />
+        Locations · Language<br /><br />
+        © 2026 REELSGO
+      </div>
+
+      <button type="button" className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
+        <Send />
+        <b>Messages</b>
+        <span className="floating-avatars">
+          {people.slice(0, 3).map(person => <span key={person._id} className="floating-avatar-item"><Avatar user={person} size={25} /></span>)}
+        </span>
+      </button>
+    </aside>
+  );
+}
+
+function StoryViewer({ story: initialStory, stories: storiesProp, initialIndex = 0, onClose, onDeleted }) {
+  const storyList = useMemo(() => {
+    const source = Array.isArray(storiesProp) && storiesProp.length ? storiesProp : [initialStory];
+    return Array.from(new Map(source.filter(Boolean).map(item => [String(item._id), item])).values());
+  }, [storiesProp, initialStory]);
+  const [storyIndex, setStoryIndex] = useState(() => Math.max(0, Math.min(initialIndex, storyList.length - 1)));
+  const story = storyList[storyIndex] || initialStory;
+  const mediaUrl = story?.mediaUrl ? `${SERVER}${story.mediaUrl}` : null;
+  const me = getUser();
+  const isOwner = String(story.author?._id || story.author) === String(me?._id);
+  const [viewersOpen, setViewersOpen] = useState(false);
+  const [storyControlsVisible, setStoryControlsVisible] = useState(true);
+  const [viewers, setViewers] = useState([]);
+  const [loadingViewers, setLoadingViewers] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [activeViewerMenu, setActiveViewerMenu] = useState(null);
+  const [viewerActionBusy, setViewerActionBusy] = useState(false);
+  const [hiddenViewerIds, setHiddenViewerIds] = useState([]);
+  const [restrictedViewerIds, setRestrictedViewerIds] = useState([]);
+  const [blockedViewerIds, setBlockedViewerIds] = useState([]);
+  const [viewerNotice, setViewerNotice] = useState("");
+
+  function goToStory(nextIndex) {
+    if (viewersOpen) return;
+    if (nextIndex < 0) return;
+    if (nextIndex >= storyList.length) { onClose(); return; }
+    setStoryIndex(nextIndex);
+    setStoryControlsVisible(true);
+    setActiveViewerMenu(null);
+    const nextStory = storyList[nextIndex];
+    if (nextStory?._id && String(nextStory.author?._id || nextStory.author) !== String(me?._id)) {
+      api(`/stories/${nextStory._id}/view`, { method: "POST" }).catch(() => {});
+    }
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowRight") { event.preventDefault(); goToStory(storyIndex + 1); }
+      else if (event.key === "ArrowLeft") { event.preventDefault(); goToStory(storyIndex - 1); }
+      else if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [storyIndex, storyList, viewersOpen, onClose]);
+
+  async function deleteStory() {
+    if (!isOwner || deleting) return;
+    const confirmed = window.confirm("Delete this story? This action cannot be undone.");
+    if (!confirmed) return;
+    setDeleting(true);
+    try {
+      await api(`/stories/${story._id}`, { method: "DELETE" });
+      if (onDeleted) onDeleted(story._id);
+      else onClose();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  async function openViewers() {
+    if (!isOwner) return;
+    setViewersOpen(true);
+    setLoadingViewers(true);
+    try {
+      const d = await api(`/stories/${story._id}/viewers`);
+      setViewers(d.viewers || []);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoadingViewers(false);
+    }
+  }
+
+  function viewerId(viewer) {
+    return String(viewer?._id || viewer?.id || "");
+  }
+
+  function runViewerAction(action, viewer) {
+    const id = viewerId(viewer);
+    const username = viewer?.username || viewer?.name || "this viewer";
+    setActiveViewerMenu(null);
+    if (action === "profile") {
+      openUserProfile(id);
+      return;
+    }
+    if (action === "hide") {
+      setHiddenViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewerNotice(`Story hidden from ${username} on this screen.`);
+    } else if (action === "restrict") {
+      setRestrictedViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewerNotice(`${username} marked as restricted on this screen.`);
+    } else if (action === "remove") {
+      setViewers(items => items.filter(item => viewerId(item) !== id));
+      setViewerNotice(`${username} removed from this viewer list.`);
+    } else if (action === "block") {
+      setBlockedViewerIds(items => items.includes(id) ? items : [...items, id]);
+      setViewers(items => items.filter(item => viewerId(item) !== id));
+      setViewerNotice(`${username} blocked on this screen.`);
+    }
+    window.setTimeout(() => setViewerNotice(""), 2600);
+  }
+
+  useEffect(() => {
+    if (!isOwner && story?._id) {
+      api(`/stories/${story._id}/view`, { method: 'POST' }).catch(() => {});
+    }
+  }, [story?._id, isOwner]);
+
+  const visibleViewers = Array.from(new Map(
+    viewers
+      .filter(v => !hiddenViewerIds.includes(viewerId(v)) && !blockedViewerIds.includes(viewerId(v)))
+      .map((viewer, index) => [viewerId(viewer) || `viewer-${index}`, viewer])
+  ).values());
+
+  return (
+    <div className={`story-viewer ${viewersOpen ? "story-viewer-viewers-open" : ""} ${storyControlsVisible ? "story-controls-visible" : "story-controls-hidden"}`} onClick={onClose}>
+      <div className="story-progress story-progress-segments" aria-label={`Story ${storyIndex + 1} of ${storyList.length}`}>
+        {storyList.map((item, index) => <span key={item._id || index} className={index < storyIndex ? "completed" : index === storyIndex ? "current" : "upcoming"} />)}
+      </div>
+      {!viewersOpen && <>
+        <button type="button" className="story-tap-zone story-tap-zone-left" aria-label="Previous story" onClick={e => { e.stopPropagation(); goToStory(storyIndex - 1); }} />
+        <button type="button" className="story-tap-zone story-tap-zone-right" aria-label="Next story" onClick={e => { e.stopPropagation(); goToStory(storyIndex + 1); }} />
+      </>}
+      <div className="story-viewer-top">
+        <div className="story-viewer-user">
+          <Avatar user={story.author} size={42} />
+          <div>
+            <UserLink user={story.author} />
+            <span>{isOwner ? 'Your story' : 'Story'}</span>
+          </div>
+        </div>
+        <div className="story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {isOwner && <button type="button" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={e => { e.stopPropagation(); deleteStory(); }} style={{ color: "#ff5c70" }}><Trash2 /></button>}
+          <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
+        </div>
+      </div>
+      <div className="story-viewer-content" onClick={e => e.stopPropagation()}>
+        {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
+      </div>
+      {isOwner && !viewersOpen && storyControlsVisible && (
+        <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
+          <span className="story-viewers-grabber" />
+          <span>{story.views?.length || 0} views · Viewers</span>
+        </button>
+      )}
+      {viewersOpen && (
+        <section className="story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
+          <div className="story-viewers-screen-top">
+            <button type="button" className="story-viewers-settings" aria-label="Story settings" onClick={() => setViewerNotice("Story settings are available from your account settings.")}><Settings /></button>
+            <div className="story-viewer-thumbnails">
+              <button type="button" className="story-thumb-card selected" aria-label="Current story">
+                {mediaUrl && story.kind === "video" ? <video src={mediaUrl} muted playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Current story" /> : <span style={{ background: story.background || "linear-gradient(135deg,#111827,#4f46e5)" }}>{story.text || "Story"}</span>}
+                <small><Users size={15} /> {visibleViewers.length || story.views?.length || 0}</small>
+              </button>
+              <button type="button" className="story-thumb-add" aria-label="Create another story" title="Add another story" onClick={() => { setViewersOpen(false); onClose(); window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { openPicker: true } })); }}><Camera /></button>
+            </div>
+            <button type="button" className="story-viewers-close" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><X /></button>
+          </div>
+          <div className="story-viewers-tabs">
+            <div className="story-viewers-tab-active"><Users /><b>{visibleViewers.length || story.views?.length || 0}</b></div>
+            <button type="button" className="story-viewers-delete" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={deleteStory}><Trash2 /></button>
+          </div>
+          {viewerNotice && <div className="story-viewer-notice" role="status">{viewerNotice}</div>}
+          {loadingViewers ? (
+            <div className="story-viewers-empty"><div className="viewer-loader" /><b>Loading viewers...</b></div>
+          ) : visibleViewers.length ? (
+            <div className="story-viewers-list story-viewers-screen-list">
+              {visibleViewers.map(v => {
+                const id = viewerId(v);
+                const menuOpen = activeViewerMenu === id;
+                const username = v.username || v.name || "ReelsGo user";
+                return (
+                  <div className="story-viewer-row story-viewer-row-menu" key={id || username}>
+                    <Avatar user={v} size={50} />
+                    <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || username}{restrictedViewerIds.includes(id) ? " · Restricted" : ""}</span></div>
+                    {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
+                    <button type="button" className="story-viewer-more" aria-label={`Options for ${username}`} onClick={() => setActiveViewerMenu(menuOpen ? null : id)}><MoreHorizontal /></button>
+                    <button type="button" className="story-viewer-message" aria-label={`Message ${username}`} onClick={() => { setActiveViewerMenu(null); openUserProfile(id); }}><Send /></button>
+                    {menuOpen && <>
+                      <button type="button" className="story-viewer-menu-backdrop" aria-label="Close viewer options" onClick={() => setActiveViewerMenu(null)} />
+                      <div className="story-viewer-action-sheet" role="menu">
+                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{username}</b></div>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("profile", v)}>View Profile</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("hide", v)}>Hide your story</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("restrict", v)}>{restrictedViewerIds.includes(id) ? "Unrestrict" : "Restrict"}</button>
+                        <button type="button" role="menuitem" onClick={() => runViewerAction("remove", v)}>Remove follower</button>
+                        <button type="button" role="menuitem" className="danger" onClick={() => runViewerAction("block", v)}>Block</button>
+                      </div>
+                    </>}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="story-viewers-empty"><Eye /><b>No views yet</b><span>When someone watches your story, their profile will appear here.</span></div>
+          )}
+          <button type="button" className="story-viewers-cancel" onClick={() => { setActiveViewerMenu(null); setViewersOpen(false); }}>Cancel</button>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function Post({ post, user, onDeleted }) {
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [text, setText] = useState("");
+  const [showComments, setShowComments] = useState(false);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsError, setCommentsError] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [likedUsersOpen, setLikedUsersOpen] = useState(false);
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [likedUsersLoading, setLikedUsersLoading] = useState(false);
+  const [likedUsersError, setLikedUsersError] = useState("");
+
+  const media = post.media?.[0];
+  const mediaUrl = media?.url ? `${SERVER}${media.url}` : "";
+  const isOwner = String(post.author?._id || post.author) === String(user?._id);
+
+  async function like() {
+    try {
+      const d = await api(`/posts/${post._id}/like`, { method: "POST" });
+      setLiked(d.liked);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function save() {
+    try {
+      const d = await api(`/posts/${post._id}/save`, { method: "POST" });
+      setSaved(d.saved);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function openLikedUsers() {
+    setLikedUsersOpen(true); setLikedUsersLoading(true); setLikedUsersError(""); setLikedUsers([]);
+    try { const data = await api(`/posts/${post._id}/likes`); setLikedUsers(Array.isArray(data.users) ? data.users : Array.isArray(data.likes) ? data.likes : []); }
+    catch (error) { setLikedUsersError(error?.message || "Could not load likes."); }
+    finally { setLikedUsersLoading(false); }
+  }
+
+  async function loadComments() {
+    setShowComments(true);
+    setCommentsLoading(true);
+    setCommentsError("");
+    try {
+      const d = await api(`/posts/${post._id}/comments`);
+      setComments(Array.isArray(d.comments) ? d.comments : []);
+    } catch (e) {
+      setCommentsError(e?.message || "Could not load comments.");
+    } finally {
+      setCommentsLoading(false);
+    }
+  }
+
+  async function comment() {
+    if (!text.trim()) return;
+    try {
+      await api(`/posts/${post._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text.trim() })
+      });
+      setText("");
+      await loadComments();
+    } catch (e) {
+      setCommentsError(e?.message || "Could not post comment.");
+    }
+  }
+
+  async function deletePost() {
+    if (!isOwner || deleting) return;
+
+    const confirmed = window.confirm(
+      "Delete this post? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setMenuOpen(false);
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await api(`/posts/${post._id}`, {
+        method: "DELETE"
+      });
+
+      setMenuOpen(false);
+
+      if (onDeleted) {
+        onDeleted(post._id);
+      }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <article className="post-card">
+        <div className="post-head">
+          <div className="post-user">
+            <Avatar user={post.author} size={42} />
+            <div>
+              <UserLink user={post.author} />
+              <span>{post.location || "ReelsGo"}</span>
+            </div>
+          </div>
+
+          <div style={{ position: "relative" }}>
+            <button
+              className="icon-button"
+              type="button"
+              aria-label="More options"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(v => !v)}
+            >
+              <MoreHorizontal />
+            </button>
+
+            {menuOpen && (
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "42px",
+                  zIndex: 40,
+                  minWidth: 170,
+                  padding: 6,
+                  borderRadius: 14,
+                  background: "#171b21",
+                  border: "1px solid rgba(255,255,255,.12)",
+                  boxShadow: "0 18px 50px rgba(0,0,0,.45)"
+                }}
+              >
+                {isOwner ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={deletePost}
+                      disabled={deleting}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 9,
+                        padding: "11px 12px",
+                        borderRadius: 10,
+                        background: "transparent",
+                        color: "#ff5c70",
+                        textAlign: "left",
+                        fontWeight: 750
+                      }}
+                    >
+                      <Trash2 size={17} />
+                      {deleting ? "Deleting..." : "Delete post"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        width: "100%",
+                        padding: "11px 12px",
+                        borderRadius: 10,
+                        background: "transparent",
+                        color: "#fff",
+                        textAlign: "left"
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      width: "100%",
+                      padding: "11px 12px",
+                      borderRadius: 10,
+                      background: "transparent",
+                      color: "#fff",
+                      textAlign: "left"
+                    }}
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {mediaUrl && (
+          <button
+            className="post-media-button"
+            type="button"
+            onClick={() => setViewerOpen(true)}
+            aria-label="Open post"
+          >
+            {media.kind === "video" ? (
+              <video
+                className="post-media"
+                src={mediaUrl}
+                muted
+                playsInline
+                preload="metadata"
+              />
+            ) : (
+              <img
+                className="post-media"
+                src={mediaUrl}
+                alt={post.caption || "Post"}
+              />
+            )}
+            {media.kind === "video" && (
+              <span className="media-play-overlay">
+                <Play fill="currentColor" />
+              </span>
+            )}
+          </button>
+        )}
+
+        <div className="actions">
+          <div>
+            <button
+              className={liked ? "liked" : ""}
+              onClick={like}
+              type="button"
+              aria-label="Like"
+            >
+              <Heart fill={liked ? "currentColor" : "none"} />
+            </button>
+
+            <button
+              onClick={loadComments}
+              type="button"
+              aria-label="Comments"
+            >
+              <MessageCircle />
+            </button>
+
+            <button
+              onClick={() => setShareOpen(true)}
+              type="button"
+              aria-label="Share"
+            >
+              <Send />
+            </button>
+          </div>
+
+          <button
+            className={saved ? "saved" : ""}
+            onClick={save}
+            type="button"
+            aria-label="Save"
+          >
+            <Bookmark fill={saved ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        <div className="post-body">
+          {!post.hideLikeCount && <button type="button" className="post-likes-link" onClick={openLikedUsers}>{post.likesCount || 0} likes</button>}
+
+          {post.caption && (
+            <p>
+              <UserLink user={post.author} /> {post.caption}
+            </p>
+          )}
+
+          <button
+            className="comments-link"
+            onClick={loadComments}
+            type="button"
+          >
+            View all comments
+          </button>
+
+
+        </div>
+      </article>
+
+      {likedUsersOpen && (
+        <div className="post-likes-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
+          <section className="post-likes-sheet" role="dialog" aria-modal="true" aria-label="People who liked this post">
+            <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikedUsersOpen(false)}><X /></button></header>
+            <div className="post-likes-sheet-list">
+              {likedUsersLoading ? <p className="post-sheet-status">Loading likes…</p> : likedUsersError ? <p className="post-sheet-status">{likedUsersError}</p> : likedUsers.length ? likedUsers.map((person, index) => {
+                const likedUser = person?.user || person?.author || person;
+                const personId = likedUser?._id || `liked-${index}`;
+                return <div className="post-likes-user-row" key={personId}><Avatar user={likedUser} size={44} /><div><UserLink user={likedUser} /><small>{likedUser?.name || "ReelsGo user"}</small></div></div>;
+              }) : <p className="post-sheet-status">No likes to show yet.</p>}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {showComments && (
+        <div className="post-comments-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
+          <section className="post-comments-sheet" role="dialog" aria-modal="true" aria-label="Comments">
+            <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Comments</h2><button type="button" className="post-comments-send" aria-label="Share post" onClick={() => { setShowComments(false); setShareOpen(true); }}><Send /></button></header>
+            <div className="post-comments-sheet-list">
+              {commentsLoading ? <p className="post-sheet-status">Loading comments…</p> : commentsError ? <p className="post-sheet-status">{commentsError}</p> : comments.length ? comments.map((c, index) => <div className="post-comment-row" key={c._id || `comment-${index}`}><Avatar user={c.author} size={38} /><div className="post-comment-copy"><div><UserLink user={c.author} /><span>{c.text}</span></div><small>Reply · Like</small></div></div>) : <div className="post-comments-empty"><b>No comments yet</b><span>Start the conversation.</span></div>}
+            </div>
+            {!post.commentsDisabled && <div className="post-comment-composer-wrap"><div className="post-comment-emoji-row">{["❤️","🙌","🔥","👏","😢","😍","😮","😂"].map(emoji => <button type="button" key={emoji} onClick={() => setText(value => value + emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div><div className="post-comment-composer"><Avatar user={user} size={36} /><input value={text} onChange={event => setText(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); comment(); } }} placeholder={`Add a comment for ${post.author?.username || post.author?.name || "this post"}…`} aria-label="Add a comment"/><button type="button" className="post-comment-gif" onClick={() => setText(value => value + " GIF ")} aria-label="Add GIF">GIF</button><button type="button" className="post-comment-submit" onClick={comment} disabled={!text.trim() || commentsLoading}>Post</button></div></div>}
+          </section>
+        </div>
+      )}
+
+      {shareOpen && (
+        <ShareSheet
+          post={post}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
+
+      {viewerOpen && (
+        <MediaViewer
+          media={media}
+          post={post}
+          onClose={() => setViewerOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+function MediaViewer({ media, post, onClose }) {
+  const url = media?.url ? `${SERVER}${media.url}` : "";
+  const [liked, setLiked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+
+  async function like() {
+    try {
+      const d = await api(`/posts/${post?._id}/like`, { method: "POST" });
+      setLiked(!!d.liked);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function save() {
+    try {
+      const d = await api(`/posts/${post?._id}/save`, { method: "POST" });
+      setSaved(!!d.saved);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  if (!url) return null;
+
+  return (
+    <div className="media-screen-viewer" role="dialog" aria-modal="true">
+      <div className="media-screen-backdrop" onClick={onClose} />
+
+      <div className="media-screen-topbar">
+        <button
+          className="media-screen-back"
+          type="button"
+          onClick={onClose}
+          aria-label="Back"
+        >
+          <ChevronRight style={{ transform: "rotate(180deg)" }} />
+        </button>
+
+        <div className="media-screen-user">
+          <Avatar user={post?.author} size={40} />
+          <div>
+            <UserLink user={post?.author} />
+            <span>{post?.location || "ReelsGo"}</span>
+          </div>
+        </div>
+
+        <button className="media-screen-more" type="button">
+          <MoreHorizontal />
+        </button>
+      </div>
+
+      <div className="media-screen-content">
+        {media.kind === "video" ? (
+          <video
+            src={url}
+            autoPlay
+            controls
+            playsInline
+            className="media-screen-media"
+          />
+        ) : (
+          <img
+            src={url}
+            alt={post?.caption || "Post"}
+            className="media-screen-media"
+          />
+        )}
+      </div>
+
+      <div className="media-screen-bottom">
+        <div className="media-screen-actions">
+          <div className="media-screen-action-group">
+            <button
+              type="button"
+              className={liked ? "active" : ""}
+              onClick={like}
+              aria-label="Like"
+            >
+              <Heart fill={liked ? "currentColor" : "none"} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              aria-label="Share"
+            >
+              <Send />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className={saved ? "active" : ""}
+            onClick={save}
+            aria-label="Save"
+          >
+            <Bookmark fill={saved ? "currentColor" : "none"} />
+          </button>
+        </div>
+
+        {post?.caption && (
+          <div className="media-screen-caption">
+            <UserLink user={post.author} />{" "}
+            <span>{post.caption}</span>
+          </div>
+        )}
+      </div>
+
+      {shareOpen && (
+        <ShareSheet
+          post={post}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ShareSheet({ post, onClose, kind = "post" }) {
+  const [people, setPeople] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [notice, setNotice] = useState("");
+
+  const postLink = `${window.location.origin}/${kind === "reel" ? "reel" : "post"}/${post?._id || ""}`;
+  const contentLabel = kind === "reel" ? "Reel" : "post";
+  const shareText = `Check out this ${contentLabel} on ReelsGo: ${postLink}`;
+
+  async function loadPeople() {
+    setLoading(true);
+    try {
+      let users = [];
+      try {
+        const currentUser = getUser();
+        if (currentUser?._id) {
+          const d = await api(`/follows/${currentUser._id}/following`);
+          users = d.following || d.users || d.followers || [];
+        }
+      } catch {}
+      if (!users.length) {
+        try {
+          const d = await api("/messages/conversations");
+          users = (d.conversations || []).map(c =>
+            (c.members || []).find(m => String(m?._id) !== String(getUser()?._id))
+          ).filter(Boolean);
+        } catch {}
+      }
+      const unique = [];
+      const seen = new Set();
+      for (const item of users) {
+        const person = item?.user || item;
+        if (!person?._id) continue;
+        const id = String(person._id);
+        if (id === String(getUser()?._id || "") || seen.has(id)) continue;
+        seen.add(id);
+        unique.push(person);
+      }
+      setPeople(unique);
+    } catch (e) {
+      console.error(e);
+      setPeople([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadPeople(); }, []);
+
+  function togglePerson(person) {
+    const id = String(person._id);
+    setSelected(current =>
+      current.some(item => String(item._id) === id)
+        ? current.filter(item => String(item._id) !== id)
+        : [...current, person]
+    );
+  }
+
+  async function copyPostLink() {
+    try {
+      await navigator.clipboard.writeText(postLink);
+      setNotice(`${kind === "reel" ? "Reel" : "Post"} link copied.`);
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = postLink;
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      setNotice(copied ? `${kind === "reel" ? "Reel" : "Post"} link copied.` : "Copy failed. Please copy the link from your browser.");
+    }
+  }
+
+  function openWhatsApp(status = false) {
+    const message = encodeURIComponent(shareText);
+    // WhatsApp Web/app opens with the link. For Status, choose "My status"
+    // in WhatsApp's own share UI; browsers cannot publish a Status silently.
+    window.open(`https://wa.me/?text=${message}`, "_blank", "noopener,noreferrer");
+    if (status) setNotice("WhatsApp opened. Choose Status in WhatsApp to post it there.");
+  }
+
+  async function shareExternally() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `ReelsGo ${contentLabel}`, text: `Check out this ${contentLabel} on ReelsGo`, url: postLink });
+      } else {
+        await copyPostLink();
+        setNotice("Sharing is not supported here, so the link was copied.");
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") setNotice("Unable to open the share menu. Try Copy link.");
+    }
+  }
+
+  async function openSocialApp(app) {
+    const text = encodeURIComponent(shareText);
+    const url = encodeURIComponent(postLink);
+    const destinations = {
+      WhatsApp: `https://wa.me/?text=${text}`,
+      Instagram: "https://www.instagram.com/",
+      "X / Twitter": `https://twitter.com/intent/tweet?text=${text}`,
+      Facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      Telegram: `https://t.me/share/url?url=${url}&text=${text}`
+    };
+    try {
+      if (app === "Instagram") {
+        await copyPostLink();
+        setNotice("ReelsGo link copied. Instagram opened; paste the link into a message or story.");
+      }
+      const destination = destinations[app];
+      if (destination) window.open(destination, "_blank", "noopener,noreferrer");
+    } catch {
+      setNotice("Could not open the app. Use Copy link and share it manually.");
+    }
+  }
+
+  function addToStory() {
+    onClose();
+    window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", {
+      detail: { postId: kind === "post" ? (post?._id || null) : null, reelId: kind === "reel" ? (post?._id || null) : null, postLink }
+    }));
+  }
+
+  async function sendPost() {
+    if (!selected.length || sending) return;
+    setSending(true);
+    let sent = 0;
+    const failed = [];
+    try {
+      for (const person of selected) {
+        try {
+          const d = await api("/messages/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ members: [person._id] })
+          });
+          const conversation = d.conversation;
+          if (!conversation?._id) throw new Error("Unable to create conversation");
+          await api(`/messages/conversations/${conversation._id}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: shareText })
+          });
+          sent += 1;
+        } catch (error) {
+          failed.push(person.username || person.name || "user");
+          console.error("Failed to share post with user", person, error);
+        }
+      }
+      if (sent && !failed.length) {
+        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
+        onClose();
+      } else if (sent) {
+        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
+        onClose();
+      } else {
+        alert(`Could not send the ${contentLabel}. Please try again.`);
+      }
+    } finally {
+      setSending(false);
+    }
+  }
+
+  const filtered = people.filter(person =>
+    `${person.username || ""} ${person.name || ""}`.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div className="share-sheet-overlay" onClick={onClose}>
+      <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
+        <div className="share-sheet-handle" />
+        <div className="share-sheet-head">
+          <div><h2>Share {kind === "reel" ? "Reel" : "post"}</h2><p>Select multiple people, or choose a sharing option</p></div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Close share"><X /></button>
+        </div>
+
+        <div className="share-search"><Search /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search people" autoFocus /></div>
+
+        <div className="share-people">
+          {loading ? <div className="share-loading">Loading people...</div> : filtered.length ? filtered.map(person => {
+            const active = selected.some(item => String(item._id) === String(person._id));
+            return (
+              <button key={person._id} type="button" className={`share-person ${active ? "selected" : ""}`}
+                onClick={() => togglePerson(person)} aria-pressed={active}
+                title={active ? `Remove @${person.username} from selection` : `Select @${person.username}`}>
+                <div className="share-person-avatar">
+                  <Avatar user={person} size={64} />
+                  {active && <span className="share-selected-check"><Check /></span>}
+                </div>
+                <b>{person.name || person.username || "ReelsGo user"}</b>
+              </button>
+            );
+          }) : <div className="share-empty"><Users /><b>No people found</b><span>Follow people to quickly share posts with them.</span></div>}
+        </div>
+
+        {selected.length > 0 && (
+          <button className="share-send-button" type="button" disabled={sending} onClick={sendPost}>
+            <Send />{sending ? "Sending..." : `Send to ${selected.length} ${selected.length === 1 ? "person" : "people"}`}
+          </button>
+        )}
+
+        <div className="share-shortcuts share-shortcuts-all" aria-label="Sharing options">
+          <button type="button" onClick={addToStory}>
+            <span className="share-shortcut-icon"><CirclePlusFallback /></span><b>Add to story</b>
+          </button>
+          <button type="button" onClick={() => openWhatsApp(false)}>
+            <span className="share-shortcut-icon whatsapp"><MessageCircle /></span><b>WhatsApp</b>
+          </button>
+          <button type="button" onClick={() => openWhatsApp(true)}>
+            <span className="share-shortcut-icon whatsapp"><CirclePlusFallback /></span><b>WhatsApp Status</b>
+          </button>
+          <button type="button" onClick={shareExternally}>
+            <span className="share-shortcut-icon"><Upload /></span><b>Share to…</b>
+          </button>
+          <button type="button" onClick={copyPostLink}>
+            <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
+          </button>
+          {[
+            { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
+            { name: "WhatsApp", mark: "◉", bg: "#25D366" },
+            { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
+            { name: "Facebook", mark: "f", bg: "#1877F2" },
+            { name: "Telegram", mark: "➤", bg: "#229ED9" }
+          ].map(app => (
+            <button className="share-social-app-button" key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}>
+              <span className="share-shortcut-icon share-social-app-icon" style={{ background: app.bg }}>{app.mark}</span><b>{app.name}</b>
+            </button>
+          ))}
+        </div>
+        {notice && <div className="share-notice" role="status">{notice}</div>}
+      </div>
+    </div>
+  );
+}
+
+function MessageCircleOffFallback() { return <span aria-hidden="true" style={{ width: 19, display: "inline-flex", justifyContent: "center" }}>◉̸</span>; }
+
+function CirclePlusFallback() {
+  return <span className="share-circle-plus">＋</span>;
+}
+
+function TagPeoplePicker({ selected = [], setSelected, onClose }) {
+  const [query, setQuery] = useState("");
+  const [people, setPeople] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadPeople(search = "") {
+    setLoading(true);
+    setError("");
+    try {
+      let users = [];
+      if (search.trim()) {
+        const d = await api(`/users/search?q=${encodeURIComponent(search.trim())}`);
+        users = d.users || d.results || [];
+      } else {
+        try {
+          const current = getUser();
+          if (current?._id) {
+            const d = await api(`/follows/${current._id}/following`);
+            users = d.following || d.users || [];
+          }
+        } catch {}
+        if (!users.length) {
+          const d = await api(`/users/search?q=${encodeURIComponent("a")}`);
+          users = d.users || d.results || [];
+        }
+      }
+
+      const currentId = String(getUser()?._id || "");
+      const unique = [];
+      const seen = new Set();
+      for (const item of users) {
+        const person = item?.user || item;
+        if (!person?._id) continue;
+        const id = String(person._id);
+        if (id === currentId || seen.has(id)) continue;
+        seen.add(id);
+        unique.push(person);
+      }
+      setPeople(unique);
+    } catch (e) {
+      console.error(e);
+      setPeople([]);
+      setError(e.message || "Unable to load people");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => loadPeople(query), query.trim() ? 250 : 0);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  function togglePerson(person) {
+    const id = String(person._id);
+    const exists = selected.some(p => String(p._id) === id);
+    if (exists) {
+      setSelected(selected.filter(p => String(p._id) !== id));
+      return;
+    }
+    if (selected.length >= 20) {
+      alert("You can tag up to 20 people.");
+      return;
+    }
+    setSelected([...selected, person]);
+  }
+
+  return (
+    <div className="tag-people-panel">
+      <div className="tag-people-head">
+        <div>
+          <b>Tag people</b>
+          <span>{selected.length ? `${selected.length} selected` : "Choose people to tag"}</span>
+        </div>
+        <button type="button" className="icon-button" onClick={onClose} aria-label="Close tag people">
+          <X />
+        </button>
+      </div>
+
+      {selected.length > 0 && (
+        <div className="tag-selected-list">
+          {selected.map(person => (
+            <button
+              key={person._id}
+              type="button"
+              className="tag-selected-chip"
+              onClick={() => togglePerson(person)}
+              title={`Remove @${person.username}`}
+            >
+              <Avatar user={person} size={30} />
+              <span>@{person.username}</span>
+              <X />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="tag-people-search">
+        <Search />
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search people by name or username"
+          autoFocus
+        />
+        {query && <button type="button" onClick={() => setQuery("")}><X /></button>}
+      </div>
+
+      <div className="tag-people-results">
+        {loading ? (
+          <div className="tag-people-state">Searching people...</div>
+        ) : error ? (
+          <div className="tag-people-state">{error}</div>
+        ) : people.length ? (
+          people.map(person => {
+            const active = selected.some(p => String(p._id) === String(person._id));
+            return (
+              <button
+                key={person._id}
+                type="button"
+                className={`tag-person-row ${active ? "selected" : ""}`}
+                onClick={() => togglePerson(person)}
+              >
+                <Avatar user={person} size={46} />
+                <span className="tag-person-info">
+                  <b>{person.username ? `@${person.username}` : person.name || "ReelsGo user"}</b>
+                  <small>{person.name || "ReelsGo user"}</small>
+                </span>
+                <span className={`tag-person-check ${active ? "active" : ""}`}>
+                  {active ? <Check /> : null}
+                </span>
+              </button>
+            );
+          })
+        ) : (
+          <div className="tag-people-state">
+            <Users />
+            <b>No people found</b>
+            <span>Search for a ReelsGo user to tag.</span>
+          </div>
+        )}
+      </div>
+
+      <button type="button" className="primary full" onClick={onClose}>
+        <Check /> Done
+      </button>
+    </div>
+  );
+}
+
+function PostComposer({ user, onClose, onDone }) {
+  const input = useRef(null);
+  const [files, setFiles] = useState([]);
+  const [caption, setCaption] = useState("");
+  const [location, setLocation] = useState("");
+  const [hashtags, setHashtags] = useState("");
+  const [audience, setAudience] = useState("everyone");
+  const [taggedPeople, setTaggedPeople] = useState([]);
+  const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeTool, setActiveTool] = useState("");
+  async function publish() {
+    if (!files.length && !caption.trim()) {
+      alert("Add a photo/video or caption");
+      return;
+    }
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      files.forEach(file => fd.append("media", file));
+      fd.append("caption", caption);
+      fd.append("location", location);
+      fd.append("hashtags", hashtags);
+      fd.append("audience", audience);
+      fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
+      await api("/posts", { method: "POST", body: fd });
+      onDone();
+      alert("Post shared");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function chooseFiles(event) {
+    const selected = Array.from(event.target.files || []);
+    setFiles(selected);
+    event.target.value = "";
+  }
+
+  function removeFile(index) {
+    setFiles(current => current.filter((_, i) => i !== index));
+  }
+
+  function openPoll() {
+    setActiveTool(current => current === "poll" ? "" : "poll");
+    setCaption(current => current || "Poll: ");
+  }
+
+  function openPrompt() {
+    setActiveTool(current => current === "prompt" ? "" : "prompt");
+    setCaption(current => current || "Prompt: ");
+  }
+
+  return (
+    <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New post">
+      <div className="publish-page">
+        <header className="publish-page-header">
+          <button type="button" className="publish-back-button" onClick={onClose} aria-label="Go back">
+            <ChevronRight style={{ transform: "rotate(180deg)" }} />
+          </button>
+          <h1>New post</h1>
+          <div className="publish-header-spacer" />
+        </header>
+
+        <div className="publish-scroll-area">
+          <section className="publish-media-section">
+            {files.length ? (
+              <div className={`publish-media-preview ${files.length > 1 ? "multiple" : ""}`}>
+                {files.map((file, index) => {
+                  const url = URL.createObjectURL(file);
+                  const isVideo = file.type.startsWith("video/");
+                  return (
+                    <div className="publish-media-item" key={`${file.name}-${file.lastModified}-${index}`}>
+                      {isVideo ? (
+                        <video src={url} muted playsInline controls preload="metadata" />
+                      ) : (
+                        <img src={url} alt={file.name} />
+                      )}
+                      <button type="button" className="publish-media-remove" onClick={() => removeFile(index)} aria-label={`Remove ${file.name}`}>
+                        <X />
+                      </button>
+                      {files.length > 1 && <span className="publish-media-count">{index + 1}/{files.length}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <button type="button" className="publish-empty-media" onClick={() => input.current?.click()}>
+                <ImageIcon />
+                <b>Add photos or videos</b>
+                <span>Choose media from your device</span>
+              </button>
+            )}
+          </section>
+
+          <section className="publish-caption-section">
+            <div className="publish-user-row">
+              <Avatar user={user} size={42} />
+              <div>
+                <b>{user?.username || user?.name || "You"}</b>
+                <span>New post</span>
+              </div>
+            </div>
+            <textarea
+              className="publish-caption"
+              placeholder="Add a caption..."
+              value={caption}
+              onChange={e => setCaption(e.target.value)}
+              maxLength={2200}
+            />
+            <div className="publish-caption-meta">
+              <span>{hashtags ? "Hashtags added" : ""}</span>
+              <span>{caption.length}/2,200</span>
+            </div>
+          </section>
+
+          <section className="publish-pills">
+            <button type="button" className={activeTool === "poll" ? "active" : ""} onClick={openPoll}>
+              <SlidersHorizontal />
+              <span>Poll</span>
+            </button>
+            <button type="button" className={activeTool === "prompt" ? "active" : ""} onClick={openPrompt}>
+              <MessageSquareText />
+              <span>Prompt</span>
+            </button>
+          </section>
+
+          <section className="publish-options-card">
+            <button
+              type="button"
+              className={`publish-option-row ${taggedPeople.length ? "selected" : ""}`}
+              onClick={() => setTagPeopleOpen(true)}
+            >
+              <span className="publish-option-icon"><UserPlus /></span>
+              <span className="publish-option-copy">
+                <b>Tag people</b>
+                <small>{taggedPeople.length ? `${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"} tagged` : "Tag people in this post"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className={`publish-option-row ${location.trim() ? "selected" : ""}`}
+              onClick={() => setActiveTool(activeTool === "location" ? "" : "location")}
+            >
+              <span className="publish-option-icon"><PinOff /></span>
+              <span className="publish-option-copy">
+                <b>Add location</b>
+                <small>{location.trim() || "Add where this post was taken"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            {activeTool === "location" && (
+              <div className="publish-inline-field">
+                <PinOff />
+                <input value={location} onChange={e => setLocation(e.target.value)} placeholder="Search or enter a location" autoFocus />
+                {location && (
+                  <button type="button" onClick={() => setLocation("")} aria-label="Clear location">
+                    <X />
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="publish-option-divider" />
+
+            <button type="button" className="publish-option-row" onClick={() => input.current?.click()}>
+              <span className="publish-option-icon"><ImageIcon /></span>
+              <span className="publish-option-copy">
+                <b>Add more media</b>
+                <small>{files.length ? `${files.length} selected` : "Choose photos or videos"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+          </section>
+
+          <section className="publish-audience-section">
+            <label htmlFor="post-audience">Who can see this post?</label>
+            <select id="post-audience" value={audience} onChange={e => setAudience(e.target.value)}>
+              <option value="everyone">Everyone</option>
+              <option value="followers">Followers</option>
+              <option value="close_friends">Close friends</option>
+              <option value="only_me">Only me</option>
+            </select>
+            <small>Close friends visibility must also be enforced by your backend.</small>
+          </section>
+
+          <section className="publish-hashtags-section">
+            <label htmlFor="publish-hashtags">Hashtags</label>
+            <input id="publish-hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} placeholder="#reelsgo #photo #life" />
+          </section>
+
+          <input ref={input} type="file" multiple accept="image/*,video/*" hidden onChange={chooseFiles} />
+        </div>
+
+        <div className="publish-bottom-bar">
+          <button type="button" className="publish-share-button" disabled={loading || (!files.length && !caption.trim())} onClick={publish}>
+            {loading ? "Sharing..." : "Share"}
+          </button>
+        </div>
+
+        {tagPeopleOpen && (
+          <div className="publish-tag-overlay">
+            <div className="publish-tag-card">
+              <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StoryComposer({ onClose, onDone, autoPick = false }) {
+  const input = useRef(null);
+  const currentUser = getUser();
+  const [file, setFile] = useState(null);
+  const [text, setText] = useState("");
+  const [audience, setAudience] = useState("everyone");
+  const [loading, setLoading] = useState(false);
+  const [activeTool, setActiveTool] = useState("");
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [commentsOff, setCommentsOff] = useState(false);
+
+  useEffect(() => {
+    if (autoPick) {
+      const timer = window.setTimeout(() => input.current?.click(), 180);
+      return () => window.clearTimeout(timer);
+    }
+  }, [autoPick]);
+
+  function downloadSelectedMedia() {
+    if (!file) { alert("Choose a photo or video first."); return; }
+    const url = URL.createObjectURL(file);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = file.name || "reelsgo-story";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setMoreMenuOpen(false);
+  }
+
+  async function publish() {
+    if (!file && !text.trim()) {
+      alert("Add a photo/video or text");
+      return;
+    }
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      if (file) fd.append("media", file);
+      fd.append("text", text);
+      fd.append("audience", audience);
+      fd.append("commentsDisabled", String(commentsOff));
+      await api("/stories", { method: "POST", body: fd });
+      onDone();
+      alert("Story shared");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function chooseFile(event) {
+    setFile(event.target.files?.[0] || null);
+    event.target.value = "";
+  }
+
+  return (
+    <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New story">
+      <div className="publish-page story-publish-page">
+        <header className="publish-page-header">
+          <button type="button" className="publish-back-button" onClick={onClose} aria-label="Go back">
+            <ChevronRight style={{ transform: "rotate(180deg)" }} />
+          </button>
+          <h1>New story</h1>
+          <div className="publish-header-spacer" />
+        </header>
+
+        <button type="button" className="story-editor-more" aria-label="More story options" onClick={() => setMoreMenuOpen(v => !v)}><MoreHorizontal /></button>
+        {moreMenuOpen && <div className="story-editor-more-menu" role="menu">
+          <button type="button" role="menuitem" onClick={downloadSelectedMedia}><Download size={19}/> Download</button>
+          <button type="button" role="menuitem" onClick={() => { setCommentsOff(v => !v); setMoreMenuOpen(false); }}><MessageCircleOffFallback /> {commentsOff ? "Turn on commenting" : "Turn off commenting"}</button>
+        </div>}
+        <div className="story-editor-toolbar" aria-label="Story editing tools">
+          {[["Text", "Aa", "text"], ["Stickers", "☻", "stickers"], ["Audio", "♫", "audio"], ["Partnerships & ads", "♙", "partnerships"], ["Sound", "◖", "sound"], ["Effects", "✧", "effects"], ["Mention", "@", "mention"], ["Draw", "〰", "draw"], ["Label AI", "✧", "label-ai"]].map(([label, mark, key]) => <button type="button" key={key} onClick={() => { setActiveTool(key); if (key === "text") document.querySelector(".story-publish-caption")?.focus(); else if (key === "audio") alert("Audio selection depends on available audio assets."); else if (key === "stickers") setText(v => v + (v ? " " : "") + "😊"); }}><span>{mark}</span><b>{label}</b></button>)}
+          <button type="button" onClick={() => setMoreMenuOpen(v => !v)}><span>•••</span><b>More</b></button>
+        </div>
+        <div className="publish-scroll-area">
+          <section className="publish-media-section">
+            {file ? (
+              <div className="publish-media-preview story-publish-preview">
+                <div className="publish-media-item story-publish-media-item">
+                  {file.type.startsWith("video/") ? (
+                    <video src={URL.createObjectURL(file)} muted playsInline controls preload="metadata" />
+                  ) : (
+                    <img src={URL.createObjectURL(file)} alt={file.name} />
+                  )}
+                  <button type="button" className="publish-media-remove" onClick={() => setFile(null)} aria-label="Remove story media">
+                    <X />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" className="publish-empty-media story-empty-media" onClick={() => input.current?.click()}>
+                <Camera />
+                <b>Add to your story</b>
+                <span>Photo, video or text</span>
+              </button>
+            )}
+          </section>
+
+          <section className="publish-caption-section">
+            <div className="publish-user-row">
+              <Avatar user={currentUser} size={42} />
+              <div>
+                <b>{currentUser?.username || currentUser?.name || "You"}</b>
+                <span>New story</span>
+              </div>
+            </div>
+            <textarea
+              className="publish-caption story-publish-caption"
+              placeholder="Add text to your story..."
+              value={text}
+              onChange={e => setText(e.target.value)}
+              maxLength={1000}
+            />
+            <div className="publish-caption-meta">
+              <span>Share a photo, video or text</span>
+              <span>{text.length}/1,000</span>
+            </div>
+          </section>
+
+          <section className="publish-pills">
+            <button
+              type="button"
+              className={activeTool === "text" ? "active" : ""}
+              onClick={() => {
+                setActiveTool(activeTool === "text" ? "" : "text");
+                setTimeout(() => document.querySelector(".story-publish-caption")?.focus(), 0);
+              }}
+            >
+              <MessageSquareText />
+              <span>Add text</span>
+            </button>
+            <button
+              type="button"
+              className={activeTool === "gallery" ? "active" : ""}
+              onClick={() => {
+                setActiveTool("gallery");
+                input.current?.click();
+              }}
+            >
+              <Camera />
+              <span>Gallery</span>
+            </button>
+          </section>
+
+          <section className="publish-options-card">
+            <button type="button" className="publish-option-row" onClick={() => input.current?.click()}>
+              <span className="publish-option-icon"><ImageIcon /></span>
+              <span className="publish-option-copy">
+                <b>Choose from gallery</b>
+                <small>{file ? file.name : "Select a photo or video"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+
+            <div className="publish-option-divider" />
+
+            <button
+              type="button"
+              className={`publish-option-row ${text.trim() ? "selected" : ""}`}
+              onClick={() => {
+                setActiveTool("text");
+                setTimeout(() => document.querySelector(".story-publish-caption")?.focus(), 0);
+              }}
+            >
+              <span className="publish-option-icon"><MessageSquareText /></span>
+              <span className="publish-option-copy">
+                <b>Add text</b>
+                <small>{text.trim() || "Write something on your story"}</small>
+              </span>
+              <ChevronRight />
+            </button>
+          </section>
+
+          <section className="publish-audience-section">
+            <label htmlFor="story-audience">Who can see this story?</label>
+            <select id="story-audience" value={audience} onChange={e => setAudience(e.target.value)}>
+              <option value="everyone">Everyone</option>
+              <option value="followers">Followers</option>
+              <option value="close_friends">Close friends</option>
+            </select>
+            <small>Close friends visibility must also be enforced by your backend.</small>
+          </section>
+          <input ref={input} type="file" accept="image/*,video/*" hidden onChange={chooseFile} />
+        </div>
+
+        <div className="publish-bottom-bar">
+          <button type="button" className="publish-share-button" disabled={loading || (!file && !text.trim())} onClick={publish}>
+            {loading ? "Sharing..." : "Share to story"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReelComposer({ onClose, onDone }) {
+  const input = useRef(null);
+  const [file, setFile] = useState(null);
+  const [caption, setCaption] = useState("");
+  const [hashtags, setHashtags] = useState("");
+  const [audience, setAudience] = useState("everyone");
+  const [taggedPeople, setTaggedPeople] = useState([]);
+  const [tagPeopleOpen, setTagPeopleOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function publish() {
+    if (!file) return alert("Select a Reel video");
+    if (file.size > 15 * 1024 * 1024) return alert("Video must be below 15 MB for MongoDB BSON storage");
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("video", file); fd.append("caption", caption); fd.append("hashtags", hashtags);
+      fd.append("audience", audience);
+      fd.append("mentions", JSON.stringify(taggedPeople.map(person => person._id)));
+      await api("/reels", { method: "POST", body: fd });
+      onDone(); alert("Reel published");
+    } catch (e) { alert(e.message); } finally { setLoading(false); }
+  }
+
+  return <Modal title="Create Reel" onClose={onClose}>
+    <div className="reel-editor">
+      <Film />
+      <h3>New Reel</h3>
+      <p>Upload a vertical video. Maximum 15 MB with the current MongoDB media model.</p>
+      {file && <div className="selected-file"><Check /> {file.name}</div>}
+    </div>
+    <input ref={input} type="file" accept="video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
+    <button className="secondary full" onClick={() => input.current?.click()}><Upload /> Choose video</button>
+    <input className="normal-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} />
+    <input className="normal-input" placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+    <label className="publish-audience-label" htmlFor="reel-audience">Who can see this Reel?</label>
+    <select id="reel-audience" className="normal-input" value={audience} onChange={e => setAudience(e.target.value)}>
+      <option value="everyone">Everyone</option>
+      <option value="followers">Followers</option>
+      <option value="close_friends">Close friends</option>
+    </select>
+    <small className="publish-audience-hint">Close friends visibility must also be enforced by your backend.</small>
+    <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
+      <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
+    </button>
+    {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
+    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Publishing..." : "Publish Reel"}</button>
+  </Modal>;
+}
+
+function InstagramMediaOptionsSheet({
+  open,
+  onClose,
+  mediaType = "post",
+  onDelete,
+  deleting = false
+}) {
+  if (!open) return null;
+
+  const isReel = mediaType === "reel";
+
+  return (
+    <div
+      className="ig-options-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${isReel ? "Reel" : "Post"} options`}
+      onMouseDown={e => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="ig-options-sheet ig-delete-only-sheet" onMouseDown={e => e.stopPropagation()}>
+        <div className="ig-options-handle" />
+
+        <button
+          type="button"
+          className="ig-option-row ig-option-delete"
+          disabled={deleting}
+          onClick={onDelete}
+        >
+          <Trash2 size={27} strokeWidth={1.9} />
+          <span>
+            {deleting
+              ? `Deleting ${isReel ? "Reel" : "post"}...`
+              : `Delete ${isReel ? "Reel" : "post"}`}
+          </span>
+        </button>
+
+        <button type="button" className="ig-options-cancel" onClick={onClose}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ProfileReelCard({ reel, user, onDeleted }) {
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const isOwner = String(reel.author?._id || reel.author) === String(user?._id);
+
+  async function deleteReel() {
+    if (!isOwner || deleting) return;
+    const confirmed = window.confirm("Delete this Reel? This action cannot be undone.");
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      await api(`/reels/${reel._id}`, { method: "DELETE" });
+      setOptionsOpen(false);
+      onDeleted?.(reel._id);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="profile-reel-card">
+        <video
+          src={`${SERVER}${reel.mediaUrl}`}
+          muted
+          playsInline
+          controls
+          preload="metadata"
+          onClick={e => e.stopPropagation()}
+        />
+        <div className="profile-reel-overlay">
+          <div className="profile-reel-caption">
+            <Film size={16} />
+            <span>{reel.caption || "Reel"}</span>
+          </div>
+          {isOwner && (
+            <button
+              type="button"
+              className="profile-media-more"
+              aria-label="Reel options"
+              title="Reel options"
+              onClick={e => {
+                e.stopPropagation();
+                setOptionsOpen(true);
+              }}
+            >
+              <MoreHorizontal size={21} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isOwner && (
+        <InstagramMediaOptionsSheet
+          open={optionsOpen}
+          onClose={() => setOptionsOpen(false)}
+          mediaType="reel"
+          onDelete={deleteReel}
+          deleting={deleting}
+        />
+      )}
+    </>
+  );
+}
+
+
+function ConnectionsModal({ user, type, onClose }) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadConnections() {
+      try {
+        setLoading(true);
+        setError("");
+        const endpoint = type === "followers"
+          ? `/follows/${user?._id}/followers`
+          : `/follows/${user?._id}/following`;
+        const data = await api(endpoint);
+        const raw = type === "followers"
+          ? (data.followers || data.users || [])
+          : (data.following || data.users || data.followers || []);
+        const normalized = raw
+          .map(item => item?.user || item?.follower || item?.following || item)
+          .filter(person => person?._id)
+          .filter((person, index, arr) => arr.findIndex(x => String(x._id) === String(person._id)) === index);
+        if (!cancelled) setItems(normalized);
+      } catch (e) {
+        if (!cancelled) setError(e.message || "Unable to load list");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadConnections();
+    return () => { cancelled = true; };
+  }, [type]);
+
+  const title = type === "followers" ? "Followers" : "Following";
+
+  return (
+    <div className="connections-overlay" onClick={onClose}>
+      <div className="connections-modal" onClick={e => e.stopPropagation()}>
+        <div className="connections-header">
+          <div>
+            <h2>{title}</h2>
+            <span>{user?.username ? `@${user.username}` : "ReelsGo"}</span>
+          </div>
+          <button type="button" onClick={onClose} aria-label={`Close ${title}`}><X /></button>
+        </div>
+        <div className="connections-body">
+          {loading ? (
+            <div className="connections-state">
+              <div className="connections-spinner" />
+              <span>Loading {title.toLowerCase()}...</span>
+            </div>
+          ) : error ? (
+            <div className="connections-state connections-error">
+              <AlertTriangle />
+              <b>Unable to load {title.toLowerCase()}</b>
+              <span>{error}</span>
+            </div>
+          ) : !items.length ? (
+            <div className="connections-state">
+              <Users />
+              <b>No {title.toLowerCase()} yet</b>
+              <span>{type === "followers" ? "People who follow you will appear here." : "People you follow will appear here."}</span>
+            </div>
+          ) : (
+            <div className="connections-list">
+              {items.map(person => (
+                <div className="connection-row" key={person._id}>
+                  <Avatar user={person} size={52} />
+                  <div className="connection-info">
+                    <UserLink user={person} />
+                    {person?.name && <span>{person.name}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileQRCodeModal({ user, onClose }) {
+  const palettes = [
+    { name: "AURORA", qr: "6D35D4", bg: "radial-gradient(ellipse at 15% 10%,#ff7eb3 0%,transparent 34%),radial-gradient(ellipse at 85% 18%,#7c5cff 0%,transparent 35%),linear-gradient(145deg,#20104d 0%,#4330a8 48%,#0b8fbd 100%)", accent: "#6d35d4" },
+    { name: "SUNSET", qr: "E34274", bg: "radial-gradient(ellipse at 20% 10%,#ffcf70 0%,transparent 36%),linear-gradient(145deg,#ff6b6b 0%,#c73876 48%,#5b2c83 100%)", accent: "#e34274" },
+    { name: "OCEAN", qr: "087EAA", bg: "radial-gradient(ellipse at 15% 15%,#62f4d2 0%,transparent 34%),linear-gradient(145deg,#052f5f 0%,#087eaa 50%,#4438a8 100%)", accent: "#087eaa" },
+    { name: "CANDY", qr: "D629A8", bg: "radial-gradient(ellipse at 20% 10%,#fff0a6 0%,transparent 34%),linear-gradient(145deg,#ff7ad9 0%,#a63be4 52%,#4546c7 100%)", accent: "#d629a8" },
+    { name: "EMERALD", qr: "087F5B", bg: "radial-gradient(ellipse at 15% 10%,#a7f3d0 0%,transparent 35%),linear-gradient(145deg,#064e3b 0%,#0f9f85 52%,#164e9a 100%)", accent: "#087f5b" },
+    { name: "GOLD", qr: "A65D03", bg: "radial-gradient(ellipse at 15% 10%,#fff1a8 0%,transparent 36%),linear-gradient(145deg,#7c2d12 0%,#c47b18 48%,#7c2d72 100%)", accent: "#a65d03" },
+    { name: "BERRY", qr: "9D174D", bg: "radial-gradient(ellipse at 80% 12%,#f9a8d4 0%,transparent 35%),linear-gradient(145deg,#500724 0%,#9d174d 48%,#4c1d95 100%)", accent: "#9d174d" },
+    { name: "MIDNIGHT", qr: "3346B8", bg: "radial-gradient(ellipse at 20% 10%,#93c5fd 0%,transparent 35%),linear-gradient(145deg,#101b42 0%,#3346b8 55%,#5b21b6 100%)", accent: "#3346b8" }
+  ];
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [colorIndex, setColorIndex] = useState(() => Math.floor(Math.random() * 8));
+  const [cameraError, setCameraError] = useState("");
+  const [manualLink, setManualLink] = useState("");
+  const [scanBusy, setScanBusy] = useState(false);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanTimerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const palette = palettes[colorIndex];
+  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || user?.username || "")}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=700x700&margin=20&ecc=H&color=${palette.qr}&bgcolor=ffffff&data=${encodeURIComponent(profileUrl)}`;
+
+  function openScannedLink(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return;
+    let target;
+    try { target = new URL(raw, window.location.origin); }
+    catch { setCameraError("This QR code does not contain a valid web link."); return; }
+    if (!/^https?:$/.test(target.protocol)) {
+      setCameraError("This QR code is not a web link."); return;
+    }
+    // Keep links on this ReelsGo site in the current tab; external URLs open separately.
+    if (target.origin === window.location.origin) window.location.href = target.href;
+    else window.open(target.href, "_blank", "noopener,noreferrer");
+  }
+
+  function loadJsQR() {
+    if (typeof window.jsQR === "function") return Promise.resolve(window.jsQR);
+    if (window.__reelsGoJsQrPromise) return window.__reelsGoJsQrPromise;
+    window.__reelsGoJsQrPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+      script.async = true;
+      script.onload = () => typeof window.jsQR === "function" ? resolve(window.jsQR) : reject(new Error("QR decoder did not load"));
+      script.onerror = () => reject(new Error("QR decoder could not load. Check your internet connection."));
+      document.head.appendChild(script);
+    });
+    return window.__reelsGoJsQrPromise;
+  }
+
+  useEffect(() => {
+    if (!scannerOpen) return undefined;
+    let cancelled = false;
+    let detector = null;
+    let decoder = null;
+    let scanning = false;
+    async function startScanner() {
+      setCameraError("");
+      if (!window.isSecureContext && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        setCameraError("Camera scanning needs HTTPS. Open ReelsGo using its secure https:// address, or choose Scan image below.");
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError("This browser or webview does not provide camera access. Use Scan image or paste a profile link below.");
+        return;
+      }
+      try {
+        try { if ("BarcodeDetector" in window) detector = new window.BarcodeDetector({ formats: ["qr_code"] }); } catch { detector = null; }
+        try { decoder = await loadJsQR(); } catch (e) { if (!detector) setCameraError("The QR compatibility decoder could not load. Check internet access, or use a browser with built-in QR scanning / paste a link."); }
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+        if (cancelled) { stream.getTracks().forEach(track => track.stop()); return; }
+        streamRef.current = stream;
+        if (!videoRef.current) return;
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        const scan = async () => {
+          if (cancelled || scanning || !videoRef.current) return;
+          scanning = true;
+          try {
+            const video = videoRef.current;
+            if (video.readyState >= 2 && video.videoWidth > 0) {
+              if (detector) {
+                try {
+                  const codes = await detector.detect(video);
+                  if (codes?.length && codes[0]?.rawValue) { openScannedLink(codes[0].rawValue); return; }
+                } catch { detector = null; }
+              }
+              if (decoder) {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                  const maxSide = 900;
+                  const scale = Math.min(1, maxSide / Math.max(video.videoWidth, video.videoHeight));
+                  canvas.width = Math.max(1, Math.round(video.videoWidth * scale));
+                  canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
+                  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+                  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                  const code = decoder(pixels.data, pixels.width, pixels.height, { inversionAttempts: "attemptBoth" });
+                  if (code?.data) { openScannedLink(code.data); return; }
+                }
+              }
+            }
+          } catch { /* Keep scanning; individual frames can fail on some cameras. */ }
+          finally { scanning = false; }
+          if (!cancelled) scanTimerRef.current = window.setTimeout(scan, 220);
+        };
+        scan();
+      } catch (error) {
+        const name = error?.name;
+        setCameraError(name === "NotAllowedError" ? "Camera permission was denied. Allow camera access in your browser settings, or choose Scan image." : name === "NotFoundError" ? "No camera was found on this device. Choose Scan image to scan a saved QR picture." : name === "NotReadableError" ? "The camera is already being used by another app. Close it and try again." : "Could not start the camera. Check permissions and use HTTPS, or choose Scan image.");
+      }
+    }
+    startScanner();
+    return () => {
+      cancelled = true;
+      if (scanTimerRef.current) window.clearTimeout(scanTimerRef.current);
+      if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    };
+  }, [scannerOpen]);
+
+  async function scanImageFile(file) {
+    if (!file) return;
+    setScanBusy(true); setCameraError("");
+    try {
+      const decoder = await loadJsQR();
+      const image = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      image.onload = () => {
+        try {
+          const canvas = canvasRef.current || document.createElement("canvas");
+          const maxSide = 1800;
+          const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+          canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = decoder(pixels.data, pixels.width, pixels.height, { inversionAttempts: "attemptBoth" });
+          URL.revokeObjectURL(objectUrl);
+          setScanBusy(false);
+          if (code?.data) openScannedLink(code.data);
+          else setCameraError("No readable QR code was found in that image. Try a clearer, uncropped image.");
+        } catch {
+          URL.revokeObjectURL(objectUrl); setScanBusy(false); setCameraError("Could not read that image. Try another QR image.");
+        }
+      };
+      image.onerror = () => { URL.revokeObjectURL(objectUrl); setScanBusy(false); setCameraError("Could not open that image."); };
+      image.src = objectUrl;
+    } catch {
+      setScanBusy(false); setCameraError("QR image scanning needs the decoder library. Check your internet connection and try again.");
+    }
+  }
+
+  async function copyProfileLink() {
+    try { await navigator.clipboard.writeText(profileUrl); alert("Profile link copied."); }
+    catch { window.prompt("Copy your profile link:", profileUrl); }
+  }
+  async function downloadQr() {
+    try {
+      const response = await fetch(qrUrl);
+      if (!response.ok) throw new Error("QR image unavailable");
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = objectUrl; a.download = `${user?.username || "reelsgo-profile"}-qr.png`;
+      document.body.appendChild(a); a.click(); a.remove(); window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch { window.open(qrUrl, "_blank", "noopener,noreferrer"); }
+  }
+  async function shareProfile() {
+    try {
+      if (navigator.share) await navigator.share({ title: `${user?.username || "ReelsGo"}'s profile`, text: "Find me on ReelsGo", url: profileUrl });
+      else await copyProfileLink();
+    } catch (error) { if (error?.name !== "AbortError") copyProfileLink(); }
+  }
+
+  return (
+    <div className="rg-profile-qr-overlay" role="dialog" aria-modal="true" aria-label={scannerOpen ? "Scan profile QR code" : "Share profile QR code"} onMouseDown={e => { if (e.target === e.currentTarget) scannerOpen ? setScannerOpen(false) : onClose(); }}>
+      <section className="rg-profile-qr-screen" style={{ background: scannerOpen ? "linear-gradient(145deg,#10172b,#202c55)" : palette.bg, "--rg-qr-accent": palette.accent }}>
+        <header className="rg-profile-qr-topbar">
+          <button type="button" className="rg-qr-round-button" aria-label="Close" onClick={() => scannerOpen ? setScannerOpen(false) : onClose()}><X /></button>
+          {!scannerOpen ? <button type="button" className="rg-qr-colour-button" onClick={() => setColorIndex(i => (i + 1) % palettes.length)}><Palette size={14}/> {palette.name} · CHANGE</button> : <span className="rg-qr-scanner-label">LIVE SCANNER</span>}
+          <button type="button" className="rg-qr-round-button" aria-label="Open QR scanner" onClick={() => { setCameraError(""); setScannerOpen(true); }}><ScanLine /></button>
+        </header>
+        {scannerOpen ? (
+          <div className="rg-qr-scanner-content">
+            <h2>Scan a profile QR code</h2>
+            <p>Center any QR code in the frame. Compatible camera scanning uses native detection or the fallback decoder.</p>
+            <div className="rg-qr-camera-frame"><video ref={videoRef} muted playsInline autoPlay /><canvas ref={canvasRef} className="rg-qr-hidden-canvas" aria-hidden="true"/><span className="rg-qr-scan-corner top-left"/><span className="rg-qr-scan-corner top-right"/><span className="rg-qr-scan-corner bottom-left"/><span className="rg-qr-scan-corner bottom-right"/></div>
+            {cameraError && <p className="rg-qr-camera-error" role="status">{cameraError}</p>}
+            <div className="rg-qr-scanner-alternatives"><button type="button" onClick={() => fileInputRef.current?.click()} disabled={scanBusy}><ImageIcon size={17}/>{scanBusy ? "Reading image…" : "Scan image"}</button><input ref={fileInputRef} className="rg-qr-file-input" type="file" accept="image/*" onChange={e => { const file = e.target.files?.[0]; if (file) scanImageFile(file); e.target.value = ""; }}/></div>
+            <form className="rg-qr-manual-form" onSubmit={e => { e.preventDefault(); openScannedLink(manualLink); }}><input value={manualLink} onChange={e => setManualLink(e.target.value)} placeholder="Paste a profile link" aria-label="Profile link"/><button type="submit">Open link</button></form>
+            <small className="rg-qr-scanner-footnote">Camera scanning requires HTTPS and camera permission. Image scanning works with a saved QR screenshot.</small>
+          </div>
+        ) : (
+          <div className="rg-profile-qr-content">
+            <div className="rg-profile-qr-card" style={{ "--rg-qr-accent": palette.accent }}>
+              <div className="rg-profile-qr-image-wrap"><img src={qrUrl} alt={`QR code for ${user?.username || "your ReelsGo profile"}`} /><div className="rg-profile-qr-center-mark"><QrCode /></div></div>
+              <div className="rg-profile-qr-username">@{user?.username || "reelsgo"}</div>
+              <div className="rg-qr-card-caption">SCAN TO CONNECT · REELSGO</div>
+            </div>
+            <div className="rg-profile-qr-actions">
+              <button type="button" onClick={shareProfile}><Share2/><span>Share profile</span></button>
+              <button type="button" onClick={copyProfileLink}><LinkIcon/><span>Copy link</span></button>
+              <button type="button" onClick={downloadQr}><Download/><span>Download</span></button>
+            </div>
+            <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>PROFILE QR</span><p>Change the colours and share your profile anywhere.</p></div>
+            <div className="rg-qr-palette-dots" aria-label="Choose QR design">{palettes.map((p, i) => <button key={p.name} type="button" title={p.name} aria-label={`${p.name} colour theme`} className={i === colorIndex ? "active" : ""} style={{ background: p.accent }} onClick={() => setColorIndex(i)} />)}</div>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function ProfilePage({ user, setUser }) {
+  const token = getToken();
+  const [tab, setTab] = useState("posts");
+  const [posts, setPosts] = useState([]);
+  const [reels, setReels] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const input = useRef(null);
+  const [name, setName] = useState(user?.name || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [website, setWebsite] = useState(user?.website || "");
+  const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
+  const [connectionsOpen, setConnectionsOpen] = useState(null);
+  const [shareQrOpen, setShareQrOpen] = useState(false);
+  const [professionalPanel, setProfessionalPanel] = useState("");
+  const [professionalAnalytics, setProfessionalAnalytics] = useState(null);
+  const [professionalReplies, setProfessionalReplies] = useState([]);
+  const [professionalToolData, setProfessionalToolData] = useState({});
+  const [professionalLoading, setProfessionalLoading] = useState(false);
+  const [professionalActionMessage, setProfessionalActionMessage] = useState("");
+  const [savedReplyShortcut, setSavedReplyShortcut] = useState("");
+  const [savedReplyMessage, setSavedReplyMessage] = useState("");
+  const isProfessional = ["professional", "creator", "business"].includes(user?.accountType);
+
+  useEffect(() => {
+    if (!professionalPanel || !token) return;
+    let cancelled = false;
+    setProfessionalActionMessage("");
+    if (["Your dashboard", "Views", "New followers", "Content you shared", "Insights"].includes(professionalPanel)) {
+      setProfessionalLoading(true);
+      api("/professional/dashboard?days=30")
+        .then(data => { if (!cancelled) setProfessionalAnalytics(data); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Analytics could not be loaded."); })
+        .finally(() => { if (!cancelled) setProfessionalLoading(false); });
+    }
+    if (professionalPanel === "Saved replies") {
+      api("/professional/saved-replies").then(data => { if (!cancelled) setProfessionalReplies(data.replies || []); })
+        .catch(error => { if (!cancelled) setProfessionalActionMessage(error.message || "Saved replies could not be loaded."); });
+    }
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (toolSlug) api(`/professional/tools/${toolSlug}`).then(data => { if (!cancelled) setProfessionalToolData(data.data || {}); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [professionalPanel, token]);
+
+  async function switchToPersonalAccount() {
+    if (!window.confirm("Switch back to a personal account? Your posts, Reels, followers, and messages will stay unchanged.")) return;
+    const nextUser = { ...user, accountType: "personal" };
+    try { if (token) await api("/professional/account-type", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "personal" }) }); }
+    catch (error) { setProfessionalActionMessage(`Could not save account type on server: ${error.message}`); return; }
+    setUser(nextUser);
+    localStorage.setItem("vk_user", JSON.stringify(nextUser));
+    localStorage.setItem("vk_account_type", "personal");
+    setProfessionalPanel("");
+  }
+
+  async function saveProfessionalToolData(data) {
+    const toolSlug = ({"Monthly recap":"monthly-recap", "Best practices":"best-practices", "Inspiration":"inspiration", "Branded content":"branded-content", "Affiliate programmes":"affiliate-programmes", "Partnership ads":"partnership-ads", "Ad tools":"ad-tools", "Trial reels":"trial-reels", "Payouts":"payouts", "Gifts":"gifts", "Trending audio":"trending-audio", "Other helpful resources":"helpful-resources", "Account status":"account-status", "Dashboard settings":"dashboard-settings"})[professionalPanel];
+    if (!toolSlug) return;
+    try {
+      const result = await api(`/professional/tools/${toolSlug}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data }) });
+      setProfessionalToolData(result.data || data);
+      setProfessionalActionMessage("Saved successfully.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not save changes."); }
+  }
+
+  async function createProfessionalSavedReply(event) {
+    event.preventDefault();
+    try {
+      const result = await api("/professional/saved-replies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ shortcut: savedReplyShortcut, message: savedReplyMessage }) });
+      setProfessionalReplies(current => [result.reply, ...current]);
+      setSavedReplyShortcut(""); setSavedReplyMessage(""); setProfessionalActionMessage("Saved reply created.");
+    } catch (error) { setProfessionalActionMessage(error.message || "Could not create saved reply."); }
+  }
+
+  async function deleteProfessionalSavedReply(id) {
+    try { await api(`/professional/saved-replies/${id}`, { method: "DELETE" }); setProfessionalReplies(current => current.filter(reply => reply._id !== id)); setProfessionalActionMessage("Saved reply deleted."); }
+    catch (error) { setProfessionalActionMessage(error.message || "Could not delete saved reply."); }
+  }
+
+  async function load() {
+    try {
+      const [p, r] = await Promise.all([api("/posts"), api("/reels")]);
+      setPosts((p.posts || []).filter(x => x.author?._id === user?._id));
+      setReels((r.reels || []).filter(x => x.author?._id === user?._id));
+    } catch (e) { console.error(e); }
+  }
+
+  useEffect(() => { load(); }, [user?._id]);
+
+  async function avatarUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return alert("Select an image");
+    if (file.size > 10 * 1024 * 1024) return alert("Image must be below 10 MB");
+
+    const fd = new FormData();
+    fd.append("avatar", file);
+
+    try {
+      setSaving(true);
+      const d = await api("/users/me/avatar", { method: "POST", body: fd });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSaving(false);
+      e.target.value = "";
+    }
+  }
+
+  async function saveProfile() {
+    try {
+      setSaving(true);
+      const d = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, bio, website, isPrivate })
+      });
+
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      setEditOpen(false);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const visiblePosts = posts;
+
+  return (
+    <div className="page profile-page">
+      <div className="profile-header">
+        <div className="profile-avatar-wrap">
+          <Avatar user={user} size={96} className="profile-avatar" />
+          <button
+            className="avatar-camera"
+            onClick={() => input.current?.click()}
+            disabled={saving}
+          >
+            <Camera />
+          </button>
+          <input
+            ref={input}
+            hidden
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={avatarUpload}
+          />
+        </div>
+
+        <div className="profile-details">
+          <div className="profile-line">
+            <h1>{user?.username} <VerifiedBadge userId={user?._id} /></h1>
+            <button className="icon-button profile-more">
+              <MoreHorizontal />
+            </button>
+          </div>
+
+          <div className="profile-stats">
+            <span>
+              <b>{user?.postsCount || posts.length}</b>
+              <small>posts</small>
+            </span>
+
+            <button
+              type="button"
+              className="profile-stat-button"
+              onClick={() => setConnectionsOpen("followers")}
+              aria-label="View followers"
+            >
+              <b>{user?.followersCount || 0}</b>
+              <small>followers</small>
+            </button>
+
+            <button
+              type="button"
+              className="profile-stat-button"
+              onClick={() => setConnectionsOpen("following")}
+              aria-label="View following"
+            >
+              <b>{user?.followingCount || 0}</b>
+              <small>following</small>
+            </button>
+          </div>
+
+          <b>{user?.name}</b>
+          {isProfessional && user?.professionalProfile?.contact?.showCategory !== false && <div className="rg-pro-category-label">{user?.professionalProfile?.category || "Digital creator"}</div>}
+          <p>{user?.bio || ""}</p>
+          {isProfessional && user?.professionalProfile?.contact?.showContact && <div className="rg-pro-public-contact">{user?.professionalProfile?.contact?.email && <span><Mail size={13}/>{user.professionalProfile.contact.email}</span>}{user?.professionalProfile?.contact?.phone && <span><Smartphone size={13}/>{user.professionalProfile.contact.phone}</span>}{user?.professionalProfile?.contact?.address && <span><LinkIcon size={13}/>{user.professionalProfile.contact.address}</span>}</div>}
+
+          {user?.website && (
+            <a href={user.website} target="_blank" rel="noreferrer">
+              <LinkIcon /> {user.website}
+            </a>
+          )}
+        </div>
+      </div>
+
+
+      <div className="rg-profile-action-row" aria-label="Profile actions">
+        <button type="button" className="secondary rg-profile-action-button" onClick={() => setEditOpen(true)}>
+          <Edit3 /> Edit profile
+        </button>
+        <button type="button" className="secondary rg-profile-action-button rg-share-profile-trigger" onClick={() => setShareQrOpen(true)}>
+          <Share2 /> Share profile
+        </button>
+      </div>
+
+      {isProfessional && (
+        <section className="rg-pro-dashboard-entry" aria-label="Professional dashboard">
+          <button type="button" className="rg-pro-dashboard-entry-button" onClick={() => setProfessionalPanel("Your dashboard")}>
+            <span className="rg-pro-entry-copy"><b>Your dashboard</b><small>Insights, tools and resources</small></span>
+            <ChevronRight size={19} />
+          </button>
+          {professionalPanel && (
+            <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
+              <section className="rg-pro-detail-sheet rg-pro-dashboard-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
+                <div className="rg-pro-sheet-header">
+                  <button type="button" className="rg-pro-sheet-back" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")} aria-label={professionalPanel === "Your dashboard" ? "Back to profile" : "Back to dashboard"}><ArrowLeft size={22} /></button>
+                  <h2>{professionalPanel}</h2>
+                  {professionalPanel === "Your dashboard" ? <button type="button" className="rg-pro-sheet-settings" onClick={() => setProfessionalPanel("Dashboard settings")} aria-label="Dashboard settings"><Settings size={20}/></button> : <span className="rg-pro-sheet-right-spacer" />}
+                </div>
+                {professionalPanel === "Your dashboard" ? <>
+                  <div className="rg-pro-dashboard-scroll">
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Insights <small>Last 30 days</small></h3>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Views")}><span>Views</span><b>↗ {professionalAnalytics?.summary?.views ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("New followers")}><span>New followers</span><b>{professionalAnalytics?.summary?.netFollowers ?? 0}</b><ChevronRight size={17}/></button>
+                      <button type="button" className="rg-pro-dashboard-row" onClick={() => setProfessionalPanel("Content you shared")}><span>Content you shared</span><b>{professionalAnalytics?.summary?.contentShared ?? (posts.length + reels.length)}</b><ChevronRight size={17}/></button>
+                    </div>
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Your tools <button type="button" onClick={() => setProfessionalPanel("All tools")}>See all</button></h3>
+                      {[
+                        ["Monthly recap","See what you made happen last month.","◷",""], ["Best practices","Tips to help create, grow and thrive.","◇",""], ["Inspiration","Discover ideas for your next post.","♧",""], ["Branded content","Partnership labels and creator approvals.","♙",""], ["Affiliate programmes","Connect affiliate programmes.","♧",""], ["Partnership ads","Manage ad partners and permissions.","♧",""], ["Ad tools","Create and manage promotions.","↗",""], ["Trial reels","Try content with non-followers first.","▷",""], ["Payouts","Payout overview, transactions and tax forms.","▤",""], ["Gifts","Manage gifts and eligibility.","♧",""], ["Saved replies","Save replies to common questions.","➦",""], ["Account status","Review account restrictions and recommendation eligibility.","✓",""]
+                      ].map(([label,desc,ico,badge]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b>{label === "Monthly recap" || label === "Saved replies" ? <small>{desc}</small> : null}</span>{badge ? <em>{badge}</em> : null}<ChevronRight size={17}/></button>)}
+                    </div>
+                    <div className="rg-pro-dashboard-group">
+                      <h3>Tips and resources</h3>
+                      {[ ["Trending audio","↗"], ["Other helpful resources","↗"] ].map(([label,ico]) => <button type="button" key={label} className="rg-pro-dashboard-row rg-pro-dashboard-tool-row" onClick={() => setProfessionalPanel(label)}><span className="rg-pro-row-icon">{ico}</span><span className="rg-pro-row-text"><b>{label}</b></span><ChevronRight size={17}/></button>)}
+                    </div>
+                    <button type="button" className="rg-pro-switch-personal" onClick={switchToPersonalAccount}>Switch to personal account</button>
+                    <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
+                  </div>
+                </> : <>
+                  <ProfessionalPanelDetails
+                    panel={professionalPanel}
+                    analytics={professionalAnalytics}
+                    loading={professionalLoading}
+                    user={user}
+                    toolData={professionalToolData}
+                    setToolData={setProfessionalToolData}
+                    saveToolData={saveProfessionalToolData}
+                    replies={professionalReplies}
+                    createSavedReply={createProfessionalSavedReply}
+                    deleteSavedReply={deleteProfessionalSavedReply}
+                    savedReplyShortcut={savedReplyShortcut}
+                    setSavedReplyShortcut={setSavedReplyShortcut}
+                    savedReplyMessage={savedReplyMessage}
+                    setSavedReplyMessage={setSavedReplyMessage}
+                    actionMessage={professionalActionMessage}
+                  />
+                </>}
+                {professionalActionMessage && <p className="rg-pro-detail-note" role="status">{professionalActionMessage}</p>}
+                {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")}>Back to dashboard</button>}
+              </section>
+            </div>
+          )}
+        </section>
+      )}
+
+
+      <div className="profile-tabs">
+        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>
+          <Grid3X3 /> Posts
+        </button>
+        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}>
+          <Film /> Reels
+        </button>
+        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}>
+          <Users /> Tagged
+        </button>
+        <button className={tab === "saved" ? "active" : ""} onClick={() => setTab("saved")}>
+          <Bookmark /> Saved
+        </button>
+      </div>
+
+      {tab === "posts" && (
+        visiblePosts.length
+          ? (
+            <div className="profile-grid">
+              {visiblePosts.map(p => (
+                <GridMedia
+                  key={p._id}
+                  post={p}
+                  user={user}
+                  onDeleted={(id) =>
+                    setPosts(current =>
+                      current.filter(item => String(item._id) !== String(id))
+                    )
+                  }
+                />
+              ))}
+            </div>
+          )
+          : <EmptyTab icon={<CameraOff />} title="No posts yet" text="Share your first photo or video." />
+      )}
+
+      {tab === "reels" && (
+        reels.length
+          ? (
+            <div className="profile-grid reels-profile-grid">
+              {reels.map(r => (
+                <ProfileReelCard
+                  key={r._id}
+                  reel={r}
+                  user={user}
+                  onDeleted={(id) =>
+                    setReels(current =>
+                      current.filter(item => String(item._id) !== String(id))
+                    )
+                  }
+                />
+              ))}
+            </div>
+          )
+          : <EmptyTab icon={<Film />} title="No Reels yet" text="Your published Reels will appear here." />
+      )}
+
+      {tab === "tagged" && (
+        posts.filter(p =>
+          (p.mentions || []).some(
+            m => String(m?._id || m) === String(user?._id)
+          )
+        ).length
+          ? (
+            <div className="profile-grid">
+              {posts
+                .filter(p =>
+                  (p.mentions || []).some(
+                    m => String(m?._id || m) === String(user?._id)
+                  )
+                )
+                .map(p => (
+                  <GridMedia
+                    key={p._id}
+                    post={p}
+                    user={user}
+                    onDeleted={(id) =>
+                      setPosts(current =>
+                        current.filter(item => String(item._id) !== String(id))
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          )
+          : <EmptyTab icon={<Users />} title="Photos of you" text="Posts where you are tagged will appear here." />
+      )}
+
+      {tab === "saved" && <SavedPage embedded user={user} />}
+      {shareQrOpen && <ProfileQRCodeModal user={user} onClose={() => setShareQrOpen(false)} />}
+
+      {connectionsOpen && (
+        <ConnectionsModal
+          user={user}
+          type={connectionsOpen}
+          onClose={() => setConnectionsOpen(null)}
+        />
+      )}
+
+      {editOpen && (
+        <EditProfilePage
+          user={user}
+          name={name}
+          setName={setName}
+          bio={bio}
+          setBio={setBio}
+          website={website}
+          setWebsite={setWebsite}
+          isPrivate={isPrivate}
+          setIsPrivate={setIsPrivate}
+          saving={saving}
+          onClose={() => setEditOpen(false)}
+          onAvatarClick={() => input.current?.click()}
+          onSave={saveProfile}
+          accountType={user?.accountType || "personal"}
+          onSwitchPersonal={switchToPersonalAccount}
+          onSwitchProfessional={(details) => {
+            const nextUser = { ...user, isPrivate: false, accountType: "professional", professionalProfile: details };
+            const saveProfile = async () => {
+              try {
+                await api("/professional/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accountType: "professional", category: details.category, showCategory: details.contact?.showCategory !== false, contact: details.contact || {} }) });
+                setIsPrivate(false);
+                setUser(nextUser);
+                localStorage.setItem("vk_user", JSON.stringify(nextUser));
+                localStorage.setItem("vk_account_type", "professional");
+                localStorage.setItem("vk_professional_profile", JSON.stringify(details));
+              } catch (error) { alert(`Could not save professional account settings: ${error.message}`); }
+            };
+            return saveProfile();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+
+function ChartNoAxesColumnIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 27h24M7 27V17h6v10M14 27V6h6v21M21 27V12h5v15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
+function TrendingUpIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 25 13 16l5 5L28 8M19 8h9v9" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>; }
+function BanknoteIcon() { return <svg className="pro-ig-benefit-icon" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="1" fill="none" stroke="currentColor" strokeWidth="2.2"/><circle cx="16" cy="16" r="4" fill="none" stroke="currentColor" strokeWidth="2.2"/><path d="M6 11h3M23 21h3" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>; }
+
+function EditProfilePage({
+  user,
+  name,
+  setName,
+  bio,
+  setBio,
+  website,
+  setWebsite,
+  isPrivate,
+  setIsPrivate,
+  saving,
+  onClose,
+  onAvatarClick,
+  onSave,
+  onSwitchProfessional,
+  onSwitchPersonal,
+  accountType = "personal"
+}) {
+  const [pronouns, setPronouns] = useState(user?.pronouns || "");
+  const [professionalOpen, setProfessionalOpen] = useState(false);
+  const [professionalStep, setProfessionalStep] = useState(0);
+  const [professionalSearch, setProfessionalSearch] = useState("");
+  const savedPro = (() => { try { return JSON.parse(localStorage.getItem("vk_professional_profile") || "null") || {}; } catch { return {}; } })();
+  const [professionalType, setProfessionalType] = useState(savedPro.type || "Creator");
+  const [professionalCategory, setProfessionalCategory] = useState(savedPro.category || "Digital creator");
+  const [professionalGoals, setProfessionalGoals] = useState(savedPro.goals || ["Reach more people", "Understand my audience"]);
+  const [professionalContact, setProfessionalContact] = useState({ email: savedPro.contact?.email || "", phone: savedPro.contact?.phone || "", address: savedPro.contact?.address || "", showContact: !!savedPro.contact?.showContact, showCategory: savedPro.contact?.showCategory !== false, connectedPage: savedPro.connectedPage || "" });
+  const [professionalSaving, setProfessionalSaving] = useState(false);
+  const [gender, setGender] = useState(user?.gender || "Man");
+  const [aiCreator, setAiCreator] = useState(!!user?.aiCreator);
+
+  return (
+    <div className="edit-profile-overlay" role="dialog" aria-modal="true">
+      <div className="edit-profile-screen">
+        <header className="edit-profile-topbar">
+          <button
+            type="button"
+            className="edit-profile-back"
+            onClick={onClose}
+            aria-label="Back"
+          >
+            <ChevronRight />
+          </button>
+
+          <h1>Edit profile</h1>
+
+          <button
+            type="button"
+            className="edit-profile-done"
+            onClick={onSave}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Done"}
+          </button>
+        </header>
+
+        <main className="edit-profile-scroll">
+          <section className="edit-profile-photo-section">
+            <div className="edit-profile-photo-row">
+              <button
+                type="button"
+                className="edit-profile-photo-button"
+                onClick={onAvatarClick}
+                disabled={saving}
+                aria-label="Change profile picture"
+              >
+                <Avatar user={user} size={168} />
+              </button>
+
+            </div>
+
+            <button
+              type="button"
+              className="edit-profile-photo-link"
+              onClick={onAvatarClick}
+            >
+              Edit profile picture
+            </button>
+          </section>
+
+          <section className="edit-profile-fields">
+            <div className="edit-profile-field-row">
+              <label>Name</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Name"
+                  autoComplete="name"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row">
+              <label>Username</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={user?.username || ""}
+                  readOnly
+                  aria-label="Username"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row">
+              <label>Pronouns</label>
+              <div className="edit-profile-field-control">
+                <input
+                  value={pronouns}
+                  onChange={e => setPronouns(e.target.value)}
+                  placeholder="Pronouns"
+                />
+              </div>
+            </div>
+
+            <div className="edit-profile-field-row edit-profile-bio-row">
+              <label>Bio</label>
+              <div className="edit-profile-field-control edit-profile-bio-control">
+                <textarea
+                  value={bio}
+                  maxLength={150}
+                  onChange={e => setBio(e.target.value)}
+                  placeholder="Bio"
+                />
+                <span>{bio.length}/150</span>
+              </div>
+            </div>
+
+            <button type="button" className="edit-profile-action-row">
+              <span>Links</span>
+              <span className="edit-profile-action-value">
+                {website || "Add links"}
+                <ChevronRight />
+              </span>
+            </button>
+
+            <button type="button" className="edit-profile-action-row">
+              <span className="edit-profile-action-stack">
+                <b>Banners</b>
+                <small>Add music, profiles and more.</small>
+              </span>
+              <span className="edit-profile-action-value">
+                Add banners
+                <ChevronRight />
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="edit-profile-action-row"
+              onClick={() => {
+                const next = gender === "Man" ? "Woman" : gender === "Woman" ? "Prefer not to say" : "Man";
+                setGender(next);
+              }}
+            >
+              <span>Gender</span>
+              <span className="edit-profile-action-value">
+                {gender}
+                <ChevronRight />
+              </span>
+            </button>
+
+            <div className="edit-profile-ai-row">
+              <div>
+                <b>AI creator</b>
+                <span>
+                  Add this label if your profile features an AI-generated person.{" "}
+                  <a href="#ai-info" onClick={e => e.preventDefault()}>Learn more</a>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className={`edit-profile-toggle ${aiCreator ? "on" : ""}`}
+                aria-pressed={aiCreator}
+                onClick={() => setAiCreator(v => !v)}
+              >
+                <span />
+              </button>
+            </div>
+
+            {["professional", "creator", "business"].includes(accountType) ? (
+              <button type="button" className="edit-profile-professional" onClick={() => {
+                if (window.confirm("Switch back to a personal account? Your posts, Reels, followers, and messages will stay unchanged.")) {
+                  onSwitchPersonal?.();
+                  onClose?.();
+                }
+              }}><span>Switch to personal account</span><ChevronRight /></button>
+            ) : (
+              <button type="button" className="edit-profile-professional" onClick={() => { setProfessionalStep(0); setProfessionalOpen(true); }}>
+                <span>Switch to professional account</span><ChevronRight />
+              </button>
+            )}
+
+            <div className="edit-profile-privacy">
+              <div>
+                <b>Private account</b>
+                <span>Only people you approve can follow you and see your posts and stories.</span>
+              </div>
+
+              <button
+                type="button"
+                className={`edit-profile-toggle ${isPrivate ? "on" : ""}`}
+                aria-pressed={isPrivate}
+                onClick={() => setIsPrivate(v => !v)}
+              >
+                <span />
+              </button>
+            </div>
+            </section>
+          </main>
+
+          {professionalOpen && (
+          <div className="pro-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="pro-setup-title">
+            <section className="pro-setup-panel pro-ig-panel">
+              <header className={`pro-setup-header pro-ig-header ${professionalStep === 0 ? "intro" : ""}`}>
+                <button type="button" className="pro-setup-icon-button pro-ig-back" onClick={() => professionalStep === 0 ? setProfessionalOpen(false) : setProfessionalStep(s => Math.max(0, s - 1))} aria-label={professionalStep === 0 ? "Close setup" : "Go back"}>
+                  {professionalStep === 0 ? <X /> : <ArrowLeft />}
+                </button>
+                <h1>{professionalStep === 0 ? "Switch to professional" : professionalStep === 1 ? "" : ""}</h1>
+                <span className="pro-ig-header-spacer" />
+              </header>
+
+              {professionalStep === 0 && (
+                <>
+                  <main className="pro-ig-intro-scroll">
+                    <div className="pro-ig-avatar"><Avatar user={user} size={148} /></div>
+                    <h2 id="pro-setup-title">Get more tools and switch for free</h2>
+                    <div className="pro-ig-benefits">
+                      <article><ChartNoAxesColumnIcon /><div><b>Access insights</b><p>See what content is getting the most attention and the best times to post.</p></div></article>
+                      <article><TrendingUpIcon /><div><b>Run ads</b><p>Get your content in front of more people and bring them to your profile or website to drive brand awareness and sales.</p></div></article>
+                      <article><BanknoteIcon /><div><b>Get paid</b><p>Earn money when you become eligible for features such as bonuses and subscriptions.</p></div></article>
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer">
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => setProfessionalStep(1)}>Next</button>
+                  </footer>
+                </>
+              )}
+
+              {professionalStep === 1 && (
+                <>
+                  <main className="pro-ig-choice-scroll">
+                    <h2 id="pro-setup-title">What type of professional are you?</h2>
+                    <div className="pro-ig-type-list">
+                      {[{id:"Creator",desc:"Best for public figures, content producers, artists and influencers."},{id:"Business",desc:"Best for retailers, local businesses, brands, organisations and service providers."}].map(item => (
+                        <button key={item.id} type="button" className={`pro-ig-type ${professionalType === item.id ? "selected" : ""}`} onClick={() => { setProfessionalType(item.id); setProfessionalCategory(item.id === "Creator" ? "Digital creator" : "Product / service"); }}>
+                          <span><b>{item.id}</b><small>{item.desc}</small></span><i aria-hidden="true">{professionalType === item.id ? <span /> : null}</i>
+                        </button>
+                      ))}
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer"><button type="button" className="pro-setup-primary pro-ig-primary" onClick={() => setProfessionalStep(2)}>Next</button></footer>
+                </>
+              )}
+
+              {professionalStep === 2 && (
+                <>
+                  <main className="pro-ig-category-scroll">
+                    <h2 id="pro-setup-title">What best describes you?</h2>
+                    <p className="pro-ig-category-lede">Categories help people find profiles like yours. You can change this at any time.</p>
+                    <div className="pro-ig-display-row"><span>Display on profile</span><button type="button" role="switch" aria-checked={professionalContact.showCategory} className={`pro-ig-switch ${professionalContact.showCategory ? "on" : ""}`} onClick={() => setProfessionalContact(v => ({...v,showCategory:!v.showCategory}))}><i /></button></div>
+                    <label className="pro-ig-search"><Search /><input value={professionalSearch} onChange={e => setProfessionalSearch(e.target.value)} placeholder="Search categories" aria-label="Search categories" /></label>
+                    <h3>{professionalSearch.trim() ? "Categories" : "Suggested"}</h3>
+                    <div className="pro-ig-category-list">
+                      {((professionalType === "Creator" ? ["Actor","Artist","Athlete","Author","Blogger","Chef","Coach","Comedian","Community","Dancer","Digital creator","Education","Entrepreneur","Fashion model","Gamer","Journalist","Musician/band","Photographer","Podcaster","Public figure","Scientist","Video creator","Writer"] : ["Advertising/marketing","Automotive","Beauty, cosmetic & personal care","Clothing (brand)","Community","Education","Entrepreneur","Health/beauty","Hotel","Local service","Media/news company","Product/service","Real estate","Restaurant","Retail company","Shopping & retail","Software","Travel agency"]).filter(c => c.toLowerCase().includes(professionalSearch.trim().toLowerCase()))).map(category => (
+                        <button type="button" key={category} className="pro-ig-category-option" onClick={() => setProfessionalCategory(category)}><span>{category}</span><i className={professionalCategory === category ? "selected" : ""}>{professionalCategory === category ? <span /> : null}</i></button>
+                      ))}
+                      {((professionalType === "Creator" ? ["Actor","Artist","Athlete","Author","Blogger","Chef","Coach","Comedian","Community","Dancer","Digital creator","Education","Entrepreneur","Fashion model","Gamer","Journalist","Musician/band","Photographer","Podcaster","Public figure","Scientist","Video creator","Writer"] : ["Advertising/marketing","Automotive","Beauty, cosmetic & personal care","Clothing (brand)","Community","Education","Entrepreneur","Health/beauty","Hotel","Local service","Media/news company","Product/service","Real estate","Restaurant","Retail company","Shopping & retail","Software","Travel agency"]).filter(c => c.toLowerCase().includes(professionalSearch.trim().toLowerCase())).length === 0) ? <p className="pro-ig-no-results">No categories found.</p> : null}
+                    </div>
+                  </main>
+                  <footer className="pro-ig-footer pro-ig-category-footer">
+                    <button type="button" className="pro-setup-primary pro-ig-primary" onClick={async () => { setProfessionalSaving(true); const details = { type: professionalType, category: professionalCategory, goals: professionalGoals, contact: professionalContact, completedAt: new Date().toISOString() }; try { await onSwitchProfessional?.(details); setProfessionalOpen(false); } finally { setProfessionalSaving(false); } }} disabled={professionalSaving}>{professionalSaving ? "Switching..." : "Switch to professional profile"}</button>
+                    <p>Switching makes your profile public and all of your content can appear in search engines. <span>Learn how to manage</span></p>
+                  </footer>
+                </>
+              )}
+            </section>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GridMedia({ post, user, onDeleted }) {
+  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const m = post.media?.[0];
+
+  if (!m?.url) return null;
+
+  const isOwner =
+    String(post.author?._id || post.author) === String(user?._id);
+
+  async function deletePost() {
+    if (!isOwner || deleting) return;
+
+    const confirmed = window.confirm(
+      "Delete this post? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setMenuOpen(false);
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await api(`/posts/${post._id}`, {
+        method: "DELETE"
+      });
+
+      setMenuOpen(false);
+
+      if (onDeleted) {
+        onDeleted(post._id);
+      }
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <div
+        style={{
+          position: "relative",
+          aspectRatio: "1 / 1",
+          overflow: "hidden",
+          background: "#15181d"
+        }}
+      >
+        <button
+          className="grid-media grid-media-button"
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open media"
+          style={{
+            width: "100%",
+            height: "100%"
+          }}
+        >
+          {m.kind === "video" ? (
+            <video
+              src={`${SERVER}${m.url}`}
+              muted
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            <img
+              src={`${SERVER}${m.url}`}
+              alt={post.caption || ""}
+            />
+          )}
+
+          {m.kind === "video" && (
+            <span className="grid-video-icon">
+              <Play fill="currentColor" />
+            </span>
+          )}
+        </button>
+
+        {isOwner && (
+          <button
+            type="button"
+            className="profile-media-more grid-post-more"
+            aria-label="Post options"
+            title="Post options"
+            onClick={e => {
+              e.stopPropagation();
+              setMenuOpen(true);
+            }}
+          >
+            <MoreHorizontal size={20} />
+          </button>
+        )}
+
+        {isOwner && (
+          <InstagramMediaOptionsSheet
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            mediaType="post"
+            onDelete={deletePost}
+            deleting={deleting}
+          />
+        )}
+      </div>
+
+      {open && (
+        <MediaViewer
+          media={m}
+          post={post}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
+  );
+}
+
+function EmptyTab({ icon, title, text }) {
+  return <div className="empty tab-empty">{icon}<h2>{title}</h2><p>{text}</p></div>;
+}
+
+function ReelsPage({ onCreate }) {
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [feedEnded, setFeedEnded] = useState(false);
+  const [commentsReel, setCommentsReel] = useState(null);
+  const [shareReelTarget, setShareReelTarget] = useState(null);
+  const [reelComments, setReelComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentSending, setCommentSending] = useState(false);
+  const [commentsError, setCommentsError] = useState("");
+  const [commentMenuId, setCommentMenuId] = useState(null);
+  const [commentActionBusy, setCommentActionBusy] = useState(false);
+  const [soundEnabledById, setSoundEnabledById] = useState({});
+  const [likedById, setLikedById] = useState({});
+  const [savedById, setSavedById] = useState({});
+  const [likesTarget, setLikesTarget] = useState(null);
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [likesLoading, setLikesLoading] = useState(false);
+  const [likesError, setLikesError] = useState("");
+  const scrollRef = useRef(null);
+  const cardRefs = useRef([]);
+  const endCardRef = useRef(null);
+  const me = getUser();
+
+  async function load() {
+    try {
+      const d = await api("/reels");
+      setReels(d.reels || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
+
+  // Mark the active page so global floating Messages UI is hidden only on Reels.
+  useEffect(() => {
+    document.body.classList.add("reelsgo-reels-active");
+    return () => document.body.classList.remove("reelsgo-reels-active");
+  }, []);
+
+  // Hide the mobile navigation while the comments sheet is open, like Instagram.
+  useEffect(() => {
+    document.body.classList.toggle("reelsgo-comments-open", Boolean(commentsReel));
+    return () => document.body.classList.remove("reelsgo-comments-open");
+  }, [commentsReel]);
+
+  useEffect(() => {
+    if (!reels.length) return;
+    const root = scrollRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+
+      if (visible.target.dataset.feedEnd === "true") {
+        setFeedEnded(true);
+        return;
+      }
+
+      const index = Number(visible.target.dataset.index);
+      if (!Number.isNaN(index)) {
+        setFeedEnded(false);
+        setActiveIndex(index);
+      }
+    }, { root, threshold: [0.35, 0.6, 0.8] });
+
+    cardRefs.current.forEach(card => card && observer.observe(card));
+    if (endCardRef.current) observer.observe(endCardRef.current);
+    return () => observer.disconnect();
+  }, [reels]);
+
+  // Only the visible Reel plays; scrolling away pauses the previous video.
+  useEffect(() => {
+    const videos = scrollRef.current?.querySelectorAll("video") || [];
+    videos.forEach((video, index) => {
+      if (index === activeIndex && !feedEnded) {
+        const promise = video.play();
+        if (promise && typeof promise.catch === "function") promise.catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeIndex, feedEnded, reels]);
+
+  function goToReel(index) {
+    const next = Math.max(0, Math.min(index, reels.length - 1));
+    const card = cardRefs.current[next];
+
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", block: "start" });
+      setFeedEnded(false);
+      setActiveIndex(next);
+    }
+  }
+
+  function shareReel(reel) {
+    setOpenMenuId(null);
+    setShareReelTarget(reel);
+  }
+
+  async function downloadReel(reel) {
+    const rawUrl = reel?.mediaUrl || reel?.videoUrl || reel?.url;
+    if (!rawUrl) {
+      alert("This Reel's video is unavailable for download.");
+      return;
+    }
+
+    const mediaUrl = /^https?:\/\//i.test(rawUrl)
+      ? rawUrl
+      : `${SERVER}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+    const safeName = String(reel?.caption || reel?.author?.username || "reelsgo-reel")
+      .normalize("NFKD")
+      .replace(/[^a-zA-Z0-9-_ ]/g, "")
+      .trim()
+      .replace(/\s+/g, "-")
+      .slice(0, 70) || "reelsgo-reel";
+
+    try {
+      const response = await fetch(mediaUrl);
+      if (!response.ok) throw new Error("Download request failed");
+      const blob = await response.blob();
+      if (!blob.size) throw new Error("The video file is empty");
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = `${safeName}.mp4`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+    } catch (error) {
+      // A direct download link is a useful fallback for hosts that do not allow fetch().
+      const anchor = document.createElement("a");
+      anchor.href = mediaUrl;
+      anchor.download = `${safeName}.mp4`;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    }
+  }
+
+  async function deleteReel(reel) {
+    const isOwner =
+      String(reel.author?._id || reel.author) === String(me?._id);
+
+    if (!isOwner || deletingId) return;
+
+    const confirmed = window.confirm(
+      "Delete this Reel? This action cannot be undone."
+    );
+
+    if (!confirmed) {
+      setOpenMenuId(null);
+      return;
+    }
+
+    setDeletingId(reel._id);
+
+    try {
+      await api(`/reels/${reel._id}`, {
+        method: "DELETE"
+      });
+
+      setOpenMenuId(null);
+
+      setReels(current => {
+        const next = current.filter(
+          item => String(item._id) !== String(reel._id)
+        );
+
+        setActiveIndex(index =>
+          next.length ? Math.min(index, next.length - 1) : 0
+        );
+
+        return next;
+      });
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  async function openReelComments(reel) {
+    setCommentsReel(reel);
+    setCommentMenuId(null);
+    setReelComments([]);
+    setCommentsError("");
+    setCommentText("");
+    setCommentsLoading(true);
+    try {
+      const data = await api(`/reels/${reel._id}/comments`);
+      const loadedComments = Array.isArray(data.comments) ? data.comments : [];
+      setReelComments(loadedComments);
+      const actualCount = Number(data.commentsCount ?? loadedComments.length);
+      setCommentsReel(current => current ? { ...current, commentsCount: actualCount } : current);
+      setReels(current => current.map(item => String(item._id) === String(reel._id) ? { ...item, commentsCount: actualCount } : item));
+    } catch (error) {
+      setCommentsError(error?.message || "Could not load comments.");
+    } finally {
+      setCommentsLoading(false);
+    }
+  }
+
+  async function submitReelComment(event) {
+    event.preventDefault();
+    if (!commentsReel || !commentText.trim() || commentSending) return;
+    setCommentSending(true);
+    setCommentsError("");
+    try {
+      const data = await api(`/reels/${commentsReel._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: commentText.trim() })
+      });
+      if (data.comment) setReelComments(current => [...current, data.comment]);
+      setCommentText("");
+      setReels(current => current.map(item => String(item._id) === String(commentsReel._id)
+        ? { ...item, commentsCount: (Number(item.commentsCount) || 0) + 1 }
+        : item));
+    } catch (error) {
+      setCommentsError(error?.message || "Could not post comment.");
+    } finally {
+      setCommentSending(false);
+    }
+  }
+
+  async function runCommentAction(action, comment) {
+    if (!commentsReel || !comment || commentActionBusy) return;
+    const isReelOwner = String(commentsReel.author?._id || commentsReel.author) === String(me?._id);
+    const isCommentAuthor = String(comment.author?._id || comment.author) === String(me?._id);
+    const commentId = String(comment._id || "");
+    const targetUserId = String(comment.author?._id || comment.author || "");
+    setCommentMenuId(null);
+
+    try {
+      if (action === "share") {
+        const url = `${window.location.origin}/reels/${commentsReel._id}`;
+        if (navigator.share) {
+          try { await navigator.share({ title: "ReelsGo Reel", text: commentsReel.caption || "Watch this Reel", url }); }
+          catch (error) { if (error?.name !== "AbortError") throw error; }
+        } else if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(url);
+          alert("Reel link copied.");
+        } else {
+          window.prompt("Copy this Reel link:", url);
+        }
+        return;
+      }
+      if (action === "story") {
+        window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { reelId: commentsReel._id, url: `${window.location.origin}/reels/${commentsReel._id}` } }));
+        return;
+      }
+      if (action === "replyReel") {
+        setCommentText(`@${comment.author?.username || comment.author?.name || "user"} `);
+        setCommentsReel(null);
+        onCreate?.();
+        return;
+      }
+      if (action === "delete") {
+        if (!isReelOwner && !isCommentAuthor) throw new Error("Only the Reel owner or comment author can delete this comment.");
+        if (!window.confirm("Delete this comment?")) return;
+        setCommentActionBusy(true);
+        await api(`/reels/${commentsReel._id}/comments/${commentId}`, { method: "DELETE" });
+        setReelComments(items => items.filter(item => String(item._id) !== commentId));
+        setReels(items => items.map(item => String(item._id) === String(commentsReel._id) ? { ...item, commentsCount: Math.max(0, Number(item.commentsCount || 0) - 1) } : item));
+        return;
+      }
+      if (action === "pin") {
+        if (!isReelOwner) throw new Error("Only the Reel owner can pin comments.");
+        setCommentActionBusy(true);
+        const data = await api(`/reels/${commentsReel._id}/comments/${commentId}/pin`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pinned: !comment.pinned }) });
+        setReelComments(items => items.map(item => String(item._id) === commentId ? { ...item, pinned: Boolean(data.comment?.pinned) } : item));
+        return;
+      }
+      if (["restrict", "block", "report"].includes(action)) {
+        if (action === "restrict" && !isReelOwner) throw new Error("Only the Reel owner can restrict commenters on this Reel.");
+        if (action === "block" && !isReelOwner) throw new Error("Only the Reel owner can block commenters from this Reel.");
+        setCommentActionBusy(true);
+        const data = await api(`/reels/${commentsReel._id}/comments/${commentId}/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetUserId, reason: action === "report" ? "Comment reported by user" : undefined }) });
+        if (action === "report") alert(data.message || "Comment reported.");
+        else alert(data.message || (action === "block" ? "User blocked from interacting with your Reels." : "User restricted on your Reels."));
+      }
+    } catch (error) {
+      setCommentsError(error?.message || "That comment action failed. Please try again.");
+    } finally {
+      setCommentActionBusy(false);
+    }
+  }
+
+  async function toggleReelLike(reel) {
+    const id = String(reel?._id || "");
+    if (!id) return;
+    try {
+      const result = await api(`/reels/${id}/like`, { method: "POST" });
+      setLikedById(current => ({ ...current, [id]: Boolean(result.liked) }));
+      setReels(current => current.map(item => String(item._id) === id
+        ? { ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }
+        : item));
+    } catch (error) {
+      alert(error?.message || "Could not like this Reel. Please sign in and try again.");
+    }
+  }
+
+  async function toggleReelSave(reel) {
+    const id = String(reel?._id || "");
+    if (!id) return;
+    try {
+      const result = await api(`/reels/${id}/save`, { method: "POST" });
+      setSavedById(current => ({ ...current, [id]: Boolean(result.saved) }));
+      setReels(current => current.map(item => String(item._id) === id
+        ? { ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }
+        : item));
+      window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
+    } catch (error) {
+      alert(error?.message || "Could not save this Reel. Please sign in and try again.");
+    }
+  }
+
+  async function openReelLikes(reel) {
+    setLikesTarget(reel);
+    setLikedUsers([]);
+    setLikesError("");
+    setLikesLoading(true);
+    try {
+      const result = await api(`/reels/${reel._id}/likes`);
+      setLikedUsers(Array.isArray(result.users) ? result.users : Array.isArray(result.likes) ? result.likes : []);
+    } catch (error) {
+      setLikesError(error?.message || "Could not load the people who liked this Reel.");
+    } finally {
+      setLikesLoading(false);
+    }
+  }
+
+  function toggleReelSound(reelId) {
+    const nextEnabled = soundEnabledById[String(reelId)] === false;
+    setSoundEnabledById(current => ({ ...current, [String(reelId)]: nextEnabled }));
+    const video = scrollRef.current?.querySelector(`[data-reel-id="${String(reelId)}"] video`);
+    if (video) {
+      video.muted = !nextEnabled;
+      if (nextEnabled) {
+        const promise = video.play();
+        if (promise && typeof promise.catch === "function") promise.catch(() => {});
+      }
+    }
+  }
+
+  return (
+    <div className="page reels-page">
+      <div className="reels-mobile-header">
+        <button type="button" className="reels-mobile-create" aria-label="Create Reel" onClick={onCreate}><PlusSquare /></button>
+        <div className="reels-mobile-title"><b>Reels</b><button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}>Friends <span className="reels-friends-avatars">{reels.slice(0, 3).map((item, i) => <span key={item._id || i}><Avatar user={item.author} size={19} /></span>)}</span></button></div>
+        <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
+      </div>
+      <div className="page-heading reels-heading">
+        <div>
+          <h1>Reels</h1>
+          <p>Short videos from ReelsGo</p>
+        </div>
+
+        <button className="desktop-create" onClick={onCreate}>
+          <Film /> Create Reel
+        </button>
+      </div>
+
+      {!loading && !reels.length ? (
+        <div className="empty">
+          <Film />
+          <h2>No Reels yet</h2>
+          <p>Upload your first short video.</p>
+          <button
+            className="primary small"
+            onClick={onCreate}
+          >
+            Upload Reel
+          </button>
+        </div>
+      ) : (
+        <div className="reels-stage">
+          <div className="reels-scroll" ref={scrollRef}>
+            {reels.map((r, index) => {
+              const isOwner =
+                String(r.author?._id || r.author) === String(me?._id);
+
+              return (
+                <article
+                  className={`reel-feed-card ${
+                    index === activeIndex ? "active" : ""
+                  }`}
+                  key={r._id}
+                  ref={el => {
+                    cardRefs.current[index] = el;
+                  }}
+                  data-index={index}
+                  data-reel-id={r._id}
+                >
+                  <div className="reel-feed-media">
+                    <video
+                      src={`${SERVER}${r.mediaUrl}`}
+                      muted={soundEnabledById[String(r._id)] === false}
+                      playsInline
+                      controls={false}
+                      onClick={e => {
+                        const video = e.currentTarget;
+                        if (video.paused) video.play().catch(() => {});
+                        else video.pause();
+                      }}
+                      preload={
+                        index === activeIndex ? "auto" : "metadata"
+                      }
+                      autoPlay={index === activeIndex}
+                      loop
+                    />
+
+                    <div className="reels-mobile-actions" aria-label="Reel actions">
+                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
+                      <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
+                      <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
+                      <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Download Reel" onClick={() => downloadReel(r)}><Download /><small>Download</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
+                    </div>
+                    <div className="reel-feed-top">
+                      <Avatar user={r.author} size={42} />
+
+                      <div>
+                        <UserLink user={r.author} />
+                        <span>{r.caption || "Reel"}</span>
+                      </div>
+
+                      <div
+                        style={{
+                          marginLeft: "auto",
+                          position: "relative"
+                        }}
+                      >
+                        <button
+                          type="button"
+                          aria-label="Reel options"
+                          title="Reel options"
+                          onClick={e => {
+                            e.stopPropagation();
+                            setOpenMenuId(current =>
+                              String(current) === String(r._id)
+                                ? null
+                                : r._id
+                            );
+                          }}
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: "50%",
+                            background: "rgba(0,0,0,.45)",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                        >
+                          <MoreHorizontal />
+                        </button>
+
+                        {openMenuId === r._id && (
+                          <div
+                            onClick={e => e.stopPropagation()}
+                            style={{
+                              position: "absolute",
+                              right: 0,
+                              top: 44,
+                              zIndex: 50,
+                              minWidth: 170,
+                              padding: 6,
+                              borderRadius: 14,
+                              background: "#171b21",
+                              border:
+                                "1px solid rgba(255,255,255,.12)",
+                              boxShadow:
+                                "0 18px 50px rgba(0,0,0,.5)"
+                            }}
+                          >
+                            <button
+                            type="button"
+                            onClick={() => shareReel(r)}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 9,
+                              padding: "11px 12px",
+                              borderRadius: 10,
+                              background: "transparent",
+                              color: "#fff",
+                              textAlign: "left",
+                              fontWeight: 700
+                            }}
+                          >
+                            <Link2 size={17} />
+                            Share Reel
+                          </button>
+
+                          {isOwner ? (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled={deletingId === r._id}
+                                  onClick={() => deleteReel(r)}
+                                  style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 9,
+                                    padding: "11px 12px",
+                                    borderRadius: 10,
+                                    background: "transparent",
+                                    color: "#ff5c70",
+                                    textAlign: "left",
+                                    fontWeight: 750
+                                  }}
+                                >
+                                  <Trash2 size={17} />
+                                  {deletingId === r._id
+                                    ? "Deleting..."
+                                    : "Delete Reel"}
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setOpenMenuId(null)
+                                  }
+                                  style={{
+                                    width: "100%",
+                                    padding: "11px 12px",
+                                    borderRadius: 10,
+                                    background: "transparent",
+                                    color: "#fff",
+                                    textAlign: "left"
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenMenuId(null)
+                                }
+                                style={{
+                                  width: "100%",
+                                  padding: "11px 12px",
+                                  borderRadius: 10,
+                                  background: "transparent",
+                                  color: "#fff",
+                                  textAlign: "left"
+                                }}
+                              >
+                                Close
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="reels-desktop-actions" aria-label="Reel actions">
+                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
+                      <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
+                      <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
+                      <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
+                      <button type="button" aria-label="Download Reel" onClick={() => downloadReel(r)}><Download /><small>Download</small></button>
+                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
+                      <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
+                    </div>
+                    <div className="reel-feed-bottom">
+                      <button
+                        type="button"
+                        title="Previous Reel"
+                        aria-label="Previous Reel"
+                        onClick={() =>
+                          goToReel(activeIndex - 1)
+                        }
+                        disabled={activeIndex <= 0}
+                      >
+                        <ChevronUp />
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Next Reel"
+                        aria-label="Next Reel"
+                        onClick={() =>
+                          goToReel(activeIndex + 1)
+                        }
+                        disabled={
+                          activeIndex >= reels.length - 1
+                        }
+                      >
+                        <ChevronDown />
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+            {!loading && reels.length > 0 && (
+              <section className="reels-feed-end" ref={endCardRef} data-feed-end="true">
+                <div className="reels-feed-end-icon"><Check /></div>
+                <h2>You're all caught up</h2>
+                <p>You've reached the end of Reels.</p>
+                <button type="button" onClick={() => goToReel(0)}>Watch from the beginning</button>
+              </section>
+            )}
+          </div>
+
+          <div
+            className="reels-side-controls"
+            aria-label="Reel navigation"
+          >
+            <button
+              type="button"
+              title="Previous Reel"
+              aria-label="Previous Reel"
+              onClick={() =>
+                goToReel(activeIndex - 1)
+              }
+              disabled={activeIndex <= 0}
+            >
+              <ChevronUp />
+            </button>
+
+            <span>
+              {reels.length
+                ? `${activeIndex + 1} / ${reels.length}`
+                : ""}
+            </span>
+
+            <button
+              type="button"
+              title="Next Reel"
+              aria-label="Next Reel"
+              onClick={() =>
+                goToReel(activeIndex + 1)
+              }
+              disabled={
+                activeIndex >= reels.length - 1
+              }
+            >
+              <ChevronDown />
+            </button>
+          </div>
+        </div>
+      )}
+      {shareReelTarget && (
+        <ShareSheet post={shareReelTarget} kind="reel" onClose={() => setShareReelTarget(null)} />
+      )}
+      {likesTarget && (
+        <div className="reel-comments-backdrop reel-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikesTarget(null); }}>
+          <section className="reel-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this Reel">
+            <header className="reel-comments-header"><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikesTarget(null)}><X /></button></header>
+            <div className="reel-likes-list">
+              {likesLoading && <p className="reel-comments-status">Loading likes…</p>}
+              {!likesLoading && likesError && <p className="reel-comments-error">{likesError}</p>}
+              {!likesLoading && !likesError && !likedUsers.length && <p className="reel-comments-status">No likes to show yet.</p>}
+              {likedUsers.map((entry, index) => { const person = entry.user || entry.actor || entry; return <div className="reel-likes-user" key={person._id || entry._id || index}><Avatar user={person} size={42}/><div><b>{person.username || person.name || "ReelsGo user"}</b><small>{person.name && person.username ? person.name : ""}</small></div></div>; })}
+            </div>
+          </section>
+        </div>
+      )}
+      {commentsReel && (
+        <div className="reel-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setCommentsReel(null); }}>
+          <section className="reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+            <header className="reel-comments-header">
+              <h2>Comments <span className="reel-comments-count">{Number(commentsReel.commentsCount ?? reelComments.length)}</span></h2>
+              <button type="button" aria-label="Close comments" onClick={() => setCommentsReel(null)}><X /></button>
+            </header>
+            <div className="reel-comments-list">
+              {commentsLoading ? <p className="reel-comments-status">Loading comments…</p> : null}
+              {!commentsLoading && !reelComments.length && !commentsError ? <p className="reel-comments-status">No comments yet. Be the first to comment.</p> : null}
+              {reelComments.map((comment, index) => {
+                const reelOwner = String(commentsReel.author?._id || commentsReel.author) === String(me?._id);
+                const ownComment = String(comment.author?._id || comment.author) === String(me?._id);
+                return (
+                  <article className={`reel-comment-row ${comment.pinned ? "is-pinned" : ""}`} key={comment._id || index}>
+                    <Avatar user={comment.author} size={36} />
+                    <div className="reel-comment-content" role="button" tabIndex={0} aria-label="Open comment options" onClick={() => setCommentMenuId(String(comment._id))} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setCommentMenuId(String(comment._id)); } }}>
+                      <div className="reel-comment-author-line"><b>{comment.author?.username || comment.author?.name || "User"}</b>{comment.pinned && <span className="reel-comment-pinned-label"><PinOff size={12}/> Pinned</span>}</div>
+                      <p>{comment.text}</p>
+                      <small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small>
+                      <div className="reel-comment-inline-actions"><button type="button" onClick={event => { event.stopPropagation(); setCommentText(`@${comment.author?.username || comment.author?.name || "user"} `); }}>Reply</button>{reelOwner && <button type="button" onClick={event => { event.stopPropagation(); runCommentAction("pin", comment); }}>{comment.pinned ? "Unpin" : "Pin"}</button>}</div>
+                    </div>
+                    <div className="reel-comment-menu-wrap">
+                      <button type="button" className="reel-comment-menu-trigger" aria-label="Comment options" onClick={() => setCommentMenuId(current => current === String(comment._id) ? null : String(comment._id))}><MoreHorizontal size={19}/></button>
+                      {commentMenuId === String(comment._id) && <div className="reel-comment-options-menu">
+                        {reelOwner && <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("pin", comment)}><PinOff size={17}/>{comment.pinned ? "Unpin" : "Pin"}</button>}
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("replyReel", comment)}><Film size={17}/>Reply with a Reel</button>
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("story", comment)}><PlusSquare size={17}/>Add to story</button>
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("share", comment)}><Send size={17}/>Share</button>
+                        {reelOwner && !ownComment && <>
+                          <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("restrict", comment)}><UserMinus size={17}/>Restrict</button>
+                          <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("block", comment)}><Ban size={17}/>Block</button>
+                        </>}
+                        <button type="button" disabled={commentActionBusy} onClick={() => runCommentAction("report", comment)}><Flag size={17}/>Report</button>
+                        {(reelOwner || ownComment) && <button type="button" className="danger" disabled={commentActionBusy} onClick={() => runCommentAction("delete", comment)}><Trash2 size={17}/>Delete</button>}
+                      </div>}
+                    </div>
+                  </article>
+                );
+              })}
+              {commentsError && <p className="reel-comments-error" role="alert">{commentsError}</p>}
+            </div>
+            <form className="reel-comment-form" onSubmit={submitReelComment}>
+              <Avatar user={me} size={34} />
+              <input value={commentText} onChange={event => setCommentText(event.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment" />
+              <button type="submit" disabled={!commentText.trim() || commentSending}>{commentSending ? "Posting…" : "Post"}</button>
+            </form>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReelViewer({ reel, onClose }) {
+  const [currentReel, setCurrentReel] = useState(reel);
+  const [liked, setLiked] = useState(Boolean(reel?.likedByMe || reel?.isLiked));
+  const [saved, setSaved] = useState(true);
+  const [comments, setComments] = useState([]);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentSending, setCommentSending] = useState(false);
+  const [error, setError] = useState("");
+  const [playing, setPlaying] = useState(true);
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    setCurrentReel(reel);
+    setLiked(Boolean(reel?.likedByMe || reel?.isLiked));
+    setSaved(true);
+    setPlaying(true);
+    if (reel?._id && getToken()) {
+      const event = { contentId: String(reel._id), contentType: "reel" };
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "impression" }) }).catch(() => {});
+      api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...event, type: "view" }) }).catch(() => {});
+    }
+  }, [reel]);
+
+  async function toggleLike() {
+    try {
+      const result = await api(`/reels/${currentReel._id}/like`, { method: "POST" });
+      setLiked(Boolean(result.liked));
+      setCurrentReel(item => ({ ...item, likesCount: Number(result.likesCount ?? item.likesCount ?? 0) }));
+      if (result.liked) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "like" }) }).catch(() => {});
+    } catch (e) { setError(e.message || "Could not like this Reel."); }
+  }
+
+  async function toggleSave() {
+    try {
+      const result = await api(`/reels/${currentReel._id}/save`, { method: "POST" });
+      setSaved(Boolean(result.saved));
+      setCurrentReel(item => ({ ...item, savesCount: Number(result.savesCount ?? item.savesCount ?? 0) }));
+      if (result.saved) api("/professional/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contentId: String(currentReel._id), contentType: "reel", type: "save" }) }).catch(() => {});
+      window.dispatchEvent(new CustomEvent("reelsgo-saved-content-updated"));
+      if (!result.saved) setError("Removed from Saved.");
+    } catch (e) { setError(e.message || "Could not update saved status."); }
+  }
+
+  async function openComments() {
+    setCommentsOpen(true);
+    setCommentsLoading(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${currentReel._id}/comments`);
+      setComments(Array.isArray(data.comments) ? data.comments : Array.isArray(data.data?.comments) ? data.data.comments : []);
+    } catch (e) { setError(e.message || "Could not load comments."); }
+    finally { setCommentsLoading(false); }
+  }
+
+  async function submitComment(e) {
+    e.preventDefault();
+    if (!commentText.trim() || commentSending) return;
+    setCommentSending(true);
+    setError("");
+    try {
+      const data = await api(`/reels/${currentReel._id}/comments`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: commentText.trim() })
+      });
+      const created = data.comment || data.data?.comment;
+      if (created) setComments(items => [...items, created]);
+      else {
+        const refreshed = await api(`/reels/${currentReel._id}/comments`);
+        setComments(Array.isArray(refreshed.comments) ? refreshed.comments : []);
+      }
+      setCurrentReel(item => ({ ...item, commentsCount: Number(item.commentsCount || 0) + 1 }));
+      setCommentText("");
+    } catch (e) { setError(e.message || "Could not post comment."); }
+    finally { setCommentSending(false); }
+  }
+
+  async function shareReel() {
+    const url = `${window.location.origin}/reel/${currentReel._id}`;
+    try {
+      if (navigator.share) await navigator.share({ title: "ReelsGo Reel", text: currentReel.caption || "Watch this Reel", url });
+      else { await navigator.clipboard.writeText(url); setError("Reel link copied."); }
+    } catch (e) { if (e?.name !== "AbortError") setError("Could not share this Reel. Try copying its link."); }
+  }
+
+  function togglePlayback() {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) { video.play().then(() => setPlaying(true)).catch(() => setPlaying(false)); }
+    else { video.pause(); setPlaying(false); }
+  }
+
+  const mediaSrc = currentReel?.mediaUrl
+    ? (/^https?:\/\//i.test(currentReel.mediaUrl) ? currentReel.mediaUrl : `${SERVER}${currentReel.mediaUrl.startsWith("/") ? "" : "/"}${currentReel.mediaUrl}`)
+    : "";
+  const authorName = currentReel.author?.username || currentReel.author?.name || "ReelsGo creator";
+
+  return (
+    <div className="reel-viewer-overlay saved-reel-viewer-overlay saved-reel-fullscreen" onClick={onClose}>
+      <button className="saved-reel-close" type="button" onClick={onClose} aria-label="Close saved Reel"><X /></button>
+      <div className="saved-reel-fullscreen-stage" onClick={e => e.stopPropagation()}>
+        {mediaSrc ? <video ref={videoRef} className="saved-reel-fullscreen-video" src={mediaSrc} autoPlay loop playsInline preload="auto" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onClick={togglePlayback} /> : <div className="saved-reel-no-media">This Reel’s video is unavailable.</div>}
+        <div className="saved-reel-top-gradient" />
+        <div className="saved-reel-topbar">
+          <Avatar user={currentReel.author} size={38} />
+          <div className="saved-reel-author-copy"><strong>@{authorName}</strong><span>Saved Reel</span></div>
+          <button type="button" className="saved-reel-soundless-label" onClick={togglePlayback}>{playing ? "Playing" : "Paused"}</button>
+        </div>
+        <button type="button" className={`saved-reel-play-toggle ${playing ? "is-playing" : ""}`} onClick={togglePlayback} aria-label={playing ? "Pause Reel" : "Play Reel"}>
+          {!playing && <Play size={32} fill="currentColor" />}
+        </button>
+        <div className="saved-reel-fullscreen-actions" aria-label="Reel actions">
+          <button type="button" onClick={toggleLike} className={liked ? "is-liked" : ""} aria-label={liked ? "Unlike Reel" : "Like Reel"}><Heart fill={liked ? "currentColor" : "none"}/><span>{Number(currentReel.likesCount || 0)}</span></button>
+          <button type="button" onClick={openComments} aria-label="View comments"><MessageCircle/><span>{Number(currentReel.commentsCount || 0)}</span></button>
+          <button type="button" onClick={shareReel} aria-label="Share Reel"><Send/><span>Share</span></button>
+          <button type="button" onClick={async () => {
+            if (!mediaSrc) { setError("This Reel's video is unavailable for download."); return; }
+            const filename = `reelsgo-${currentReel?._id || "reel"}.mp4`;
+            try {
+              const response = await fetch(mediaSrc);
+              if (!response.ok) throw new Error("Download failed");
+              const blob = await response.blob();
+              const objectUrl = URL.createObjectURL(blob);
+              const anchor = document.createElement("a");
+              anchor.href = objectUrl;
+              anchor.download = filename;
+              document.body.appendChild(anchor);
+              anchor.click();
+              anchor.remove();
+              window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+            } catch {
+              const anchor = document.createElement("a");
+              anchor.href = mediaSrc;
+              anchor.download = filename;
+              anchor.target = "_blank";
+              anchor.rel = "noopener noreferrer";
+              document.body.appendChild(anchor);
+              anchor.click();
+              anchor.remove();
+            }
+          }} aria-label="Download Reel"><Download/><span>Download</span></button>
+          <button type="button" onClick={toggleSave} className={saved ? "is-saved" : ""} aria-label={saved ? "Remove saved Reel" : "Save Reel"}><Bookmark fill={saved ? "currentColor" : "none"}/><span>{saved ? "Saved" : "Save"}</span></button>
+        </div>
+        <div className="saved-reel-bottom-gradient" />
+        <div className="saved-reel-fullscreen-caption"><strong>@{authorName}</strong><p>{currentReel.caption || "Watch this Reel again."}</p><span><Film size={13}/> Original Reel</span></div>
+        {error && <div className="saved-reel-fullscreen-notice" role="status">{error}<button type="button" onClick={() => setError("")} aria-label="Dismiss message"><X size={14}/></button></div>}
+      </div>
+      {commentsOpen && <div className="saved-reel-comments-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setCommentsOpen(false); }}>
+        <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+          <header><h3>Comments <span>{Number(currentReel.commentsCount || comments.length)}</span></h3><button type="button" onClick={() => setCommentsOpen(false)} aria-label="Close comments"><X /></button></header>
+          <div className="saved-reel-comments-list">
+            {commentsLoading ? <p className="saved-reel-comment-state">Loading comments…</p> : null}
+            {!commentsLoading && !comments.length ? <p className="saved-reel-comment-state">No comments yet. Be the first to comment.</p> : null}
+            {comments.map((comment, index) => <article className="saved-reel-comment" key={comment._id || index}><Avatar user={comment.author} size={34}/><div><b>{comment.author?.username || comment.author?.name || "User"}</b><p>{comment.text}</p><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div></article>)}
+          </div>
+          <form className="saved-reel-comment-form" onSubmit={submitComment}><input value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Add a comment…" maxLength={1000} aria-label="Add a comment"/><button type="submit" disabled={!commentText.trim() || commentSending}>{commentSending ? "Posting…" : "Post"}</button></form>
+        </section>
+      </div>}
+    </div>
+  );
+}
+
+const RECENT_PROFILE_SEARCHES_KEY = "reelsgo_recent_opened_profiles_v1";
+
+function readRecentProfiles() {
+  try {
+    const value = JSON.parse(localStorage.getItem(RECENT_PROFILE_SEARCHES_KEY) || "[]");
+    return Array.isArray(value) ? value.filter(item => item && item._id) : [];
+  } catch { return []; }
+}
+
+function SearchPage({ onOpenProfile, onBack }) {
+  const [q, setQ] = useState("");
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [recent, setRecent] = useState(readRecentProfiles);
+  const [recentMenuId, setRecentMenuId] = useState(null);
+  const [recentExpanded, setRecentExpanded] = useState(false);
+
+  async function search(v) {
+    setQ(v);
+    if (!v.trim()) { setUsers([]); return; }
+    setLoading(true);
+    try {
+      const d = await api(`/users/search?q=${encodeURIComponent(v.trim())}`);
+      setUsers(d.users || []);
+    } catch (e) {
+      console.error(e);
+      setUsers([]);
+    } finally { setLoading(false); }
+  }
+
+  function openSearchedProfile(person) {
+    if (!person?._id) return;
+    // Only add a person after the user actually opens their profile, not just from search results.
+    const previous = readRecentProfiles();
+    const updated = [person, ...previous.filter(item => String(item._id) !== String(person._id))].slice(0, 20);
+    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not save recent profiles", e); }
+    setRecent(updated);
+    onOpenProfile(person._id);
+  }
+
+  function clearRecent() {
+    try { localStorage.removeItem(RECENT_PROFILE_SEARCHES_KEY); } catch {}
+    setRecent([]);
+    setRecentMenuId(null);
+  }
+
+  function deleteRecentProfile(profileId) {
+    const updated = readRecentProfiles().filter(item => String(item._id) !== String(profileId));
+    try { localStorage.setItem(RECENT_PROFILE_SEARCHES_KEY, JSON.stringify(updated)); } catch (e) { console.warn("Could not update recent profiles", e); }
+    setRecent(updated);
+    setRecentMenuId(null);
+  }
+
+  return (
+    <div className="page rg-instagram-search-page">
+      <div className="rg-search-topbar">
+        <button type="button" className="rg-search-back" onClick={() => onBack ? onBack() : setQ("")} aria-label="Go back"><ChevronRight /></button>
+        <div className="search-box rg-search-pill">
+          <Search />
+          <input value={q} onChange={e => search(e.target.value)} placeholder="Search" autoFocus />
+          {q && <button className="rg-search-clear" onClick={() => { setQ(""); setUsers([]); }} aria-label="Clear search"><X /></button>}
+        </div>
+      </div>
+
+      {loading && <div className="empty small-empty"><p>Searching...</p></div>}
+      {!loading && q.trim() && users.length > 0 && (
+        <div className="user-list" aria-label="Search results">
+          {users.map(u => <button className="user-row" key={u._id} onClick={() => openSearchedProfile(u)} type="button">
+            <Avatar user={u} size={48} />
+            <div><b>@{u.username}</b><span>{u.name}</span></div><ChevronRight />
+          </button>)}
+        </div>
+      )}
+      {!loading && q.trim() && !users.length && <div className="empty small-empty"><Search /><h2>No users found</h2><p>Try the exact username or another name.</p></div>}
+
+      {!q.trim() && <section className="recent-searches-section" aria-label="Recent profiles">
+        <div className="recent-searches-heading"><h2>Recent</h2>{recent.length > 0 && <button type="button" className="recent-clear-button" onClick={clearRecent}>Clear all</button>}</div>
+        {recent.length > 0 ? <div className="user-list recent-searches-list">
+          {(recentExpanded ? recent : recent.slice(0, 5)).map(person => <div className="recent-profile-wrap" key={person._id}>
+            <button className="user-row recent-profile-row" onClick={() => openSearchedProfile(person)} type="button">
+              <Avatar user={person} size={48} /><div className="recent-profile-text"><b>{person.username || "user"}</b><span>{person.name || "ReelsGo member"}</span></div>
+            </button>
+            <div className="recent-profile-options">
+              <button type="button" className="recent-remove-button" aria-label={`Remove ${person.username || "profile"} from recent searches`} onClick={() => deleteRecentProfile(person._id)}><X /></button>
+            </div>
+          </div>)}
+        </div> : <div className="recent-searches-empty"><Clock3 /><h3>No recent profiles yet</h3><p>Search for someone and open their profile. It will appear here even after you close ReelsGo.</p></div>}
+      </section>}
+    </div>
+  );
+}
+
+function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
+  const [profile, setProfile] = useState(null);
+  const [tab, setTab] = useState("posts");
+  const [loading, setLoading] = useState(true);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [connectionsOpen, setConnectionsOpen] = useState(null);
+  const [profileOptionsOpen, setProfileOptionsOpen] = useState(false);
+  const [profileAboutOpen, setProfileAboutOpen] = useState(false);
+  const [sharedActivityOpen, setSharedActivityOpen] = useState(false);
+  const [profileQrOpen, setProfileQrOpen] = useState(false);
+  const [profileActionBusy, setProfileActionBusy] = useState(false);
+  const [profileActionNotice, setProfileActionNotice] = useState("");
+  const [storyHidden, setStoryHidden] = useState(false);
+  const [profileNotifications, setProfileNotifications] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true; } catch { return false; }
+  });
+
+  async function load() {
+    setLoading(true);
+    try {
+      const d = await api(`/users/${userId}/profile`);
+      setProfile(d);
+    } catch (e) {
+      alert(e.message);
+      onBack();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    setTab("posts");
+    setProfileOptionsOpen(false);
+    try { setProfileNotifications(JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true); } catch { setProfileNotifications(false); }
+    load();
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    api("/users/me/settings/story-hidden").then(data => {
+      if (!cancelled) setStoryHidden((data.userIds || []).some(id => String(id) === String(userId)));
+    }).catch(() => {
+      try { setStoryHidden((JSON.parse(localStorage.getItem("reelsgo_hidden_story_users") || "[]")).includes(String(userId))); } catch {}
+    });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  async function toggleFollow() {
+    if (!profile?.user || String(profile.user._id) === String(currentUser?._id)) return;
+    setFollowLoading(true);
+    try {
+      if (profile.followStatus === "accepted" || profile.followStatus === "pending") {
+        await api(`/follows/${profile.user._id}`, { method: "DELETE" });
+      } else {
+        await api(`/follows/${profile.user._id}`, { method: "POST" });
+      }
+      await load();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setFollowLoading(false);
+    }
+  }
+
+  if (loading) {
+    return <div className="page"><div className="empty"><p>Loading profile...</p></div></div>;
+  }
+
+  if (!profile?.user) return null;
+
+  const u = profile.user;
+  const isSelf = String(u._id) === String(currentUser?._id);
+  const canView = !!profile.canViewContent;
+  const canViewConnections = isSelf || !!profile.canViewConnections;
+  const posts = profile.posts || [];
+  const reels = profile.reels || [];
+  const tagged = profile.tagged || [];
+
+  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(u._id)}`;
+  async function copyProfileUrl() {
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(profileUrl);
+      else window.prompt("Copy profile URL:", profileUrl);
+      setProfileActionNotice("Profile URL copied.");
+    } catch { window.prompt("Copy profile URL:", profileUrl); }
+    setProfileOptionsOpen(false);
+  }
+
+  async function runProfileAction(action) {
+    if (profileActionBusy) return;
+    setProfileActionNotice("");
+    if (action === "about") { setProfileOptionsOpen(false); setProfileAboutOpen(true); return; }
+    if (action === "activity") { setProfileOptionsOpen(false); setSharedActivityOpen(true); return; }
+    if (action === "qr") { setProfileOptionsOpen(false); setProfileQrOpen(true); return; }
+    if (action === "share") {
+      setProfileOptionsOpen(false);
+      try {
+        if (navigator.share) await navigator.share({ title: `@${u.username} on ReelsGo`, text: `Check out @${u.username} on ReelsGo`, url: profileUrl });
+        else await copyProfileUrl();
+      } catch (error) { if (error?.name !== "AbortError") await copyProfileUrl(); }
+      return;
+    }
+    if (action === "copy") { await copyProfileUrl(); return; }
+    if (action === "report") {
+      const reason = window.prompt("Why are you reporting this account?\nEnter a reason such as Spam, Impersonation, or Harassment:", "Spam");
+      if (!reason?.trim()) return;
+      setProfileActionBusy(true);
+      try {
+        await api("/reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ targetType: "user", targetId: u._id, reason: reason.trim(), details: `Reported profile @${u.username}` }) });
+        setProfileOptionsOpen(false); setProfileActionNotice("Report submitted for review.");
+      } catch (e) { alert(e.message || "Could not submit report."); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "restrict" || action === "block") {
+      const label = action === "block" ? "Block" : "Restrict";
+      if (!window.confirm(`${label} @${u.username}?`)) return;
+      setProfileActionBusy(true);
+      try {
+        await api(`/users/me/settings/people/${action === "block" ? "blocked" : "restricted"}/${encodeURIComponent(u._id)}`, { method: "POST" });
+        setProfileOptionsOpen(false);
+        setProfileActionNotice(`@${u.username} ${action === "block" ? "blocked" : "restricted"}.`);
+        if (action === "block") onBack();
+      } catch (e) { alert(e.message || `Could not ${action} this account.`); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "hideStory") {
+      setProfileActionBusy(true);
+      try {
+        if (storyHidden) await api(`/users/me/settings/story-hidden/${encodeURIComponent(u._id)}`, { method: "DELETE" });
+        else await api(`/users/me/settings/story-hidden/${encodeURIComponent(u._id)}`, { method: "POST" });
+        const next = !storyHidden; setStoryHidden(next);
+        try {
+          const saved = JSON.parse(localStorage.getItem("reelsgo_hidden_story_users") || "[]");
+          const ids = next ? [...new Set([...saved.map(String), String(u._id)])] : saved.filter(id => String(id) !== String(u._id));
+          localStorage.setItem("reelsgo_hidden_story_users", JSON.stringify(ids));
+        } catch {}
+        setProfileOptionsOpen(false); setProfileActionNotice(next ? `Stories from @${u.username} hidden.` : `Stories from @${u.username} unhidden.`);
+      } catch (e) { alert(e.message || "Could not update story visibility."); }
+      finally { setProfileActionBusy(false); }
+      return;
+    }
+    if (action === "removeFollower") {
+      if (!window.confirm(`Remove @${u.username} from your followers?`)) return;
+      setProfileActionBusy(true);
+      try {
+        const data = await api(`/follows/followers/${encodeURIComponent(u._id)}`, { method: "DELETE" });
+        setProfileOptionsOpen(false);
+        setProfileActionNotice(data?.removed ? `@${u.username} removed from your followers.` : `@${u.username} is not currently following you.`);
+        if (data?.removed) await load();
+      } catch (e) { alert(e.message || "Could not remove follower."); }
+      finally { setProfileActionBusy(false); }
+    }
+  }
+
+  return (
+    <div className="page profile-page">
+      <div className="rg-public-profile-topbar">
+        <button type="button" onClick={onBack} aria-label="Go back"><ArrowLeft size={23}/></button>
+        <strong>@{u.username || "user"}</strong>
+        <span className="rg-public-profile-topbar-spacer" />
+        <button type="button" aria-label={profileNotifications ? "Turn off post notifications" : "Turn on post notifications"} title={profileNotifications ? "Notifications on" : "Notifications off"} onClick={() => {
+          const next = !profileNotifications; setProfileNotifications(next);
+          try { const saved = JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}"); saved[String(u._id)] = next; localStorage.setItem("reelsgo_profile_notifications", JSON.stringify(saved)); } catch {}
+          setProfileActionNotice(next ? `Notifications enabled for @${u.username} on this device.` : `Notifications disabled for @${u.username}.`);
+        }}><Bell size={22} fill={profileNotifications ? "currentColor" : "none"}/></button>
+        {!isSelf && <button type="button" aria-label="More profile options" aria-expanded={profileOptionsOpen} onClick={() => setProfileOptionsOpen(true)}><MoreHorizontal size={23}/></button>}
+      </div>
+
+      <div className="profile-header">
+        <div className="profile-avatar-wrap">
+          <Avatar user={u} size={96} className="profile-avatar" />
+        </div>
+
+        <div className="profile-details">
+          <div className="profile-line">
+            <h1 className="rg-public-profile-display-name">{u.name || u.username} <VerifiedBadge userId={u?._id} /></h1>
+          </div>
+
+          <div className="profile-stats">
+            <span><b>{u.postsCount || posts.length}</b><small>posts</small></span>
+            {canViewConnections ? (
+              <>
+                <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("followers")} aria-label={`View ${u.username || "user"} followers`}>
+                  <b>{u.followersCount || 0}</b><small>followers</small>
+                </button>
+                <button type="button" className="profile-stat-button" onClick={() => setConnectionsOpen("following")} aria-label={`View ${u.username || "user"} following`}>
+                  <b>{u.followingCount || 0}</b><small>following</small>
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="profile-stat-locked"><b>{u.followersCount || 0}</b><small>followers</small></span>
+                <span className="profile-stat-locked"><b>{u.followingCount || 0}</b><small>following</small></span>
+              </>
+            )}
+          </div>
+
+          <b>{u.name}</b>
+          <p>{u?.bio || ""}</p>
+          {u.website && <a href={u.website} target="_blank" rel="noreferrer"><LinkIcon /> {u.website}</a>}
+
+          {u.isPrivate && !canView && !isSelf && (
+            <div className="private-profile-note">
+              <Lock />
+              <div>
+                <b>This account is private</b>
+                <span>Follow this account and wait for approval to see posts and stories.</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {!isSelf && <div className="rg-public-profile-actions">
+        <button type="button" className={profile.followStatus === "accepted" ? "secondary" : "primary"} onClick={toggleFollow} disabled={followLoading}>
+          {followLoading ? "Please wait…" : profile.followStatus === "accepted" ? <>Following <ChevronDown size={16}/></> : profile.followStatus === "pending" ? "Requested" : "Follow"}
+        </button>
+        <button type="button" className="secondary" onClick={() => onMessage(u._id)}><MessageCircle/> Message</button>
+        <button type="button" className="secondary" aria-label="Profile options" onClick={() => setProfileOptionsOpen(true)}><UserPlus/></button>
+      </div>}
+
+      <div className="profile-tabs">
+        <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
+        <button className={tab === "reels" ? "active" : ""} onClick={() => setTab("reels")}><Film /> Reels</button>
+        <button className={tab === "tagged" ? "active" : ""} onClick={() => setTab("tagged")}><Users /> Tagged</button>
+      </div>
+
+      {!canView && !isSelf ? (
+        <div className="private-profile-lock">
+          <div className="private-lock-icon"><Lock /></div>
+          <h2>Private account</h2>
+          <p>Follow this account to see their photos, videos and Reels.</p>
+        </div>
+      ) : (
+        <>
+          {tab === "posts" && (
+            posts.length
+              ? <div className="profile-grid">{posts.map(p => <GridMedia key={p._id} post={p} />)}</div>
+              : <EmptyTab icon={<CameraOff />} title="No posts yet" text="This user has not shared any posts." />
+          )}
+
+          {tab === "reels" && (
+            reels.length
+              ? <div className="profile-grid reels-profile-grid">{reels.map(r => <div className="grid-reel" key={r._id}><video src={`${SERVER}${r.mediaUrl}`} controls playsInline /></div>)}</div>
+              : <EmptyTab icon={<Film />} title="No Reels yet" text="This user has not shared any Reels." />
+          )}
+
+          {tab === "tagged" && (
+            tagged.length
+              ? <div className="profile-grid">{tagged.map(p => <GridMedia key={p._id} post={p} />)}</div>
+              : <EmptyTab icon={<Users />} title="Photos of you" text="Tagged posts will appear here." />
+          )}
+        </>
+      )}
+
+      {profileActionNotice && <div className="rg-profile-action-toast" role="status">{profileActionNotice}<button type="button" onClick={() => setProfileActionNotice("")} aria-label="Dismiss notice"><X size={15}/></button></div>}
+
+      {profileOptionsOpen && !isSelf && createPortal(
+        <div className="rg-profile-options-backdrop" role="dialog" aria-modal="true" aria-label={`Options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !profileActionBusy) setProfileOptionsOpen(false); }}>
+          <section className="rg-profile-options-sheet" onMouseDown={e => e.stopPropagation()}>
+            <div className="rg-profile-options-handle" />
+            <button type="button" className="danger" disabled={profileActionBusy} onClick={() => runProfileAction("report")}>Report</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("restrict")}>Restrict</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("block")}>Block</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("about")}>About this account</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("activity")}>See shared activity</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("hideStory")}>{storyHidden ? "Unhide your story" : "Hide your story"}</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("removeFollower")}>Remove follower</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("copy")}>Copy profile URL</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("share")}>Share this profile</button>
+            <button type="button" disabled={profileActionBusy} onClick={() => runProfileAction("qr")}>QR code</button>
+          </section>
+          <button type="button" className="rg-profile-options-cancel" disabled={profileActionBusy} onClick={() => setProfileOptionsOpen(false)}>Cancel</button>
+        </div>,
+        document.body
+      )}
+
+      {profileAboutOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="About this account" onMouseDown={e => { if (e.target === e.currentTarget) setProfileAboutOpen(false); }}><section className="rg-profile-info-card"><div className="rg-profile-info-icon"><CircleUser size={30}/></div><h2>About this account</h2><p className="rg-profile-info-username">@{u.username}</p><div className="rg-profile-info-row"><span>Joined ReelsGo</span><b>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date not available"}</b></div><div className="rg-profile-info-row"><span>Account type</span><b>{u.isPrivate ? "Private" : "Public"}</b></div><div className="rg-profile-info-row"><span>Verification</span><b>{verificationStatusCache.get(String(u._id)) ? "Verified" : "Not verified"}</b></div><button type="button" className="rg-profile-info-done" onClick={() => setProfileAboutOpen(false)}>Done</button></section></div>}
+
+      {sharedActivityOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="Shared activity" onMouseDown={e => { if (e.target === e.currentTarget) setSharedActivityOpen(false); }}><section className="rg-profile-info-card rg-shared-activity-card"><div className="rg-profile-info-handle"/><h2>Shared activity</h2><p className="rg-profile-info-username">You and @{u.username}</p><div className="rg-shared-activity-list"><div><b>{profile.followStatus === "accepted" ? "You follow each other’s updates" : profile.followStatus === "pending" ? "Follow request pending" : "You are not following this account"}</b><small>Follow status</small></div><div><b>{posts.length} posts · {reels.length} Reels</b><small>Content visible to you</small></div><div><b>{u.followersCount || 0} followers</b><small>Account activity</small></div></div><button type="button" className="rg-profile-info-done" onClick={() => { setSharedActivityOpen(false); onMessage(u._id); }}>Open conversation</button><button type="button" className="rg-profile-info-secondary" onClick={() => setSharedActivityOpen(false)}>Close</button></section></div>}
+
+      {profileQrOpen && <ProfileQRCodeModal user={u} onClose={() => setProfileQrOpen(false)} />}
+
+      {connectionsOpen && (
+        <ConnectionsModal
+          user={u}
+          type={connectionsOpen}
+          onClose={() => setConnectionsOpen(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+
+function getSharedMediaFromMessage(text) {
+  const value = String(text || "");
+  const match = value.match(/https?:\/\/[^\s]+\/(reel|reels|post|posts)\/([a-zA-Z0-9_-]+)/i);
+  if (!match) return null;
+  const type = ["reel", "reels"].includes(match[1].toLowerCase()) ? "reel" : "post";
+  return { type, id: match[2], url: match[0].replace(/[),.]+$/, "") };
+}
+
+function MessageText({ text }) {
+  const words = String(text || "").split(/\s+/).filter(Boolean);
+  if (!words.length) return null;
+  const chunks = [];
+  for (let i = 0; i < words.length; i += 30) chunks.push(words.slice(i, i + 30).join(" "));
+  return <span className="message-text-lines">{chunks.map((chunk, index) => <span className="message-text-line" key={`${index}-${chunk.slice(0, 12)}`}>{chunk}</span>)}</span>;
+}
+
+function SharedMediaMessage({ text }) {
+  const shared = useMemo(() => getSharedMediaFromMessage(text), [text]);
+  const [media, setMedia] = useState(null);
+  const [loading, setLoading] = useState(Boolean(shared));
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadShared() {
+      if (!shared) { setLoading(false); return; }
+      setLoading(true);
+      setFailed(false);
+      try {
+        const endpoint = shared.type === "reel" ? `/reels/${encodeURIComponent(shared.id)}` : `/posts/${encodeURIComponent(shared.id)}`;
+        let data = null;
+        try {
+          data = await api(endpoint);
+        } catch {}
+        let found = shared.type === "reel"
+          ? (data?.reel || data?.data?.reel || data)
+          : (data?.post || data?.data?.post || data);
+        if (String(found?._id || "") !== String(shared.id)) found = null;
+        if (!found) {
+          const feed = await api(shared.type === "reel" ? "/reels" : "/posts");
+          const items = shared.type === "reel"
+            ? (feed?.reels || feed?.data?.reels || [])
+            : (feed?.posts || feed?.data?.posts || []);
+          found = items.find(item => String(item?._id) === String(shared.id)) || null;
+        }
+        if (!cancelled) {
+          if (found?._id) setMedia(found);
+          else setFailed(true);
+        }
+      } catch {
+        if (!cancelled) setFailed(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadShared();
+    return () => { cancelled = true; };
+  }, [shared?.type, shared?.id]);
+
+  if (!shared) return <MessageText text={text} />;
+
+  const mediaUrl = shared.type === "reel"
+    ? media?.mediaUrl
+    : media?.media?.[0]?.url;
+  const resolvedMediaUrl = mediaUrl
+    ? (/^https?:\/\//i.test(mediaUrl) ? mediaUrl : `${SERVER}${mediaUrl.startsWith("/") ? "" : "/"}${mediaUrl}`)
+    : "";
+
+  return <div className="shared-message-content" onClick={e => e.stopPropagation()}>
+    <a className="shared-message-link" href={shared.url} target="_blank" rel="noreferrer">
+      {loading ? <div className="shared-message-loading"><Film size={20}/><span>Loading {shared.type}…</span></div> :
+        media && !failed ? <>
+          <div className={`shared-message-media ${shared.type === "reel" ? "is-reel" : "is-post"}`}>
+            {resolvedMediaUrl && (shared.type === "reel" || media.media?.[0]?.kind === "video")
+              ? <video src={resolvedMediaUrl} controls playsInline preload="metadata" />
+              : resolvedMediaUrl ? <img src={resolvedMediaUrl} alt={media.caption || "Shared post"} loading="lazy"/> : <div className="shared-message-media-fallback"><ImageIcon/></div>}
+            {shared.type === "reel" && <span className="shared-message-reel-label"><Play size={13} fill="currentColor"/> Reel</span>}
+          </div>
+          <div className="shared-message-preview-copy">
+            <b>{media.author?.username ? `@${media.author.username}` : "ReelsGo"}</b>
+            <p>{media.caption || (shared.type === "reel" ? "Watch this Reel" : "View this post")}</p>
+            <small>Open in ReelsGo <ChevronRight size={13}/></small>
+          </div>
+        </> : <div className="shared-message-unavailable"><Film size={20}/><span>{failed ? `${shared.type === "reel" ? "Reel" : "Post"} preview unavailable` : "Open shared content"}</span><small>Tap to view</small></div>}
+    </a>
+  </div>;
+}
+
+function MessagesPage({ openConversationId = null, openConversationData = null }) {
+  const me = getUser();
+  const [conversations, setConversations] = useState([]);
+  const [inboxTab, setInboxTab] = useState(() => {
+    try { return localStorage.getItem("reelsgo_inbox_tab") || "Primary"; } catch { return "Primary"; }
+  });
+  const [conversationFolders, setConversationFolders] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_conversation_folders") || "{}"); } catch { return {}; }
+  });
+  const [active, setActive] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [newMessageOpen, setNewMessageOpen] = useState(false);
+  const [peopleSearch, setPeopleSearch] = useState("");
+  const [peopleResults, setPeopleResults] = useState([]);
+  const [peopleLoading, setPeopleLoading] = useState(false);
+  const [peopleError, setPeopleError] = useState("");
+  const [startingConversationId, setStartingConversationId] = useState(null);
+  const [noteComposerOpen, setNoteComposerOpen] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [noteAudience, setNoteAudience] = useState("followers");
+  const [noteSaving, setNoteSaving] = useState(false);
+  const [noteEditingId, setNoteEditingId] = useState(null);
+  const [noteReplyTarget, setNoteReplyTarget] = useState(null);
+  const [noteActionTarget, setNoteActionTarget] = useState(null);
+  const [noteReplyDraft, setNoteReplyDraft] = useState("");
+  const [noteReplySending, setNoteReplySending] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [requestsOpen, setRequestsOpen] = useState(false);
+  const [requestActionId, setRequestActionId] = useState(null);
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const chatAttachmentInput = useRef(null);
+  const [mobileChat, setMobileChat] = useState(false);
+  const [conversationQuery, setConversationQuery] = useState('');
+  const [messageFiltersOpen, setMessageFiltersOpen] = useState(false);
+  const [messageFiltersMore, setMessageFiltersMore] = useState(false);
+  const [messageFoldersExpanded, setMessageFoldersExpanded] = useState(false);
+  const [messageFilters, setMessageFilters] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("reelsgo_message_filters") || "{}");
+      // Ignore the retired 10K+ followers filter if it exists in older browser storage.
+      const { tenK: _legacyTenK, ...savedFilters } = saved || {};
+      return { unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false, ...savedFilters };
+    } catch {
+      return { unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false };
+    }
+  });
+  const [conversationMenuId, setConversationMenuId] = useState(null);
+  const [conversationMenuOpen, setConversationMenuOpen] = useState(false);
+  const [deletingConversationId, setDeletingConversationId] = useState(null);
+  const [mobileConversationActions, setMobileConversationActions] = useState(null);
+  const [pinnedConversationIds, setPinnedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_pinned_conversations") || "[]").map(String); } catch { return []; } });
+  const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
+  const longPressTimer = useRef(null);
+  const suppressConversationClick = useRef(false);
+  const [messageMenuId, setMessageMenuId] = useState(null);
+  const [deletingMessageId, setDeletingMessageId] = useState(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [emojiCategory, setEmojiCategory] = useState("Smileys");
+  const emojiPickerRef = useRef(null);
+  const chatGalleryInput = useRef(null);
+  const [chatCustomizeOpen, setChatCustomizeOpen] = useState(false);
+  const [chatDetailsOpen, setChatDetailsOpen] = useState(false);
+  const [chatDetailsProfile, setChatDetailsProfile] = useState(null);
+  const [chatDetailsLoading, setChatDetailsLoading] = useState(false);
+  const [chatDetailsTab, setChatDetailsTab] = useState("posts");
+  const [chatTheme, setChatTheme] = useState({ accent: "#c026d3", background: "" });
+  const chatThemes = [
+    { name: "Berry", accent: "#c026d3" },
+    { name: "Sunset", accent: "#f97316" },
+    { name: "Ocean", accent: "#0ea5e9" },
+    { name: "Emerald", accent: "#10b981" },
+    { name: "Violet", accent: "#8b5cf6" },
+    { name: "Rose", accent: "#f43f5e" },
+    { name: "Gold", accent: "#d4a017" },
+    { name: "Ice", accent: "#38bdf8" }
+  ];
+  const chatThemeStorageKey = active?._id ? `reelsgo_chat_theme_${String(active._id)}` : "";
+
+  // Track the actual visible viewport on mobile browsers. When the on-screen
+  // keyboard opens, VisualViewport.height shrinks; the chat then fits above it.
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const updateVisibleViewport = () => {
+      const height = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--rg-visual-viewport-height", `${Math.round(height)}px`);
+    };
+    updateVisibleViewport();
+    window.visualViewport?.addEventListener("resize", updateVisibleViewport);
+    window.visualViewport?.addEventListener("scroll", updateVisibleViewport);
+    window.addEventListener("resize", updateVisibleViewport);
+    return () => {
+      window.visualViewport?.removeEventListener("resize", updateVisibleViewport);
+      window.visualViewport?.removeEventListener("scroll", updateVisibleViewport);
+      window.removeEventListener("resize", updateVisibleViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!chatThemeStorageKey) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(chatThemeStorageKey) || "null");
+      setChatTheme(saved && typeof saved === "object" ? { accent: saved.accent || "#c026d3", background: saved.background || "" } : { accent: "#c026d3", background: "" });
+    } catch { setChatTheme({ accent: "#c026d3", background: "" }); }
+  }, [chatThemeStorageKey]);
+
+  function saveChatTheme(nextTheme) {
+    setChatTheme(nextTheme);
+    if (chatThemeStorageKey) {
+      try { localStorage.setItem(chatThemeStorageKey, JSON.stringify(nextTheme)); }
+      catch { alert("This image is too large to save. Choose a smaller image."); }
+    }
+  }
+
+  function chooseChatWallpaper(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Choose an image file."); event.target.value = ""; return; }
+    // Resize/compress the selected image before saving to localStorage. This avoids
+    // quota errors and makes gallery wallpapers persist for this conversation.
+    const reader = new FileReader();
+    reader.onerror = () => alert("Could not read that image. Please try another one.");
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => alert("That image could not be opened. Try another image.");
+      image.onload = () => {
+        const maxSide = 1100;
+        const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { alert("Your browser could not process that image."); return; }
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        let compressed = canvas.toDataURL("image/jpeg", 0.78);
+        if (compressed.length > 1_250_000) compressed = canvas.toDataURL("image/jpeg", 0.58);
+        saveChatTheme({ ...chatTheme, background: compressed });
+      };
+      image.src = String(reader.result || "");
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  }
+
+  async function openChatDetails() {
+    if (!active) return;
+    setChatDetailsOpen(true);
+    setChatDetailsTab("posts");
+    setChatDetailsLoading(true);
+    setChatDetailsProfile(null);
+    const person = other(active);
+    try {
+      const data = await api(`/users/${person?._id}/profile`);
+      setChatDetailsProfile(data);
+    } catch (error) {
+      console.warn("Could not load chat profile details", error);
+      setChatDetailsProfile({ user: person, posts: [], reels: [], tagged: [] });
+    } finally {
+      setChatDetailsLoading(false);
+    }
+  }
+
+  useEffect(() => { try { localStorage.setItem("reelsgo_pinned_conversations", JSON.stringify(pinnedConversationIds)); } catch {} }, [pinnedConversationIds]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_muted_conversations", JSON.stringify(mutedConversationIds)); } catch {} }, [mutedConversationIds]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_conversation_folders", JSON.stringify(conversationFolders)); } catch {} }, [conversationFolders]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_inbox_tab", inboxTab); } catch {} }, [inboxTab]);
+  useEffect(() => { try { localStorage.setItem("reelsgo_message_filters", JSON.stringify(messageFilters)); } catch {} }, [messageFilters]);
+  const [, setVerifiedFilterRefresh] = useState(0);
+  useEffect(() => {
+    if (!messageFilters.verified) return undefined;
+    let cancelled = false;
+    const ids = [...new Set(conversations.map(c => other(c)?._id).filter(Boolean).map(String))];
+    Promise.all(ids.map(async id => {
+      if (verificationStatusCache.has(id)) return;
+      try {
+        const status = await api(`/verification/status/${id}`);
+        verificationStatusCache.set(id, Boolean(status?.verified));
+      } catch { verificationStatusCache.set(id, false); }
+    })).then(() => { if (!cancelled) setVerifiedFilterRefresh(v => v + 1); });
+    return () => { cancelled = true; };
+  }, [messageFilters.verified, conversations]);
+
+  function cancelConversationLongPress() {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = null;
+  }
+
+  function startConversationLongPress(conversation) {
+    cancelConversationLongPress();
+    suppressConversationClick.current = false;
+    longPressTimer.current = window.setTimeout(() => {
+      suppressConversationClick.current = true;
+      setConversationMenuId(String(conversation._id));
+      setMobileConversationActions(conversation);
+      if (navigator.vibrate) navigator.vibrate(25);
+    }, 500);
+  }
+
+  function runConversationAction(action, conversation) {
+    const id = String(conversation?._id || "");
+    if (!id) return;
+    if (action === "delete") {
+      setMobileConversationActions(null);
+      setConversationMenuId(id);
+      deleteConversation(conversation);
+      return;
+    }
+    if (action === "unread") {
+      setConversations(prev => prev.map(c => String(c._id) === id ? { ...c, unreadCount: Math.max(1, Number(c.unreadCount || 0)) } : c));
+      if (String(active?._id) === id) setActive(prev => prev ? { ...prev, unreadCount: 1 } : prev);
+    } else if (action === "primary" || action === "general") {
+      setConversationFolders(prev => ({ ...prev, [id]: action === "general" ? "General" : "Primary" }));
+      setInboxTab(action === "general" ? "General" : "Primary");
+    } else if (action === "pin") {
+      setPinnedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev]);
+    } else if (action === "mute") {
+      setMutedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    }
+    setMobileConversationActions(null);
+    setConversationMenuId(null);
+  }
+
+  async function loadConversations(selectId = null) {
+    try {
+      const d = await api('/messages/conversations');
+      const serverRows = d.conversations || [];
+      // Keep locally deleted conversations hidden when the backend has no DELETE route.
+      let hiddenIds = [];
+      try { hiddenIds = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]"); } catch {}
+      const rows = serverRows.filter(c => !hiddenIds.includes(String(c._id)));
+      setConversations(rows);
+      if (selectId) {
+        const c = rows.find(x => String(x._id) === String(selectId));
+        if (c) { setActive(c); setMobileChat(true); }
+      }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
+  }
+
+  async function deleteConversation(conversation) {
+    if (!conversation?._id || deletingConversationId) return;
+    const id = String(conversation._id);
+    const person = other(conversation);
+    const confirmed = window.confirm(`Delete conversation with ${person?.username ? `@${person.username}` : person?.name || "this person"}? It will be removed from your inbox.`);
+    if (!confirmed) { setConversationMenuId(null); setConversationMenuOpen(false); return; }
+    setDeletingConversationId(id);
+    // Hide immediately so the interface works even if the deployed backend
+    // does not implement DELETE /messages/conversations/:id.
+    const hideLocally = () => {
+      try {
+        const existing = JSON.parse(localStorage.getItem("reelsgo_hidden_conversations") || "[]");
+        localStorage.setItem("reelsgo_hidden_conversations", JSON.stringify([...new Set([...existing.map(String), id])]));
+      } catch {}
+      setConversations(prev => prev.filter(c => String(c._id) !== id));
+      if (String(active?._id) === id) {
+        setActive(null); setMessages([]); setMobileChat(false);
+      }
+      setConversationMenuId(null); setConversationMenuOpen(false);
+    };
+    try {
+      await api(`/messages/conversations/${id}`, { method: 'DELETE' });
+      hideLocally();
+    } catch (e) {
+      // A missing backend endpoint should not break the UI or show "API not found".
+      // The conversation is hidden on this device; server-side deletion needs backend support.
+      hideLocally();
+      console.warn("Conversation hidden locally because server deletion is unavailable:", e?.message);
+    } finally { setDeletingConversationId(null); }
+  }
+
+  async function loadNotes() {
+    try { const d = await api('/notes'); setNotes(d.notes || []); } catch { setNotes([]); }
+  }
+
+  async function openNewMessagePicker() {
+    setNewMessageOpen(true);
+    setPeopleSearch("");
+    setPeopleError("");
+    setPeopleLoading(true);
+    try {
+      let users = [];
+      const current = getUser();
+      if (current?._id) {
+        try {
+          const following = await api(`/follows/${current._id}/following`);
+          users = following.following || following.users || [];
+        } catch {}
+      }
+      if (!users.length) {
+        const result = await api(`/users/search?q=${encodeURIComponent("a")}`);
+        users = result.users || result.results || [];
+      }
+      const currentId = String(getUser()?._id || "");
+      const seen = new Set();
+      setPeopleResults(users.map(item => item?.user || item).filter(user => {
+        if (!user?._id || String(user._id) === currentId || seen.has(String(user._id))) return false;
+        seen.add(String(user._id));
+        return true;
+      }));
+    } catch (error) {
+      setPeopleError(error.message || "Could not load users.");
+    } finally { setPeopleLoading(false); }
+  }
+
+  async function searchMessagePeople(value) {
+    setPeopleSearch(value);
+    setPeopleError("");
+    if (!value.trim()) {
+      openNewMessagePicker();
+      return;
+    }
+    setPeopleLoading(true);
+    try {
+      const result = await api(`/users/search?q=${encodeURIComponent(value.trim())}`);
+      const currentId = String(getUser()?._id || "");
+      const seen = new Set();
+      setPeopleResults((result.users || result.results || []).map(item => item?.user || item).filter(user => {
+        if (!user?._id || String(user._id) === currentId || seen.has(String(user._id))) return false;
+        seen.add(String(user._id));
+        return true;
+      }));
+    } catch (error) {
+      setPeopleResults([]);
+      setPeopleError(error.message || "Could not search users.");
+    } finally { setPeopleLoading(false); }
+  }
+
+  async function startConversationWith(user) {
+    if (!user?._id || startingConversationId) return;
+    setStartingConversationId(String(user._id));
+    setPeopleError("");
+    try {
+      const result = await api("/messages/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ members: [String(user._id)] })
+      });
+      const conversation = result.conversation;
+      if (!conversation?._id) throw new Error("The server did not return a conversation.");
+      setConversations(current => [conversation, ...current.filter(item => String(item._id) !== String(conversation._id))]);
+      setNewMessageOpen(false);
+      setActive(conversation);
+      setMobileChat(true);
+      await openConversation(conversation);
+    } catch (error) {
+      setPeopleError(error.message || "Unable to start conversation.");
+    } finally { setStartingConversationId(null); }
+  }
+
+  async function publishNote(event) {
+    event?.preventDefault?.();
+    const clean = noteDraft.trim();
+    if (!clean || noteSaving) return;
+    setNoteSaving(true);
+    try {
+      const payload = { text: clean.slice(0, 60), audience: noteAudience };
+      let result;
+      if (noteEditingId) {
+        try {
+          result = await api(`/notes/${noteEditingId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        } catch (patchError) {
+          if (/404|not found|method/i.test(String(patchError.message))) {
+            result = await api(`/notes/${noteEditingId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+          } else throw patchError;
+        }
+        if (result.note) setNotes(current => current.map(note => String(note._id) === String(noteEditingId) ? result.note : note));
+        else await loadNotes();
+      } else {
+        result = await api("/notes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        if (result.note) setNotes(current => [result.note, ...current.filter(note => String(note.author?._id || note.author) !== String(me?._id))]);
+        else await loadNotes();
+      }
+      setNoteDraft(""); setNoteEditingId(null); setNoteComposerOpen(false);
+    } catch (error) { alert(error.message || (noteEditingId ? "Could not update note." : "Could not publish note.")); }
+    finally { setNoteSaving(false); }
+  }
+
+  function editMyNote(note) {
+    setNoteEditingId(String(note?._id || ""));
+    setNoteDraft(note?.text || "");
+    setNoteAudience(note?.audience || "followers");
+    setNoteComposerOpen(true);
+  }
+
+  async function deleteMyNote(note) {
+    if (!note?._id || !window.confirm("Delete your note?")) return;
+    try {
+      await api(`/notes/${note._id}`, { method: "DELETE" });
+      setNotes(current => current.filter(item => String(item._id) !== String(note._id)));
+    } catch (error) { alert(error.message || "Could not delete note. The backend must support DELETE /api/notes/:id."); }
+  }
+
+  async function replyToNote(event) {
+    event?.preventDefault?.();
+    const messageText = noteReplyDraft.trim();
+    const activeReplyNote = noteReplyTarget || noteActionTarget;
+    const targetUser = activeReplyNote?.author;
+    const targetId = targetUser?._id || targetUser;
+    if (!messageText || !targetId || noteReplySending) return;
+    setNoteReplySending(true);
+    try {
+      const conversationResult = await api("/messages/conversations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: [String(targetId)] }) });
+      const conversation = conversationResult.conversation;
+      if (!conversation?._id) throw new Error("Could not open conversation.");
+      const noteReplyText = `Reply to your note “${String(activeReplyNote?.text || "").trim()}”:\n${messageText}`;
+      await api(`/messages/conversations/${conversation._id}/messages`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: noteReplyText }) });
+      setNoteReplyDraft(""); setNoteReplyTarget(null); setNoteActionTarget(null);
+      // Refresh the inbox and load the persisted message into the opened conversation.
+      await loadConversations(conversation._id);
+      await openConversation(conversation);
+    } catch (error) { alert(error.message || "Could not send note reply."); }
+    finally { setNoteReplySending(false); }
+  }
+
+  async function loadRequests() {
+    try {
+      const d = await api('/follows/requests');
+      setRequests(d.requests || []);
+    } catch {
+      setRequests([]);
+    }
+  }
+
+  async function acceptFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/accept`, { method: 'POST' });
+      setRequests(prev => prev.filter(r => String(r._id) !== String(requestId)));
+      // Refresh conversations/notes as the newly accepted follower relationship
+      // can immediately affect available messaging and activity state.
+      await loadConversations();
+    } catch (e) {
+      alert(e.message || 'Unable to accept follow request');
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  async function declineFollowRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/decline`, { method: 'POST' });
+      setRequests(prev => prev.filter(r => String(r._id) !== String(requestId)));
+    } catch (e) {
+      alert(e.message || 'Unable to reject follow request');
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  useEffect(() => {
+    loadConversations();
+    loadNotes();
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState !== "hidden") { loadConversations(); loadNotes(); }
+    }, 60000);
+    const refreshOnFocus = () => { loadConversations(); loadNotes(); };
+    window.addEventListener("focus", refreshOnFocus);
+    return () => { window.clearInterval(refreshTimer); window.removeEventListener("focus", refreshOnFocus); };
+  }, []);
+
+  // Refresh unread state and the active conversation periodically.
+  // This also picks up the exact seenAt time from the server so the
+  // sender can see "Seen 1 min ago" without refreshing the page.
+  useEffect(() => {
+    let cancelled = false;
+
+    const refreshMessagesState = async () => {
+      try {
+        const cd = await api('/messages/conversations');
+        if (cancelled) return;
+
+        setConversations(cd.conversations || []);
+
+        if (!active?._id) return;
+
+        const md = await api(`/messages/conversations/${active._id}/messages`);
+        if (cancelled) return;
+
+        const rows = md.messages || [];
+        setMessages(rows);
+
+        const unseen = rows
+          .filter(
+            m =>
+              String(m.sender?._id) !== String(me?._id) &&
+              !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+          )
+          .slice(-50);
+
+        if (unseen.length) {
+          const seenNow = new Date().toISOString();
+
+          await Promise.all(
+            unseen.map(m =>
+              api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+            )
+          );
+
+          if (!cancelled) {
+            setMessages(current =>
+              current.map(m =>
+                unseen.some(u => String(u._id) === String(m._id))
+                  ? {
+                      ...m,
+                      seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                      seenAt: m.seenAt || seenNow
+                    }
+                  : m
+              )
+            );
+          }
+        }
+      } catch {}
+    };
+
+    refreshMessagesState();
+    const timer = setInterval(refreshMessagesState, 4000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [active?._id, me?._id]);
+
+  useEffect(() => {
+    if (!emojiOpen) return;
+    const closeOnOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setEmojiOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", closeOnOutside);
+    return () => document.removeEventListener("pointerdown", closeOnOutside);
+  }, [emojiOpen]);
+
+  useEffect(() => {
+    if (!openConversationId) return;
+    (async () => {
+      try {
+        // Load the inbox first, but open the conversation returned by POST even
+        // if the inbox response is briefly stale or omits the new conversation.
+        const cd = await api('/messages/conversations');
+        const rows = cd.conversations || [];
+        setConversations(rows);
+        const listed = rows.find(x => String(x._id) === String(openConversationId));
+        const returned = openConversationData && String(openConversationData._id) === String(openConversationId)
+          ? openConversationData
+          : null;
+        const conversationToOpen = listed || returned;
+        if (conversationToOpen) {
+          setActive({ ...conversationToOpen, unreadCount: 0 });
+          setMobileChat(true);
+        }
+        const md = await api(`/messages/conversations/${openConversationId}/messages`);
+        const openedMessages = md.messages || [];
+        setMessages(openedMessages);
+        const unseen = openedMessages
+          .filter(
+            m =>
+              String(m.sender?._id) !== String(me?._id) &&
+              !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+          )
+          .slice(-50);
+        const seenNow = new Date().toISOString();
+
+        await Promise.all(
+          unseen.map(m =>
+            api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+          )
+        );
+
+        if (unseen.length) {
+          setMessages(current =>
+            current.map(m =>
+              unseen.some(u => String(u._id) === String(m._id))
+                ? {
+                    ...m,
+                    seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                    seenAt: m.seenAt || seenNow
+                  }
+                : m
+            )
+          );
+        }
+
+        setConversations(current =>
+          current.map(item =>
+            String(item._id) === String(openConversationId)
+              ? { ...item, unreadCount: 0 }
+              : item
+          )
+        );
+      } catch (e) { console.error(e); }
+    })();
+  }, [openConversationId, openConversationData]);
+
+  async function openConversation(c) {
+    // Opening a conversation must not trigger the mobile keyboard.
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    setEmojiOpen(false);
+    setChatCustomizeOpen(false);
+    setChatDetailsOpen(false);
+    setActive({ ...c, unreadCount: 0 });
+    setMobileChat(true);
+    try {
+      const d = await api(`/messages/conversations/${c._id}/messages`);
+      const rows = d.messages || [];
+      setMessages(rows);
+
+      const unseen = rows
+        .filter(
+          m =>
+            String(m.sender?._id) !== String(me?._id) &&
+            !(m.seenBy || []).some(x => String(x?._id || x) === String(me?._id))
+        )
+        .slice(-50);
+
+      const seenNow = new Date().toISOString();
+
+      await Promise.all(
+        unseen.map(m =>
+          api(`/messages/messages/${m._id}/seen`, { method: 'POST' }).catch(() => {})
+        )
+      );
+
+      if (unseen.length) {
+        setMessages(current =>
+          current.map(m =>
+            unseen.some(u => String(u._id) === String(m._id))
+              ? {
+                  ...m,
+                  seenBy: [...(m.seenBy || []), me?._id].filter(Boolean),
+                  seenAt: m.seenAt || seenNow
+                }
+              : m
+          )
+        );
+      }
+
+      // Remove the unread indicator immediately after the receiver opens the chat.
+      setConversations(current =>
+        current.map(item =>
+          String(item._id) === String(c._id)
+            ? { ...item, unreadCount: 0 }
+            : item
+        )
+      );
+      setActive(current => current ? { ...current, unreadCount: 0 } : current);
+    } catch (e) { alert(e.message); }
+  }
+
+  function insertEmoji(emoji) {
+    setText(current => `${current}${emoji}`);
+    setEmojiOpen(true);
+  }
+
+  async function sendMessage() {
+    if (!active || !text.trim() || sending || uploadingMedia) return;
+    setSending(true);
+    try {
+      const d = await api(`/messages/conversations/${active._id}/messages`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text.trim() })
+      });
+      if (d.message) setMessages(m => [...m, d.message]);
+      setText('');
+      await loadConversations(active._id);
+    } catch (e) { alert(e.message); }
+    finally { setSending(false); }
+  }
+
+  async function sendChatMedia(file) {
+    if (!active || !file || uploadingMedia || sending) return;
+    const allowed = file.type.startsWith('image/') || file.type.startsWith('video/');
+    if (!allowed) { alert('Choose an image or video.'); return; }
+    const maxBytes = 15 * 1024 * 1024;
+    if (file.size > maxBytes) { alert('Choose a file smaller than 15 MB.'); return; }
+    setUploadingMedia(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const uploaded = await api('/media', { method: 'POST', body: form });
+      const media = uploaded?.media;
+      if (!media?._id) throw new Error('The media upload did not return a media ID.');
+      const messageData = await api(`/messages/conversations/${active._id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.trim(), mediaId: media._id, kind: media.kind || (file.type.startsWith('video/') ? 'video' : 'image') })
+      });
+      if (messageData.message) setMessages(current => [...current, messageData.message]);
+      setText('');
+      setEmojiOpen(false);
+      await loadConversations(active._id);
+    } catch (error) {
+      alert(error?.message || 'Could not send that media. Please try again.');
+    } finally {
+      setUploadingMedia(false);
+      if (chatAttachmentInput.current) chatAttachmentInput.current.value = '';
+    }
+  }
+
+  async function deleteMessage(messageId) {
+    if (!messageId || deletingMessageId) return;
+    const confirmed = window.confirm("Delete this message? It will be removed from the chat for everyone.");
+    if (!confirmed) {
+      setMessageMenuId(null);
+      return;
+    }
+    setDeletingMessageId(messageId);
+    try {
+      await api(`/messages/messages/${messageId}`, { method: "DELETE" });
+      setMessages(current => current.filter(message => String(message._id) !== String(messageId)));
+      setMessageMenuId(null);
+      if (active?._id) await loadConversations(active._id);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setDeletingMessageId(null);
+    }
+  }
+
+  function other(c) {
+    return (c?.members || []).find(x => String(x._id) !== String(me?._id));
+  }
+
+  function name(c) {
+    const u = other(c);
+    return u?.username || u?.name || c?.title || 'Conversation';
+  }
+
+  function time(value) {
+    if (!value) return '';
+    return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function seenTime(value) {
+    if (!value) return 'Seen';
+    const seenAt = new Date(value).getTime();
+    if (!Number.isFinite(seenAt)) return 'Seen';
+
+    const seconds = Math.max(0, Math.floor((Date.now() - seenAt) / 1000));
+
+    if (seconds < 10) return 'Seen just now';
+
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Seen ${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Seen ${hours} ${hours === 1 ? 'hr' : 'hrs'} ago`;
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `Seen ${days} ${days === 1 ? 'day' : 'days'} ago`;
+
+    return `Seen ${new Date(value).toLocaleDateString([], {
+      day: 'numeric',
+      month: 'short'
+    })}`;
+  }
+
+  const myNote = notes.find(n => String(n.author?._id) === String(me?._id));
+  const otherNotes = notes.filter(n => String(n.author?._id) !== String(me?._id));
+  const filteredConversations = conversations.filter(c => {
+    const u = other(c);
+    // Do not render orphaned conversations whose other account was deleted in MongoDB.
+    if (!u?._id) return false;
+    const q = conversationQuery.trim().toLowerCase();
+    if (q && !String(u?.username || '').toLowerCase().includes(q) && !String(u?.name || '').toLowerCase().includes(q)) return false;
+    const folder = conversationFolders[String(c._id)] || "Primary";
+    if (inboxTab === "Requests" || folder !== inboxTab) return false;
+    const last = c.lastMessage || {};
+    const senderId = String(last.sender?._id || last.sender || "");
+    if (messageFilters.unread && !(Number(c.unreadCount || 0) > 0 || c.isUnread)) return false;
+    if (messageFilters.unanswered && (!senderId || senderId === String(me?._id))) return false;
+    if (messageFilters.storyReplies && !(/story|replied to your story/i.test(String(last.text || last.caption || "")) || last.storyReply === true || last.kind === "story_reply")) return false;
+    if (messageFilters.verified && !(u.verified || u.isVerified || u.blueTick || verificationStatusCache.get(String(u._id)) === true)) return false;
+    if (messageFilters.pinned && !pinnedConversationIds.includes(String(c._id))) return false;
+    if (messageFilters.muted && !mutedConversationIds.includes(String(c._id))) return false;
+    return true;
+  }).sort((a, b) => Number(pinnedConversationIds.includes(String(b._id))) - Number(pinnedConversationIds.includes(String(a._id))) || new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+
+  return (
+    <div className={`page messages-page ${active && (mobileChat || (typeof window !== "undefined" && window.innerWidth <= 700)) ? "is-mobile-chat" : ""}`}>
+      <div className="messages-instagram-head">
+        <div className="messages-account-title">
+          <b>{me?.username || me?.name || 'Messages'}</b>
+          <ChevronRight className="messages-account-chevron" />
+        </div>
+        <button className="messages-compose-button" type="button" aria-label="New message" onClick={openNewMessagePicker}>
+          <Edit3 />
+        </button>
+      </div>
+
+      <div className="messages-search-bar">
+        <Search />
+        <input
+          value={conversationQuery}
+          onChange={e => setConversationQuery(e.target.value)}
+          placeholder="Search"
+          aria-label="Search messages"
+        />
+        {conversationQuery && <button type="button" onClick={() => setConversationQuery('')}><X /></button>}
+      </div>
+
+      <div className="messages-notes-section">
+        <div className="messages-notes-header"><b>Notes</b><button onClick={loadNotes}>Refresh</button></div>
+        <div className="messages-notes-scroll">
+          <div className="note-card-wrap">
+            <button className="message-note-card my-note" type="button" title={myNote?.text || "Share a note"} onClick={() => myNote ? setNoteActionTarget(myNote) : (setNoteEditingId(null), setNoteDraft(""), setNoteAudience("followers"), setNoteComposerOpen(true))}>
+              <div className="message-note-avatar-wrap"><Avatar user={me} size={58} />{!myNote && <span className="note-add">+</span>}</div>
+              <b>Your note</b><span>{myNote?.text || 'Share a note'}</span>
+            </button>
+
+          </div>
+          {otherNotes.map(note => <button className="message-note-card" key={note._id} type="button" onClick={() => setNoteActionTarget(note)}>
+            <div className="message-note-bubble">{note.text}</div><div className="message-note-avatar"><Avatar user={note.author} size={58} /></div>
+            <UserLink user={note.author} /><span>{note.music || 'Tap for options'}</span>
+          </button>)}
+          {!otherNotes.length && <div className="notes-empty">Follow people and their notes will appear here.</div>}
+        </div>
+      </div>
+
+      {newMessageOpen && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNewMessageOpen(false)}><section className="messages-requests-modal new-message-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><b>New message</b><button type="button" aria-label="Close" onClick={() => setNewMessageOpen(false)}><X /></button></div>
+        <div className="new-message-search"><label htmlFor="new-message-user-search">To:</label><input id="new-message-user-search" autoFocus value={peopleSearch} onChange={e => searchMessagePeople(e.target.value)} placeholder="Search people" /></div>
+        <div className="new-message-results">
+          {peopleLoading ? <div className="new-message-status">Searching people…</div> : null}
+          {!peopleLoading && !peopleResults.length && !peopleError ? <div className="new-message-status">Search for someone to start a conversation.</div> : null}
+          {peopleResults.map(user => <button className="new-message-user-row" type="button" key={user._id} disabled={!!startingConversationId} onClick={() => startConversationWith(user)}><Avatar user={user} size={46}/><span><b>{user.name || user.username || "User"}</b></span><span className="new-message-start-label">{String(startingConversationId) === String(user._id) ? "Opening…" : "Message"}</span></button>)}
+          {peopleError ? <div className="new-message-error" role="alert">{peopleError}</div> : null}
+        </div>
+      </section></div>}
+
+      {noteComposerOpen && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNoteComposerOpen(false)}><section className="messages-requests-modal note-composer-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><button type="button" className="note-cancel-button" onClick={() => setNoteComposerOpen(false)}>Cancel</button><b>{noteEditingId ? "Edit note" : "New note"}</b><button type="button" className="note-share-button" disabled={!noteDraft.trim() || noteSaving} onClick={publishNote}>{noteSaving ? (noteEditingId ? "Saving…" : "Sharing…") : (noteEditingId ? "Save" : "Share")}</button></div>
+        <form className="note-composer-body" onSubmit={publishNote}><div className="note-composer-profile"><Avatar user={me} size={48}/><div><b>{me?.username || me?.name || "Your note"}</b><small>Visible for 24 hours</small></div></div><textarea value={noteDraft} onChange={e => setNoteDraft(e.target.value.slice(0, 60))} maxLength={60} autoFocus placeholder="Share a thought…" rows={3}/><div className="note-composer-footer"><label htmlFor="note-audience">Audience</label><select id="note-audience" value={noteAudience} onChange={e => setNoteAudience(e.target.value)}><option value="followers">Followers you follow back</option><option value="close-friends">Close Friends</option></select><span>{noteDraft.length}/60</span></div><button className="note-publish-mobile" type="submit" disabled={!noteDraft.trim() || noteSaving}>{noteSaving ? (noteEditingId ? "Saving…" : "Sharing…") : (noteEditingId ? "Save changes" : "Share note")}</button></form>
+      </section></div>}
+
+      {noteActionTarget && (() => { const ownNote = String(noteActionTarget.author?._id || noteActionTarget.author) === String(me?._id); return <div className="messages-requests-overlay messages-compose-overlay note-viewer-overlay" onClick={() => { setNoteActionTarget(null); setNoteReplyDraft(""); }}><section className={`messages-requests-modal note-action-modal ${ownNote ? "note-owner-view" : "note-other-view"}`} onClick={e => e.stopPropagation()}><div className="note-sheet-handle"/><div className="note-viewer-top"><Avatar user={noteActionTarget.author} size={54}/><div className="note-viewer-copy"><b>{ownNote ? "Your note" : `${noteActionTarget.author?.username || noteActionTarget.author?.name || "User"} · now`}</b><small>{noteActionTarget.music || `Shared with ${noteActionTarget.audience === "close_friends" || noteActionTarget.audience === "close-friends" ? "Close Friends" : "followers"}`}</small></div><button type="button" className="note-viewer-close" aria-label="Close" onClick={() => { setNoteActionTarget(null); setNoteReplyDraft(""); }}><X/></button></div><div className="note-viewer-content"><p>{String(noteActionTarget.text || noteActionTarget.note || "").trim() || "No text in this note"}</p></div>{ownNote ? <div className="note-owner-view-actions"><button type="button" className="note-owner-new" onClick={() => { setNoteActionTarget(null); setNoteEditingId(null); setNoteDraft(""); setNoteAudience("followers"); setNoteComposerOpen(true); }}>Leave a new note</button><button type="button" className="note-owner-edit" onClick={() => { editMyNote(noteActionTarget); setNoteActionTarget(null); }}>Edit note</button><button type="button" className="note-owner-delete" onClick={async () => { const selected = noteActionTarget; setNoteActionTarget(null); await deleteMyNote(selected); }}>Delete note</button></div> : <form className="note-inline-reply" onSubmit={replyToNote}><input aria-label="Reply to note" autoFocus value={noteReplyDraft} onChange={e => setNoteReplyDraft(e.target.value)} placeholder={`Reply to ${noteActionTarget.author?.username || noteActionTarget.author?.name || "user"}…`} maxLength={1000}/><button type="submit" disabled={!noteReplyDraft.trim() || noteReplySending}>{noteReplySending ? "Sending…" : "Send"}</button></form>}</section></div>; })()}
+
+      {noteReplyTarget && <div className="messages-requests-overlay messages-compose-overlay" onClick={() => setNoteReplyTarget(null)}><section className="messages-requests-modal note-composer-modal note-reply-modal" onClick={e => e.stopPropagation()}><div className="messages-requests-head"><button type="button" className="note-cancel-button" onClick={() => setNoteReplyTarget(null)}>Cancel</button><b>Reply to note</b><button type="button" className="note-share-button" disabled={!noteReplyDraft.trim() || noteReplySending} onClick={replyToNote}>{noteReplySending ? "Sending…" : "Send"}</button></div><form className="note-composer-body" onSubmit={replyToNote}><div className="note-composer-profile"><Avatar user={noteReplyTarget.author} size={48}/><div><b>{noteReplyTarget.author?.username || noteReplyTarget.author?.name || "User"}</b><small>“{noteReplyTarget.text}”</small></div></div><textarea value={noteReplyDraft} onChange={e => setNoteReplyDraft(e.target.value)} maxLength={1000} autoFocus placeholder="Reply to their note…" rows={3}/><button className="note-publish-mobile" type="submit" disabled={!noteReplyDraft.trim() || noteReplySending}>{noteReplySending ? "Sending…" : "Send reply"}</button></form></section></div>}
+
+      {requestsOpen && <div className="messages-requests-overlay" onClick={() => setRequestsOpen(false)}><div className="messages-requests-modal" onClick={e => e.stopPropagation()}>
+        <div className="messages-requests-head"><b>Follow requests</b><button onClick={() => setRequestsOpen(false)}><X /></button></div>
+        {!requests.length ? (
+          <div className="requests-empty">
+            <UserPlus />
+            <b>No requests</b>
+            <span>New follow requests will appear here.</span>
+          </div>
+        ) : (
+          <div className="requests-list">
+            {requests.map(r => {
+              const u = r.follower || r.requester || r.actor || {};
+              const busy = String(requestActionId || '') === String(r._id);
+              return (
+                <div className="request-row" key={r._id}>
+                  <Avatar user={u} size={48} />
+                  <div className="request-row-copy">
+                    <UserLink user={u} />
+                    <span>wants to follow you</span>
+                  </div>
+                  <div className="request-actions">
+                    <button
+                      type="button"
+                      className="request-accept-btn"
+                      disabled={!!requestActionId}
+                      onClick={() => acceptFollowRequest(r._id)}
+                    >
+                      {busy ? '...' : 'Accept'}
+                    </button>
+                    <button
+                      type="button"
+                      className="request-reject-btn"
+                      disabled={!!requestActionId}
+                      onClick={() => declineFollowRequest(r._id)}
+                    >
+                      {busy ? '...' : 'Reject'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div></div>}
+
+      {!active && <div className="messages-folder-controls">
+        <button type="button" className={`messages-filter-trigger ${Object.values(messageFilters).some(Boolean) ? "has-active-filters" : ""}`} onClick={() => setMessageFiltersOpen(true)} aria-label="Open message filters">
+          <SlidersHorizontal size={17}/><ChevronDown size={13}/>
+        </button>
+        <div className="messages-inbox-tabs" role="tablist" aria-label="Message folders">
+          {["Primary", "Requests", "General"].map(tab => <button type="button" key={tab} role="tab" aria-selected={inboxTab === tab} className={inboxTab === tab ? "active" : ""} onClick={() => setInboxTab(tab)}>{tab}{tab === "Requests" && requests.length > 0 ? <span>{requests.length}</span> : null}</button>)}
+        </div>
+      </div>}
+
+      {messageFiltersOpen && !active && <div className="messages-filter-overlay" onMouseDown={e => { if (e.target === e.currentTarget) setMessageFiltersOpen(false); }}>
+        <section className="messages-filter-sheet" role="dialog" aria-modal="true" aria-label="Message filters">
+          <div className="messages-filter-grabber"/><h2>Filters</h2>
+          {[
+            ["unread", "Unread", <Mail size={20}/>],
+            ["unanswered", "Unanswered", <CircleHelp size={20}/>],
+            ["storyReplies", "Story replies", <CircleDashed size={20}/>],
+            ["verified", "Verified profiles", <BadgeCheck size={20}/>]
+          ].map(([key, label, icon]) => <button type="button" className="messages-filter-option" key={key} onClick={() => setMessageFilters(v => ({ ...v, [key]: !v[key] }))}>
+            <span className="messages-filter-option-icon">{icon}</span><span>{label}</span><i className={messageFilters[key] ? "checked" : ""}>{messageFilters[key] ? <Check size={14}/> : null}</i>
+          </button>)}
+          <button type="button" className="messages-filter-see-more" onClick={() => setMessageFiltersMore(v => !v)}>{messageFiltersMore ? "See less" : "See more"}</button>
+          {messageFiltersMore && <>
+            <button type="button" className="messages-filter-option" onClick={() => setMessageFilters(v => ({ ...v, pinned: !v.pinned }))}><span className="messages-filter-option-icon"><PinOff size={20}/></span><span>Pinned conversations</span><i className={messageFilters.pinned ? "checked" : ""}>{messageFilters.pinned ? <Check size={14}/> : null}</i></button>
+            <button type="button" className="messages-filter-option" onClick={() => setMessageFilters(v => ({ ...v, muted: !v.muted }))}><span className="messages-filter-option-icon"><Bell size={20}/></span><span>Muted conversations</span><i className={messageFilters.muted ? "checked" : ""}>{messageFilters.muted ? <Check size={14}/> : null}</i></button>
+          </>}
+          <div className="messages-filter-divider"/>
+          <button type="button" className="messages-filter-folders-heading" onClick={() => setMessageFoldersExpanded(v => !v)}><b>Folders</b><ChevronRight className={messageFoldersExpanded ? "expanded" : ""}/></button>
+          {messageFoldersExpanded && <div className="messages-filter-folders">{["Primary", "General", "Requests"].map(folder => <button type="button" key={folder} onClick={() => { setInboxTab(folder); setMessageFiltersOpen(false); }}>{folder}<span>{folder === "Requests" ? requests.length : conversations.filter(c => (conversationFolders[String(c._id)] || "Primary") === folder).length}</span></button>)}</div>}
+          <div className="messages-filter-footer"><button type="button" onClick={() => setMessageFilters({ unread: false, unanswered: false, storyReplies: false, verified: false, pinned: false, muted: false })}>Clear all</button><button type="button" onClick={() => setMessageFiltersOpen(false)}>Done</button></div>
+        </section>
+      </div>}
+
+      <div className={`chat-layout instagram-chat-layout ${active ? 'has-active' : ''}`} style={{ "--rg-chat-accent": chatTheme.accent, "--rg-chat-wallpaper": chatTheme.background ? `url("${chatTheme.background}")` : "none" }}>
+        <div className="conversation-list instagram-conversation-list">
+          <div className="conversation-list-title">
+            <b>{inboxTab === "Requests" ? "Message requests" : inboxTab}</b>
+          </div>
+          {inboxTab === "Requests" ? (requests.length ? <div className="conversation-scroll">{requests.map(r => { const u = r.follower || r.requester || r.actor || {}; return <div className="conversation-item-shell" key={r._id}><div className="conversation-item"><div className="conversation-avatar-wrap"><Avatar user={u} size={52}/></div><div className="conversation-copy"><b>{u.username || u.name || "User"}</b><span className="conversation-preview">wants to follow you</span></div><div className="request-actions"><button type="button" className="request-accept-btn" onClick={() => acceptFollowRequest(r._id)}>Accept</button><button type="button" className="request-reject-btn" onClick={() => declineFollowRequest(r._id)}>Delete</button></div></div></div>; })}</div> : <div className="chat-empty-list"><MessageCircle/><b>No requests</b><span>New requests will appear here.</span></div>) : loading ? <div className="chat-empty-list">Loading...</div> : filteredConversations.length ? <div className="conversation-scroll">
+            {filteredConversations.map(c => {
+              const u = other(c); const selected = String(active?._id) === String(c._id);
+              const unread = Number(c.unreadCount || 0) > 0;
+              return <div className={`conversation-item-shell ${selected ? 'active' : ''}`} key={c._id}>
+                <button
+                  className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''} ${pinnedConversationIds.includes(String(c._id)) ? 'is-pinned' : ''}`}
+                  onClick={() => { if (suppressConversationClick.current) { suppressConversationClick.current = false; return; } openConversation(c); }}
+                  onTouchStart={() => startConversationLongPress(c)}
+                  onTouchEnd={cancelConversationLongPress}
+                  onTouchMove={cancelConversationLongPress}
+                  onTouchCancel={cancelConversationLongPress}
+                  onContextMenu={e => { e.preventDefault(); setConversationMenuId(String(c._id)); setMobileConversationActions(c); }}
+                  onMouseDown={e => { if (e.pointerType !== 'touch') return; startConversationLongPress(c); }}
+                  onMouseUp={cancelConversationLongPress}
+                  type="button">
+                  <div className="conversation-avatar-wrap">
+                    <Avatar user={u} size={58} />
+                    {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
+                  </div>
+                  <div className="conversation-copy">
+                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.username || u?.name || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
+                    <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
+                    {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
+                  </div>
+                </button>
+                <div className="conversation-options-wrap">
+                  <button type="button" className="conversation-options-button" aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`} onClick={() => { setConversationMenuId(v => v === String(c._id) ? null : String(c._id)); setConversationMenuOpen(false); }}><MoreHorizontal size={19} /></button>
+                  {conversationMenuId === String(c._id) && !mobileConversationActions && <div className="conversation-options-menu"><button type="button" onClick={() => runConversationAction('primary', c)}><Mail size={17}/>Move to Primary</button><button type="button" onClick={() => runConversationAction('general', c)}><Mail size={17}/>Move to General</button><button type="button" onClick={() => runConversationAction('unread', c)}><Mail size={17}/>Mark as unread</button><button type="button" onClick={() => runConversationAction('pin', c)}><PinOff size={17}/>{pinnedConversationIds.includes(String(c._id)) ? 'Unpin' : 'Pin'}</button><button type="button" onClick={() => runConversationAction('mute', c)}><Bell size={17}/>{mutedConversationIds.includes(String(c._id)) ? 'Unmute' : 'Mute'}</button><button className="conversation-delete-action" type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={17}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete'}</button></div>}
+                </div>
+              </div>;
+            })}
+          </div> : <div className="chat-empty-list"><MessageCircle /><b>Start a conversation</b><span>Send a message to someone you follow.</span><small>Open a profile and tap Message.</small></div>}
+        </div>
+
+        <div className="chat instagram-chat">
+          {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
+            <div className="chat-head instagram-chat-head">
+              <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
+              <button type="button" className="chat-profile-open" onClick={openChatDetails} aria-label="Open chat details"><Avatar user={other(active)} size={44} /></button>
+              <button type="button" className="chat-profile-title chat-profile-title-button" onClick={openChatDetails} aria-label="Open chat details"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></button>
+              <button type="button" className="chat-customize-button" aria-label="Customize chat" title="Customize chat" onClick={() => setChatCustomizeOpen(true)}><Palette size={20} /></button>
+              <div className="chat-header-options-wrap">
+                <button type="button" className="chat-header-options-button" aria-label="Conversation options" onClick={() => setConversationMenuOpen(v => !v)}><MoreHorizontal /></button>
+                {conversationMenuOpen && <div className="conversation-options-menu chat-header-options-menu"><button type="button" disabled={deletingConversationId === String(active._id)} onClick={() => deleteConversation(active)}><Trash2 size={15}/>{deletingConversationId === String(active._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
+              </div>
+            </div>
+            <div className="chat-messages instagram-chat-messages">
+              {messages.length ? messages.map(m => {
+                const mine = String(m.sender?._id) === String(me?._id);
+                const seen = (m.seenBy || []).some(x => String(x?._id || x) !== String(me?._id));
+                return <div key={m._id} className={`message-line ${mine ? 'mine' : 'received'}`}>
+                  {!mine && <Avatar user={m.sender} size={30} />}
+                  <div className={`message-bubble-wrap ${mine ? 'mine' : ''}`}>
+                    <div
+                      className={`bubble ${mine ? 'mine' : ''}`}
+                      onContextMenu={(e) => {
+                        if (!mine) return;
+                        e.preventDefault();
+                        setMessageMenuId(messageMenuId === m._id ? null : m._id);
+                      }}
+                      onClick={() => { if (mine) setMessageMenuId(messageMenuId === m._id ? null : m._id); }}
+                    >
+                      {m.mediaId && (typeof m.mediaId === 'object' ? m.mediaId._id : m.mediaId) ? (() => {
+                        const media = m.mediaId;
+                        const mediaId = typeof media === 'object' ? media._id : media;
+                        const mediaKind = m.kind || (typeof media === 'object' ? media.kind : 'image');
+                        const mediaUrl = typeof media === 'object' && media.url
+                          ? (/^https?:\/\//i.test(media.url) ? media.url : `${SERVER}${media.url.startsWith('/') ? '' : '/'}${media.url}`)
+                          : `${SERVER}/api/media/${mediaId}`;
+                        return <div className="chat-attached-media" onClick={event => event.stopPropagation()}>
+                          {mediaKind === 'video'
+                            ? <video src={mediaUrl} controls playsInline preload="metadata" />
+                            : <a href={mediaUrl} target="_blank" rel="noreferrer"><img src={mediaUrl} alt="Image attachment" loading="lazy" /></a>}
+                          {m.text?.trim() && <p className="chat-attached-caption"><MessageText text={m.text} /></p>}
+                        </div>;
+                      })() : <SharedMediaMessage text={m.text} />}
+                      <div className="message-meta">
+                        <small>{time(m.createdAt)}</small>
+                        {mine && <small>{seen ? seenTime(m.seenAt) : 'Sent'}</small>}
+                      </div>
+                    </div>
+                    {mine && messageMenuId === m._id && (
+                      <div className="message-action-menu" onClick={(e) => e.stopPropagation()}>
+                        <button type="button" onClick={() => deleteMessage(m._id)} disabled={deletingMessageId === m._id}>
+                          <Trash2 /> {deletingMessageId === m._id ? "Deleting..." : "Delete message"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>;
+              }) : <div className="empty chat-no-messages"><div className="chat-first-message-avatar"><Avatar user={other(active)} size={74} /></div><h2>{other(active)?.name || other(active)?.username}</h2><span>Start a conversation with this person.</span></div>}
+            </div>
+            <div className="chat-input instagram-chat-input" ref={emojiPickerRef}>
+              <input
+                ref={chatAttachmentInput}
+                className="chat-attachment-file-input"
+                type="file"
+                accept="image/*,video/*"
+                hidden
+                onChange={event => { const file = event.target.files?.[0]; if (file) sendChatMedia(file); }}
+              />
+              <button type="button" className="chat-attach-button" aria-label="Attach image or video" title={uploadingMedia ? "Uploading media…" : "Attach image or video"} onClick={() => chatAttachmentInput.current?.click()} disabled={uploadingMedia || sending || !active}><Paperclip /></button>
+              <div className="chat-message-field">
+                <input
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                  onFocus={() => {
+                    // Never scroll the document or call scrollIntoView when the keyboard opens.
+                    // Scroll only the message pane so the latest message stays visible.
+                    window.requestAnimationFrame(() => {
+                      const page = document.querySelector(".messages-page.is-mobile-chat");
+                      const messages = page?.querySelector(".chat-messages.instagram-chat-messages");
+                      if (messages) messages.scrollTop = Math.max(0, messages.scrollHeight - messages.clientHeight);
+                    });
+                  }}
+                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                  placeholder={uploadingMedia ? "Sending media…" : "Message..."}
+                  disabled={sending || uploadingMedia}
+                  aria-label="Message"
+                />
+                <button
+                  type="button"
+                  className={`chat-smile-button ${emojiOpen ? 'active' : ''}`}
+                  onClick={() => setEmojiOpen(value => !value)}
+                  aria-label="Emoji"
+                  title="Emoji"
+                >
+                  <Smile />
+                </button>
+                {emojiOpen && (
+                  <div className="reelsgo-emoji-picker" role="dialog" aria-label="Emoji picker">
+                    <div className="reelsgo-emoji-picker-head">
+                      <b>Emojis</b>
+                      <button type="button" onClick={() => setEmojiOpen(false)} aria-label="Close emoji picker"><X /></button>
+                    </div>
+                    <div className="reelsgo-emoji-tabs" role="tablist">
+                      {REELSGO_EMOJI_TABS.map(category => (
+                        <button
+                          type="button"
+                          key={category}
+                          className={emojiCategory === category ? 'active' : ''}
+                          onClick={() => setEmojiCategory(category)}
+                          aria-label={category}
+                          title={category}
+                        >
+                          {category === 'Smileys' ? '😀' : category === 'People' ? '👍' : category === 'Animals' ? '🐶' : category === 'Food' ? '🍕' : category === 'Travel' ? '✈️' : category === 'Objects' ? '💡' : category === 'Symbols' ? '❤️' : '🇮🇳'}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="reelsgo-emoji-grid">
+                      {REELSGO_EMOJI_CATEGORIES[emojiCategory].map((emoji, index) => (
+                        <button type="button" key={`${emoji}-${index}`} onClick={() => insertEmoji(emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {text.trim() && <button type="button" className="chat-send-button" onClick={sendMessage} disabled={sending} aria-label="Send"><Send /></button>}
+            </div>
+          </>}
+        </div>
+      </div>
+      {chatDetailsOpen && active && (
+        <div className="rg-chat-details-screen">
+          <header className="rg-chat-details-topbar">
+            <button type="button" aria-label="Back to chat" onClick={() => setChatDetailsOpen(false)}><ChevronRight style={{ transform: "rotate(180deg)" }} /></button>
+            <div className="rg-chat-details-top-actions">
+              <button type="button" aria-label="Search messages" onClick={() => { setChatDetailsOpen(false); document.querySelector(".chat-message-field input")?.focus(); }}><Search /></button>
+              <button type="button" aria-label="Customize chat" onClick={() => { setChatDetailsOpen(false); setChatCustomizeOpen(true); }}><Settings /></button>
+            </div>
+          </header>
+          <div className="rg-chat-details-profile">
+            <Avatar user={other(active)} size={92} />
+            <h2>{chatDetailsProfile?.user?.name || other(active)?.name || other(active)?.username || "User"}</h2>
+            <div className="rg-chat-details-actions">
+              <button type="button" onClick={() => { setChatDetailsOpen(false); setChatCustomizeOpen(true); }}><Palette /><span>Customise</span></button>
+              <button type="button" onClick={() => { setChatDetailsOpen(false); openUserProfile(other(active)?._id); }}><User /><span>Profile</span></button>
+              <button type="button" onClick={() => { const id = String(active?._id); setMutedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]); }}><Bell /><span>{mutedConversationIds.includes(String(active?._id)) ? "Unmute" : "Mute"}</span></button>
+            </div>
+          </div>
+          <div className="rg-chat-details-tabs" role="tablist" aria-label="Profile media">
+            <button type="button" className={chatDetailsTab === "posts" ? "active" : ""} onClick={() => setChatDetailsTab("posts")} aria-label="Posts"><Grid3X3 /></button>
+            <button type="button" className={chatDetailsTab === "reels" ? "active" : ""} onClick={() => setChatDetailsTab("reels")} aria-label="Reels"><Film /></button>
+          </div>
+          {chatDetailsLoading ? <div className="rg-chat-details-status">Loading profile…</div> : (() => {
+            const items = chatDetailsTab === "reels" ? (chatDetailsProfile?.reels || []) : (chatDetailsProfile?.posts || []);
+            return items.length ? <div className="rg-chat-details-grid">{items.map((item, index) => {
+              const raw = item.mediaUrl || item.media?.[0]?.url || item.imageUrl || "";
+              const src = raw ? (/^https?:\/\//i.test(raw) ? raw : `${SERVER}${String(raw).startsWith("/") ? "" : "/"}${raw}`) : "";
+              const video = chatDetailsTab === "reels" || item.kind === "video" || item.type === "video";
+              return <button type="button" key={item._id || index} className="rg-chat-details-tile" onClick={() => { setChatDetailsOpen(false); openUserProfile(other(active)?._id); }} aria-label="Open profile media">{src ? (video ? <video src={src} muted playsInline preload="metadata" /> : <img src={src} alt="" loading="lazy" />) : <span>{item.caption || "Post"}</span>}{video && <i><Film size={15}/></i>}</button>;
+            })}</div> : <div className="rg-chat-details-status">{chatDetailsTab === "reels" ? "No Reels to show" : "No posts to show"}</div>;
+          })()}
+        </div>
+      )}
+
+      {chatCustomizeOpen && active && (
+        <div className="rg-chat-customize-overlay" onClick={() => setChatCustomizeOpen(false)}>
+          <section className="rg-chat-customize-panel" role="dialog" aria-modal="true" aria-label="Customize chat" onClick={e => e.stopPropagation()}>
+            <div className="rg-chat-customize-head"><div><b>Customize chat</b><span>Make this conversation yours</span></div><button type="button" aria-label="Close" onClick={() => setChatCustomizeOpen(false)}><X /></button></div>
+            <div className="rg-chat-customize-section"><b>Chat colours</b><p>Choose a colour for your messages.</p><div className="rg-chat-theme-grid">{chatThemes.map(theme => <button type="button" key={theme.name} className={chatTheme.accent === theme.accent ? "active" : ""} onClick={() => saveChatTheme({ ...chatTheme, accent: theme.accent })}><i style={{ background: theme.accent }} /><span>{theme.name}</span></button>)}</div></div>
+            <div className="rg-chat-customize-section rg-chat-wallpaper-section"><b>Chat background</b><p>Use a photo from your gallery as this conversation's background.</p>{chatTheme.background && <div className="rg-chat-wallpaper-preview" style={{ backgroundImage: `url("${chatTheme.background}")` }}><button type="button" onClick={() => saveChatTheme({ ...chatTheme, background: "" })}>Remove photo</button></div>}<input ref={chatGalleryInput} className="rg-chat-gallery-input" type="file" accept="image/*" onChange={chooseChatWallpaper} /><button type="button" className="rg-chat-browse-gallery" onClick={() => chatGalleryInput.current?.click()}><ImageIcon size={19}/><span><b>Browse from gallery</b><small>Choose a photo from your device</small></span><ChevronRight size={18}/></button></div>
+            <button type="button" className="rg-chat-customize-done" onClick={() => setChatCustomizeOpen(false)}>Done</button>
+          </section>
+        </div>
+      )}
+
+      {mobileConversationActions && (
+        <div className="mobile-conversation-action-overlay" role="presentation" onClick={() => { setMobileConversationActions(null); setConversationMenuId(null); }}>
+          <section className="mobile-conversation-action-sheet" role="dialog" aria-modal="true" aria-label="Conversation actions" onClick={e => e.stopPropagation()}>
+            <div className="mobile-action-sheet-handle" />
+            <div className="mobile-action-sheet-user"><Avatar user={other(mobileConversationActions)} size={42} /><div><b>{other(mobileConversationActions)?.username ? `@${other(mobileConversationActions).username}` : other(mobileConversationActions)?.name || 'Conversation'}</b><span>Conversation options</span></div></div>
+            <button type="button" onClick={() => runConversationAction('primary', mobileConversationActions)}><Mail size={22}/><span>Move to Primary</span></button>
+            <button type="button" onClick={() => runConversationAction('general', mobileConversationActions)}><Mail size={22}/><span>Move to General</span></button>
+            <button type="button" onClick={() => runConversationAction('unread', mobileConversationActions)}><Mail size={22}/><span>Mark as unread</span></button>
+            <button type="button" onClick={() => runConversationAction('pin', mobileConversationActions)}><PinOff size={22}/><span>{pinnedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unpin' : 'Pin'}</span></button>
+            <button type="button" onClick={() => runConversationAction('mute', mobileConversationActions)}><Bell size={22}/><span>{mutedConversationIds.includes(String(mobileConversationActions._id)) ? 'Unmute' : 'Mute'}</span></button>
+            <button type="button" className="mobile-action-delete" onClick={() => runConversationAction('delete', mobileConversationActions)}><Trash2 size={22}/><span>Delete</span></button>
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotificationsPage({ onBack }) {
+  const [items, setItems] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
+  const [followingIds, setFollowingIds] = useState(new Set());
+  const [loading, setLoading] = useState(true);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [requestActionId, setRequestActionId] = useState(null);
+  // Tap a notification to show its Delete / Cancel actions inline.
+  // Nothing is deleted until the user explicitly confirms Delete.
+  const [notificationMenuId, setNotificationMenuId] = useState(null);
+
+  const me = getUser();
+
+  async function loadNotifications() {
+    setLoading(true);
+    try {
+      const d = await api("/notifications");
+      setItems(d.notifications || []);
+    } catch (e) {
+      console.error(e);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadRequests() {
+    setRequestsLoading(true);
+    try {
+      const d = await api("/follows/requests");
+      setRequests(d.requests || []);
+    } catch (e) {
+      console.error(e);
+      setRequests([]);
+    } finally {
+      setRequestsLoading(false);
+    }
+  }
+
+  async function loadFollowing() {
+    try {
+      if (!me?._id) return;
+      const d = await api(`/follows/${me._id}/following`);
+      const rows = d.following || d.users || [];
+      const ids = new Set();
+      rows.forEach(item => {
+        const user = item?.user || item;
+        if (user?._id) ids.add(String(user._id));
+      });
+      setFollowingIds(ids);
+    } catch (e) {
+      console.error(e);
+      setFollowingIds(new Set());
+    }
+  }
+
+  useEffect(() => {
+    loadNotifications();
+    loadFollowing();
+    loadRequests();
+  }, []);
+
+  async function acceptRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/accept`, { method: "POST" });
+      setRequests(current => current.filter(r => String(r._id) !== String(requestId)));
+      await loadNotifications();
+    } catch (e) {
+      alert(e.message || "Unable to accept follow request");
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  async function rejectRequest(requestId) {
+    if (!requestId || requestActionId) return;
+    setRequestActionId(requestId);
+    try {
+      await api(`/follows/requests/${requestId}/decline`, { method: "POST" });
+      setRequests(current => current.filter(r => String(r._id) !== String(requestId)));
+      await loadNotifications();
+    } catch (e) {
+      alert(e.message || "Unable to reject follow request");
+    } finally {
+      setRequestActionId(null);
+    }
+  }
+
+  function notificationType(n) {
+    const type = String(n?.type || n?.kind || n?.event || "").toLowerCase();
+    const text = String(n?.text || n?.message || "").toLowerCase();
+    if (type.includes("comment") || text.includes("comment")) return "comment";
+    if (type.includes("follow") || text.includes("follow")) return "follow";
+    if (type.includes("like") || text.includes("liked") || text.includes("like")) return "like";
+    if (type.includes("message") || text.includes("message")) return "message";
+    if (type.includes("reel")) return "reel";
+    if (type.includes("story")) return "story";
+    if (type.includes("mention") || text.includes("mention")) return "mention";
+    return "other";
+  }
+
+  const filteredItems = useMemo(() => {
+    if (activeTab === "comments") return items.filter(n => notificationType(n) === "comment");
+    if (activeTab === "follows") return items.filter(n => notificationType(n) === "follow");
+    if (activeTab === "likes") return items.filter(n => notificationType(n) === "like");
+    if (activeTab === "people") {
+      return items.filter(n => {
+        const actorId = n?.actor?._id || n?.actorId || n?.userId;
+        return actorId && followingIds.has(String(actorId));
+      });
+    }
+    return items;
+  }, [items, activeTab, followingIds]);
+
+  // Combine likes only when the backend identifies the same target post/reel/story.
+  // Notifications without a shared target ID stay separate to avoid false grouping.
+  const displayNotifications = useMemo(() => {
+    const result = [];
+    const likeGroups = new Map();
+    for (const item of filteredItems) {
+      if (notificationType(item) !== "like") {
+        result.push(item);
+        continue;
+      }
+      const targetId = item?.post?._id || item?.postId || item?.targetPostId ||
+        item?.target?._id || item?.targetId || item?.contentId ||
+        item?.reel?._id || item?.reelId || item?.story?._id || item?.storyId;
+      if (!targetId) {
+        result.push(item);
+        continue;
+      }
+      const key = `like:${String(targetId)}`;
+      if (!likeGroups.has(key)) {
+        const group = { ...item, _isGroupedLike: true, _groupedItems: [item], _groupedActors: [item.actor].filter(Boolean), _groupKey: key };
+        likeGroups.set(key, group);
+        result.push(group);
+      } else {
+        const group = likeGroups.get(key);
+        group._groupedItems.push(item);
+        if (item.actor && !group._groupedActors.some(actor => String(actor?._id) === String(item.actor?._id))) {
+          group._groupedActors.push(item.actor);
+        }
+        const itemTime = new Date(item.createdAt || 0).getTime();
+        const groupTime = new Date(group.createdAt || 0).getTime();
+        if (itemTime > groupTime) {
+          group.createdAt = item.createdAt;
+          group._latestNotificationId = item._id;
+        }
+      }
+    }
+    return result;
+  }, [filteredItems]);
+
+  const notificationSections = useMemo(() => {
+    const now = new Date();
+    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startYesterday = startToday - 24 * 60 * 60 * 1000;
+    const startWeek = startToday - 6 * 24 * 60 * 60 * 1000;
+    const groups = new Map([["Today", []], ["Yesterday", []], ["Last 7 days", []], ["Earlier", []]]);
+    for (const item of displayNotifications) {
+      const stamp = new Date(item.createdAt || 0).getTime();
+      let label = "Earlier";
+      if (stamp >= startToday) label = "Today";
+      else if (stamp >= startYesterday) label = "Yesterday";
+      else if (stamp >= startWeek) label = "Last 7 days";
+      groups.get(label).push(item);
+    }
+    return [...groups.entries()].filter(([, rows]) => rows.length).map(([title, rows]) => ({ title, rows }));
+  }, [displayNotifications]);
+
+  const tabs = [
+    { id: "all", label: "All" },
+    { id: "people", label: "People you follow" },
+    { id: "comments", label: "Comments" },
+    { id: "follows", label: "Follows" },
+    { id: "requests", label: "Requests", count: requests.length }
+  ];
+
+  return (
+    <div className="page notifications-page">
+      <div className="notifications-center-head">
+        <h1>Notifications</h1>
+        <button type="button" className="notifications-refresh" onClick={() => { loadNotifications(); loadRequests(); loadFollowing(); }} aria-label="Refresh notifications">
+          <Bell />
+        </button>
+      </div>
+
+      <div className="notification-tabs" role="tablist" aria-label="Notification filters">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            className={activeTab === tab.id ? "active" : ""}
+            onClick={() => {
+              setActiveTab(tab.id);
+              if (tab.id === "requests") loadRequests();
+            }}
+          >
+            <span>{tab.label}</span>
+            {tab.count > 0 && <b className="notification-tab-count">{tab.count > 99 ? "99+" : tab.count}</b>}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "requests" ? (
+        <section className="notification-request-center">
+          <div className="notification-section-title">
+            <div>
+              <h2>Follow requests</h2>
+              <p>People who want to follow you</p>
+            </div>
+            <button type="button" onClick={loadRequests}>Refresh</button>
+          </div>
+
+          {requestsLoading ? (
+            <div className="notification-center-state">Loading requests...</div>
+          ) : requests.length ? (
+            <div className="notification-requests-list">
+              {requests.map(request => {
+                const person = request?.follower || request?.requester || request?.actor || request?.user || {};
+                const busy = String(requestActionId || "") === String(request._id);
+                return (
+                  <div className="notification-request-row" key={request._id}>
+                    <Avatar user={person} size={52} />
+                    <div className="notification-request-copy">
+                      <UserLink user={person} />
+                      <span>wants to follow you</span>
+                      <small>{request.createdAt ? new Date(request.createdAt).toLocaleString() : "Follow request"}</small>
+                    </div>
+                    <div className="notification-request-actions">
+                      <button type="button" className="notification-request-accept" disabled={!!requestActionId} onClick={() => acceptRequest(request._id)}>
+                        {busy ? "..." : "Accept"}
+                      </button>
+                      <button type="button" className="notification-request-reject" disabled={!!requestActionId} onClick={() => rejectRequest(request._id)}>
+                        {busy ? "..." : "Reject"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="notification-center-state notification-center-empty">
+              <UserPlus />
+              <h3>No follow requests</h3>
+              <p>New follow requests will appear here.</p>
+            </div>
+          )}
+        </section>
+      ) : (
+        <section className="notification-feed">
+          {loading ? (
+            <div className="notification-center-state">Loading notifications...</div>
+          ) : displayNotifications.length ? (
+            notificationSections.map(section => (
+              <div className="notification-time-section" key={section.title}>
+                <h2 className="notification-time-heading">{section.title}</h2>
+                {section.rows.map(n => {
+              const notificationId = String(n._groupKey || n._id);
+              const isMenuOpen = notificationMenuId === notificationId;
+              const actorId = String(n?.actor?._id || n?.actorId || n?.userId || "");
+              const isFollowingActor = actorId && followingIds.has(actorId);
+              const groupedItems = n._isGroupedLike ? n._groupedItems : [n];
+              async function deleteNotification(e) {
+                e.stopPropagation();
+                try {
+                  await Promise.all(groupedItems.map(item => api(`/notifications/${item._id}`, { method: "DELETE" })));
+                  const deletedIds = new Set(groupedItems.map(item => String(item._id)));
+                  setItems(current => current.filter(item => !deletedIds.has(String(item._id))));
+                  setNotificationMenuId(null);
+                } catch (error) {
+                  alert(error.message || "Could not delete notification.");
+                }
+              }
+              async function followBack(e) {
+                e.stopPropagation();
+                if (!actorId || isFollowingActor || requestActionId) return;
+                setRequestActionId(actorId);
+                try {
+                  await api(`/follows/${actorId}`, { method: "POST" });
+                  setFollowingIds(current => new Set([...current, actorId]));
+                } catch (error) {
+                  alert(error.message || "Unable to follow this person.");
+                } finally {
+                  setRequestActionId(null);
+                }
+              }
+              return (
+                <div className={`notification-swipe-shell${isMenuOpen ? " menu-open" : ""}`} key={notificationId}>
+                  <button
+                    type="button"
+                    className="notification notification-card"
+                    aria-label={`Open profile for ${n?.actor?.username || n?.actor?.name || "notification user"}`}
+                    onClick={() => {
+                      const profileActor = n._isGroupedLike ? (n._groupedActors[0] || n.actor) : n.actor;
+                      const targetProfileId = profileActor?._id || n?.actorId || n?.userId;
+                      if (targetProfileId) window.dispatchEvent(new CustomEvent("vk-open-profile", { detail: { id: String(targetProfileId) } }));
+                    }}
+                  >
+                    {n._isGroupedLike ? (
+                      <span className="notification-avatar-stack" aria-hidden="true">
+                        {n._groupedActors.slice(0, 3).map((actor, index) => <span key={actor?._id || index} style={{ zIndex: 4 - index, marginLeft: index ? -13 : 0 }}><Avatar user={actor} size={38} /></span>)}
+                      </span>
+                    ) : <Avatar user={n.actor} size={48} />}
+                    <span className="notification-copy">
+                      <span>
+                        {n._isGroupedLike ? (
+                          <>
+                            <UserLink user={n._groupedActors[0] || n.actor} />
+                            {n._groupedActors[1] ? <> , <UserLink user={n._groupedActors[1]} /></> : null}
+                            {" "}{n._groupedItems.length > 2 ? `and ${n._groupedItems.length - 2} others liked your ${n?.reelId || n?.reel?._id ? "reel" : n?.storyId || n?.story?._id ? "story" : "post"}.` : `liked your ${n?.reelId || n?.reel?._id ? "reel" : n?.storyId || n?.story?._id ? "story" : "post"}.`}
+                          </>
+                        ) : <><UserLink user={n.actor} />{" "}{n.text || n.message || "New activity on your account"}</>}
+                      </span>
+                      <small>{n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="notification-options-trigger"
+                    aria-label="Notification options"
+                    title="Notification options"
+                    aria-expanded={isMenuOpen}
+                    onClick={(event) => { event.stopPropagation(); setNotificationMenuId(current => current === notificationId ? null : notificationId); }}
+                  ><MoreHorizontal size={19} /></button>
+                  {notificationType(n) === "follow" && actorId && actorId !== String(me?._id || "") && (
+                    <button
+                      type="button"
+                      className={`notification-followback${isFollowingActor ? " is-following" : ""}`}
+                      disabled={!!requestActionId || !!isFollowingActor}
+                      onClick={followBack}
+                    >
+                      {requestActionId === actorId ? "…" : isFollowingActor ? "Following" : "Follow back"}
+                    </button>
+                  )}
+                  {isMenuOpen && (
+                    <div className="notification-inline-actions" role="group" aria-label="Notification actions">
+                      <button type="button" className="notification-option-delete" onClick={deleteNotification}>
+                        <Trash2 size={16} /> Delete
+                      </button>
+                      <button type="button" className="notification-option-cancel" onClick={() => setNotificationMenuId(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+                })}
+              </div>
+            ))
+          ) : (
+            <div className="notification-center-state notification-center-empty">
+              <Bell />
+              <h3>No notifications</h3>
+              <p>New activity will appear here.</p>
+            </div>
+          )}
+        </section>
+      )}
+    </div>
+  );
+}
+
+function SavedPage({ user, embedded = false }) {
+  const [posts, setPosts] = useState([]);
+  const [reels, setReels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState("posts");
+  const [activeReel, setActiveReel] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    const normalize = (data, kind) => {
+      const raw = kind === "posts"
+        ? (data?.posts || data?.data?.posts || data?.savedPosts || data?.saved || [])
+        : (data?.reels || data?.data?.reels || data?.savedReels || data?.saved || []);
+      return Array.isArray(raw)
+        ? raw.map(item => kind === "posts" ? (item?.post || item) : (item?.reel || item))
+          .filter(item => item && (kind === "posts" ? item._id : item._id && item.mediaUrl))
+        : [];
+    };
+    const refreshSaved = () => {
+      api("/posts/saved").then(data => setPosts(normalize(data, "posts"))).catch(() => {});
+      api("/reels/saved").then(data => setReels(normalize(data, "reels"))).catch(() => {});
+    };
+    Promise.all([
+      api("/posts/saved").catch(error => { console.error("Could not load saved posts:", error); return { posts: [] }; }),
+      api("/reels/saved").catch(error => { console.error("Could not load saved Reels:", error); return { reels: [] }; })
+    ]).then(([postData, reelData]) => {
+      if (cancelled) return;
+      setPosts(normalize(postData, "posts"));
+      setReels(normalize(reelData, "reels"));
+    }).finally(() => { if (!cancelled) setLoading(false); });
+    window.addEventListener("reelsgo-saved-content-updated", refreshSaved);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("reelsgo-saved-content-updated", refreshSaved);
+    };
+  }, []);
+
+  const totalSaved = posts.length + reels.length;
+  const body = <section className={`saved-page-content${embedded ? " saved-page-embedded" : ""}`}>
+    {!embedded && <header className="saved-page-header">
+      <div className="saved-page-title-icon"><Bookmark size={25} strokeWidth={1.8} /></div>
+      <div className="saved-page-title-copy"><h1>Saved</h1><p>Keep the posts and Reels you want to come back to.</p></div>
+      <div className="saved-page-total"><strong>{totalSaved}</strong><span>saved items</span></div>
+    </header>}
+    <div className="saved-page-toolbar">
+      <div className="saved-page-tabs" role="tablist" aria-label="Saved content">
+        <button type="button" role="tab" aria-selected={activeType === "posts"} className={activeType === "posts" ? "active" : ""} onClick={() => setActiveType("posts")}><Grid3X3 size={17}/><span>Posts</span><b>{posts.length}</b></button>
+        <button type="button" role="tab" aria-selected={activeType === "reels"} className={activeType === "reels" ? "active" : ""} onClick={() => setActiveType("reels")}><Film size={17}/><span>Reels</span><b>{reels.length}</b></button>
+      </div>
+      <span className="saved-private-note"><Lock size={13}/> Only you can see what you save</span>
+    </div>
+    {loading ? <div className="saved-page-state"><div className="saved-loading-mark"><Bookmark size={25}/></div><strong>Loading your saved items</strong><span>Just a moment…</span></div> : activeType === "posts" ? (
+      posts.length ? <div className="profile-grid saved-posts-grid">{posts.slice(0, 100).map(p => <GridMedia key={p._id} post={p} user={user} onDeleted={id => setPosts(current => current.filter(item => String(item._id) !== String(id)))} />)}</div>
+      : <div className="saved-page-empty"><div className="saved-empty-art"><Bookmark size={32} strokeWidth={1.5}/></div><h2>Save your favorites</h2><p>Tap the bookmark on a post to save it here. Your saved posts are private and only visible to you.</p></div>
+    ) : (
+      reels.length ? <div className="profile-grid reels-profile-grid saved-reels-grid">{reels.slice(0, 100).map(reel => <button key={reel._id} type="button" className="grid-media grid-media-button saved-reel-tile" onClick={() => setActiveReel(reel)} aria-label={`Play saved Reel${reel.caption ? `: ${reel.caption}` : ""}`}>
+        <video src={/^https?:\/\//i.test(reel.mediaUrl || "") ? reel.mediaUrl : `${SERVER}${String(reel.mediaUrl || "").startsWith("/") ? "" : "/"}${reel.mediaUrl || ""}`} muted playsInline preload="metadata" />
+        <span className="saved-reel-play" aria-hidden="true"><Play size={22} fill="currentColor"/></span>
+        {reel.caption ? <span className="saved-reel-caption">{reel.caption}</span> : null}
+      </button>)}</div> : <div className="saved-page-empty"><div className="saved-empty-art"><Film size={32} strokeWidth={1.5}/></div><h2>Your saved Reels live here</h2><p>When you bookmark a Reel, you can find it here and watch it again anytime.</p></div>
+    )}
+    {activeReel && <ReelViewer reel={activeReel} onClose={() => setActiveReel(null)} />}
+  </section>;
+  if (embedded) return <div className="embedded-saved">{body}</div>;
+  return <div className="page saved-page-shell">{body}</div>;
+}
+
+const settingsSections = [
+  { id: "account", title: "Your account", icon: User, items: ["Edit profile", "Personal information", "Password", "Account privacy", "Deactivate or delete account", "Profile discovery", "Account suggestions"] },
+  { id: "privacy", title: "Privacy", icon: Lock, items: ["Private account", "Activity status", "Hidden words", "Hide offensive comments", "Custom words filter", "Tags and mentions", "Allow tags from", "Allow mentions from", "Comments", "Sharing", "Allow remixing", "Allow downloads", "Story sharing", "Close Friends", "Restricted accounts", "Blocked accounts", "Muted accounts", "Close friends visibility"] },
+  { id: "security", title: "Security", icon: Shield, items: ["Login alerts", "New device alerts", "Security email notifications", "Sensitive action confirmations", "Remember trusted devices", "Password change alerts", "Email change alerts", "Phone change alerts", "Active session reminders"] },
+  { id: "notifications", title: "Notifications", icon: Bell, items: ["Push notifications", "Likes", "Comments", "Followers and follow requests", "Messages", "Message requests", "Story replies", "Mentions", "Live notifications", "Reels interactions", "Product announcements", "Email notifications"] },
+  { id: "messages", title: "Messages and replies", icon: MessageSquareText, items: ["Message requests", "Read receipts", "Typing indicator", "Group message requests", "Story replies", "Allow sharing", "Allow message previews", "Allow voice messages", "Call notifications"] },
+  { id: "content", title: "What you see", icon: Compass, items: ["Sensitive content", "Autoplay videos", "Suggested posts", "Show political content", "Use less mobile data", "Favorites feed", "Show liked posts", "Personalized recommendations", "Hide previously seen posts", "Show content in original language"] },
+  { id: "media", title: "Media quality", icon: ImageIcon, items: ["Data usage saver", "Upload at highest quality", "Autoplay videos on Wi-Fi", "Autoplay videos on mobile data", "Save original photos", "Save original videos", "Allow media downloads", "Preload videos"] },
+  { id: "accessibility", title: "Accessibility", icon: Smartphone, items: ["Reduce motion", "Captions", "Auto-generated captions", "Text size", "Sound effects", "Text-to-speech", "Screen reader labels", "High contrast", "Keyboard navigation"] },
+  { id: "language", title: "Language", icon: Languages, items: ["App language", "Automatic translations", "Translate captions", "Translate comments", "Translate messages", "Preferred content language"] },
+  { id: "help", title: "Help", icon: CircleHelp, items: ["Help center", "Report a problem", "Privacy and safety", "Community guidelines", "Terms and policies"] }
+];
+
+
+function CloseFriendsSettings() {
+  const [query, setQuery] = useState("");
+  const [people, setPeople] = useState([]);
+  const [closeFriends, setCloseFriends] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
+  const [busyId, setBusyId] = useState("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  async function loadCloseFriends() {
+    setLoading(true);
+    try {
+      const data = await api("/users/me/close-friends");
+      setCloseFriends(data.closeFriends || []);
+      setError("");
+    } catch (e) {
+      setError(e.message || "Could not load your Close Friends list.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadCloseFriends();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const term = query.trim();
+      if (!term) {
+        setPeople([]);
+        setSearching(false);
+        return;
+      }
+
+      setSearching(true);
+      try {
+        const data = await api(`/users/search?q=${encodeURIComponent(term)}`);
+        const results = data.users || data.results || [];
+        const currentId = String(getUser()?._id || "");
+        const existing = new Set(
+          closeFriends.map(person => String(person?._id || person?.user?._id || person))
+        );
+        const unique = [];
+        const seen = new Set();
+
+        for (const item of results) {
+          const person = item?.user || item;
+          const id = String(person?._id || "");
+          if (!id || id === currentId || existing.has(id) || seen.has(id)) continue;
+          seen.add(id);
+          unique.push(person);
+        }
+        if (!cancelled) {
+          setPeople(unique);
+          setError("");
+        }
+      } catch (e) {
+        if (!cancelled) setError(e.message || "Unable to search users.");
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query, closeFriends]);
+
+  async function addPerson(person) {
+    const id = String(person._id);
+    setBusyId(id);
+    setError("");
+    setNotice("");
+
+    try {
+      const data = await api("/users/me/close-friends", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id }),
+      });
+      setCloseFriends(data.closeFriends || [...closeFriends, person]);
+      setPeople(current => current.filter(p => String(p._id) !== id));
+      setNotice(`@${person.username || person.name || "User"} added to Close Friends.`);
+    } catch (e) {
+      setError(e.message || "Unable to add this person.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function removePerson(person) {
+    const id = String(person?._id || person?.user?._id || person);
+    setBusyId(id);
+    setError("");
+    setNotice("");
+
+    try {
+      const data = await api(`/users/me/close-friends/${id}`, {
+        method: "DELETE",
+      });
+      setCloseFriends(data.closeFriends || closeFriends.filter(
+        p => String(p?._id || p?.user?._id || p) !== id
+      ));
+      setNotice("Person removed from Close Friends.");
+    } catch (e) {
+      setError(e.message || "Unable to remove this person.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  return (
+    <div className="rg-close-friends">
+      <div className="rg-cf-intro">
+        <div className="rg-cf-icon"><Users /></div>
+        <div>
+          <h2>Close Friends</h2>
+          <p>Choose who can see stories shared with your Close Friends audience.</p>
+        </div>
+      </div>
+
+      <label className="rg-cf-search">
+        <Search aria-hidden="true" />
+        <input
+          type="search"
+          value={query}
+          onChange={event => setQuery(event.target.value)}
+          placeholder="Search by username or name"
+          aria-label="Search users to add to Close Friends"
+        />
+        {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search"><X /></button>}
+      </label>
+
+      {error && <div className="rg-cf-message error" role="alert">{error}</div>}
+      {notice && <div className="rg-cf-message success" role="status">{notice}</div>}
+
+      {query.trim() && (
+        <div className="rg-cf-search-results">
+          {searching ? (
+            <p className="rg-cf-muted">Searching…</p>
+          ) : people.length ? (
+            people.map(person => (
+              <div className="rg-cf-person" key={person._id}>
+                <Avatar user={person} size={44} />
+                <div className="rg-cf-person-info">
+                  <b>@{person.username || "user"}</b>
+                  <span>{person.name || "ReelsGo user"}</span>
+                </div>
+                <button
+                  className="rg-cf-add"
+                  type="button"
+                  disabled={!!busyId}
+                  onClick={() => addPerson(person)}
+                >
+                  <UserPlus size={16} />
+                  {busyId === String(person._id) ? "Adding…" : "Add"}
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="rg-cf-muted">No users found to add.</p>
+          )}
+        </div>
+      )}
+
+      <div className="rg-cf-list-heading">
+        <h3>Your list</h3>
+        <span>{closeFriends.length} {closeFriends.length === 1 ? "person" : "people"}</span>
+      </div>
+
+      {loading ? (
+        <p className="rg-cf-muted">Loading your Close Friends…</p>
+      ) : closeFriends.length ? (
+        closeFriends.map(item => {
+          const person = item?.user || item;
+          const id = String(person?._id || person);
+          return (
+            <div className="rg-cf-person" key={id}>
+              <Avatar user={person} size={44} />
+              <div className="rg-cf-person-info">
+                <b>{person?.username ? `@${person.username}` : "ReelsGo user"}</b>
+                <span>{person?.name || ""}</span>
+              </div>
+              <button
+                className="rg-cf-remove"
+                type="button"
+                disabled={!!busyId}
+                onClick={() => removePerson(person)}
+              >
+                {busyId === id ? "Removing…" : "Remove"}
+              </button>
+            </div>
+          );
+        })
+      ) : (
+        <div className="rg-cf-empty">
+          <Users />
+          <b>Your Close Friends list is empty</b>
+          <span>Search for people above and select Add.</span>
+        </div>
+      )}
+
+      <p className="rg-cf-footnote">
+        Your list is private. People are not notified when you add or remove them.
+      </p>
+    </div>
+  );
+}
+
+function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification }) {
+  const [section, setSection] = useState("account");
+  const [search, setSearch] = useState("");
+  const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [mobileSectionOpen, setMobileSectionOpen] = useState(false);
+
+  const visible = settingsSections.filter(s =>
+    !search ||
+    s.title.toLowerCase().includes(search.toLowerCase()) ||
+    s.items.some(i => i.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  function openSection(id) {
+    setSection(id);
+    setSelectedItem("");
+    setMobileSectionOpen(true);
+    window.requestAnimationFrame(() => {
+      const el = document.querySelector(".settings-content");
+      if (el) el.scrollTop = 0;
+    });
+  }
+
+  function handleSettingsBack() {
+    if (mobileSectionOpen) {
+      setMobileSectionOpen(false);
+      setSelectedItem("");
+      return;
+    }
+    onClose();
+  }
+
+  async function savePrivacy() {
+    try {
+      const d = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPrivate: privateAccount })
+      });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+      alert("Privacy updated");
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  async function togglePrivateAccount(next) {
+    const previous = privateAccount;
+    setPrivateAccount(next);
+    try {
+      const d = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPrivate: next })
+      });
+      setUser(d.user);
+      localStorage.setItem("vk_user", JSON.stringify(d.user));
+    } catch (e) {
+      setPrivateAccount(previous);
+      alert(e.message);
+    }
+  }
+
+  const activeSection = settingsSections.find(x => x.id === section);
+
+  return (
+    <div className="overlay settings-overlay">
+      <div className="settings-modal instagram-settings">
+        <div className="settings-topbar">
+          <button
+            className="settings-back"
+            onClick={handleSettingsBack}
+            type="button"
+            aria-label={mobileSectionOpen ? "Back to settings" : "Back to home"}
+          >
+            <ChevronRight
+              className="settings-back-icon"
+              style={{ transform: "rotate(180deg)" }}
+            />
+          </button>
+
+          <h2>{mobileSectionOpen ? activeSection?.title : "Settings and activity"}</h2>
+
+          <button
+            className="settings-close-desktop"
+            onClick={onClose}
+            type="button"
+            aria-label="Close settings"
+          >
+            <X />
+          </button>
+        </div>
+
+        <div className="settings-search">
+          <Search />
+          <input
+            value={search}
+            onChange={e => {
+              setSearch(e.target.value);
+              if (mobileSectionOpen) setMobileSectionOpen(false);
+            }}
+            placeholder="Search settings"
+            aria-label="Search settings"
+          />
+          {search && (
+            <button
+              className="settings-search-clear"
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+            >
+              <X />
+            </button>
+          )}
+        </div>
+
+        {/* Desktop / tablet settings navigation */}
+        <div className="settings-layout">
+          <aside className="settings-sidebar">
+            {visible.map(s => {
+              const Icon = s.icon;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={section === s.id ? "active" : ""}
+                  onClick={() => {
+                    setSection(s.id);
+                    setSelectedItem("");
+                  }}
+                >
+                  <Icon />
+                  <span>{s.title}</span>
+                  <ChevronRight />
+                </button>
+              );
+            })}
+
+            <button className="settings-logout" onClick={onLogout} type="button">
+              <LogOut />
+              <span>Log out</span>
+            </button>
+          </aside>
+
+          <section className="settings-content">
+            <div className="settings-section-title">
+              <h1>{activeSection?.title}</h1>
+              <p>Manage your ReelsGo experience.</p>
+            </div>
+
+            {section === "account" && (
+              <>
+                <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} onSelect={setSelectedItem} />
+              </>
+            )}
+            {section === "privacy" && (
+              <PrivacySettings
+                privateAccount={privateAccount}
+                setPrivateAccount={setPrivateAccount}
+                togglePrivateAccount={togglePrivateAccount}
+                savePrivacy={savePrivacy}
+                onSelect={setSelectedItem}
+              />
+            )}
+            {section === "privacy" && <CloseFriendsSettings />}
+            {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} onSelect={setSelectedItem} />}
+            {section === "security" && (
+              <SecuritySettings onSelect={setSelectedItem} />
+            )}
+            {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} onSelect={setSelectedItem} />}
+            {section === "notifications" && (
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "messages" && (
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "content" && (
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "media" && (
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "accessibility" && (
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "language" && (
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} onSelect={setSelectedItem} />
+              )}
+            {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
+
+            {selectedItem && (
+              <SettingDetailScreen
+                item={selectedItem}
+                sectionId={section}
+                user={user}
+                setUser={setUser}
+                onBack={() => setSelectedItem("")}
+              />
+            )}
+          </section>
+        </div>
+
+        {/* Mobile settings category list. Nothing is hidden behind the desktop sidebar. */}
+        <div className={`settings-mobile ${mobileSectionOpen ? "section-open" : "section-list-open"}`}>
+          {!mobileSectionOpen ? (
+            <div className="settings-mobile-list">
+              <div className="settings-mobile-heading">
+                <h1>Settings and activity</h1>
+                <p>All ReelsGo settings</p>
+              </div>
+
+              <div className="settings-mobile-categories">
+                {visible.map(s => {
+                  const Icon = s.icon;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className="settings-mobile-category"
+                      onClick={() => openSection(s.id)}
+                    >
+                      <span className="settings-mobile-category-icon">
+                        <Icon />
+                      </span>
+                      <span className="settings-mobile-category-copy">
+                        <b>{s.title}</b>
+                        <small>{s.items.length} settings</small>
+                      </span>
+                      <ChevronRight />
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                className="settings-mobile-logout"
+                type="button"
+                onClick={onLogout}
+              >
+                <LogOut />
+                <span>Log out</span>
+              </button>
+            </div>
+          ) : (
+            <section className="settings-mobile-detail">
+              <div className="settings-mobile-detail-head">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileSectionOpen(false);
+                    setSelectedItem("");
+                  }}
+                  aria-label="Back to all settings"
+                >
+                  <ChevronRight style={{ transform: "rotate(180deg)" }} />
+                </button>
+                <div>
+                  <h1>{activeSection?.title}</h1>
+                  <p>{activeSection?.items.length || 0} settings</p>
+                </div>
+              </div>
+
+              {section === "account" && (
+                <>
+                  <AccountSettings user={user} onSelect={setSelectedItem} onOpenVerification={onOpenVerification} />
+                  <ToggleSettings title="Account preferences" sectionId="account" items={settingsSections.find(s => s.id === "account")?.items.filter(x => ["Profile discovery", "Account suggestions"].includes(x)) || []} onSelect={setSelectedItem} />
+                </>
+              )}
+              {section === "privacy" && (
+                <PrivacySettings
+                  privateAccount={privateAccount}
+                  setPrivateAccount={setPrivateAccount}
+                  togglePrivateAccount={togglePrivateAccount}
+                  savePrivacy={savePrivacy}
+                  onSelect={setSelectedItem}
+                />
+              )}
+              {section === "privacy" && <CloseFriendsSettings />}
+              {section === "privacy" && <ToggleSettings title="Additional privacy preferences" sectionId="privacy" items={settingsSections.find(s => s.id === "privacy")?.items.filter(x => !["Private account", "Restricted accounts", "Blocked accounts", "Muted accounts"].includes(x)) || []} onSelect={setSelectedItem} />}
+              {section === "security" && (
+                <SecuritySettings onSelect={setSelectedItem} />
+              )}
+              {section === "security" && <ToggleSettings title="Security preferences" sectionId="security" items={settingsSections.find(s => s.id === "security")?.items || []} onSelect={setSelectedItem} />}
+              {section === "notifications" && (
+                <ToggleSettings title={activeSection?.title || "Notifications"} sectionId="notifications" items={settingsSections.find(s => s.id === "notifications")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "messages" && (
+                <ToggleSettings title={activeSection?.title || "Messages"} sectionId="messages" items={settingsSections.find(s => s.id === "messages")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "content" && (
+                <ToggleSettings title={activeSection?.title || "Content"} sectionId="content" items={settingsSections.find(s => s.id === "content")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "media" && (
+                <ToggleSettings title={activeSection?.title || "Media"} sectionId="media" items={settingsSections.find(s => s.id === "media")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "accessibility" && (
+                <ToggleSettings title={activeSection?.title || "Accessibility"} sectionId="accessibility" items={settingsSections.find(s => s.id === "accessibility")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "language" && (
+                <ToggleSettings title={activeSection?.title || "Language"} sectionId="language" items={settingsSections.find(s => s.id === "language")?.items || []} onSelect={setSelectedItem} />
+              )}
+              {section === "help" && <HelpSettings onSelect={setSelectedItem} />}
+
+              {selectedItem && (
+                <SettingDetailScreen
+                  item={selectedItem}
+                  sectionId={section}
+                  user={user}
+                  setUser={setUser}
+                  onBack={() => setSelectedItem("")}
+                />
+              )}
+            </section>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccountSettings({ user, onSelect, onOpenVerification }) {
+  return <div className="settings-panel">
+    <div className="settings-profile-row"><Avatar user={user} size={72} /><div><b>{user?.username} <VerifiedBadge userId={user?._id} /></b><span>{user?.email}</span></div><button className="secondary" onClick={() => onSelect("Edit profile")}>Edit profile</button></div>
+    <div className="verification-settings-card">
+      <div className="verification-settings-icon"><BadgeCheck /></div>
+      <div className="verification-settings-copy">
+        <b>{verificationStatusCache.get(String(user?._id)) === true ? "Verified account" : "Get your blue tick"}</b>
+        <span>{verificationStatusCache.get(String(user?._id)) === true ? "Your ReelsGo blue badge is active." : "Enter your phone number once to activate your custom ReelsGo blue badge."}</span>
+      </div>
+      {verificationStatusCache.get(String(user?._id)) === true ? (
+        <span className="verification-active-label"><BadgeCheck /> Active</span>
+      ) : (
+        <button className="primary verification-settings-button" onClick={onOpenVerification}>Get verified</button>
+      )}
+    </div>
+    <SettingRow onClick={() => onSelect("Personal information")} icon={<User />} title="Personal information" description="Name, email and profile information" />
+    <SettingRow onClick={() => onSelect("Password")} icon={<KeyRound />} title="Password" description="Change your account password" />
+    <SettingRow onClick={() => onSelect("Account privacy")} icon={<Lock />} title="Account privacy" description="Public or private account" />
+    <SettingRow onClick={() => onSelect("Deactivate or delete account")} icon={<Trash2 />} title="Deactivate or delete account" description="Temporarily deactivate or permanently delete" danger />
+  </div>;
+}
+
+function Toggle({ checked, onChange, disabled = false }) {
+  return (
+    <button
+      type="button"
+      className={`toggle ${checked ? "on" : "off"}`}
+      aria-pressed={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+    >
+      <span className="toggle-knob" />
+    </button>
+  );
+}
+
+function PrivacySettings({ privateAccount, setPrivateAccount, togglePrivateAccount, savePrivacy, onSelect }) {
+  return <div className="settings-panel">
+    <div className="settings-card-highlight"><Lock /><div><b>Account privacy</b><p>When private, only approved followers can see your posts and stories.</p></div></div>
+    <div className="privacy-toggle-row settings-toggle-row">
+      <div><b>Private account</b><span>Only approved followers can see your posts and stories.</span></div>
+      <Toggle checked={privateAccount} onChange={togglePrivateAccount} />
+    </div>
+    <SettingRow onClick={() => onSelect("Blocked accounts")} icon={<Ban />} title="Blocked accounts" description="Review accounts you blocked" />
+    <SettingRow onClick={() => onSelect("Restricted accounts")} icon={<UserMinus />} title="Restricted accounts" description="Manage restricted people" />
+    <SettingRow onClick={() => onSelect("Tags and mentions")} icon={<AtSign />} title="Tags and mentions" description="Choose who can tag or mention you" />
+    <SettingRow onClick={() => onSelect("Comments")} icon={<MessageSquareText />} title="Comments" description="Control who can comment on your posts" />
+    <button className="primary" onClick={savePrivacy}>Save privacy</button>
+  </div>;
+}
+
+function SecuritySettings({ onSelect }) {
+  return <div className="settings-panel">
+    <SettingRow onClick={() => onSelect("Password")} icon={<KeyRound />} title="Password" description="Update your password regularly" />
+    <SettingRow onClick={() => onSelect("Two-factor authentication")} icon={<Shield />} title="Two-factor authentication" description="Add another layer of account protection" action="Set up" />
+    <SettingRow onClick={() => onSelect("Login activity")} icon={<Clock3 />} title="Login activity" description="Review recent account sessions" />
+    <SettingRow onClick={() => onSelect("Where you're logged in")} icon={<Smartphone />} title="Where you're logged in" description="Review active devices" />
+    <SettingRow onClick={() => onSelect("Emails from ReelsGo")} icon={<Mail />} title="Emails from ReelsGo" description="Security and account emails" />
+  </div>;
+}
+
+function ToggleSettings({ title, items, sectionId = "general", onSelect }) {
+  const [values, setValues] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    api("/users/me/settings")
+      .then(data => {
+        if (active) { setValues(data?.settings || {}); setError(""); }
+      })
+      .catch(err => { if (active) setError(err?.message || "Unable to load saved preferences."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  return <div className="settings-panel rg-settings-options">
+    <h2 className="panel-heading">{title}</h2>
+    {loading && <p className="settings-save-status">Loading your saved preferences…</p>}
+    {error && <p className="settings-save-error" role="alert">{error}</p>}
+    {items.map(item => {
+      const key = `${sectionId}.${item}`;
+      const enabled = Object.prototype.hasOwnProperty.call(values, key) ? Boolean(values[key]) : true;
+      return <SettingRow
+        key={key}
+        title={item}
+        description={loading ? "Loading preference…" : `Currently ${enabled ? "on" : "off"}. Click to open and change this setting.`}
+        icon={<SlidersHorizontal />}
+        action={enabled ? "On" : "Off"}
+        onClick={() => onSelect?.(item)}
+      />;
+    })}
+  </div>;
+}
+
+function SettingDetailScreen({ item, sectionId, user, setUser, onBack }) {
+  const [settings, setSettings] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [name, setName] = useState(user?.name || "");
+  const [username, setUsername] = useState(user?.username || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [website, setWebsite] = useState(user?.website || "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [people, setPeople] = useState([]);
+  const [peopleSearch, setPeopleSearch] = useState("");
+  const [peopleLoading, setPeopleLoading] = useState(false);
+  const [peopleBusyId, setPeopleBusyId] = useState("");
+
+  const peopleType = item === "Blocked accounts" ? "blocked" : item === "Restricted accounts" ? "restricted" : "";
+  const isPeopleList = Boolean(peopleType);
+
+  const key = `${sectionId}.${item}`;
+  const value = Object.prototype.hasOwnProperty.call(settings, key) ? Boolean(settings[key]) : true;
+
+  useEffect(() => {
+    let active = true;
+    api("/users/me/settings")
+      .then(data => { if (active) setSettings(data?.settings || {}); })
+      .catch(err => { if (active) setError(err?.message || "Unable to load this setting."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  async function saveBoolean(next) {
+    const previous = value;
+    setSettings(current => ({ ...current, [key]: next }));
+    setSaving(true); setError(""); setNotice("");
+    try {
+      const data = await api("/users/me/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value: next })
+      });
+      setSettings(data?.settings || { ...settings, [key]: next });
+      setNotice("Your change has been saved to your ReelsGo account.");
+    } catch (err) {
+      setSettings(current => ({ ...current, [key]: previous }));
+      setError(err?.message || "Could not save this setting. Check that the backend settings route is deployed.");
+    } finally { setSaving(false); }
+  }
+
+  async function saveProfile(event) {
+    event.preventDefault(); setSaving(true); setError(""); setNotice("");
+    try {
+      const data = await api("/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, bio, website })
+      });
+      const serverUser = data?.user || data || {};
+      const updated = { ...(user || {}), ...serverUser, name, username, email, bio, website };
+      setUser?.(updated);
+      localStorage.setItem("vk_user", JSON.stringify(updated));
+      setName(updated.name || "");
+      setUsername(updated.username || "");
+      setEmail(updated.email || "");
+      setBio(updated.bio || "");
+      setWebsite(updated.website || "");
+      setNotice("Profile information saved and updated.");
+    } catch (err) { setError(err?.message || "Could not save profile information."); }
+    finally { setSaving(false); }
+  }
+
+  async function changePassword(event) {
+    event.preventDefault(); setError(""); setNotice("");
+    if (newPassword.length < 8) { setError("Use at least 8 characters for your new password."); return; }
+    if (newPassword !== confirmPassword) { setError("The new passwords do not match."); return; }
+    setSaving(true);
+    try {
+      const data = await api("/users/me/password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      setNotice(data.message || "Password updated successfully.");
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (err) { setError(err?.message || "Password update endpoint is not available on the backend yet."); }
+    finally { setSaving(false); }
+  }
+
+  const isProfile = ["Personal information", "Edit profile"].includes(item);
+  const isPassword = item === "Password";
+
+  useEffect(() => {
+    if (!isPeopleList) return;
+    let active = true;
+    setPeopleLoading(true);
+    const timer = setTimeout(() => {
+      const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
+      api(`/users/me/settings/people?${query}`)
+        .then(data => { if (active) { setPeople(Array.isArray(data?.people) ? data.people : Array.isArray(data?.users) ? data.users : []); setError(""); } })
+        .catch(err => { if (active) setError(err?.message || `Unable to load ${item.toLowerCase()}.`); })
+        .finally(() => { if (active) setPeopleLoading(false); });
+    }, 250);
+    return () => { active = false; clearTimeout(timer); };
+  }, [isPeopleList, peopleType, peopleSearch, item]);
+
+  async function updatePerson(personId, action) {
+    setPeopleBusyId(personId); setError(""); setNotice("");
+    try {
+      const url = `/users/me/settings/people/${peopleType}/${personId}`;
+      const data = await api(url, {
+        method: action === "add" ? "POST" : "DELETE",
+        headers: { "Content-Type": "application/json" },
+        ...(action === "add" ? { body: JSON.stringify({}) } : {})
+      });
+      if (action === "add") {
+        setPeople(current => [...current.filter(p => String(p._id) !== String(personId)), data?.person].filter(Boolean));
+        setNotice(`${item === "Blocked accounts" ? "Account blocked" : "Account restricted"} successfully.`);
+      } else {
+        setPeople(current => current.filter(p => String(p._id) !== String(personId)));
+        setNotice("Account removed from this list.");
+      }
+      if (peopleSearch) {
+        const query = new URLSearchParams({ type: peopleType, search: peopleSearch }).toString();
+        const refreshed = await api(`/users/me/settings/people?${query}`);
+        setPeople(Array.isArray(refreshed?.people) ? refreshed.people : Array.isArray(refreshed?.users) ? refreshed.users : []);
+      }
+    } catch (err) { setError(err?.message || "Could not update this account."); }
+    finally { setPeopleBusyId(""); }
+  }
+  const isPrivateAccount = item === "Account privacy" || item === "Private account";
+  const descriptions = {
+    "Profile discovery": "Choose whether your account can be suggested or discovered by other ReelsGo users.",
+    "Account suggestions": "Control whether ReelsGo may suggest your account to other people.",
+    "Activity status": "Control whether people can see when you are active.",
+    "Read receipts": "Control whether people can see when you have read their messages.",
+    "Typing indicator": "Control whether people can see when you are typing.",
+    "Autoplay videos": "Choose whether videos play automatically when you browse.",
+    "Allow downloads": "Set your preference for allowing content downloads. Server-side download routes must enforce this choice.",
+    "Close friends visibility": "Set the default preference for Close Friends story visibility. Story routes must enforce this on every request.",
+    "Hidden words": "Enable or disable the hidden words preference. Filtering must also be applied to incoming comments and messages.",
+  };
+
+  return <section className="setting-detail-screen">
+    <button type="button" className="setting-detail-back" onClick={onBack}><ChevronRight style={{ transform: "rotate(180deg)" }} /> Back to {settingsSections.find(s => s.id === sectionId)?.title || "Settings"}</button>
+    <div className="rg-detail-heading"><span className="rg-detail-kicker">REELSGO SETTINGS</span><h2>{item}</h2><p>{descriptions[item] || `Manage ${item.toLowerCase()} for your ReelsGo account.`}</p></div>
+    {error && <div className="rg-detail-message error" role="alert">{error}</div>}
+    {notice && <div className="rg-detail-message success" role="status">{notice}</div>}
+    {isPeopleList ? <div className="rg-detail-form rg-people-manager">
+      <label>Search ReelsGo accounts<input value={peopleSearch} onChange={e => setPeopleSearch(e.target.value)} placeholder="Search by name or username" autoComplete="off" /></label>
+      <p className="rg-detail-footnote">{peopleSearch.trim() ? "Search results show accounts you can add to this list." : `Accounts you have ${peopleType === "blocked" ? "blocked" : "restricted"} appear here.`}</p>
+      {peopleLoading ? <p className="settings-save-status">Loading accounts…</p> : null}
+      {!peopleLoading && people.length === 0 && <p className="settings-save-status">{peopleSearch.trim() ? "No matching accounts found." : `No ${peopleType} accounts yet.`}</p>}
+      <div className="rg-people-results">
+        {people.map(person => {
+          const personId = String(person?._id || person?.id || "");
+          if (!personId) return null;
+          const isOnList = !peopleSearch.trim();
+          const displayName = person?.name || person?.fullName || person?.username || "ReelsGo user";
+          return <div className="rg-people-row" key={personId}>
+            <div className="rg-people-avatar">{String(displayName).slice(0, 1).toUpperCase()}</div>
+            <div className="rg-people-copy"><b>{displayName}</b><small>@{String(person?.username || "user").replace(/^@/, "")}</small></div>
+            <button type="button" className={isOnList ? "secondary" : "primary"} disabled={peopleBusyId === personId} onClick={() => updatePerson(personId, isOnList ? "remove" : "add")}>{peopleBusyId === personId ? "Please wait…" : isOnList ? "Remove" : peopleType === "blocked" ? "Block" : "Restrict"}</button>
+          </div>;
+        })}
+      </div>
+    </div> : isProfile ? <form className="rg-detail-form" onSubmit={saveProfile}>
+      <label>Full name<input value={name} onChange={e => setName(e.target.value)} maxLength={80} /></label>
+      <label>Username<input value={username} onChange={e => setUsername(e.target.value)} maxLength={30} /></label>
+      <label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
+      <label>Bio<textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3} /></label>
+      <label>Website<input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://example.com" /></label>
+      <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Saving…" : "Save changes"}</button>
+    </form> : isPassword ? <form className="rg-detail-form" onSubmit={changePassword}>
+      <label>Current password<input type="password" autoComplete="current-password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required /></label>
+      <label>New password<input type="password" autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={8} required /></label>
+      <label>Confirm new password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} minLength={8} required /></label>
+      <button className="primary rg-detail-save" disabled={saving} type="submit">{saving ? "Updating…" : "Update password"}</button>
+    </form> : isPrivateAccount ? <div className="rg-detail-control-card"><div><b>Private account</b><p>When enabled, only approved followers should be able to see your private content. Your backend content routes must enforce this.</p></div><Toggle checked={Boolean(user?.isPrivate)} onChange={async next => { setSaving(true); setError(""); try { const d = await api("/users/me", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPrivate: next }) }); setUser?.(d.user); localStorage.setItem("vk_user", JSON.stringify(d.user)); setNotice("Account privacy updated."); } catch (e) { setError(e.message); } finally { setSaving(false); } }} disabled={saving} /></div> : item === "Deactivate or delete account" ? <div className="rg-detail-control-card danger"><div><b>Account deactivation and deletion</b><p>These actions require a dedicated server endpoint and confirmation flow. No destructive action will be taken from this screen.</p></div></div> : <div className="rg-detail-control-card"><div><b>{item}</b><p>{descriptions[item] || "Turn this preference on or off. This choice is saved to your ReelsGo account."}</p><small>{loading ? "Loading saved value…" : `Currently ${value ? "on" : "off"}`}</small></div><Toggle checked={value} disabled={loading || saving} onChange={saveBoolean} /></div>}
+    {!isProfile && !isPassword && !isPrivateAccount && !isPeopleList && item !== "Deactivate or delete account" && <p className="rg-detail-footnote">Changes are saved to your account. Some preferences also require the corresponding ReelsGo feature to enforce them in the backend.</p>}
+  </section>;
+}
+
+function HelpSettings({ onSelect }) {
+  return <div className="settings-panel"><SettingRow onClick={() => onSelect("Help center")} icon={<CircleHelp />} title="Help center" description="Find answers to common questions" /><SettingRow onClick={() => onSelect("Report a problem")} icon={<Flag />} title="Report a problem" description="Tell us when something is not working" /><SettingRow onClick={() => onSelect("Privacy and safety")} icon={<Shield />} title="Privacy and safety" description="Safety resources and policies" /><SettingRow onClick={() => onSelect("Community guidelines")} icon={<AlertTriangle />} title="Community guidelines" description="Rules for using ReelsGo" /></div>;
+}
+
+function SettingRow({ icon, title, description, action, danger, onClick }) {
+  return <button onClick={onClick} className={`setting-row ${danger ? "danger-row" : ""}`}><span className="setting-row-icon">{icon}</span><span className="setting-row-text"><b>{title}</b><small>{description}</small></span>{action ? <em>{action}</em> : <ChevronRight />}</button>;
+}
+
+function Modal({ title, onClose, children }) {
+  return <div className="overlay" onClick={onClose}><div className="modal" onClick={e => e.stopPropagation()}><div className="modal-head"><h2>{title}</h2><button onClick={onClose}><X /></button></div><div className="modal-body">{children}</div></div></div>;
+}
+
+export default App;
+
+
+// Professional dashboard panel details are kept in this file so App.jsx is self-contained.
+const TOOL_SLUGS = {
+  "Monthly recap": "monthly-recap",
+  "Best practices": "best-practices",
+  "Inspiration": "inspiration",
+  "Branded content": "branded-content",
+  "Affiliate programmes": "affiliate-programmes",
+  "Partnership ads": "partnership-ads",
+  "Ad tools": "ad-tools",
+  "Trial reels": "trial-reels",
+  "Payouts": "payouts",
+  "Gifts": "gifts",
+  "Trending audio": "trending-audio",
+  "Other helpful resources": "helpful-resources",
+  "Account status": "account-status",
+  "Dashboard settings": "dashboard-settings"
+};
+
+function Metric({ value, label }) {
+  return <div className="rg-pro-metric"><b>{Number(value || 0).toLocaleString()}</b><small>{label}</small></div>;
+}
+function Section({ title, children }) {
+  return <section className="rg-pro-data-section"><h3>{title}</h3>{children}</section>;
+}
+function EmptyState({ children }) {
+  return <p className="rg-pro-empty-state">{children}</p>;
+}
+function SaveButton({ onClick, children = "Save changes" }) {
+  return <button type="button" className="rg-pro-detail-primary" onClick={onClick}>{children}</button>;
+}
+function TextSetting({ label, value, onChange, placeholder = "", maxLength = 1000 }) {
+  return <label className="rg-pro-field">{label}<textarea value={value || ""} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} rows={3} /></label>;
+}
+function ProToggle({ checked, onChange, children }) {
+  return <label className="rg-pro-toggle"><input type="checkbox" checked={!!checked} onChange={e => onChange(e.target.checked)} /> <span>{children}</span></label>;
+}
+
+function ProfessionalPanelDetails({
+  panel, analytics, loading, user, toolData, setToolData, saveToolData,
+  replies, createSavedReply, deleteSavedReply, savedReplyShortcut, setSavedReplyShortcut,
+  savedReplyMessage, setSavedReplyMessage
+}) {
+  const summary = analytics?.summary || {};
+  const daily = analytics?.daily || [];
+  const topContent = analytics?.topContent || [];
+  const update = (key, value) => setToolData(current => ({ ...current, [key]: value }));
+  const save = () => saveToolData(toolData || {});
+  const metrics = (
+    <div className="rg-pro-detail-stats">
+      <Metric value={summary.views} label="Views recorded" />
+      <Metric value={summary.reach} label="Accounts reached" />
+      <Metric value={summary.impressions} label="Impressions recorded" />
+      <Metric value={summary.interactions} label="Interactions" />
+      <Metric value={summary.likes} label="Likes" />
+      <Metric value={summary.comments} label="Comments" />
+    </div>
+  );
+  const trackedDaily = daily.slice(-14).reverse();
+
+  if (["Views", "Insights"].includes(panel)) {
+    return <>
+      <p className="rg-pro-panel-intro">Performance from activity recorded by ReelsGo in the last 30 days.</p>
+      {metrics}
+      <Section title="Daily activity">
+        {loading ? <EmptyState>Loading recorded activity…</EmptyState> : trackedDaily.length ? <div className="rg-pro-daily-list">{trackedDaily.map(day =>
+          <div key={day._id}><b>{day._id}</b><span>{Number(day.views || 0).toLocaleString()} views</span><span>{Number(day.interactions || 0).toLocaleString()} interactions</span></div>
+        )}</div> : <EmptyState>No analytics events have been recorded in this period yet. Views and interactions will appear here after ReelsGo records them.</EmptyState>}
+      </Section>
+      <Section title="Audience and engagement">
+        <div className="rg-pro-detail-stats"><Metric value={summary.followers} label="Current followers" /><Metric value={summary.profileVisits} label="Profile visits recorded" /><Metric value={summary.saves} label="Saves recorded" /></div>
+      </Section>
+    </>;
+  }
+
+  if (panel === "New followers") {
+    return <>
+      <p className="rg-pro-panel-intro">Follower changes recorded by ReelsGo during the last 30 days. Current follower total comes from your account record.</p>
+      <div className="rg-pro-detail-stats"><Metric value={summary.followers} label="Current followers" /><Metric value={summary.newFollowers} label="New follows recorded" /><Metric value={summary.unfollows} label="Unfollows recorded" /><Metric value={summary.netFollowers} label="Net change recorded" /></div>
+      <Section title="Recent daily activity">
+        {trackedDaily.length ? <div className="rg-pro-daily-list">{trackedDaily.map(day => <div key={day._id}><b>{day._id}</b><span>{Number(day.views || 0).toLocaleString()} views</span><span>{Number(day.interactions || 0).toLocaleString()} interactions</span></div>)}</div> : <EmptyState>No dated analytics events are available yet. This panel does not estimate or invent follower growth.</EmptyState>}
+      </Section>
+    </>;
+  }
+
+  if (panel === "Content you shared") {
+    return <>
+      <div className="rg-pro-detail-stats"><Metric value={summary.contentShared} label="Total content" /><Metric value={summary.posts} label="Posts" /><Metric value={summary.reels} label="Reels" /></div>
+      <Section title="Content performance">
+        {topContent.length ? <div className="rg-pro-content-performance">{topContent.map((item, index) =>
+          <article key={`${item._id?.contentId || index}-${item._id?.contentType || "content"}`}><div><b>{item._id?.contentType === "reel" ? "Reel" : "Post"} · {String(item._id?.contentId || "").slice(-6)}</b><small>Views recorded: {Number(item.views || 0).toLocaleString()}</small></div><span>{Number(item.likes || 0)} likes · {Number(item.comments || 0)} comments · {Number(item.shares || 0)} shares</span></article>
+        )}</div> : <EmptyState>Your content count comes from published database records. Per-post performance will appear here when view and interaction events are recorded.</EmptyState>}
+      </Section>
+    </>;
+  }
+
+  if (panel === "Monthly recap") {
+    return <>
+      <p className="rg-pro-panel-intro">A recap of recorded activity for the current 30-day dashboard period.</p>
+      <div className="rg-pro-detail-stats"><Metric value={summary.contentShared} label="Content shared" /><Metric value={summary.views} label="Views recorded" /><Metric value={summary.interactions} label="Interactions recorded" /><Metric value={summary.netFollowers} label="Net follows recorded" /></div>
+      <Section title="Activity summary"><div className="rg-pro-recap-lines">
+        <p><b>Posts:</b> {Number(summary.posts || 0).toLocaleString()}</p>
+        <p><b>Reels:</b> {Number(summary.reels || 0).toLocaleString()}</p>
+        <p><b>Likes / comments / shares / saves:</b> {summary.likes || 0} / {summary.comments || 0} / {summary.shares || 0} / {summary.saves || 0}</p>
+      </div></Section>
+      {!summary.views && !summary.interactions && <EmptyState>No analytics events have been recorded in this period. Counts above reflect available account records only.</EmptyState>}
+    </>;
+  }
+
+  if (panel === "Saved replies") {
+    return <div className="rg-pro-tool-form">
+      <p className="rg-pro-panel-intro">Create reusable replies stored in your ReelsGo account.</p>
+      <form onSubmit={createSavedReply}>
+        <label className="rg-pro-field">Shortcut<input value={savedReplyShortcut} onChange={e => setSavedReplyShortcut(e.target.value)} placeholder="e.g. thanks" maxLength={40} required /></label>
+        <label className="rg-pro-field">Reply message<textarea value={savedReplyMessage} onChange={e => setSavedReplyMessage(e.target.value)} placeholder="Write the reply you want to reuse" maxLength={2000} required rows={4} /></label>
+        <button type="submit" className="rg-pro-detail-primary">Save reply</button>
+      </form>
+      <Section title={`Saved replies (${replies.length})`}>
+        {replies.length ? <div className="rg-pro-saved-replies">{replies.map(reply => <article key={reply._id}><b>/{reply.shortcut}</b><p>{reply.message}</p><button type="button" onClick={() => deleteSavedReply(reply._id)}>Delete</button></article>)}</div> : <EmptyState>You have not saved any replies yet.</EmptyState>}
+      </Section>
+    </div>;
+  }
+
+  if (panel === "Best practices") {
+    const checks = [
+      ["profileComplete", "Keep your name, profile photo and bio current"],
+      ["captionChecked", "Review captions and accessibility before publishing"],
+      ["privacyChecked", "Review privacy and comment settings"],
+      ["weeklyReview", "Review insights before planning the next post"]
+    ];
+    const checklist = toolData.checklist || {};
+    return <>
+      <p className="rg-pro-panel-intro">A practical creator checklist. Your completion choices are saved to your ReelsGo tool settings.</p>
+      <Section title="Account checklist">{checks.map(([key, label]) => <ProToggle key={key} checked={checklist[key]} onChange={value => update("checklist", { ...checklist, [key]: value })}>{label}</ProToggle>)}</Section>
+      <SaveButton onClick={save}>Save checklist</SaveButton>
+    </>;
+  }
+
+  if (panel === "Inspiration") {
+    const ideas = [
+      "Show a short before-and-after process.",
+      "Answer one question people commonly ask you.",
+      "Share three steps from a skill you use.",
+      "Explain the story behind a recent project.",
+      "Turn a useful comment into a follow-up post."
+    ];
+    return <>
+      <p className="rg-pro-panel-intro">Content prompts you can adapt to your own topic; these are ideas, not performance predictions.</p>
+      <Section title="Ideas to develop"><div className="rg-pro-idea-list">{ideas.map((idea, i) => <article key={idea}><span>{String(i + 1).padStart(2, "0")}</span><p>{idea}</p></article>)}</div></Section>
+      <TextSetting label="My next content idea" value={toolData.nextIdea} onChange={value => update("nextIdea", value)} placeholder="Write your own idea or draft…" />
+      <SaveButton onClick={save}>Save idea</SaveButton>
+    </>;
+  }
+
+  if (panel === "Branded content") {
+    return <>
+      <p className="rg-pro-panel-intro">Record partnership details for your own workflow. This does not publish a paid-partnership label to external platforms.</p>
+      <TextSetting label="Brand / partner name" value={toolData.partnerName} onChange={value => update("partnerName", value)} placeholder="Enter a brand or partner" maxLength={160} />
+      <TextSetting label="Campaign notes" value={toolData.campaignNotes} onChange={value => update("campaignNotes", value)} placeholder="Deliverables, dates, disclosure notes…" maxLength={4000} />
+      <ProToggle checked={toolData.disclosureReminder} onChange={value => update("disclosureReminder", value)}>Remind me to check sponsorship disclosure before publishing</ProToggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Affiliate programmes") {
+    return <>
+      <p className="rg-pro-panel-intro">Track an affiliate programme manually. No affiliate network is connected, so commissions and links are not imported.</p>
+      <TextSetting label="Programme / network" value={toolData.programmeName} onChange={value => update("programmeName", value)} placeholder="Programme name" maxLength={160} />
+      <TextSetting label="Affiliate link or application URL" value={toolData.affiliateUrl} onChange={value => update("affiliateUrl", value)} placeholder="https://…" maxLength={1000} />
+      <TextSetting label="Notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Application status, terms, or next steps" maxLength={4000} />
+      <div className="rg-pro-integration-status"><b>Network connection</b><span>Not connected</span><small>Affiliate clicks and commissions cannot be reported until a provider integration is configured.</small></div>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Partnership ads" || panel === "Ad tools") {
+    return <>
+      <p className="rg-pro-panel-intro">{panel === "Ad tools" ? "Prepare campaign notes and a draft budget." : "Keep partner authorization and campaign notes in one place."} These settings do not launch ads.</p>
+      {panel === "Partnership ads" && <TextSetting label="Partner / business account" value={toolData.partnerName} onChange={value => update("partnerName", value)} placeholder="Partner name or account" maxLength={160} />}
+      <TextSetting label="Campaign name" value={toolData.campaignName} onChange={value => update("campaignName", value)} placeholder="Campaign draft name" maxLength={160} />
+      <TextSetting label="Campaign objective" value={toolData.objective} onChange={value => update("objective", value)} placeholder="e.g. profile visits, product awareness" maxLength={300} />
+      <label className="rg-pro-field">Draft budget (optional)<input type="number" min="0" step="0.01" value={toolData.budget ?? ""} onChange={e => update("budget", e.target.value === "" ? "" : Math.max(0, Number(e.target.value)))} placeholder="0.00" /></label>
+      <TextSetting label="Campaign notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Audience, dates, creative to prepare…" maxLength={4000} />
+      <div className="rg-pro-integration-status"><b>Ad delivery</b><span>Not connected</span><small>A configured advertising provider is required to create or run campaigns.</small></div>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Trial reels") {
+    return <>
+      <p className="rg-pro-panel-intro">Plan a test Reel here. ReelsGo does not currently distribute trial Reels to a separate non-follower audience automatically.</p>
+      <TextSetting label="Test Reel concept" value={toolData.concept} onChange={value => update("concept", value)} placeholder="What are you testing?" maxLength={1000} />
+      <TextSetting label="Hypothesis / success criteria" value={toolData.successCriteria} onChange={value => update("successCriteria", value)} placeholder="What would make this test useful?" maxLength={1000} />
+      <ProToggle checked={toolData.readyToPublish} onChange={value => update("readyToPublish", value)}>Mark this test plan ready</ProToggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Payouts" || panel === "Gifts") {
+    return <>
+      <p className="rg-pro-panel-intro">{panel === "Payouts" ? "No payout provider is connected, so there are no verified balances, transactions or tax records to display." : "Gift delivery and earnings are not configured in this ReelsGo build. No earnings are estimated."}</p>
+      <div className="rg-pro-integration-status"><b>{panel === "Payouts" ? "Payout provider" : "Gifts provider"}</b><span>Not connected</span><small>Connect an eligible provider before showing payment or earning information.</small></div>
+      <TextSetting label="Setup notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Record setup steps or questions…" maxLength={4000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Trending audio") {
+    return <>
+      <p className="rg-pro-panel-intro">No licensed trending-audio feed is connected. Save audio ideas or reference links manually without implying they are currently trending.</p>
+      <TextSetting label="Audio name / reference" value={toolData.audioName} onChange={value => update("audioName", value)} placeholder="Audio title or artist" maxLength={200} />
+      <TextSetting label="Reference URL" value={toolData.audioUrl} onChange={value => update("audioUrl", value)} placeholder="https://…" maxLength={1000} />
+      <TextSetting label="Notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Idea for how to use this audio" maxLength={2000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Account status") {
+    const checks = [
+      ["Profile has a name", !!user?.name],
+      ["Username is set", !!user?.username],
+      ["Profile has a bio", !!String(user?.bio || "").trim()],
+      ["Public account", !user?.isPrivate]
+    ];
+    return <>
+      <p className="rg-pro-panel-intro">These are profile setup checks only. This app does not currently have a moderation enforcement or recommendation-eligibility feed.</p>
+      <Section title="Profile setup">{checks.map(([label, ok]) => <div className="rg-pro-status-row" key={label}><span>{label}</span><b className={ok ? "is-ok" : "is-missing"}>{ok ? "Complete" : "Review"}</b></div>)}</Section>
+      <EmptyState>For restrictions, reports, or recommendation eligibility, a moderation/status service must provide that data. No account restriction is assumed here.</EmptyState>
+    </>;
+  }
+
+  if (panel === "Dashboard settings") {
+    return <>
+      <p className="rg-pro-panel-intro">These preferences are stored with your ReelsGo professional tool settings.</p>
+      <label className="rg-pro-field">Dashboard note / goal<textarea value={toolData.dashboardGoal || ""} onChange={e => update("dashboardGoal", e.target.value)} placeholder="What do you want to focus on this month?" maxLength={1000} rows={3} /></label>
+      <ProToggle checked={toolData.showZeroMetrics !== false} onChange={value => update("showZeroMetrics", value)}>Show metrics even when the recorded value is zero</ProToggle>
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "Other helpful resources") {
+    return <>
+      <p className="rg-pro-panel-intro">Use these practical resources to review your ReelsGo account.</p>
+      <Section title="Account workflow"><div className="rg-pro-resource-list">
+        <article><b>Profile setup</b><p>Review your name, username, bio, profile image and public/private setting.</p></article>
+        <article><b>Publishing checklist</b><p>Check the media, caption, audience and comment settings before publishing.</p></article>
+        <article><b>Performance review</b><p>Use recorded views and interactions to compare content; do not treat missing events as zero audience interest.</p></article>
+        <article><b>Account safety</b><p>Keep sign-in details private and review your account security settings regularly.</p></article>
+      </div></Section>
+      <TextSetting label="Resource notes" value={toolData.notes} onChange={value => update("notes", value)} placeholder="Save useful reminders…" maxLength={3000} />
+      <SaveButton onClick={save} />
+    </>;
+  }
+
+  if (panel === "All tools") {
+    return <Section title="Professional tools"><div className="rg-pro-resource-list">
+      {Object.keys(TOOL_SLUGS).map(name => <article key={name}><b>{name}</b><p>Open this item from the dashboard to view its available data and settings.</p></article>)}
+    </div></Section>;
+  }
+
+  return <EmptyState>There is no panel configured for this option yet.</EmptyState>;
 }
+
