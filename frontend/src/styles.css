@@ -15072,3 +15072,59 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
  .story-editor-more-menu{top:calc(86px + 10 * 44px);right:54px}
  .story-viewers-screen-top{height:36%!important;min-height:235px!important;max-height:330px!important}
 }
+
+
+/* All ten share actions stay on one horizontal row; swipe sideways on narrow screens. */
+.share-sheet .share-shortcuts-all {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none !important;
+  padding: 12px 2px 8px !important;
+  margin: 12px 0 0 !important;
+  border-top: 1px solid rgba(255,255,255,.12) !important;
+}
+.share-sheet .share-shortcuts-all::-webkit-scrollbar { display: none !important; }
+.share-sheet .share-shortcuts-all > button {
+  flex: 0 0 68px !important;
+  width: 68px !important;
+  min-width: 68px !important;
+  max-width: 68px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 2px 0 !important;
+  background: transparent !important;
+  color: #f5f5f7 !important;
+}
+.share-sheet .share-shortcuts-all .share-shortcut-icon {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 50% !important;
+  font-size: 25px !important;
+}
+.share-sheet .share-shortcuts-all .share-social-app-icon {
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+.share-sheet .share-shortcuts-all button b {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.15 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
