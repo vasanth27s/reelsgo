@@ -15146,3 +15146,19 @@ body:has(.rg-profile-options-backdrop) .mobile-bottom-nav {
 .story-viewer.story-controls-hidden .story-viewer-content {
   cursor: pointer;
 }
+
+
+/* Story viewer navigation: full-screen overlay above app navigation. */
+.story-viewer{z-index:99999!important;inset:0!important;padding:0!important;background:#050608!important;touch-action:pan-y;}
+.story-viewer-content{position:relative;height:100dvh!important;width:min(100vw,520px)!important;max-height:100dvh!important;border-radius:0!important;flex:0 1 auto;}
+.story-viewer-content img,.story-viewer-content video{object-fit:contain!important;}
+.story-viewer-top{top:calc(12px + env(safe-area-inset-top))!important;left:16px!important;right:16px!important;}
+.story-viewer-top-actions{position:relative;z-index:8;}
+.story-tap-zone{position:absolute;top:12%;bottom:12%;width:38%;z-index:4;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;}
+.story-tap-left{left:0;}
+.story-tap-right{right:0;}
+.story-viewers-button{z-index:7!important;bottom:calc(18px + env(safe-area-inset-bottom))!important;}
+.story-viewers-screen{z-index:20!important;}
+body.reelsgo-story-open{overflow:hidden!important;}
+body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.reelsgo-story-open .sidebar{visibility:hidden!important;pointer-events:none!important;}
+@media(max-width:700px){.story-viewer{align-items:center!important;padding:0!important}.story-viewer-content{width:100vw!important;height:100dvh!important;max-height:100dvh!important}.story-viewer-top{top:calc(12px + env(safe-area-inset-top))!important}.story-tap-zone{top:14%;bottom:12%;width:35%;}.story-viewers-button{bottom:calc(16px + env(safe-area-inset-bottom))!important;}}
