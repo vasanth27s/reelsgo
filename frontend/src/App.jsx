@@ -1330,8 +1330,8 @@ function StoryViewer({ story, onClose, onDeleted }) {
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
           <div>
-            <UserLink user={story.author} />
-            <span>{isOwner ? 'Your story' : 'Story'}</span>
+            <b className="story-viewer-display-name">{isOwner ? "Your story" : (story.author?.name || story.author?.fullName || story.author?.username || "Story")}</b>
+            <span>{isOwner ? "Your story" : "Story"}</span>
           </div>
         </div>
         <div className="story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1342,6 +1342,15 @@ function StoryViewer({ story, onClose, onDeleted }) {
       <div className="story-viewer-content" onClick={e => { e.stopPropagation(); setStoryControlsVisible(v => !v); }}>
         {mediaUrl && story.kind === 'video' ? <video src={mediaUrl} autoPlay controls playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Story" /> : <div className="story-text-view" style={{ background: story.background || 'linear-gradient(135deg,#111827,#4f46e5)' }}>{story.text || 'Story'}</div>}
       </div>
+      {isOwner && !viewersOpen && storyControlsVisible && (
+        <div className="story-owner-actions" onClick={e => e.stopPropagation()}>
+          <button type="button" onClick={openViewers}><Users /><span>Activity</span></button>
+          <button type="button" onClick={async () => { try { if (navigator.share) await navigator.share({ title: "My ReelsGo story", url: window.location.href }); else { await navigator.clipboard.writeText(window.location.href); setViewerNotice("Story link copied"); } } catch {} }}><Share2 /><span>Share on...</span></button>
+          <button type="button" onClick={() => setViewerNotice("Mention someone by sharing this story with them.")}><AtSign /><span>Mention</span></button>
+          <button type="button" onClick={() => setViewerNotice("Choose a person from your messages to send this story.")}><Send /><span>Send</span></button>
+          <button type="button" onClick={() => setViewerNotice("More story options are available from the story menu.")}><MoreHorizontal /><span>More</span></button>
+        </div>
+      )}
       {isOwner && !viewersOpen && storyControlsVisible && (
         <button className="story-viewers-button" onClick={e => { e.stopPropagation(); openViewers(); }}>
           <span className="story-viewers-grabber" />
@@ -1357,7 +1366,7 @@ function StoryViewer({ story, onClose, onDeleted }) {
                 {mediaUrl && story.kind === "video" ? <video src={mediaUrl} muted playsInline /> : mediaUrl ? <img src={mediaUrl} alt="Current story" /> : <span style={{ background: story.background || "linear-gradient(135deg,#111827,#4f46e5)" }}>{story.text || "Story"}</span>}
                 <small><Users size={15} /> {visibleViewers.length || story.views?.length || 0}</small>
               </button>
-              <button type="button" className="story-thumb-add" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><Camera /></button>
+              <button type="button" className="story-thumb-add" aria-label="Create another story" title="Create another story" onClick={() => { setViewersOpen(false); setActiveViewerMenu(null); window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { source: "story-viewers", createNew: true } })); }}><Camera /></button>
             </div>
             <button type="button" className="story-viewers-close" aria-label="Close viewers" onClick={() => setViewersOpen(false)}><X /></button>
           </div>
@@ -1377,14 +1386,14 @@ function StoryViewer({ story, onClose, onDeleted }) {
                 return (
                   <div className="story-viewer-row story-viewer-row-menu" key={id || username}>
                     <Avatar user={v} size={50} />
-                    <div className="story-viewer-user-info"><UserLink user={v} /><span>{v.name || username}{restrictedViewerIds.includes(id) ? " · Restricted" : ""}</span></div>
+                    <div className="story-viewer-user-info"><b>{v.name || v.fullName || username}</b>{restrictedViewerIds.includes(id) && <span>Restricted</span>}</div>
                     {v.viewedAt && <small>{new Date(v.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>}
                     <button type="button" className="story-viewer-more" aria-label={`Options for ${username}`} onClick={() => setActiveViewerMenu(menuOpen ? null : id)}><MoreHorizontal /></button>
                     <button type="button" className="story-viewer-message" aria-label={`Message ${username}`} onClick={() => { setActiveViewerMenu(null); openUserProfile(id); }}><Send /></button>
                     {menuOpen && <>
                       <button type="button" className="story-viewer-menu-backdrop" aria-label="Close viewer options" onClick={() => setActiveViewerMenu(null)} />
                       <div className="story-viewer-action-sheet" role="menu">
-                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{username}</b></div>
+                        <div className="story-viewer-action-user"><Avatar user={v} size={44} /><b>{v.name || v.fullName || username}</b></div>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("profile", v)}>View Profile</button>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("hide", v)}>Hide your story</button>
                         <button type="button" role="menuitem" onClick={() => runViewerAction("restrict", v)}>{restrictedViewerIds.includes(id) ? "Unrestrict" : "Restrict"}</button>
@@ -6269,7 +6278,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                     {unread && <span className="conversation-unread-dot" aria-label="Unread message" />}
                   </div>
                   <div className="conversation-copy">
-                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.username || u?.name || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
+                    <div className="conversation-name-line"><b className={`conversation-username ${unread ? 'is-unread' : ''}`}>{u?.name || u?.fullName || u?.username || "User"}</b>{pinnedConversationIds.includes(String(c._id)) && <PinOff size={13} className="conversation-pin-indicator" />}{mutedConversationIds.includes(String(c._id)) && <Bell size={13} className="conversation-mute-indicator" />}</div>
                     <span className={`conversation-preview ${unread ? 'is-unread' : ''}`}>{c.lastMessage?.text || 'Start a conversation'}</span>
                     {c.lastMessage?.createdAt && <small>{time(c.lastMessage.createdAt)}</small>}
                   </div>
