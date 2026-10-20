@@ -3162,6 +3162,8 @@ function ProfilePage({ user, setUser }) {
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
+  const [profileQuickActionsOpen, setProfileQuickActionsOpen] = useState(false);
+  const profileAvatarLongPressTimer = useRef(null);
   const [professionalPanel, setProfessionalPanel] = useState("");
   const [professionalAnalytics, setProfessionalAnalytics] = useState(null);
   const [professionalReplies, setProfessionalReplies] = useState([]);
@@ -3279,16 +3281,84 @@ function ProfilePage({ user, setUser }) {
   }
 
   const visiblePosts = posts;
+  const quickProfileAvatarSrc = user?.avatar && typeof user.avatar === "string"
+    ? user.avatar
+    : avatarUrl(user);
+  const quickProfileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || user?.username || "")}`;
+
+  function clearProfileAvatarLongPress() {
+    if (profileAvatarLongPressTimer.current) {
+      window.clearTimeout(profileAvatarLongPressTimer.current);
+      profileAvatarLongPressTimer.current = null;
+    }
+  }
+
+  function startProfileAvatarLongPress() {
+    clearProfileAvatarLongPress();
+    profileAvatarLongPressTimer.current = window.setTimeout(() => {
+      setProfileQuickActionsOpen(true);
+      if (navigator.vibrate) navigator.vibrate(25);
+    }, 480);
+  }
+
+  async function copyQuickProfileLink() {
+    try {
+      await navigator.clipboard.writeText(quickProfileUrl);
+      setProfileQuickActionsOpen(false);
+      window.alert("Profile link copied.");
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = quickProfileUrl;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const copied = document.execCommand("copy");
+      field.remove();
+      if (copied) {
+        setProfileQuickActionsOpen(false);
+        window.alert("Profile link copied.");
+      } else {
+        window.prompt("Copy your profile link:", quickProfileUrl);
+      }
+    }
+  }
+
+  async function shareQuickProfile() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `${user?.username || "ReelsGo"}'s profile`, text: "Find me on ReelsGo", url: quickProfileUrl });
+        setProfileQuickActionsOpen(false);
+      } else {
+        await copyQuickProfileLink();
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") await copyQuickProfileLink();
+    }
+  }
+
+  useEffect(() => () => clearProfileAvatarLongPress(), []);
 
   return (
     <div className="page profile-page">
       <div className="profile-header">
-        <div className="profile-avatar-wrap">
+        <div
+          className="profile-avatar-wrap rg-own-avatar-longpress-target"
+          onPointerDown={startProfileAvatarLongPress}
+          onPointerUp={clearProfileAvatarLongPress}
+          onPointerLeave={clearProfileAvatarLongPress}
+          onPointerCancel={clearProfileAvatarLongPress}
+          onContextMenu={event => { event.preventDefault(); clearProfileAvatarLongPress(); setProfileQuickActionsOpen(true); }}
+          aria-label="Long press to share your profile"
+        >
           <Avatar user={user} size={96} className="profile-avatar" />
           <button
             className="avatar-camera"
+            onPointerDown={event => { event.stopPropagation(); clearProfileAvatarLongPress(); }}
             onClick={() => input.current?.click()}
             disabled={saving}
+            aria-label="Change profile photo"
           >
             <Camera />
           </button>
@@ -3511,6 +3581,40 @@ function ProfilePage({ user, setUser }) {
       )}
 
       {tab === "saved" && <SavedPage embedded user={user} />}
+
+      {profileQuickActionsOpen && (
+        <div
+          className="rg-profile-quick-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Profile photo actions"
+          onPointerDown={event => { if (event.target === event.currentTarget) setProfileQuickActionsOpen(false); }}
+          style={{ "--rg-profile-quick-image": quickProfileAvatarSrc ? `url("${quickProfileAvatarSrc.replace(/"/g, "%22")}")` : "none" }}
+        >
+          <div className="rg-profile-quick-backdrop" aria-hidden="true" />
+          <button type="button" className="rg-profile-quick-close" onClick={() => setProfileQuickActionsOpen(false)} aria-label="Close profile actions"><X /></button>
+          <div className="rg-profile-quick-avatar-area">
+            <div className="rg-profile-quick-avatar-shell">
+              {quickProfileAvatarSrc ? <img src={quickProfileAvatarSrc} alt={`${user?.username || "Your"} profile`} className="rg-profile-quick-avatar-image" /> : <div className="rg-profile-quick-avatar-fallback">{(user?.name || user?.username || "U").slice(0, 1).toUpperCase()}</div>}
+              <button type="button" className="rg-profile-quick-edit" onClick={() => { setProfileQuickActionsOpen(false); window.setTimeout(() => input.current?.click(), 0); }} aria-label="Change profile photo"><Edit3 /></button>
+            </div>
+          </div>
+          <div className="rg-profile-quick-actions">
+            <button type="button" onClick={shareQuickProfile}>
+              <span className="rg-profile-quick-action-icon"><CircleUser /></span><span>Share</span>
+            </button>
+            <button type="button" onClick={copyQuickProfileLink}>
+              <span className="rg-profile-quick-action-icon"><LinkIcon /></span><span>Copy link</span>
+            </button>
+            <button type="button" onClick={() => { setProfileQuickActionsOpen(false); setShareQrOpen(true); }}>
+              <span className="rg-profile-quick-action-icon"><QrCode /></span><span>QR code</span>
+            </button>
+            <button type="button" onClick={() => { setProfileQuickActionsOpen(false); window.setTimeout(() => input.current?.click(), 0); }}>
+              <span className="rg-profile-quick-action-icon"><UserRoundCheck /></span><span>Add avatar</span>
+            </button>
+          </div>
+        </div>
+      )}
       {shareQrOpen && <ProfileQRCodeModal user={user} onClose={() => setShareQrOpen(false)} />}
 
       {connectionsOpen && (
@@ -8045,4 +8149,3 @@ function ProfessionalPanelDetails({
 
   return <EmptyState>There is no panel configured for this option yet.</EmptyState>;
 }
-
