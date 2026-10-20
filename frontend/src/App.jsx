@@ -932,18 +932,25 @@ function AuthLogo({ className = "" }) {
 
 function Auth({ onLogin }) {
   const [mode, setMode] = useState("login");
-  const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "", confirmPassword: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function submit(e) {
     e.preventDefault();
     setError("");
+    if (mode === "signup" && form.password !== form.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     setLoading(true);
     try {
       const path = mode === "login" ? "/auth/login" : "/auth/register";
-      const body = mode === "login" ? { email: form.email, password: form.password } : form;
+      const body = mode === "login"
+        ? { email: form.email, password: form.password }
+        : { name: form.name, username: form.username, email: form.email, password: form.password };
       const d = await api(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -957,50 +964,57 @@ function Auth({ onLogin }) {
     }
   }
 
-  return (
-    <div className="auth-page">
-      <div className="auth-showcase">
-        <div className="auth-showcase-logo">
-          <AuthLogo className="auth-showcase-image" />
-        </div>
-        <h1>Share your world.</h1>
-        <p>Photos, Reels, Stories, messages and the people you care about — all in one social space.</p>
-        <div className="auth-pills"><span>Posts</span><span>Stories</span><span>Reels</span><span>Messages</span></div>
-      </div>
+  const toggleMode = () => {
+    setMode(mode === "login" ? "signup" : "login");
+    setError("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  };
 
-      <form className="auth-card" onSubmit={submit}>
-        <div className="auth-logo">
+  return (
+    <main className={`auth-page auth-blue-theme ${mode === "signup" ? "auth-signup-mode" : "auth-login-mode"}`}>
+      <form className="auth-card auth-glass-card" onSubmit={submit}>
+        <div className="auth-logo auth-glass-logo">
           <AuthLogo className="auth-page-image" />
         </div>
-        <h2 className="auth-title">{mode === "login" ? "Log in" : "Create an account"}</h2>
-        <p className="auth-subtitle">{mode === "login" ? "Welcome back. Continue where you left off." : "Join and start sharing."}</p>
+        <h2 className="auth-title">{mode === "login" ? "Welcome Back" : "Create Account"}</h2>
+        <p className="auth-subtitle">{mode === "login" ? "Sign in to your account" : "Sign up to join ReelsGo"}</p>
 
         {mode === "signup" && <>
-          <Field icon={<CircleUser />} placeholder="Full name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
-          <Field icon={<AtSign />} placeholder="Username" value={form.username} onChange={v => setForm({ ...form, username: v })} />
+          <Field icon={<CircleUser />} placeholder="Full name" autoComplete="name" value={form.name} onChange={v => setForm({ ...form, name: v })} />
+          <Field icon={<AtSign />} placeholder="Username" autoComplete="username" value={form.username} onChange={v => setForm({ ...form, username: v })} />
         </>}
 
-        <Field icon={<Mail />} type="email" placeholder="Email address" value={form.email} onChange={v => setForm({ ...form, email: v })} />
-        <div className="password-field">
-          <Field icon={<KeyRound />} type={showPassword ? "text" : "password"} placeholder="Password" value={form.password} onChange={v => setForm({ ...form, password: v })} />
-          <button type="button" onClick={() => setShowPassword(v => !v)}>{showPassword ? <EyeOff /> : <Eye />}</button>
+        <Field icon={<Mail />} type="email" placeholder="Email" autoComplete="email" value={form.email} onChange={v => setForm({ ...form, email: v })} />
+        <div className="password-field auth-password-row">
+          <Field icon={<KeyRound />} type={showPassword ? "text" : "password"} placeholder="Password" autoComplete={mode === "login" ? "current-password" : "new-password"} value={form.password} onChange={v => setForm({ ...form, password: v })} />
+          <button className="auth-password-visibility" type="button" onClick={() => setShowPassword(v => !v)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff /> : <Eye />}</button>
+          {mode === "login" && <button className="auth-submit auth-arrow-submit" type="submit" disabled={loading} aria-label="Log in">
+            {loading ? <span className="auth-spinner" /> : <span aria-hidden="true">→</span>}
+          </button>}
         </div>
 
-        {mode === "login" && <button type="button" className="forgot">Forgot password?</button>}
-        {error && <div className="error">{error}</div>}
-        <button className="primary auth-submit" disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Log in" : "Create account"}</button>
+        {mode === "signup" && <div className="password-field auth-password-row">
+          <Field icon={<Lock />} type={showConfirmPassword ? "text" : "password"} placeholder="Confirm password" autoComplete="new-password" value={form.confirmPassword} onChange={v => setForm({ ...form, confirmPassword: v })} />
+          <button className="auth-password-visibility" type="button" onClick={() => setShowConfirmPassword(v => !v)} aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}>{showConfirmPassword ? <EyeOff /> : <Eye />}</button>
+        </div>}
 
-        <div className="auth-divider"><span>OR</span></div>
-        <button type="button" className="secondary auth-switch" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); }}>
-          {mode === "login" ? "Create new account" : "Already have an account? Log in"}
-        </button>
+        {mode === "login" && <button type="button" className="forgot" onClick={() => setError("If you cannot sign in, contact ReelsGo support to reset your password.")}>Forgot Password?</button>}
+        {error && <div className="error" role="alert">{error}</div>}
+
+        {mode === "signup" && <button className="primary auth-submit auth-signup-submit" type="submit" disabled={loading}>{loading ? "Creating account…" : "Create Account"}<span aria-hidden="true">→</span></button>}
+
+        <p className="auth-bottom-switch">
+          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+          <button type="button" onClick={toggleMode}>{mode === "login" ? "Sign up" : "Log in"}</button>
+        </p>
       </form>
-    </div>
+    </main>
   );
 }
 
-function Field({ icon, type = "text", placeholder, value, onChange }) {
-  return <div className="field-wrap"><span>{icon}</span><input type={type} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} /></div>;
+function Field({ icon, type = "text", placeholder, value, onChange, autoComplete }) {
+  return <div className="field-wrap"><span>{icon}</span><input type={type} placeholder={placeholder} value={value} autoComplete={autoComplete} onChange={e => onChange(e.target.value)} /></div>;
 }
 
 function HomePage({ user, refreshKey, onCreate, onStory }) {
