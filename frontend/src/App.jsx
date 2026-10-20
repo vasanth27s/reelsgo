@@ -3609,9 +3609,6 @@ function ProfilePage({ user, setUser }) {
             <button type="button" onClick={() => { setProfileQuickActionsOpen(false); setShareQrOpen(true); }}>
               <span className="rg-profile-quick-action-icon"><QrCode /></span><span>QR code</span>
             </button>
-            <button type="button" onClick={() => { setProfileQuickActionsOpen(false); window.setTimeout(() => input.current?.click(), 0); }}>
-              <span className="rg-profile-quick-action-icon"><UserRoundCheck /></span><span>Add avatar</span>
-            </button>
           </div>
         </div>
       )}
