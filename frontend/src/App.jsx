@@ -5071,6 +5071,8 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [followLoading, setFollowLoading] = useState(false);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [profileOptionsOpen, setProfileOptionsOpen] = useState(false);
+  const [profileQuickActionsOpen, setProfileQuickActionsOpen] = useState(false);
+  const profileAvatarLongPressTimer = useRef(null);
   const [profileAboutOpen, setProfileAboutOpen] = useState(false);
   const [sharedActivityOpen, setSharedActivityOpen] = useState(false);
   const [profileQrOpen, setProfileQrOpen] = useState(false);
@@ -5144,6 +5146,36 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const tagged = profile.tagged || [];
 
   const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(u._id)}`;
+  const quickProfileAvatarSrc = u?.avatar && typeof u.avatar === "string" ? u.avatar : avatarUrl(u);
+  const isFollowingProfile = profile.followStatus === "accepted";
+
+  function clearPublicProfileAvatarLongPress() {
+    if (profileAvatarLongPressTimer.current) {
+      window.clearTimeout(profileAvatarLongPressTimer.current);
+      profileAvatarLongPressTimer.current = null;
+    }
+  }
+
+  function startPublicProfileAvatarLongPress() {
+    clearPublicProfileAvatarLongPress();
+    profileAvatarLongPressTimer.current = window.setTimeout(() => {
+      setProfileQuickActionsOpen(true);
+      if (navigator.vibrate) navigator.vibrate(25);
+    }, 480);
+  }
+
+  useEffect(() => () => clearPublicProfileAvatarLongPress(), [userId]);
+
+  async function shareQuickPublicProfile() {
+    await runProfileAction("share");
+    setProfileQuickActionsOpen(false);
+  }
+
+  async function copyQuickPublicProfile() {
+    await runProfileAction("copy");
+    setProfileQuickActionsOpen(false);
+  }
+
   async function copyProfileUrl() {
     try {
       if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(profileUrl);
@@ -5236,7 +5268,15 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
       </div>
 
       <div className="profile-header">
-        <div className="profile-avatar-wrap">
+        <div
+          className="profile-avatar-wrap rg-public-avatar-longpress-target"
+          onPointerDown={startPublicProfileAvatarLongPress}
+          onPointerUp={clearPublicProfileAvatarLongPress}
+          onPointerLeave={clearPublicProfileAvatarLongPress}
+          onPointerCancel={clearPublicProfileAvatarLongPress}
+          onContextMenu={event => { event.preventDefault(); clearPublicProfileAvatarLongPress(); setProfileQuickActionsOpen(true); }}
+          aria-label={`Long press to view @${u.username || "user"} profile actions`}
+        >
           <Avatar user={u} size={96} className="profile-avatar" />
         </div>
 
@@ -5347,6 +5387,48 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
       {profileAboutOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="About this account" onMouseDown={e => { if (e.target === e.currentTarget) setProfileAboutOpen(false); }}><section className="rg-profile-info-card"><div className="rg-profile-info-icon"><CircleUser size={30}/></div><h2>About this account</h2><p className="rg-profile-info-username">@{u.username}</p><div className="rg-profile-info-row"><span>Joined ReelsGo</span><b>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" }) : "Date not available"}</b></div><div className="rg-profile-info-row"><span>Account type</span><b>{u.isPrivate ? "Private" : "Public"}</b></div><div className="rg-profile-info-row"><span>Verification</span><b>{verificationStatusCache.get(String(u._id)) ? "Verified" : "Not verified"}</b></div><button type="button" className="rg-profile-info-done" onClick={() => setProfileAboutOpen(false)}>Done</button></section></div>}
 
       {sharedActivityOpen && <div className="rg-profile-info-backdrop" role="dialog" aria-modal="true" aria-label="Shared activity" onMouseDown={e => { if (e.target === e.currentTarget) setSharedActivityOpen(false); }}><section className="rg-profile-info-card rg-shared-activity-card"><div className="rg-profile-info-handle"/><h2>Shared activity</h2><p className="rg-profile-info-username">You and @{u.username}</p><div className="rg-shared-activity-list"><div><b>{profile.followStatus === "accepted" ? "You follow each other’s updates" : profile.followStatus === "pending" ? "Follow request pending" : "You are not following this account"}</b><small>Follow status</small></div><div><b>{posts.length} posts · {reels.length} Reels</b><small>Content visible to you</small></div><div><b>{u.followersCount || 0} followers</b><small>Account activity</small></div></div><button type="button" className="rg-profile-info-done" onClick={() => { setSharedActivityOpen(false); onMessage(u._id); }}>Open conversation</button><button type="button" className="rg-profile-info-secondary" onClick={() => setSharedActivityOpen(false)}>Close</button></section></div>}
+
+      {profileQuickActionsOpen && !isSelf && (
+        <div
+          className="rg-profile-quick-overlay rg-public-profile-quick-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`@${u.username || "user"} profile actions`}
+          onPointerDown={event => { if (event.target === event.currentTarget) setProfileQuickActionsOpen(false); }}
+          style={{ "--rg-profile-quick-image": quickProfileAvatarSrc ? `url("${quickProfileAvatarSrc.replace(/"/g, "%22")}")` : "none" }}
+        >
+          <div className="rg-profile-quick-backdrop" aria-hidden="true" />
+          <button type="button" className="rg-profile-quick-close" onClick={() => setProfileQuickActionsOpen(false)} aria-label="Close profile actions"><X /></button>
+          <div className="rg-profile-quick-avatar-area">
+            <div className="rg-profile-quick-avatar-shell">
+              {quickProfileAvatarSrc ? <img src={quickProfileAvatarSrc} alt={`@${u.username || "user"} profile`} className="rg-profile-quick-avatar-image" /> : <div className="rg-profile-quick-avatar-fallback">{(u?.name || u?.username || "U").slice(0, 1).toUpperCase()}</div>}
+            </div>
+          </div>
+          {isFollowingProfile ? (
+            <div className="rg-profile-quick-actions">
+              <button type="button" onClick={async () => { await toggleFollow(); setProfileQuickActionsOpen(false); }} disabled={followLoading}>
+                <span className="rg-profile-quick-action-icon"><UserRoundCheck /></span><span>{followLoading ? "Please wait…" : "Following"}</span>
+              </button>
+              <button type="button" onClick={shareQuickPublicProfile}>
+                <span className="rg-profile-quick-action-icon"><CircleUser /></span><span>Share</span>
+              </button>
+              <button type="button" onClick={copyQuickPublicProfile}>
+                <span className="rg-profile-quick-action-icon"><LinkIcon /></span><span>Copy link</span>
+              </button>
+              <button type="button" onClick={() => { setProfileQuickActionsOpen(false); setProfileQrOpen(true); }}>
+                <span className="rg-profile-quick-action-icon"><QrCode /></span><span>QR code</span>
+              </button>
+            </div>
+          ) : (
+            <div className="rg-profile-quick-unfollowed-actions">
+              <button type="button" className="rg-profile-quick-follow-button" onClick={async () => { await toggleFollow(); setProfileQuickActionsOpen(false); }} disabled={followLoading}>
+                {followLoading ? "Please wait…" : profile.followStatus === "pending" ? "Requested" : "Follow"}
+              </button>
+              <button type="button" className="rg-profile-quick-share-profile" onClick={shareQuickPublicProfile}>Share profile</button>
+            </div>
+          )}
+        </div>
+      )}
 
       {profileQrOpen && <ProfileQRCodeModal user={u} onClose={() => setProfileQrOpen(false)} />}
 
