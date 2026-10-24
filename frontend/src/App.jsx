@@ -937,6 +937,22 @@ function SplashScreen({ onBegin }) {
   return (
     <main className="rg-splash-screen" aria-label="Welcome to ReelsGo">
       <img className="rg-splash-background-image" src={splashBackground} alt="" aria-hidden="true" />
+      {/* Desktop-only cinematic background video. Mobile keeps the static Earth image. */}
+      <video
+        className="rg-splash-desktop-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster={splashBackground}
+        aria-hidden="true"
+        tabIndex={-1}
+        onCanPlay={(event) => event.currentTarget.classList.add("is-ready")}
+        onError={(event) => event.currentTarget.classList.add("video-failed")}
+      >
+        <source src="/starting.MP4" type="video/mp4" />
+      </video>
       <div className="rg-splash-vignette" aria-hidden="true" />
       <div className="rg-splash-stars-overlay" aria-hidden="true" />
       <div className="rg-splash-orbit-overlay rg-splash-orbit-overlay-one" aria-hidden="true" />
