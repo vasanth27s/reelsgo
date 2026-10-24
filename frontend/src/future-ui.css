@@ -302,3 +302,152 @@ html:has(.rg-splash-screen),body:has(.rg-splash-screen),#root:has(.rg-splash-scr
   .rg-splash-background-image,.rg-splash-stars-overlay,.rg-splash-mark { animation: none !important; }
 }
 html:has(.rg-splash-screen), body:has(.rg-splash-screen), #root:has(.rg-splash-screen) { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; }
+
+
+/* FINAL splash viewport fix: fill the entire laptop/mobile viewport. */
+html:has(.rg-splash-screen), body:has(.rg-splash-screen), #root:has(.rg-splash-screen) {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+body:has(.rg-splash-screen) { min-width: 0 !important; }
+.rg-splash-screen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  width: 100dvw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100svh !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: block !important;
+  isolation: isolate !important;
+  border-radius: 0 !important;
+  background: #02040f !important;
+}
+.rg-splash-background-image {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center 47% !important;
+  transform-origin: center center !important;
+  animation: rgSplashCosmicDrift 32s ease-in-out infinite alternate !important;
+}
+.rg-splash-vignette {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg,rgba(1,3,14,.04) 0%,rgba(2,3,16,.02) 42%,rgba(2,3,16,.18) 67%,rgba(2,3,16,.60) 100%),radial-gradient(ellipse at center,transparent 42%,rgba(0,0,8,.2) 100%) !important;
+}
+.rg-splash-stars-overlay { z-index: 2 !important; }
+.rg-splash-orbit-overlay {
+  position: absolute !important;
+  z-index: 3 !important;
+  left: 50% !important;
+  top: 45% !important;
+  width: min(94vw, 1120px) !important;
+  height: min(34vw, 360px) !important;
+  border: 1px solid rgba(102,177,255,.7) !important;
+  border-left-color: rgba(50,232,255,.95) !important;
+  border-right-color: rgba(244,77,255,.9) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 12px rgba(57,151,255,.4), inset 0 0 12px rgba(132,69,255,.12) !important;
+  pointer-events: none !important;
+  transform: translate(-50%,-50%) rotate(-23deg) !important;
+  animation: rgSplashOrbitSpin 24s linear infinite !important;
+}
+.rg-splash-orbit-overlay-two {
+  width: min(88vw, 1000px) !important;
+  height: min(48vw, 470px) !important;
+  border-color: rgba(169,93,255,.42) !important;
+  transform: translate(-50%,-50%) rotate(33deg) !important;
+  animation: rgSplashOrbitSpinReverse 32s linear infinite !important;
+}
+/* Moving atmospheric sheen gives the static Earth artwork a subtle rotation illusion. */
+.rg-splash-earth-rotation {
+  position: absolute !important;
+  z-index: 4 !important;
+  top: 45% !important;
+  left: 50% !important;
+  width: min(75vw, 860px) !important;
+  aspect-ratio: 1 !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  transform: translate(-50%,-50%) !important;
+  background: linear-gradient(105deg,transparent 25%,rgba(30,185,255,.02) 37%,rgba(119,221,255,.20) 48%,rgba(160,81,255,.13) 53%,transparent 68%) !important;
+  mix-blend-mode: screen !important;
+  -webkit-mask-image: radial-gradient(ellipse at center,#000 0 60%,transparent 71%) !important;
+  mask-image: radial-gradient(ellipse at center,#000 0 60%,transparent 71%) !important;
+  animation: rgEarthSurfaceSweep 12s ease-in-out infinite alternate !important;
+}
+.rg-splash-content {
+  position: absolute !important;
+  z-index: 8 !important;
+  left: 50% !important;
+  top: auto !important;
+  bottom: clamp(28px,5.5vh,70px) !important;
+  width: min(92vw,620px) !important;
+  max-width: 620px !important;
+  margin: 0 !important;
+  padding: 0 14px env(safe-area-inset-bottom) !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+.rg-splash-mark {
+  width: clamp(62px,7vw,94px) !important;
+  height: clamp(62px,7vw,94px) !important;
+  margin: 0 0 8px !important;
+}
+.rg-splash-content h1 { font-size: clamp(40px,5vw,68px) !important; line-height: 1.02 !important; }
+.rg-splash-tagline { margin-top: 10px !important; font-size: clamp(13px,1.45vw,20px) !important; letter-spacing: .07em !important; }
+.rg-splash-subline { margin-top: 5px !important; font-size: clamp(10px,1vw,14px) !important; letter-spacing: .22em !important; }
+.rg-splash-screen .rg-splash-begin {
+  width: min(100%,390px) !important;
+  min-height: clamp(50px,6.5vh,68px) !important;
+  margin: clamp(18px,3vh,30px) auto 0 !important;
+  font-size: clamp(16px,1.35vw,21px) !important;
+}
+@keyframes rgSplashOrbitSpin { from { transform: translate(-50%,-50%) rotate(-23deg); } to { transform: translate(-50%,-50%) rotate(337deg); } }
+@keyframes rgSplashOrbitSpinReverse { from { transform: translate(-50%,-50%) rotate(33deg); } to { transform: translate(-50%,-50%) rotate(-327deg); } }
+@keyframes rgEarthSurfaceSweep { 0% { transform: translate(-62%,-50%) rotate(-9deg); opacity: .18; } 50% { opacity: .62; } 100% { transform: translate(-38%,-50%) rotate(9deg); opacity: .24; } }
+@media (min-width: 900px) {
+  .rg-splash-background-image { object-position: center 47% !important; }
+  .rg-splash-orbit-overlay { top: 43% !important; }
+  .rg-splash-earth-rotation { top: 43% !important; width: min(56vw, 850px) !important; }
+  .rg-splash-content { bottom: clamp(24px,4vh,48px) !important; }
+}
+@media (max-width: 600px) {
+  .rg-splash-background-image { object-position: center 47% !important; }
+  .rg-splash-orbit-overlay { top: 39% !important; width: 115vw !important; height: 42vw !important; }
+  .rg-splash-orbit-overlay-two { height: 58vw !important; }
+  .rg-splash-earth-rotation { top: 40% !important; width: 105vw !important; }
+  .rg-splash-content { bottom: calc(24px + env(safe-area-inset-bottom)) !important; }
+}
+@media (max-height: 620px) and (min-width: 700px) {
+  .rg-splash-content { bottom: 12px !important; }
+  .rg-splash-mark { width: 46px !important; height: 46px !important; }
+  .rg-splash-content h1 { font-size: 32px !important; }
+  .rg-splash-tagline { margin-top: 4px !important; }
+  .rg-splash-subline { margin-top: 1px !important; }
+  .rg-splash-screen .rg-splash-begin { margin-top: 8px !important; min-height: 40px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rg-splash-background-image,.rg-splash-stars-overlay,.rg-splash-mark,.rg-splash-orbit-overlay,.rg-splash-earth-rotation { animation: none !important; }
+}
