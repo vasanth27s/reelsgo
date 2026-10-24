@@ -543,6 +543,7 @@ function SharedReelPage({ reelId, onBack }) {
 function App() {
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
+  const [showSplash, setShowSplash] = useState(() => !getToken());
   const [page, setPage] = useState(() => {
     const shared = getSharedRouteFromPath();
     return shared ? `shared-${shared.type}` : (getProfileIdFromUrl() ? "user-profile" : "home");
@@ -764,6 +765,7 @@ function App() {
   if (!token && sharedReelId) {
     return <div className="shared-public-shell"><SharedReelPage reelId={sharedReelId} onBack={() => { window.history.pushState({}, "", "/"); setSharedReelId(null); setPage("home"); }} /></div>;
   }
+  if (!token && showSplash) return <SplashScreen onBegin={() => setShowSplash(false)} />;
   if (!token) return <Auth onLogin={login} />;
 
   return (
@@ -928,6 +930,39 @@ function Nav({ icon, label, active, onClick }) {
 
 function NavMobile({ icon, label, active, onClick }) {
   return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
+}
+
+function SplashScreen({ onBegin }) {
+  return (
+    <main className="rg-splash-screen">
+      <div className="rg-splash-stars" aria-hidden="true" />
+      <div className="rg-splash-planet" aria-hidden="true">
+        <span className="rg-splash-planet-glow" />
+        <span className="rg-splash-planet-land" />
+        <span className="rg-splash-orbit rg-splash-orbit-one" />
+        <span className="rg-splash-orbit rg-splash-orbit-two" />
+      </div>
+      <div className="rg-splash-content">
+        <div className="rg-splash-mark" aria-label="ReelsGo logo">
+          <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+            <defs>
+              <linearGradient id="rg-splash-gradient" x1="12" y1="12" x2="86" y2="88" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#37e9ff"/><stop offset=".52" stopColor="#7955ff"/><stop offset="1" stopColor="#ff43c6"/>
+              </linearGradient>
+              <filter id="rg-splash-glow"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <path d="M39 15h20a18 18 0 0 1 0 36H45a10 10 0 0 0 0 20h16" fill="none" stroke="url(#rg-splash-gradient)" strokeWidth="10" strokeLinecap="round" filter="url(#rg-splash-glow)"/>
+            <path d="M61 85H41a18 18 0 0 1 0-36h14a10 10 0 0 0 0-20H39" fill="none" stroke="url(#rg-splash-gradient)" strokeWidth="10" strokeLinecap="round" filter="url(#rg-splash-glow)"/>
+          </svg>
+        </div>
+        <h1>ReelsGo</h1>
+        <p className="rg-splash-tagline">Connect · Create · Explore</p>
+        <p className="rg-splash-subline">Beyond Limits</p>
+        <button type="button" className="rg-splash-begin" onClick={onBegin}>Let’s Begin <span aria-hidden="true">↗</span></button>
+      </div>
+      <div className="rg-splash-bottom-glow" aria-hidden="true" />
+    </main>
+  );
 }
 
 function AuthLogo({ className = "" }) {
