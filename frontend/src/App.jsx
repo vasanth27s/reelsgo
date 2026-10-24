@@ -939,6 +939,9 @@ function SplashScreen({ onBegin }) {
       <img className="rg-splash-background-image" src={splashBackground} alt="" aria-hidden="true" />
       <div className="rg-splash-vignette" aria-hidden="true" />
       <div className="rg-splash-stars-overlay" aria-hidden="true" />
+      <div className="rg-splash-orbit-overlay rg-splash-orbit-overlay-one" aria-hidden="true" />
+      <div className="rg-splash-orbit-overlay rg-splash-orbit-overlay-two" aria-hidden="true" />
+      <div className="rg-splash-earth-rotation" aria-hidden="true" />
 
       <section className="rg-splash-content">
         <div className="rg-splash-mark" aria-label="ReelsGo logo">
