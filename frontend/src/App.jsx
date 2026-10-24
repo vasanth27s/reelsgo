@@ -1365,7 +1365,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
     setStorySelectedPeople([]);
     setStoryMentionOpen(mode === "mention");
     setStorySendOpen(mode === "send");
-    loadStoryPeople();
+    if (mode === "mention") loadStoryPeople();
   }
 
   function toggleStoryPerson(person) {
@@ -1551,18 +1551,17 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
         {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setViewersOpen(true); setStorySettingsOpen(true); }}><Settings/>Story settings</button>}
         {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryCommentsEnabled(!storyCommentsDisabled); }}><Ban/>{storyCommentsDisabled ? "Turn on commenting" : "Turn off commenting"}</button>}
       </section></>}
-      {(storyMentionOpen || storySendOpen) && <div className="rg-story-sheet-overlay" onClick={e => { e.stopPropagation(); setStoryMentionOpen(false); setStorySendOpen(false); }}><section className="rg-story-people-sheet" onClick={e => e.stopPropagation()}>
-        <div className="rg-story-sheet-handle"/><div className="rg-story-search"><Search/><input value={storyPeopleQuery} onChange={e => setStoryPeopleQuery(e.target.value)} placeholder="Search" autoFocus/>{storySendOpen && <button type="button" aria-label="Close" onClick={() => setStorySendOpen(false)}><X/></button>}</div>
-        {storySendOpen && <div className="rg-story-suggested">Suggested</div>}
-        <div className={`rg-story-people-list ${storySendOpen ? "grid" : "list"}`}>
+      {storyMentionOpen && <div className="rg-story-sheet-overlay" onClick={e => { e.stopPropagation(); setStoryMentionOpen(false); }}><section className="rg-story-people-sheet" onClick={e => e.stopPropagation()}>
+        <div className="rg-story-sheet-handle"/><div className="rg-story-search"><Search/><input value={storyPeopleQuery} onChange={e => setStoryPeopleQuery(e.target.value)} placeholder="Search" autoFocus/><button type="button" aria-label="Close" onClick={() => setStoryMentionOpen(false)}><X/></button></div>
+        <div className="rg-story-people-list list">
           {storyPeopleLoading ? <div className="rg-story-people-empty">Loading people...</div> : storyPeople.filter(p => `${p.username || ""} ${p.name || ""}`.toLowerCase().includes(storyPeopleQuery.toLowerCase())).length ? storyPeople.filter(p => `${p.username || ""} ${p.name || ""}`.toLowerCase().includes(storyPeopleQuery.toLowerCase())).map(person => {
             const active = storySelectedPeople.some(p => String(p._id) === String(person._id));
-            return <button type="button" key={person._id} className={`rg-story-person ${active ? "selected" : ""}`} onClick={() => toggleStoryPerson(person)}><span className="rg-story-person-avatar"><Avatar user={person} size={storySendOpen ? 74 : 58}/>{active && <i><Check/></i>}</span><b>{person.name || person.username || "ReelsGo user"}</b>{!storySendOpen && <span className={`rg-story-select-circle ${active ? "active" : ""}`}>{active && <Check/>}</span>}</button>;
+            return <button type="button" key={person._id} className={`rg-story-person ${active ? "selected" : ""}`} onClick={() => toggleStoryPerson(person)}><span className="rg-story-person-avatar"><Avatar user={person} size={58}/>{active && <i><Check/></i>}</span><b>{person.name || person.username || "ReelsGo user"}</b><span className={`rg-story-select-circle ${active ? "active" : ""}`}>{active && <Check/>}</span></button>;
           }) : <div className="rg-story-people-empty">No people found</div>}
         </div>
-        {storyMentionOpen && <button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={() => { setStoryMentionOpen(false); setStoryNotice(storySelectedPeople.length ? `Selected ${storySelectedPeople.length} ${storySelectedPeople.length === 1 ? "person" : "people"} to mention.` : "Select people first."); window.setTimeout(() => setStoryNotice(""), 2600); }}>Mention</button>}
-        {storySendOpen && <><div className="rg-story-share-shortcuts"><button type="button" onClick={() => { const url = `${window.location.origin}/story/${story._id}`; window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this story on ReelsGo: ${url}`)}`, "_blank", "noopener,noreferrer"); }}><i className="whatsapp">◉</i><span>WhatsApp</span></button><button type="button" onClick={async () => { try { if (navigator.share) await navigator.share({ title: "ReelsGo story", url: `${window.location.origin}/story/${story._id}` }); else await copyStoryLink(); } catch (e) { if (e?.name !== "AbortError") copyStoryLink(); } }}><i><Upload/></i><span>Share to...</span></button><button type="button" onClick={copyStoryLink}><i><LinkIcon/></i><span>Copy link</span></button></div><button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={sendStoryToSelected}><Send/>{storySelectedPeople.length ? `Send (${storySelectedPeople.length})` : "Send"}</button></>}
+        <button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={() => { setStoryMentionOpen(false); setStoryNotice(storySelectedPeople.length ? `Selected ${storySelectedPeople.length} ${storySelectedPeople.length === 1 ? "person" : "people"} to mention.` : "Select people first."); window.setTimeout(() => setStoryNotice(""), 2600); }}>Mention</button>
       </section></div>}
+      {storySendOpen && <ShareSheet post={story} kind="story" onClose={() => setStorySendOpen(false)} />}
       {storyCommentsOpen && <div className="post-comments-sheet-backdrop rg-story-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setStoryCommentsOpen(false); }}>
         <section className="post-comments-sheet rg-story-comments-sheet" role="dialog" aria-modal="true" aria-label="Story comments">
           <header className="post-sheet-header"><span className="post-sheet-handle"/><h2>Comments</h2><button type="button" aria-label="Close comments" onClick={() => setStoryCommentsOpen(false)}><X/></button></header>
@@ -2115,9 +2114,10 @@ function ShareSheet({ post, onClose, kind = "post" }) {
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const postLink = `${window.location.origin}/${kind === "reel" ? "reel" : "post"}/${post?._id || ""}`;
-  const contentLabel = kind === "reel" ? "Reel" : "post";
-  const shareText = `Check out this ${contentLabel} on ReelsGo: ${postLink}`;
+  const contentType = kind === "story" ? "story" : kind === "reel" ? "reel" : "post";
+  const postLink = `${window.location.origin}/${contentType}/${post?._id || ""}`;
+  const contentLabel = kind === "story" ? "Story" : kind === "reel" ? "Reel" : "post";
+  const shareText = `Check out this ${contentLabel.toLowerCase()} on ReelsGo: ${postLink}`;
 
   async function loadPeople() {
     setLoading(true);
@@ -2171,7 +2171,7 @@ function ShareSheet({ post, onClose, kind = "post" }) {
   async function copyPostLink() {
     try {
       await navigator.clipboard.writeText(postLink);
-      setNotice(`${kind === "reel" ? "Reel" : "Post"} link copied.`);
+      setNotice(`${contentLabel} link copied.`);
     } catch {
       const field = document.createElement("textarea");
       field.value = postLink;
@@ -2181,7 +2181,7 @@ function ShareSheet({ post, onClose, kind = "post" }) {
       field.select();
       const copied = document.execCommand("copy");
       field.remove();
-      setNotice(copied ? `${kind === "reel" ? "Reel" : "Post"} link copied.` : "Copy failed. Please copy the link from your browser.");
+      setNotice(copied ? `${contentLabel} link copied.` : "Copy failed. Please copy the link from your browser.");
     }
   }
 
@@ -2196,7 +2196,7 @@ function ShareSheet({ post, onClose, kind = "post" }) {
   async function shareExternally() {
     try {
       if (navigator.share) {
-        await navigator.share({ title: `ReelsGo ${contentLabel}`, text: `Check out this ${contentLabel} on ReelsGo`, url: postLink });
+        await navigator.share({ title: `ReelsGo ${contentLabel}`, text: `Check out this ${contentLabel.toLowerCase()} on ReelsGo`, url: postLink });
       } else {
         await copyPostLink();
         setNotice("Sharing is not supported here, so the link was copied.");
@@ -2262,13 +2262,13 @@ function ShareSheet({ post, onClose, kind = "post" }) {
         }
       }
       if (sent && !failed.length) {
-        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
+        alert(`${contentLabel} sent to ${sent} ${sent === 1 ? "person" : "people"}.`);
         onClose();
       } else if (sent) {
-        alert(`${kind === "reel" ? "Reel" : "Post"} sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
+        alert(`${contentLabel} sent to ${sent} ${sent === 1 ? "person" : "people"}. Could not send to: ${failed.join(", ")}.`);
         onClose();
       } else {
-        alert(`Could not send the ${contentLabel}. Please try again.`);
+        alert(`Could not send the ${contentLabel.toLowerCase()}. Please try again.`);
       }
     } finally {
       setSending(false);
@@ -2280,11 +2280,11 @@ function ShareSheet({ post, onClose, kind = "post" }) {
   );
 
   return (
-    <div className="share-sheet-overlay" onClick={onClose}>
-      <div className="share-sheet glass-panel" onClick={e => e.stopPropagation()}>
+    <div className="share-sheet-overlay" onClick={e => { e.stopPropagation(); onClose(); }}>
+      <div className={`share-sheet glass-panel ${kind === "story" ? "story-share-sheet" : ""}`} onClick={e => e.stopPropagation()}>
         <div className="share-sheet-handle" />
         <div className="share-sheet-head">
-          <div><h2>Share {kind === "reel" ? "Reel" : "post"}</h2><p>Select multiple people, or choose a sharing option</p></div>
+          <div><h2>Share {contentLabel}</h2><p>Select multiple people, or choose a sharing option</p></div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close share"><X /></button>
         </div>
 
@@ -2314,22 +2314,22 @@ function ShareSheet({ post, onClose, kind = "post" }) {
         )}
 
         <div className="share-shortcuts share-shortcuts-all" aria-label="Sharing options">
-          <button type="button" onClick={addToStory}>
+          {kind !== "story" && <button type="button" onClick={addToStory}>
             <span className="share-shortcut-icon"><CirclePlusFallback /></span><b>Add to story</b>
-          </button>
+          </button>}
           <button type="button" onClick={() => openWhatsApp(false)}>
             <span className="share-shortcut-icon whatsapp"><MessageCircle /></span><b>WhatsApp</b>
           </button>
-          <button type="button" onClick={() => openWhatsApp(true)}>
+          {kind !== "story" && <button type="button" onClick={() => openWhatsApp(true)}>
             <span className="share-shortcut-icon whatsapp"><CirclePlusFallback /></span><b>WhatsApp Status</b>
-          </button>
+          </button>}
           <button type="button" onClick={shareExternally}>
             <span className="share-shortcut-icon"><Upload /></span><b>Share to…</b>
           </button>
           <button type="button" onClick={copyPostLink}>
             <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
           </button>
-          {[
+          {kind !== "story" && [
             { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
             { name: "WhatsApp", mark: "◉", bg: "#25D366" },
             { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
