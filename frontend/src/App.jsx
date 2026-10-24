@@ -12,87 +12,6 @@ import {
   Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp
 } from "lucide-react";
 
-const REELSGO_REFERENCE_THEME_CSS = String.raw`/* ReelsGo visual refresh: dark cinematic neon UI inspired by the supplied reference board. */
-:root{color-scheme:dark;--bg:#050812;--card:#0b1222;--text:#f5f7ff;--muted:#9ba8c3;--line:rgba(89,166,255,.25);--accent:#5d5cff;--accent2:#d52bff;--danger:#ff496d;--soft:#101b31}
-html,body,#root{background:#040711!important;color:#f4f6ff!important}
-body{background:radial-gradient(ellipse at 50% -10%,#111a46 0,transparent 48%),#040711!important;color:#f4f6ff!important}
-button,input,textarea,select{font-family:Inter,ui-sans-serif,system-ui,sans-serif}
-button{transition:background .18s,border-color .18s,box-shadow .18s,transform .18s}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #6deaff!important;outline-offset:2px}
-.app{background:transparent!important;color:#f4f6ff!important}
-.sidebar,.mobile-header,.bottom-nav{background:rgba(5,10,25,.94)!important;color:#f4f6ff!important;border-color:rgba(69,161,255,.24)!important;backdrop-filter:blur(22px)!important}
-.sidebar{box-shadow:8px 0 40px #0004!important}
-.brand{border-bottom-color:rgba(87,153,255,.17)!important}
-.brand-wordmark,.mobile-brand-wordmark{color:#fff!important;letter-spacing:-.04em!important;text-shadow:0 0 18px #7e54ff!important}
-.nav,.nav-mobile,.mobile-profile{color:#aebbd4!important;background:transparent!important;border:1px solid transparent!important;border-radius:13px!important}
-.nav:hover,.nav.active,.nav-mobile.active,.mobile-profile.active{color:#fff!important;background:linear-gradient(110deg,rgba(67,76,255,.24),rgba(205,43,255,.12))!important;border-color:rgba(103,130,255,.38)!important;box-shadow:inset 0 0 18px #465bff12,0 0 18px #3e52ff12!important}
-.main{background:transparent!important;color:#f4f6ff!important}
-.page{color:#f4f6ff!important}
-.page-heading h1,.page h1,.page h2,.page h3,.settings-topbar h2,.settings-section-title h1{color:#f5f7ff!important;letter-spacing:-.025em}
-.page-heading p,.page p,.page small,.page label{color:#aab6d0}
-.post-card,.stories-card,.quick-create,.empty,.user-row,.explore-feature,.reel-card,.chat-layout,.notification,.edit-card,.auth-card,.modal,.mobile-menu,.settings-modal,.settings-panel,.settings-card-highlight,.verification-card,.verification-overlay .verification-card{background:linear-gradient(155deg,rgba(15,25,48,.98),rgba(6,11,25,.98))!important;color:#eef3ff!important;border:1px solid rgba(65,157,255,.28)!important;box-shadow:0 14px 40px #0005,0 0 24px #214bff0b!important}
-.post-card,.stories-card,.quick-create,.reel-card,.user-row,.notification,.edit-card{border-radius:17px!important;overflow:hidden}
-.post-head,.post-body,.modal-head,.modal-body,.settings-topbar,.settings-content,.conversation-list,.chat-messages{color:#edf2ff!important;border-color:rgba(96,149,255,.18)!important}
-.stories-card{background:rgba(8,14,31,.9)!important}
-.story,.story>span{color:#dbe4ff!important}
-.quick-create>button:nth-child(2),.search-box,.settings-search,.field-wrap,.chat-input input,.comment-input input,.normal-input,.form-row input,.edit-card input,.edit-card textarea,.auth-card input,.auth-card textarea,.verification-input,.rg-pro-field input,.rg-pro-field textarea{background:rgba(4,9,22,.85)!important;color:#f5f7ff!important;border:1px solid rgba(96,158,255,.33)!important;border-radius:12px!important}
-input::placeholder,textarea::placeholder{color:#7f8da9!important}
-.search-box{background:rgba(7,13,28,.94)!important}
-.search-box input{color:#f5f7ff!important}
-.primary,.desktop-create,.auth-submit,.auth-switch,.secondary,.create-bottom,.rg-splash-begin,.settings-content .primary,.verification-card .primary{color:#fff!important;background:linear-gradient(105deg,#353bff 0%,#8734ff 55%,#f02ea9 100%)!important;border:1px solid rgba(180,180,255,.42)!important;border-radius:999px!important;box-shadow:0 0 20px rgba(89,70,255,.3)!important}
-.primary:hover,.desktop-create:hover,.auth-submit:hover,.secondary:hover,.rg-splash-begin:hover{transform:translateY(-1px);box-shadow:0 0 26px rgba(117,70,255,.55)!important}
-.secondary{background:rgba(17,29,52,.95)!important;border-color:rgba(90,158,255,.35)!important}
-.icon-button,.post-card .icon-button,.mobile-header button,.settings-back{color:#e9efff!important;background:transparent!important}
-.icon-button:hover,.mobile-header button:hover,.settings-back:hover{background:rgba(74,100,255,.18)!important}
-.avatar{box-shadow:0 0 0 1px rgba(90,189,255,.32)!important}
-.profile-header{border-bottom-color:rgba(88,148,255,.22)!important}
-.profile-tabs{border-color:rgba(88,148,255,.25)!important}
-.profile-tabs button{color:#8f9eb9!important}
-.profile-tabs button.active{color:#fff!important;border-bottom-color:#a85bff!important}
-.profile-stats small,.profile-details>p,.profile-details>a{color:#b1bfd9!important}
-.chat-layout{border-radius:18px!important}
-.conversation-list{border-right-color:rgba(96,149,255,.2)!important}
-.conversation-list button,.setting-row,.settings-sidebar button{color:#e8eeff!important;border-bottom-color:rgba(96,149,255,.15)!important;background:transparent!important}
-.conversation-list button:hover,.setting-row:hover,.settings-sidebar button:hover,.settings-sidebar button.active{background:rgba(72,81,255,.14)!important;color:#fff!important}
-.bubble{background:#14223a!important;color:#eef3ff!important;border:1px solid rgba(90,158,255,.15)!important}
-.bubble.mine{background:linear-gradient(115deg,#343cff,#8b32ff)!important;color:#fff!important}
-.chat-input,.comment-input,.actions{border-color:rgba(96,149,255,.18)!important}
-.actions button,.comments-link{color:#dce5ff!important}
-.notification{background:linear-gradient(145deg,#101a31,#080e20)!important}
-.settings-overlay{background:#040711!important}
-.settings-modal.instagram-settings{background:#040711!important}
-.settings-sidebar button.active{background:linear-gradient(100deg,rgba(66,73,255,.25),rgba(204,42,255,.1))!important}
-.settings-card-highlight{background:rgba(77,76,255,.13)!important}
-.setting-row-icon{background:#121e38!important;color:#b9caff!important}
-.modal-head{border-bottom-color:rgba(90,158,255,.2)!important}
-.overlay{background:rgba(0,2,12,.76)!important;backdrop-filter:blur(9px)!important}
-.auth-page{background:radial-gradient(ellipse at 20% 15%,rgba(57,68,255,.25),transparent 38%),radial-gradient(ellipse at 85% 75%,rgba(207,39,255,.16),transparent 36%),#040711!important;color:#fff!important}
-.auth-showcase h1{background:linear-gradient(100deg,#fff,#9eabff,#f079ff)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
-.auth-showcase p,.auth-subtitle{color:#a9b7d5!important}
-.auth-pills span{background:#0c1530!important;border-color:rgba(91,160,255,.28)!important;color:#dce7ff!important}
-.auth-card h2,.auth-card label{color:#f5f7ff!important}
-.auth-logo,.auth-showcase-logo{background:linear-gradient(135deg,#343bff,#9d31ff,#ed2bb1)!important;box-shadow:0 0 25px #6b43ff66!important}
-.error{background:#3a1025!important;color:#ffb7c7!important}
-.rg-splash-screen{background:#02040c!important}
-.rg-splash-screen .rg-splash-background-image,.rg-splash-screen .rg-splash-desktop-video{filter:saturate(1.08) contrast(1.04)}
-.rg-splash-screen:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(1,3,12,.08),rgba(1,3,12,.15) 40%,rgba(1,3,12,.72))}
-.rg-splash-screen .rg-splash-content{z-index:5!important}
-.rg-splash-screen .rg-splash-begin{letter-spacing:.01em}
-.rg-splash-screen .rg-splash-content h1{text-shadow:0 0 25px rgba(105,88,255,.25)}
-.reels-grid{gap:13px!important}
-.reel-card{border-radius:14px!important;border-color:rgba(65,157,255,.32)!important}
-.reel-card video{background:#030711!important}
-.profile-grid{gap:3px!important}
-.profile-grid .grid-media,.profile-grid .grid-reel{background:#0a1225!important}
-.profile-grid .grid-media img,.profile-grid .grid-media video,.profile-grid .grid-reel video{filter:saturate(1.05)}
-.rg-pro-field,.rg-pro-panel-intro,.rg-pro-resource-list,.rg-pro-resource-list article{color:#dce5ff!important}
-.rg-pro-resource-list article{background:#0d1730!important;border-color:rgba(90,158,255,.22)!important}
-@media(min-width:701px){.main{padding-bottom:28px!important}.page{width:min(100%,1040px)!important;padding:30px 28px!important}.sidebar{width:238px!important}.main{margin-left:238px!important}.sidebar .nav{min-height:46px!important}}
-@media(max-width:1050px) and (min-width:701px){.sidebar{width:76px!important}.main{margin-left:76px!important}.brand{justify-content:center!important}.brand-wordmark{font-size:0!important}.nav{justify-content:center!important}.nav>span{margin:0!important}}
-@media(max-width:700px){body{background:#040711!important}.main{background:#040711!important}.mobile-header{height:58px!important}.bottom-nav{height:70px!important}.page{padding:16px 10px!important}.post-card,.stories-card,.quick-create{border-radius:14px!important}.auth-page{padding:16px 12px!important}.auth-card{border-radius:23px!important}.settings-content{background:#040711!important}.settings-topbar{background:#060b18!important}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
-`;
-
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
 
@@ -623,20 +542,6 @@ function SharedReelPage({ reelId, onBack }) {
 }
 
 function App() {
-  // Keep the existing navigation and app behaviour; apply the new reference-inspired UI from App.jsx.
-  useEffect(() => {
-    const styleId = "reelsgo-reference-neon-theme";
-    let style = document.getElementById(styleId);
-    if (!style) {
-      style = document.createElement("style");
-      style.id = styleId;
-      style.textContent = REELSGO_REFERENCE_THEME_CSS;
-      document.head.appendChild(style);
-    }
-    return () => {
-      // Keep the theme installed while the app is mounted; React may re-run effects in StrictMode.
-    };
-  }, []);
   const [user, setUser] = useState(getUser());
   const [token, setToken] = useState(getToken());
   const [showSplash, setShowSplash] = useState(() => !getToken());
