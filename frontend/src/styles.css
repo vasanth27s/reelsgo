@@ -15381,3 +15381,17 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
 .story-share-sheet .share-shortcuts-all { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
 .story-share-sheet .share-people { max-height: min(42vh, 390px) !important; }
 .story-share-sheet .share-shortcuts-all > button { flex: 0 0 auto; }
+
+/* Critical ReelsGo splash fallback: core layout remains styled even if future-ui.css is cached late. */
+.rg-splash-screen{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;min-height:100svh!important;overflow:hidden!important;display:block!important;margin:0!important;padding:0!important;background:#03040b!important;color:#fff!important;isolation:isolate!important}
+.rg-splash-screen .rg-splash-scene{position:absolute!important;z-index:2!important;top:clamp(30px,5.5vh,70px)!important;left:50%!important;width:min(94vw,510px)!important;aspect-ratio:1!important;transform:translateX(-50%)!important}
+.rg-splash-screen .rg-splash-planet{position:absolute!important;left:50%!important;top:50%!important;width:76%!important;aspect-ratio:1!important;transform:translate(-50%,-50%)!important;border-radius:50%!important;overflow:hidden!important;background:#101b62!important;box-shadow:0 0 70px #4a4aff70,0 0 130px #a02cff42!important}
+.rg-splash-screen .rg-splash-earth-map{position:absolute!important;width:142%!important;height:100%!important;left:-20%!important;top:0!important;max-width:none!important;animation:rgEarthRotation 32s linear infinite!important}
+.rg-splash-screen .rg-splash-content{position:absolute!important;left:50%!important;top:auto!important;bottom:clamp(36px,7.5vh,78px)!important;transform:translateX(-50%)!important;width:min(90vw,440px)!important;display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;z-index:5!important;margin:0!important}
+.rg-splash-screen .rg-splash-mark{width:clamp(54px,13vw,78px)!important;height:clamp(54px,13vw,78px)!important;display:grid!important;place-items:center!important;margin:0 0 5px!important}
+.rg-splash-screen .rg-splash-mark svg{width:100%!important;height:100%!important;display:block!important}
+.rg-splash-screen .rg-splash-content h1{margin:0!important;font-size:clamp(30px,7.5vw,43px)!important;line-height:1.08!important;text-align:center!important;color:#e7e7ff!important;background:linear-gradient(105deg,#fff,#b8b5ff,#75eaff)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.rg-splash-screen .rg-splash-tagline,.rg-splash-screen .rg-splash-subline{display:block!important;text-align:center!important;color:#f4f5ff!important;margin:9px 0 0!important}
+.rg-splash-screen .rg-splash-subline{color:#aeb9df!important;margin-top:3px!important;font-size:10px!important;letter-spacing:.2em!important}
+.rg-splash-screen .rg-splash-begin{display:flex!important;align-items:center!important;justify-content:center!important;width:min(100%,290px)!important;min-height:48px!important;margin:19px auto 0!important;border:1px solid #c6b0ff!important;border-radius:999px!important;background:linear-gradient(105deg,#32137f,#3d36d8,#7b25b8)!important;color:#fff!important;font-weight:750!important;box-shadow:0 0 25px #774aff9c!important;appearance:none!important;-webkit-appearance:none!important}
+html:has(.rg-splash-screen),body:has(.rg-splash-screen),#root:has(.rg-splash-screen){height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
