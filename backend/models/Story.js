@@ -63,6 +63,10 @@ const storySchema = new mongoose.Schema(
       required: true,
       index: true
     },
+    allowComments: {
+      type: Boolean,
+      default: true
+    },
     views: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"
