@@ -731,3 +731,35 @@ body:has(.rg-splash-screen) { min-width:0 !important; }
   .auth-page.auth-blue-theme { padding:18px 14px !important; }
   .auth-blue-theme .auth-glass-card { padding:26px 20px 23px !important; }
 }
+
+
+/* Desktop splash video: uses frontend/starting.MP4; mobile stays on the static image. */
+.rg-splash-desktop-video {
+  display: none;
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  background: #02040f;
+  transition: opacity 650ms ease;
+  pointer-events: none;
+}
+.rg-splash-desktop-video.is-ready { opacity: 1; }
+.rg-splash-desktop-video.video-failed { display: none !important; }
+@media (min-width: 768px) {
+  .rg-splash-desktop-video { display: block; }
+  .rg-splash-background-image { object-position: center center !important; }
+}
+@media (max-width: 767px) {
+  .rg-splash-desktop-video { display: none !important; }
+  .rg-splash-background-image { display: block !important; opacity: 1 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rg-splash-desktop-video { display: none !important; }
+}
