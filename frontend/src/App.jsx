@@ -1646,6 +1646,7 @@ function Post({ post, user, onDeleted }) {
   const [text, setText] = useState("");
   const [showComments, setShowComments] = useState(false);
   const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentSending, setCommentSending] = useState(false);
   const [commentsError, setCommentsError] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -1700,17 +1701,26 @@ function Post({ post, user, onDeleted }) {
   }
 
   async function comment() {
-    if (!text.trim()) return;
+    const message = text.trim();
+    if (!message || commentSending || post.commentsDisabled) return;
+    setCommentSending(true);
+    setCommentsError("");
     try {
-      await api(`/posts/${post._id}/comments`, {
+      const data = await api(`/posts/${post._id}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: text.trim() })
+        body: JSON.stringify({ text: message })
       });
+      if (!data?.comment) throw new Error("Comment was not saved. Please try again.");
+      // Add the server-confirmed comment immediately. Avoid a second GET request
+      // that could fail and make a successfully posted comment appear to fail.
+      setComments(current => [...current, data.comment]);
       setText("");
-      await loadComments();
+      setCommentsError("");
     } catch (e) {
-      setCommentsError(e?.message || "Could not post comment.");
+      setCommentsError(e?.message || "Could not post comment. Please try again.");
+    } finally {
+      setCommentSending(false);
     }
   }
 
@@ -1954,7 +1964,7 @@ function Post({ post, user, onDeleted }) {
             <div className="post-comments-sheet-list">
               {commentsLoading ? <p className="post-sheet-status">Loading comments…</p> : commentsError ? <p className="post-sheet-status">{commentsError}</p> : comments.length ? comments.map((c, index) => <div className="post-comment-row" key={c._id || `comment-${index}`}><Avatar user={c.author} size={38} /><div className="post-comment-copy"><div><UserLink user={c.author} /><span>{c.text}</span></div><small>Reply · Like</small></div></div>) : <div className="post-comments-empty"><b>No comments yet</b><span>Start the conversation.</span></div>}
             </div>
-            {!post.commentsDisabled && <div className="post-comment-composer-wrap"><div className="post-comment-emoji-row">{["❤️","🙌","🔥","👏","😢","😍","😮","😂"].map(emoji => <button type="button" key={emoji} onClick={() => setText(value => value + emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div><div className="post-comment-composer"><Avatar user={user} size={36} /><input value={text} onChange={event => setText(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); comment(); } }} placeholder={`Add a comment for ${post.author?.username || post.author?.name || "this post"}…`} aria-label="Add a comment"/><button type="button" className="post-comment-gif" onClick={() => setText(value => value + " GIF ")} aria-label="Add GIF">GIF</button><button type="button" className="post-comment-submit" onClick={comment} disabled={!text.trim() || commentsLoading}>Post</button></div></div>}
+            {!post.commentsDisabled && <div className="post-comment-composer-wrap"><div className="post-comment-emoji-row">{["❤️","🙌","🔥","👏","😢","😍","😮","😂"].map(emoji => <button type="button" key={emoji} onClick={() => setText(value => value + emoji)} aria-label={`Add ${emoji}`}>{emoji}</button>)}</div><div className="post-comment-composer"><Avatar user={user} size={36} /><input value={text} onChange={event => setText(event.target.value)} onKeyDown={event => { if (event.key === "Enter") { event.preventDefault(); comment(); } }} placeholder={`Add a comment for ${post.author?.username || post.author?.name || "this post"}…`} aria-label="Add a comment"/><button type="button" className="post-comment-gif" onClick={() => setText(value => value + " GIF ")} aria-label="Add GIF">GIF</button><button type="button" className="post-comment-submit" onClick={comment} disabled={!text.trim() || commentsLoading || commentSending}>{commentSending ? "Posting…" : "Post"}</button></div></div>}
           </section>
         </div>
       )}
