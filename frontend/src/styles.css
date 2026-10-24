@@ -15363,3 +15363,10 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
   .rg-story-people-list.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 10px}
   .rg-story-people-list.grid .rg-story-person>b{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
+
+/* Story comments reuse the post/reel comments sheet, but sit above the full-screen story viewer. */
+.rg-story-comments-backdrop { z-index: 100100 !important; background: rgba(0,0,0,.58) !important; }
+.rg-story-comments-sheet { z-index: 100101 !important; }
+.rg-story-comments-sheet .post-comments-sheet-list { padding-bottom: 20px; }
+.rg-story-comments-sheet .post-comment-composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+.rg-story-comments-sheet .post-comment-submit { min-width: 42px; }
