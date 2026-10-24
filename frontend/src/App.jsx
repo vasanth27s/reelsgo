@@ -1282,6 +1282,8 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
   const [storyPeopleQuery, setStoryPeopleQuery] = useState("");
   const [storySelectedPeople, setStorySelectedPeople] = useState([]);
   const [storyNotice, setStoryNotice] = useState("");
+  const [storyReplyText, setStoryReplyText] = useState("");
+  const [storyLiked, setStoryLiked] = useState(false);
   const [replyAudience, setReplyAudience] = useState(() => localStorage.getItem("reelsgo_story_reply_audience") || "followers");
   const [storyPrefs, setStoryPrefs] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_story_settings") || "{}"); } catch { return {}; } });
   const saveStoryPref = (key, value) => setStoryPrefs(prev => { const next = { ...prev, [key]: value }; localStorage.setItem("reelsgo_story_settings", JSON.stringify(next)); return next; });
@@ -1371,6 +1373,23 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
     window.setTimeout(() => setStoryNotice(""), 2600);
   }
 
+  async function sendStoryReply() {
+    const text = storyReplyText.trim();
+    if (!text || !story.author?._id) return;
+    try {
+      const d = await api("/messages/conversations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: [story.author._id] }) });
+      const conversation = d.conversation;
+      if (!conversation?._id) throw new Error("Could not open this conversation.");
+      await api(`/messages/conversations/${conversation._id}/messages`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      setStoryReplyText("");
+      setStoryNotice("Reply sent.");
+      window.setTimeout(() => setStoryNotice(""), 2200);
+    } catch (e) {
+      setStoryNotice(e.message || "Could not send reply.");
+      window.setTimeout(() => setStoryNotice(""), 2600);
+    }
+  }
+
   async function copyStoryLink() {
     const link = `${window.location.origin}/story/${story._id}`;
     try { await navigator.clipboard.writeText(link); }
@@ -1437,13 +1456,13 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
       <div className="story-viewer-top">
         <div className="story-viewer-user">
           <Avatar user={story.author} size={42} />
-          <div>
-            <UserLink user={story.author} />
-            <span>{isOwner ? 'Your story' : 'Story'}</span>
+          <div className="rg-story-author-meta">
+            <b>{isOwner ? "Your story" : (story.author?.username || story.author?.name || "ReelsGo user")}</b>
+            <span>{(() => { const stamp = new Date(story.createdAt || story.updatedAt || Date.now()).getTime(); const hours = Math.max(0, Math.floor((Date.now() - stamp) / 3600000)); return hours < 1 ? "now" : `${Math.min(hours, 23)}h`; })()}</span>
           </div>
         </div>
-        <div className="story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {isOwner && <button type="button" title="Delete story" aria-label="Delete story" disabled={deleting} onClick={e => { e.stopPropagation(); deleteStory(); }} style={{ color: "#ff5c70" }}><Trash2 /></button>}
+        <div className="story-viewer-top-actions rg-story-viewer-top-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button type="button" aria-label="More story options" title="More" onClick={e => { e.stopPropagation(); setStoryMoreOpen(v => !v); }}><MoreHorizontal /></button>
           <button type="button" aria-label="Close story" onClick={e => { e.stopPropagation(); onClose(); }}><X /></button>
         </div>
       </div>
@@ -1453,23 +1472,24 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
       <button type="button" className="story-tap-zone story-tap-left" aria-label="Previous story" onClick={e => { e.stopPropagation(); if (storyIndex > 0) onPrevious?.(); }} />
       <button type="button" className="story-tap-zone story-tap-right" aria-label="Next story" onClick={e => { e.stopPropagation(); onNext?.(); }} />
       {storyNotice && <div className="rg-story-notice" role="status">{storyNotice}</div>}
-      {!viewersOpen && storyControlsVisible && <div className="rg-story-action-bar" onClick={e => e.stopPropagation()}>
+      {!viewersOpen && storyControlsVisible && (isOwner ? <div className="rg-story-action-bar" onClick={e => e.stopPropagation()}>
         <button type="button" className="rg-story-activity" onClick={openViewers}><span className="rg-story-mini-avatars"><Avatar user={me} size={27}/><span>{story.views?.length || 0}</span></span><b>Activity</b></button>
         <button type="button" onClick={() => { setStoryMoreOpen(false); openStoryPeople("mention"); }}><AtSign/><b>Mention</b></button>
         <button type="button" onClick={() => { setStoryMoreOpen(false); openStoryPeople("send"); }}><Send/><b>Send</b></button>
         <button type="button" onClick={() => setStoryMoreOpen(v => !v)}><MoreHorizontal/><b>More</b></button>
-      </div>}
+      </div> : <div className="rg-story-reply-bar" onClick={e => e.stopPropagation()}>
+        <form className="rg-story-reply-form" onSubmit={e => { e.preventDefault(); sendStoryReply(); }}><input aria-label="Reply to story" placeholder="Send message..." value={storyReplyText} onChange={e => setStoryReplyText(e.target.value)} /><button type="submit" aria-label="Send reply" disabled={!storyReplyText.trim()}><Send/></button></form>
+        <button type="button" className={`rg-story-reaction ${storyLiked ? "liked" : ""}`} aria-label="Like story" onClick={() => setStoryLiked(v => !v)}><Heart fill={storyLiked ? "currentColor" : "none"}/></button>
+        <button type="button" aria-label="Reply to story" onClick={() => document.querySelector(".rg-story-reply-form input")?.focus()}><MessageCircle/></button>
+        <button type="button" aria-label="Send story" onClick={() => openStoryPeople("send")}><Send/></button>
+      </div>)}
       {storyMoreOpen && <><button className="rg-story-menu-backdrop" aria-label="Close story menu" onClick={e => { e.stopPropagation(); setStoryMoreOpen(false); }}/><section className="rg-story-more-menu" onClick={e => e.stopPropagation()}>
         {isOwner && <button type="button" className="danger" onClick={() => { setStoryMoreOpen(false); deleteStory(); }}><Trash2/>Delete story</button>}
-        <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryNotice("Story archive is available from your profile when archive storage is enabled."); window.setTimeout(() => setStoryNotice(""), 2600); }}><Archive/>Archive</button>
-        <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryNotice("Highlight selection is not configured yet."); window.setTimeout(() => setStoryNotice(""), 2600); }}><Heart/>Highlight</button>
+        {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryNotice("Story archive is available from your profile when archive storage is enabled."); window.setTimeout(() => setStoryNotice(""), 2600); }}><Archive/>Archive</button>}
         <button type="button" onClick={() => { setStoryMoreOpen(false); if (mediaUrl) { const a = document.createElement("a"); a.href = mediaUrl; a.download = `reelsgo-story-${story._id || "story"}`; a.target = "_blank"; a.rel = "noopener noreferrer"; a.click(); } else { setStoryNotice("There is no media file to save."); window.setTimeout(() => setStoryNotice(""), 2400); } }}><Download/>Save...</button>
-        <button type="button" onClick={() => { setStoryMoreOpen(false); window.dispatchEvent(new CustomEvent("reelsgo-open-story-composer", { detail: { storyId: story._id, shareAsPost: true, mediaUrl } })); }}><Grid3X3/>Share as post...</button>
-        <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryNotice("AI label editing is not available for this story yet."); window.setTimeout(() => setStoryNotice(""), 2400); }}><Edit3/>Edit AI label</button>
-        <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryNotice("Story promotion is not connected in this build."); window.setTimeout(() => setStoryNotice(""), 2400); }}><TrendingUp/>Boost Story</button>
         <button type="button" onClick={copyStoryLink}><LinkIcon/>Copy story link</button>
-        <button type="button" onClick={() => { setStoryMoreOpen(false); setViewersOpen(true); setStorySettingsOpen(true); }}><Settings/>Story settings</button>
-        <button type="button" onClick={() => { const next = !(storyPrefs.allowComments === false); saveStoryPref("allowComments", !next); setStoryMoreOpen(false); setStoryNotice(next ? "Story commenting turned off." : "Story commenting turned on."); window.setTimeout(() => setStoryNotice(""), 2400); }}><Ban/>{storyPrefs.allowComments === false ? "Turn on commenting" : "Turn off commenting"}</button>
+        {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setViewersOpen(true); setStorySettingsOpen(true); }}><Settings/>Story settings</button>}
+        {isOwner && <button type="button" onClick={() => { const next = !(storyPrefs.allowComments === false); saveStoryPref("allowComments", !next); setStoryMoreOpen(false); setStoryNotice(next ? "Story commenting turned off." : "Story commenting turned on."); window.setTimeout(() => setStoryNotice(""), 2400); }}><Ban/>{storyPrefs.allowComments === false ? "Turn on commenting" : "Turn off commenting"}</button>}
       </section></>}
       {(storyMentionOpen || storySendOpen) && <div className="rg-story-sheet-overlay" onClick={e => { e.stopPropagation(); setStoryMentionOpen(false); setStorySendOpen(false); }}><section className="rg-story-people-sheet" onClick={e => e.stopPropagation()}>
         <div className="rg-story-sheet-handle"/><div className="rg-story-search"><Search/><input value={storyPeopleQuery} onChange={e => setStoryPeopleQuery(e.target.value)} placeholder="Search" autoFocus/>{storySendOpen && <button type="button" aria-label="Close" onClick={() => setStorySendOpen(false)}><X/></button>}</div>
@@ -1477,7 +1497,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
         <div className={`rg-story-people-list ${storySendOpen ? "grid" : "list"}`}>
           {storyPeopleLoading ? <div className="rg-story-people-empty">Loading people...</div> : storyPeople.filter(p => `${p.username || ""} ${p.name || ""}`.toLowerCase().includes(storyPeopleQuery.toLowerCase())).length ? storyPeople.filter(p => `${p.username || ""} ${p.name || ""}`.toLowerCase().includes(storyPeopleQuery.toLowerCase())).map(person => {
             const active = storySelectedPeople.some(p => String(p._id) === String(person._id));
-            return <button type="button" key={person._id} className={`rg-story-person ${active ? "selected" : ""}`} onClick={() => toggleStoryPerson(person)}><span className="rg-story-person-avatar"><Avatar user={person} size={storySendOpen ? 74 : 58}/>{active && <i><Check/></i>}</span><b>{person.name || person.username || "ReelsGo user"}</b>{!storySendOpen && <small>@{person.username || "user"}</small>}{!storySendOpen && <span className={`rg-story-select-circle ${active ? "active" : ""}`}>{active && <Check/>}</span>}</button>;
+            return <button type="button" key={person._id} className={`rg-story-person ${active ? "selected" : ""}`} onClick={() => toggleStoryPerson(person)}><span className="rg-story-person-avatar"><Avatar user={person} size={storySendOpen ? 74 : 58}/>{active && <i><Check/></i>}</span><b>{person.name || person.username || "ReelsGo user"}</b>{!storySendOpen && <span className={`rg-story-select-circle ${active ? "active" : ""}`}>{active && <Check/>}</span>}</button>;
           }) : <div className="rg-story-people-empty">No people found</div>}
         </div>
         {storyMentionOpen && <button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={() => { setStoryMentionOpen(false); setStoryNotice(storySelectedPeople.length ? `Selected ${storySelectedPeople.length} ${storySelectedPeople.length === 1 ? "person" : "people"} to mention.` : "Select people first."); window.setTimeout(() => setStoryNotice(""), 2600); }}>Mention</button>}
