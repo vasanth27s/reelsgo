@@ -941,6 +941,17 @@ function Auth({ onLogin }) {
   async function submit(e) {
     e.preventDefault();
     setError("");
+    if (mode === "login") {
+      if (!String(form.email || "").trim()) { setError("Please fill in your email."); return; }
+      if (!String(form.password || "").trim()) { setError("Please fill in your password."); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email).trim())) { setError("Please enter a valid email address."); return; }
+    } else {
+      if (!String(form.name || "").trim()) { setError("Please fill in your full name."); return; }
+      if (!String(form.username || "").trim()) { setError("Please fill in your username."); return; }
+      if (!String(form.email || "").trim()) { setError("Please fill in your email."); return; }
+      if (!String(form.password || "").trim()) { setError("Please fill in your password."); return; }
+      if (!String(form.confirmPassword || "").trim()) { setError("Please confirm your password."); return; }
+    }
     if (mode === "signup" && form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -1283,10 +1294,17 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
   const [storySelectedPeople, setStorySelectedPeople] = useState([]);
   const [storyNotice, setStoryNotice] = useState("");
   const [storyReplyText, setStoryReplyText] = useState("");
+  const [storyCommentsOpen, setStoryCommentsOpen] = useState(false);
+  const [storyComments, setStoryComments] = useState([]);
+  const [storyCommentsLoading, setStoryCommentsLoading] = useState(false);
+  const [storyCommentText, setStoryCommentText] = useState("");
+  const [storyCommentSending, setStoryCommentSending] = useState(false);
+  const [storyCommentError, setStoryCommentError] = useState("");
   const [storyLiked, setStoryLiked] = useState(false);
   const [replyAudience, setReplyAudience] = useState(() => localStorage.getItem("reelsgo_story_reply_audience") || "followers");
   const [storyPrefs, setStoryPrefs] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_story_settings") || "{}"); } catch { return {}; } });
   const saveStoryPref = (key, value) => setStoryPrefs(prev => { const next = { ...prev, [key]: value }; localStorage.setItem("reelsgo_story_settings", JSON.stringify(next)); return next; });
+  const storyCommentsDisabled = isOwner && storyPrefs.allowComments !== undefined ? storyPrefs.allowComments === false : story.allowComments === false;
   const [storyControlsVisible, setStoryControlsVisible] = useState(true);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
@@ -1371,6 +1389,48 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
     setStoryNotice(sent ? `Story sent to ${sent} ${sent === 1 ? "person" : "people"}.` : "Could not send the story. Please try again.");
     setStorySendOpen(false);
     window.setTimeout(() => setStoryNotice(""), 2600);
+  }
+
+  async function openStoryComments() {
+    if (storyCommentsDisabled) {
+      setStoryNotice("Comments are turned off for this story.");
+      window.setTimeout(() => setStoryNotice(""), 2200);
+      return;
+    }
+    setStoryCommentsOpen(true);
+    setStoryCommentsLoading(true);
+    setStoryCommentError("");
+    try {
+      const data = await api(`/stories/${story._id}/comments`);
+      setStoryComments(Array.isArray(data.comments) ? data.comments : []);
+    } catch (error) {
+      setStoryCommentError(error?.message || "Could not load comments.");
+    } finally { setStoryCommentsLoading(false); }
+  }
+
+  async function submitStoryComment(event) {
+    event.preventDefault();
+    const text = storyCommentText.trim();
+    if (!text || storyCommentSending) return;
+    setStoryCommentSending(true);
+    setStoryCommentError("");
+    try {
+      const data = await api(`/stories/${story._id}/comments`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      if (data.comment) setStoryComments(items => [...items, data.comment]);
+      setStoryCommentText("");
+    } catch (error) { setStoryCommentError(error?.message || "Could not post comment."); }
+    finally { setStoryCommentSending(false); }
+  }
+
+  async function setStoryCommentsEnabled(enabled) {
+    saveStoryPref("allowComments", enabled);
+    try {
+      await api(`/stories/${story._id}/comments-settings`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ allowComments: enabled }) });
+      setStoryNotice(enabled ? "Story comments turned on." : "Story comments turned off.");
+    } catch (error) {
+      setStoryNotice(error?.message || "Could not update comment settings.");
+    }
+    window.setTimeout(() => setStoryNotice(""), 2400);
   }
 
   async function sendStoryReply() {
@@ -1480,7 +1540,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
       </div> : <div className="rg-story-reply-bar" onClick={e => e.stopPropagation()}>
         <form className="rg-story-reply-form" onSubmit={e => { e.preventDefault(); sendStoryReply(); }}><input aria-label="Reply to story" placeholder="Send message..." value={storyReplyText} onChange={e => setStoryReplyText(e.target.value)} /><button type="submit" aria-label="Send reply" disabled={!storyReplyText.trim()}><Send/></button></form>
         <button type="button" className={`rg-story-reaction ${storyLiked ? "liked" : ""}`} aria-label="Like story" onClick={() => setStoryLiked(v => !v)}><Heart fill={storyLiked ? "currentColor" : "none"}/></button>
-        <button type="button" aria-label="Reply to story" onClick={() => document.querySelector(".rg-story-reply-form input")?.focus()}><MessageCircle/></button>
+        <button type="button" aria-label="View story comments" onClick={openStoryComments}><MessageCircle/></button>
         <button type="button" aria-label="Send story" onClick={() => openStoryPeople("send")}><Send/></button>
       </div>)}
       {storyMoreOpen && <><button className="rg-story-menu-backdrop" aria-label="Close story menu" onClick={e => { e.stopPropagation(); setStoryMoreOpen(false); }}/><section className="rg-story-more-menu" onClick={e => e.stopPropagation()}>
@@ -1489,7 +1549,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
         <button type="button" onClick={() => { setStoryMoreOpen(false); if (mediaUrl) { const a = document.createElement("a"); a.href = mediaUrl; a.download = `reelsgo-story-${story._id || "story"}`; a.target = "_blank"; a.rel = "noopener noreferrer"; a.click(); } else { setStoryNotice("There is no media file to save."); window.setTimeout(() => setStoryNotice(""), 2400); } }}><Download/>Save...</button>
         <button type="button" onClick={copyStoryLink}><LinkIcon/>Copy story link</button>
         {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setViewersOpen(true); setStorySettingsOpen(true); }}><Settings/>Story settings</button>}
-        {isOwner && <button type="button" onClick={() => { const next = !(storyPrefs.allowComments === false); saveStoryPref("allowComments", !next); setStoryMoreOpen(false); setStoryNotice(next ? "Story commenting turned off." : "Story commenting turned on."); window.setTimeout(() => setStoryNotice(""), 2400); }}><Ban/>{storyPrefs.allowComments === false ? "Turn on commenting" : "Turn off commenting"}</button>}
+        {isOwner && <button type="button" onClick={() => { setStoryMoreOpen(false); setStoryCommentsEnabled(!storyCommentsDisabled); }}><Ban/>{storyCommentsDisabled ? "Turn on commenting" : "Turn off commenting"}</button>}
       </section></>}
       {(storyMentionOpen || storySendOpen) && <div className="rg-story-sheet-overlay" onClick={e => { e.stopPropagation(); setStoryMentionOpen(false); setStorySendOpen(false); }}><section className="rg-story-people-sheet" onClick={e => e.stopPropagation()}>
         <div className="rg-story-sheet-handle"/><div className="rg-story-search"><Search/><input value={storyPeopleQuery} onChange={e => setStoryPeopleQuery(e.target.value)} placeholder="Search" autoFocus/>{storySendOpen && <button type="button" aria-label="Close" onClick={() => setStorySendOpen(false)}><X/></button>}</div>
@@ -1503,6 +1563,16 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
         {storyMentionOpen && <button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={() => { setStoryMentionOpen(false); setStoryNotice(storySelectedPeople.length ? `Selected ${storySelectedPeople.length} ${storySelectedPeople.length === 1 ? "person" : "people"} to mention.` : "Select people first."); window.setTimeout(() => setStoryNotice(""), 2600); }}>Mention</button>}
         {storySendOpen && <><div className="rg-story-share-shortcuts"><button type="button" onClick={() => { const url = `${window.location.origin}/story/${story._id}`; window.open(`https://wa.me/?text=${encodeURIComponent(`Check out this story on ReelsGo: ${url}`)}`, "_blank", "noopener,noreferrer"); }}><i className="whatsapp">◉</i><span>WhatsApp</span></button><button type="button" onClick={async () => { try { if (navigator.share) await navigator.share({ title: "ReelsGo story", url: `${window.location.origin}/story/${story._id}` }); else await copyStoryLink(); } catch (e) { if (e?.name !== "AbortError") copyStoryLink(); } }}><i><Upload/></i><span>Share to...</span></button><button type="button" onClick={copyStoryLink}><i><LinkIcon/></i><span>Copy link</span></button></div><button type="button" className="rg-story-primary" disabled={!storySelectedPeople.length} onClick={sendStoryToSelected}><Send/>{storySelectedPeople.length ? `Send (${storySelectedPeople.length})` : "Send"}</button></>}
       </section></div>}
+      {storyCommentsOpen && <div className="post-comments-sheet-backdrop rg-story-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setStoryCommentsOpen(false); }}>
+        <section className="post-comments-sheet rg-story-comments-sheet" role="dialog" aria-modal="true" aria-label="Story comments">
+          <header className="post-sheet-header"><span className="post-sheet-handle"/><h2>Comments</h2><button type="button" aria-label="Close comments" onClick={() => setStoryCommentsOpen(false)}><X/></button></header>
+          <div className="post-comments-sheet-list">
+            {storyCommentsLoading ? <div className="post-comments-empty"><b>Loading comments…</b></div> : storyComments.length ? storyComments.map(comment => <article className="post-comment-row" key={comment._id}><Avatar user={comment.author} size={34}/><div className="post-comment-copy"><div><b>{comment.author?.name || comment.author?.username || "ReelsGo user"}</b><span>{comment.text}</span></div><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div></article>) : <div className="post-comments-empty"><MessageCircle/><b>No comments yet</b><span>Be the first to comment on this story.</span></div>}
+            {storyCommentError && <p className="error" role="alert">{storyCommentError}</p>}
+          </div>
+          <div className="post-comment-composer-wrap"><div className="post-comment-emoji-row">{["❤️","🙌","🔥","👏","😢","😍","😂"].map(emoji => <button type="button" key={emoji} onClick={() => setStoryCommentText(value => value + emoji)}>{emoji}</button>)}</div><form className="post-comment-composer" onSubmit={submitStoryComment}><input aria-label="Write a comment" placeholder="Add a comment…" value={storyCommentText} onChange={event => setStoryCommentText(event.target.value)} maxLength={1000}/><button className="post-comment-submit" type="submit" disabled={!storyCommentText.trim() || storyCommentSending}>{storyCommentSending ? "Posting…" : "Post"}</button></form></div>
+        </section>
+      </div>}
       {viewersOpen && (
         <section className="story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
           <div className="story-viewers-screen-top">
@@ -1559,7 +1629,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
             <header><button type="button" aria-label="Save and close settings" onClick={() => setStorySettingsOpen(false)}><Check /></button><b>Story</b></header>
             <section><h3>Viewing</h3><button className="story-setting-row" onClick={() => saveStoryPref("hideStoryFrom", !(storyPrefs.hideStoryFrom || false))}><span><b>Hide story from</b><small>Hide your story and live videos from specific people.</small></span><em>{storyPrefs.hideStoryFrom ? "Selected" : "0 people"}　›</em></button><button className="story-setting-row" onClick={() => saveStoryPref("closeFriends", !(storyPrefs.closeFriends || false))}><span><b>Close friends</b><small>Share your story only with specific people.</small></span><em>{storyPrefs.closeFriends ? "Selected" : "0 people"}　›</em></button></section>
             <section><h3>Replying</h3><div className="story-setting-description">Allow message replies<small>Choose who can reply to your story.</small></div>{[["followers","Your followers"],["mutuals","Followers you follow back"],["off","Off"]].map(([value,label])=><button key={value} className="story-setting-choice" onClick={() => { setReplyAudience(value); localStorage.setItem("reelsgo_story_reply_audience", value); }}><span>{label}</span><i className={replyAudience === value ? "selected" : ""}/></button>)}</section>
-            <section><h3>Commenting</h3><button className="story-setting-row" onClick={() => saveStoryPref("allowComments", storyPrefs.allowComments === false)}><span><b>Allow comments</b><small>Choose who can leave comments on your story.</small></span><em>{storyPrefs.allowComments === false ? "Off" : "Everyone"}　›</em></button></section>
+            <section><h3>Commenting</h3><button className="story-setting-row" onClick={() => setStoryCommentsEnabled(!storyCommentsDisabled)}><span><b>Allow comments</b><small>Choose who can leave comments on your story.</small></span><em>{storyCommentsDisabled ? "Off" : "Everyone"}　›</em></button></section>
             <section><h3>Saving</h3>{[["saveCameraRoll","Save story to Camera Roll","Automatically save photos and videos to your phone's camera roll."],["saveArchive","Save story to archive","Automatically save your stories to your archive."]].map(([key,label,desc])=><button key={key} className="story-setting-toggle-row" onClick={() => saveStoryPref(key, !(storyPrefs[key] ?? (key === "saveArchive")))}><span>{label}<small>{desc}</small></span><i className={(storyPrefs[key] ?? (key === "saveArchive")) ? "on" : ""}/></button>)}</section>
             <section><h3>Sharing</h3><button className="story-setting-toggle-row" onClick={() => saveStoryPref("allowReshare", !(storyPrefs.allowReshare ?? true))}><span>Allow others to share your story<small>Let people you mention share your story.</small></span><i className={(storyPrefs.allowReshare ?? true) ? "on" : ""}/></button></section>
           </section></div>}
