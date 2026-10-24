@@ -14,6 +14,17 @@ import {
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
 const SERVER = API.replace(/\/api\/?$/, "");
 
+// ReelsGo navigation chat icon: two overlapping outlined message bubbles.
+function ChatBubblesIcon({ size = 24, strokeWidth = 2.5, ...props }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true" {...props}>
+      <path d="M24 6H48C56 6 61 11 61 19V35C61 43 56 48 48 48H39L27 58V48H24C16 48 11 43 11 35V19C11 11 16 6 24 6Z" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M38 18H17C9 18 4 23 4 31V39C4 47 9 52 17 52H22" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M25 24H48M25 33H48" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
+    </svg>
+  );
+}
+
 
 // Built-in emoji picker: no external package required, so it works on desktop,
 // Android, iPhone/iPad and small-screen browsers without extra dependencies.
@@ -769,7 +780,7 @@ function App() {
           <Nav icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
           <Nav icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
           <Nav icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
-          <Nav icon={<MessageCircle />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+          <Nav icon={<ChatBubblesIcon size={24} />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
           <Nav icon={<Bell />} label="Notifications" active={page === "notifications"} onClick={() => navigate("notifications")} />
           <Nav icon={<PlusSquare />} label="Create" onClick={() => setCreateOpen(true)} />
           <Nav icon={<Avatar user={user} size={27} />} label="Profile" active={page === "profile"} onClick={openOwnProfile} />
@@ -854,7 +865,7 @@ function App() {
       <nav className="bottom-nav glass-bottom-nav">
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
-        <NavMobile icon={<Send />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+        <NavMobile icon={<ChatBubblesIcon size={29} />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
         <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={(event) => openOwnProfile(event)} aria-label="Profile">
           <Avatar user={user} size={34} />
@@ -1269,7 +1280,7 @@ function SuggestionsRail({ user, posts }) {
       </div>
 
       <button type="button" className="floating-messages" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-messages"))}>
-        <Send />
+        <ChatBubblesIcon size={24} />
         <b>Messages</b>
         <span className="floating-avatars">
           {people.slice(0, 3).map(person => <span key={person._id} className="floating-avatar-item"><Avatar user={person} size={25} /></span>)}
@@ -1540,8 +1551,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
       </div> : <div className="rg-story-reply-bar" onClick={e => e.stopPropagation()}>
         <form className="rg-story-reply-form" onSubmit={e => { e.preventDefault(); sendStoryReply(); }}><input aria-label="Reply to story" placeholder="Send message..." value={storyReplyText} onChange={e => setStoryReplyText(e.target.value)} /><button type="submit" aria-label="Send reply" disabled={!storyReplyText.trim()}><Send/></button></form>
         <button type="button" className={`rg-story-reaction ${storyLiked ? "liked" : ""}`} aria-label="Like story" onClick={() => setStoryLiked(v => !v)}><Heart fill={storyLiked ? "currentColor" : "none"}/></button>
-        <button type="button" aria-label="View story comments" onClick={openStoryComments}><MessageCircle/></button>
-        <button type="button" aria-label="Send story" onClick={() => openStoryPeople("send")}><Send/></button>
+          <button type="button" aria-label="Send story" onClick={() => openStoryPeople("send")}><Send/></button>
       </div>)}
       {storyMoreOpen && <><button className="rg-story-menu-backdrop" aria-label="Close story menu" onClick={e => { e.stopPropagation(); setStoryMoreOpen(false); }}/><section className="rg-story-more-menu" onClick={e => e.stopPropagation()}>
         {isOwner && <button type="button" className="danger" onClick={() => { setStoryMoreOpen(false); deleteStory(); }}><Trash2/>Delete story</button>}
