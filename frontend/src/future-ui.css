@@ -151,3 +151,154 @@ html:has(.app),body:has(.app){background:#050611!important;color:#f5f6ff!importa
 .app .primary,.app .auth-submit,.app .share-send-button,.app .story-publish-button{background:linear-gradient(105deg,#5836ed,#9c3eff 52%,#00bce8)!important;box-shadow:0 8px 28px #754aff42!important}
 .app .post-card:hover,.app .reel-card:hover,.app .explore-feature:hover{border-color:#786cff72!important;box-shadow:0 20px 58px #0007,0 0 24px #7e5aff12!important}
 html:has(.rg-splash-screen),body:has(.rg-splash-screen),#root:has(.rg-splash-screen){height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
+
+/* ReelsGo splash: use the actual uploaded cosmic Earth artwork as the background. */
+.rg-splash-screen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-height: 100svh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  display: block !important;
+  background: #02040f !important;
+  color: #fff !important;
+}
+.rg-splash-background-image {
+  position: absolute !important;
+  z-index: -3 !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block !important;
+  animation: rgSplashCosmicDrift 38s ease-in-out infinite alternate !important;
+  transform-origin: center center !important;
+}
+.rg-splash-vignette {
+  position: absolute !important;
+  z-index: -2 !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg,rgba(1,3,14,.08) 0%,rgba(2,3,16,.02) 38%,rgba(2,3,16,.18) 63%,rgba(2,3,16,.48) 100%), radial-gradient(ellipse at center,transparent 42%,rgba(0,0,8,.25) 100%) !important;
+}
+.rg-splash-stars-overlay {
+  position: absolute !important;
+  z-index: -1 !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  opacity: .28 !important;
+  background-image: radial-gradient(circle at 14% 18%,#fff 0 1px,transparent 1.8px),radial-gradient(circle at 81% 23%,#80dfff 0 1px,transparent 2px),radial-gradient(circle at 22% 78%,#e2a7ff 0 1px,transparent 2px),radial-gradient(circle at 88% 72%,#fff 0 1px,transparent 2px) !important;
+  background-size: 190px 220px,240px 270px,280px 240px,320px 300px !important;
+  animation: rgSplashStarDrift 22s linear infinite !important;
+}
+.rg-splash-content {
+  position: absolute !important;
+  z-index: 2 !important;
+  left: 50% !important;
+  top: 53.5% !important;
+  bottom: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(92vw, 520px) !important;
+  padding: 0 12px env(safe-area-inset-bottom) !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+}
+.rg-splash-mark {
+  width: clamp(76px, 15vw, 118px) !important;
+  height: clamp(76px, 15vw, 118px) !important;
+  margin: 0 0 4px !important;
+  display: grid !important;
+  place-items: center !important;
+  filter: drop-shadow(0 0 12px rgba(30,190,255,.8)) drop-shadow(0 0 25px rgba(181,38,255,.62)) !important;
+  animation: rgSplashLogoFloat 4s ease-in-out infinite !important;
+}
+.rg-splash-mark svg { width: 100% !important; height: 100% !important; display: block !important; }
+.rg-splash-content h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: clamp(39px, 9vw, 66px) !important;
+  font-weight: 850 !important;
+  letter-spacing: -.045em !important;
+  line-height: 1.04 !important;
+  color: #fff !important;
+  background: none !important;
+  -webkit-text-fill-color: #fff !important;
+  text-shadow: 0 2px 24px rgba(0,0,0,.7), 0 0 20px rgba(90,120,255,.25) !important;
+}
+.rg-splash-content h1 span {
+  color: #a58bff !important;
+  background: linear-gradient(100deg,#4eeaff 0%,#6e66ff 45%,#ff4ad6 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.rg-splash-tagline {
+  margin: 14px 0 0 !important;
+  color: #fff !important;
+  font-size: clamp(13px,3.6vw,21px) !important;
+  font-weight: 500 !important;
+  letter-spacing: .12em !important;
+  text-shadow: 0 2px 12px #000 !important;
+}
+.rg-splash-tagline i { color: #d04dff !important; font-style: normal !important; padding: 0 .13em !important; }
+.rg-splash-subline {
+  margin: 7px 0 0 !important;
+  color: #e3d9ff !important;
+  font-size: clamp(11px,2.8vw,17px) !important;
+  letter-spacing: .28em !important;
+  text-shadow: 0 2px 12px #000 !important;
+}
+.rg-splash-begin {
+  width: min(100%, 360px) !important;
+  min-height: clamp(56px,7.5vh,76px) !important;
+  margin: clamp(25px,4.5vh,42px) auto 0 !important;
+  padding: 0 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  border: 2px solid rgba(255,255,255,.88) !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  background: linear-gradient(100deg,#006eff 0%,#3428f7 42%,#c51bff 76%,#f529ba 100%) !important;
+  box-shadow: 0 0 9px #22dfff,0 0 25px rgba(43,107,255,.85),0 0 48px rgba(210,35,255,.56),inset 0 0 14px rgba(255,255,255,.2) !important;
+  font-size: clamp(17px,4vw,23px) !important;
+  font-weight: 750 !important;
+  letter-spacing: .01em !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  transition: transform .2s ease,filter .2s ease,box-shadow .2s ease !important;
+}
+.rg-splash-begin:hover { transform: translateY(-2px) !important; filter: brightness(1.12) !important; box-shadow: 0 0 13px #22dfff,0 0 34px rgba(43,107,255,.95),0 0 60px rgba(210,35,255,.7) !important; }
+.rg-splash-begin:active { transform: scale(.98) !important; }
+.rg-splash-arrow { font-size: 1.45em !important; font-weight: 400 !important; line-height: 1 !important; }
+@keyframes rgSplashCosmicDrift { from { transform: scale(1.015) translate3d(0,0,0); } to { transform: scale(1.075) translate3d(0,-.7%,0); } }
+@keyframes rgSplashStarDrift { from { transform: translateY(0); } to { transform: translateY(-22px); } }
+@keyframes rgSplashLogoFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@media (max-height: 720px) {
+  .rg-splash-content { top: 48% !important; }
+  .rg-splash-mark { width: 64px !important; height: 64px !important; }
+  .rg-splash-content h1 { font-size: clamp(34px,7vw,48px) !important; }
+  .rg-splash-tagline { margin-top: 8px !important; }
+  .rg-splash-begin { margin-top: 16px !important; min-height: 48px !important; }
+}
+@media (min-width: 800px) {
+  .rg-splash-content { top: 54% !important; }
+  .rg-splash-background-image { object-position: center 48% !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rg-splash-background-image,.rg-splash-stars-overlay,.rg-splash-mark { animation: none !important; }
+}
+html:has(.rg-splash-screen), body:has(.rg-splash-screen), #root:has(.rg-splash-screen) { height: 100dvh !important; min-height: 100dvh !important; overflow: hidden !important; }
