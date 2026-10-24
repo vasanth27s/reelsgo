@@ -15365,10 +15365,15 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
 }
 
 /* Story comments reuse the post/reel comments sheet, but sit above the full-screen story viewer. */
-.rg-story-comments-backdrop { z-index: 100100 !important; background: rgba(0,0,0,.58) !important; }
-.rg-story-comments-sheet { z-index: 100101 !important; }
+.rg-story-comments-backdrop { z-index: 100100 !important; background: rgba(0,0,0,.58) !important; pointer-events: auto !important; }
+.rg-story-comments-sheet { z-index: 100101 !important; pointer-events: auto !important; position: relative; }
+.rg-story-comments-sheet input,
+.rg-story-comments-sheet button,
+.rg-story-comments-sheet form { pointer-events: auto !important; }
 .rg-story-comments-sheet .post-comments-sheet-list { padding-bottom: 20px; }
 .rg-story-comments-sheet .post-comment-composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+.rg-story-comments-sheet .post-comment-composer { position: relative; z-index: 2; }
+.rg-story-comments-sheet .post-comment-composer input { min-width: 0; flex: 1; }
 .rg-story-comments-sheet .post-comment-submit { min-width: 42px; }
 
 
