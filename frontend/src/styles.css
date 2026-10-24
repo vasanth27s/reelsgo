@@ -15370,3 +15370,9 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
 .rg-story-comments-sheet .post-comments-sheet-list { padding-bottom: 20px; }
 .rg-story-comments-sheet .post-comment-composer-wrap { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 .rg-story-comments-sheet .post-comment-submit { min-width: 42px; }
+
+
+/* Story Send uses the same recipient picker as Reel/Post sharing, with story-only shortcuts. */
+.story-share-sheet .share-shortcuts-all { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.story-share-sheet .share-people { max-height: min(42vh, 390px) !important; }
+.story-share-sheet .share-shortcuts-all > button { flex: 0 0 auto; }
