@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import reelsGoLogo from "../image.png";
+import splashBackground from "../Neon Earth Among Cosmic Orbits.png";
 import {
   Home, Search, PlusSquare, Heart, MessageCircle, User, Settings, LogOut, ArrowLeft,
   Camera, Menu, X, Image as ImageIcon, Film, Bookmark, Compass, MoreHorizontal,
@@ -934,74 +935,12 @@ function NavMobile({ icon, label, active, onClick }) {
 
 function SplashScreen({ onBegin }) {
   return (
-    <main className="rg-splash-screen" aria-label="Welcome to ReelsGo" style={{
-      position: "fixed", inset: 0, zIndex: 2147483000, width: "100vw", height: "100dvh",
-      minHeight: "100svh", overflow: "hidden", display: "block", margin: 0, padding: 0,
-      background: "#03040b", color: "#fff", isolation: "isolate"
-    }}>
-      <div className="rg-splash-stars" aria-hidden="true" />
-      <div className="rg-splash-nebula rg-splash-nebula-one" aria-hidden="true" />
-      <div className="rg-splash-nebula rg-splash-nebula-two" aria-hidden="true" />
+    <main className="rg-splash-screen" aria-label="Welcome to ReelsGo">
+      <img className="rg-splash-background-image" src={splashBackground} alt="" aria-hidden="true" />
+      <div className="rg-splash-vignette" aria-hidden="true" />
+      <div className="rg-splash-stars-overlay" aria-hidden="true" />
 
-      <div className="rg-splash-scene" aria-hidden="true">
-        <div className="rg-splash-orbit rg-splash-orbit-one" />
-        <div className="rg-splash-orbit rg-splash-orbit-two" />
-        <div className="rg-splash-planet">
-          <div className="rg-splash-earth-surface">
-            <svg className="rg-splash-earth-map" viewBox="0 0 520 520" role="presentation" aria-hidden="true">
-              <defs>
-                <clipPath id="rgEarthClip"><circle cx="260" cy="260" r="250" /></clipPath>
-                <radialGradient id="rgEarthOcean" cx="31%" cy="24%" r="80%">
-                  <stop offset="0" stopColor="#69e8ff" />
-                  <stop offset=".2" stopColor="#2469df" />
-                  <stop offset=".52" stopColor="#17217d" />
-                  <stop offset=".78" stopColor="#100b3f" />
-                  <stop offset="1" stopColor="#03040c" />
-                </radialGradient>
-                <linearGradient id="rgEarthLand" x1="0" y1="0" x2="1" y2="1">
-                  <stop stopColor="#a6f6ed" />
-                  <stop offset=".38" stopColor="#47a7c9" />
-                  <stop offset=".72" stopColor="#7d6df4" />
-                  <stop offset="1" stopColor="#d45bdb" />
-                </linearGradient>
-                <radialGradient id="rgEarthShade" cx="28%" cy="22%" r="78%">
-                  <stop offset=".48" stopColor="#fff" stopOpacity="0" />
-                  <stop offset=".78" stopColor="#02030a" stopOpacity=".18" />
-                  <stop offset="1" stopColor="#010208" stopOpacity=".96" />
-                </radialGradient>
-                <filter id="rgEarthBlur"><feGaussianBlur stdDeviation="8" /></filter>
-              </defs>
-              <g clipPath="url(#rgEarthClip)">
-                <rect width="520" height="520" fill="url(#rgEarthOcean)" />
-                <g className="rg-splash-earth-continents" fill="url(#rgEarthLand)" stroke="#b4f5ff" strokeOpacity=".22" strokeWidth="2">
-                  <path d="M58 106l26-23 27 7 11 18 28 5 11 19-10 18 13 18-9 20-23 4-8 23-19 6-8 28-17-9-4-25-17-12-7-24-17-8-4-27 14-13-5-25z" />
-                  <path d="M146 249l26-11 20 12 7 24-11 22 6 22-14 29-7 34-19 25-11-18-4-30-16-20 7-29-8-22z" />
-                  <path d="M226 94l27-19 29 9 13 16 32 3 17 19-9 15-27 3-13 17-21-2-12 17-22-8-17 7-20-16 5-22-15-14z" />
-                  <path d="M270 181l22-10 28 11 18 24-4 26-17 12-5 30-17 29-13 29-19 15-13-22 3-28-12-21 5-26-11-20 13-17z" />
-                  <path d="M337 105l21-16 31 8 20 21 27 7 18 20-12 20-24 3-8 17-25-4-16 15-22-12-3-25-19-11z" />
-                  <path d="M390 236l24-16 31 10 12 22-13 19-29 3-12 19-20-11-5-23z" />
-                  <path d="M92 58l19-15 28 9 9 16-19 15-23-3zM315 351l19-8 17 17-9 23-21 2-13-15zM450 331l16-8 15 15-8 18-18-3z" />
-                </g>
-                <g fill="none" stroke="#c6f8ff" strokeOpacity=".12">
-                  <path d="M-10 180Q260 80 530 180M-10 245Q260 145 530 245M-10 310Q260 210 530 310M-10 375Q260 275 530 375" />
-                  <ellipse cx="260" cy="260" rx="135" ry="250" />
-                  <ellipse cx="260" cy="260" rx="205" ry="250" />
-                </g>
-                <path d="M-10 166Q90 90 180 140T360 133T540 90" fill="none" stroke="#b4f7ff" strokeOpacity=".28" strokeWidth="17" filter="url(#rgEarthBlur)" />
-                <rect width="520" height="520" fill="url(#rgEarthShade)" />
-              </g>
-            </svg>
-            <div className="rg-splash-earth-atmosphere" />
-          </div>
-        </div>
-        <div className="rg-splash-orbit rg-splash-orbit-three" />
-      </div>
-
-      <div className="rg-splash-content" style={{
-        position: "absolute", left: "50%", top: "min(57vh, 520px)", transform: "translateX(-50%)",
-        width: "min(90vw, 440px)", display: "flex", flexDirection: "column", alignItems: "center",
-        textAlign: "center", zIndex: 5, margin: 0, padding: "0 10px"
-      }}>
+      <section className="rg-splash-content">
         <div className="rg-splash-mark" aria-label="ReelsGo logo">
           <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
             <defs>
@@ -1014,13 +953,13 @@ function SplashScreen({ onBegin }) {
             <path d="M61 85H41a18 18 0 0 1 0-36h14a10 10 0 0 0 0-20H39" fill="none" stroke="url(#rg-splash-gradient)" strokeWidth="10" strokeLinecap="round" filter="url(#rg-splash-glow)"/>
           </svg>
         </div>
-        <h1>ReelsGo</h1>
-        <p className="rg-splash-tagline">Connect · Create · Explore</p>
+        <h1>Reels<span>Go</span></h1>
+        <p className="rg-splash-tagline">Connect <i>·</i> Create <i>·</i> Explore</p>
         <p className="rg-splash-subline">Beyond Limits</p>
-        <button type="button" className="rg-splash-begin" onClick={onBegin}>Let’s Begin <span aria-hidden="true">↗</span></button>
-        <p className="rg-splash-footnote">YOUR WORLD. YOUR MOMENT. YOUR REELSGO.</p>
-      </div>
-      <div className="rg-splash-bottom-glow" aria-hidden="true" />
+        <button type="button" className="rg-splash-begin" onClick={onBegin}>
+          <span>Let’s Begin</span><span className="rg-splash-arrow" aria-hidden="true">→</span>
+        </button>
+      </section>
     </main>
   );
 }
