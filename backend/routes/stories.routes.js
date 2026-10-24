@@ -11,6 +11,7 @@ import Story from "../models/Story.js";
 import User from "../models/User.js";
 import Follow from "../models/Follow.js";
 import StoryView from "../models/StoryView.js";
+import StoryComment from "../models/StoryComment.js";
 import UserSettings from "../models/UserSettings.js";
 
 const router =
@@ -295,6 +296,77 @@ router.post(
   }
 );
 
+
+/* STORY COMMENTS: list and create comments; the owner can turn comments off. */
+router.get("/:id/comments", auth, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id).select("author expiresAt allowComments closeFriends");
+    if (!story || story.expiresAt <= new Date()) return res.status(404).json({ message: "Story not found or expired" });
+    const isOwner = String(story.author) === String(req.user.id);
+    if (!isOwner) {
+      if (story.closeFriends) return res.status(403).json({ message: "This story is for close friends" });
+      const followsAuthor = await Follow.findOne({ follower: req.user.id, following: story.author, status: "accepted" });
+      if (!followsAuthor) return res.status(403).json({ message: "Follow this account to view this story" });
+    }
+    if (story.allowComments === false && !isOwner) return res.status(403).json({ message: "Comments are turned off for this story" });
+    const comments = await StoryComment.find({ story: story._id }).populate("author", "name username avatar").sort({ createdAt: 1 }).limit(300).lean();
+    return res.json({ comments, commentsCount: comments.length, allowComments: story.allowComments !== false });
+  } catch (error) {
+    console.error("Load story comments failed:", error);
+    return res.status(500).json({ message: "Failed to load story comments" });
+  }
+});
+
+router.post("/:id/comments", auth, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id).select("author expiresAt allowComments closeFriends");
+    if (!story || story.expiresAt <= new Date()) return res.status(404).json({ message: "Story not found or expired" });
+    if (story.allowComments === false) return res.status(403).json({ message: "Comments are turned off for this story" });
+    if (String(story.author) !== String(req.user.id)) {
+      if (story.closeFriends) return res.status(403).json({ message: "This story is for close friends" });
+      const followsAuthor = await Follow.findOne({ follower: req.user.id, following: story.author, status: "accepted" });
+      if (!followsAuthor) return res.status(403).json({ message: "Follow this account to view this story" });
+    }
+    const text = String(req.body?.text || "").trim();
+    if (!text) return res.status(400).json({ message: "Comment cannot be empty" });
+    if (text.length > 1000) return res.status(400).json({ message: "Comment cannot exceed 1000 characters" });
+    const comment = await StoryComment.create({ story: story._id, author: req.user.id, text });
+    const populated = await StoryComment.findById(comment._id).populate("author", "name username avatar").lean();
+    return res.status(201).json({ comment: populated });
+  } catch (error) {
+    console.error("Create story comment failed:", error);
+    return res.status(500).json({ message: "Failed to create story comment" });
+  }
+});
+
+router.delete("/:id/comments/:commentId", auth, async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id).select("author");
+    if (!story) return res.status(404).json({ message: "Story not found" });
+    const comment = await StoryComment.findOne({ _id: req.params.commentId, story: story._id });
+    if (!comment) return res.status(404).json({ message: "Comment not found" });
+    if (String(comment.author) !== String(req.user.id) && String(story.author) !== String(req.user.id)) return res.status(403).json({ message: "You cannot delete this comment" });
+    await comment.deleteOne();
+    return res.json({ ok: true, commentId: String(comment._id) });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete story comment" });
+  }
+});
+
+router.patch("/:id/comments-settings", auth, async (req, res) => {
+  try {
+    const enabled = req.body?.allowComments;
+    if (typeof enabled !== "boolean") return res.status(400).json({ message: "allowComments must be true or false" });
+    const story = await Story.findOne({ _id: req.params.id, author: req.user.id });
+    if (!story) return res.status(404).json({ message: "Story not found or you are not the owner" });
+    story.allowComments = enabled;
+    await story.save();
+    return res.json({ ok: true, allowComments: story.allowComments });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update story comment settings" });
+  }
+});
+
 /*
 =========================================================
 DELETE STORY
@@ -340,6 +412,7 @@ router.delete(
         story:
           story._id
       });
+      await StoryComment.deleteMany({ story: story._id });
 
       /*
        * Delete story.
