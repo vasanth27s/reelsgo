@@ -9,7 +9,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp, Star
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -617,9 +617,6 @@ function App() {
       } else {
         setProfileUserId(targetId);
         setPage("user-profile");
-        const profileUrl = new URL(window.location.href);
-        profileUrl.searchParams.set("profile", targetId);
-        window.history.pushState({ reelsgoProfile: targetId }, "", profileUrl.pathname + profileUrl.search + profileUrl.hash);
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -3442,14 +3439,6 @@ function ProfilePage({ user, setUser }) {
   const [website, setWebsite] = useState(user?.website || "");
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
-  const [followingSheetOpen, setFollowingSheetOpen] = useState(false);
-  const [muteOptionsOpen, setMuteOptionsOpen] = useState(false);
-  const [profileFavorite, setProfileFavorite] = useState(() => {
-    try { return (JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]")).map(String).includes(String(userId)); } catch { return false; }
-  });
-  const [profileMute, setProfileMute] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}")[String(userId)] || { posts: false, stories: false, notes: false }; } catch { return { posts: false, stories: false, notes: false }; }
-  });
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [profileQuickActionsOpen, setProfileQuickActionsOpen] = useState(false);
   const profileAvatarLongPressTimer = useRef(null);
@@ -5355,8 +5344,6 @@ function SearchPage({ onOpenProfile, onBack }) {
 
 function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [profile, setProfile] = useState(null);
-  const [profileError, setProfileError] = useState("");
-  const profileLoadRequest = useRef(0);
   const [tab, setTab] = useState("posts");
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -5376,62 +5363,22 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
     try { return JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true; } catch { return false; }
   });
 
-  async function load(targetUserId = userId) {
-    const requestId = ++profileLoadRequest.current;
-    if (!targetUserId) {
-      setProfile(null);
-      setProfileError("This profile link is missing a user ID.");
-      setLoading(false);
-      return;
-    }
+  async function load() {
     setLoading(true);
-    setProfileError("");
     try {
-      // Support both the direct API response and common wrapped response shapes.
-      const response = await api(`/users/${encodeURIComponent(String(targetUserId))}/profile`);
-      const payload = response?.profile || response?.data?.profile || response?.data || response;
-      let normalized = payload;
-      if (!normalized?.user && response?.user) normalized = response;
-      if (!normalized?.user && payload?.profile?.user) normalized = payload.profile;
-      if (!normalized?.user && payload?.data?.user) normalized = payload.data;
-      if (!normalized?.user && (payload?._id || payload?.id || payload?.username)) {
-        normalized = { ...response, ...payload, user: payload };
-      }
-      if (!normalized?.user) {
-        throw new Error("The profile service returned no user details. Please check the /api/users/:id/profile response.");
-      }
-      // Keep optional collections predictable so the profile can render safely.
-      normalized = {
-        ...normalized,
-        posts: Array.isArray(normalized.posts) ? normalized.posts : [],
-        reels: Array.isArray(normalized.reels) ? normalized.reels : [],
-        tagged: Array.isArray(normalized.tagged) ? normalized.tagged : []
-      };
-      if (requestId === profileLoadRequest.current) setProfile(normalized);
-    } catch (error) {
-      if (requestId === profileLoadRequest.current) {
-        setProfile(null);
-        setProfileError(error?.message || "Unable to load this profile. Please try again.");
-      }
+      const d = await api(`/users/${userId}/profile`);
+      setProfile(d);
+    } catch (e) {
+      alert(e.message);
+      onBack();
     } finally {
-      if (requestId === profileLoadRequest.current) setLoading(false);
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    setProfile(null);
-    setProfileError("");
     setTab("posts");
     setProfileOptionsOpen(false);
-    setFollowingSheetOpen(false);
-    setMuteOptionsOpen(false);
-    try {
-      setProfileFavorite(JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]").map(String).includes(String(userId)));
-      setProfileMute(JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}")[String(userId)] || { posts: false, stories: false, notes: false });
-    } catch {
-      setProfileFavorite(false);
-      setProfileMute({ posts: false, stories: false, notes: false });
-    }
     try { setProfileNotifications(JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true); } catch { setProfileNotifications(false); }
     load();
   }, [userId]);
@@ -5489,54 +5436,6 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
     setPublicProfileQuickOpen(false);
   }
 
-  function toggleProfileFavorite() {
-    const id = String(userId);
-    const saved = (() => { try { return JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]").map(String); } catch { return []; } })();
-    const next = profileFavorite ? saved.filter(value => value !== id) : [...new Set([...saved, id])];
-    try { localStorage.setItem("reelsgo_favorite_users", JSON.stringify(next)); } catch {}
-    setProfileFavorite(!profileFavorite);
-    setProfileActionNotice(!profileFavorite ? "Added to Favourites." : "Removed from Favourites.");
-  }
-
-  function toggleProfileMute(kind) {
-    const next = { ...profileMute, [kind]: !profileMute[kind] };
-    const all = (() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}"); } catch { return {}; } })();
-    all[String(userId)] = next;
-    try { localStorage.setItem("reelsgo_muted_profile_settings", JSON.stringify(all)); } catch {}
-    setProfileMute(next);
-    setProfileActionNotice(`${kind[0].toUpperCase()}${kind.slice(1)} ${next[kind] ? "muted" : "unmuted"} for this profile on this device.`);
-  }
-
-  async function unfollowFromSheet() {
-    if (followLoading) return;
-    setFollowLoading(true);
-    try {
-      await api(`/follows/${profile.user._id}`, { method: "DELETE" });
-      setFollowingSheetOpen(false);
-      setMuteOptionsOpen(false);
-      await load();
-      setProfileActionNotice(`Unfollowed @${profile.user.username || "this account"}.`);
-    } catch (e) {
-      alert(e.message || "Unable to unfollow this account.");
-    } finally {
-      setFollowLoading(false);
-    }
-  }
-
-  async function restrictFromSheet() {
-    if (profileActionBusy) return;
-    setProfileActionBusy(true);
-    try {
-      await api(`/users/me/settings/people/restricted/${encodeURIComponent(profile.user._id)}`, { method: "POST" });
-      setFollowingSheetOpen(false);
-      setProfileActionNotice(`@${profile.user.username || "This account"} restricted.`);
-    } catch (e) {
-      alert(e.message || "Could not restrict this account.");
-    } finally {
-      setProfileActionBusy(false);
-    }
-  }
-
   async function toggleFollow() {
     if (!profile?.user || String(profile.user._id) === String(currentUser?._id)) return;
     setFollowLoading(true);
@@ -5555,29 +5454,10 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   }
 
   if (loading) {
-    return (
-      <div className="page profile-page rg-profile-loading" role="status" aria-live="polite">
-        <div className="empty"><p>Loading profile...</p></div>
-      </div>
-    );
+    return <div className="page"><div className="empty"><p>Loading profile...</p></div></div>;
   }
 
-  if (profileError || !profile?.user) {
-    return (
-      <div className="page profile-page rg-profile-load-error" role="alert">
-        <div className="rg-profile-error-card">
-          <button type="button" className="secondary" onClick={onBack}><ArrowLeft size={17}/> Back</button>
-          <div className="rg-profile-error-icon"><User size={30}/></div>
-          <h2>Profile couldn't be loaded</h2>
-          <p>{profileError || "The profile data was empty. Please try again."}</p>
-          <div className="rg-profile-error-actions">
-            <button type="button" className="primary" onClick={() => load(userId)}>Try again</button>
-            <button type="button" className="secondary" onClick={onBack}>Go back</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!profile?.user) return null;
 
   const u = profile.user;
   const isSelf = String(u._id) === String(currentUser?._id);
@@ -5734,13 +5614,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
       </div>
 
       {!isSelf && <div className="rg-public-profile-actions">
-        <button
-          type="button"
-          className={profile.followStatus === "accepted" ? "secondary" : "primary"}
-          onClick={() => profile.followStatus === "accepted" ? setFollowingSheetOpen(true) : toggleFollow()}
-          disabled={followLoading}
-          aria-expanded={followingSheetOpen}
-        >
+        <button type="button" className={profile.followStatus === "accepted" ? "secondary" : "primary"} onClick={toggleFollow} disabled={followLoading}>
           {followLoading ? "Please wait…" : profile.followStatus === "accepted" ? <>Following <ChevronDown size={16}/></> : profile.followStatus === "pending" ? "Requested" : "Follow"}
         </button>
         <button type="button" className="secondary" onClick={() => onMessage(u._id)}><MessageCircle/> Message</button>
@@ -5821,67 +5695,6 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
               </button>
             </>}
           </div>
-        </div>,
-        document.body
-      )}
-
-      {followingSheetOpen && !isSelf && createPortal(
-        <div
-          className="rg-following-sheet-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Following options for @${u.username || "user"}`}
-          onMouseDown={event => {
-            if (event.target === event.currentTarget && !followLoading && !profileActionBusy) {
-              setFollowingSheetOpen(false);
-              setMuteOptionsOpen(false);
-            }
-          }}
-        >
-          <section className="rg-following-sheet" onMouseDown={event => event.stopPropagation()}>
-            <div className="rg-following-sheet-handle" />
-            <h2 className="rg-following-sheet-title">@{u.username || "user"}</h2>
-
-            <button type="button" className="rg-following-sheet-row" onClick={toggleProfileFavorite}>
-              <span>{profileFavorite ? "Remove from Favourites" : "Add to Favourites"}</span>
-              <Star size={25} fill={profileFavorite ? "currentColor" : "none"} />
-            </button>
-
-            <button
-              type="button"
-              className="rg-following-sheet-row"
-              aria-expanded={muteOptionsOpen}
-              onClick={() => setMuteOptionsOpen(value => !value)}
-            >
-              <span>Mute</span>
-              <ChevronRight className={muteOptionsOpen ? "rg-following-chevron-open" : ""} size={24} />
-            </button>
-
-            {muteOptionsOpen && (
-              <div className="rg-following-mute-options">
-                {[
-                  ["posts", "Posts"],
-                  ["stories", "Stories"],
-                  ["notes", "Notes"]
-                ].map(([key, label]) => (
-                  <button type="button" key={key} onClick={() => toggleProfileMute(key)}>
-                    <span>{label}</span>
-                    <span className={`rg-following-switch ${profileMute[key] ? "is-on" : ""}`} aria-label={`${label} ${profileMute[key] ? "muted" : "not muted"}`} />
-                  </button>
-                ))}
-                <p>Mute preferences are saved on this device.</p>
-              </div>
-            )}
-
-            <button type="button" className="rg-following-sheet-row" disabled={profileActionBusy} onClick={restrictFromSheet}>
-              <span>{profileActionBusy ? "Please wait…" : "Restrict"}</span>
-              <ChevronRight size={24} />
-            </button>
-
-            <button type="button" className="rg-following-sheet-row rg-following-unfollow" disabled={followLoading} onClick={unfollowFromSheet}>
-              <span>{followLoading ? "Unfollowing…" : "Unfollow"}</span>
-            </button>
-          </section>
         </div>,
         document.body
       )}
