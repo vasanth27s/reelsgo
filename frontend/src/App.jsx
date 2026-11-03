@@ -799,10 +799,11 @@ function App() {
       <header className={`mobile-header ${page === "home" ? "mobile-header-home" : ""} ${page === "user-profile" ? "mobile-header-profile" : ""}`}>
         {page === "home" ? (
           <>
+            <button className="mobile-home-create" onClick={() => setCreateOpen(true)} aria-label="Create post"><PlusSquare /></button>
             <button className="mobile-brand mobile-brand-centered" onClick={() => navigate("home")} aria-label="ReelsGo home"><ReelsGoLogo className="mobile-brand-wordmark" /></button>
             <div className="mobile-header-actions">
-              <button onClick={() => navigate("search")} aria-label="Explore"><Compass /></button>
               <button onClick={() => navigate("notifications")} aria-label="Notifications"><Bell /></button>
+              <button onClick={() => setMenuOpen(true)} aria-label="More options"><Menu /></button>
             </div>
           </>
         ) : (
@@ -864,12 +865,15 @@ function App() {
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
-      <nav className="bottom-nav glass-bottom-nav" aria-label="Main navigation">
+      <nav className="bottom-nav glass-bottom-nav">
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
+        <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
+        <NavMobile icon={<ChatBubblesIcon size={29} />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-        <button className="nav-mobile nav-create-button" onClick={() => setCreateOpen(true)} aria-label="Create post"><PlusSquare /></button>
-        <NavMobile icon={<Heart />} label="Activity" active={page === "notifications"} onClick={() => navigate("notifications")} />
-        <NavMobile icon={<ChatBubblesIcon size={25} />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={(event) => openOwnProfile(event)} aria-label="Profile">
+          <Avatar user={user} size={34} />
+          <span>Profile</span>
+        </button>
       </nav>
 
       {createOpen && <PostComposer user={user} onClose={() => setCreateOpen(false)} onDone={() => setCreateOpen(false)} />}
@@ -1094,25 +1098,6 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [loading, setLoading] = useState(true);
   const [activeStories, setActiveStories] = useState([]);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
-  const [activeFeedTab, setActiveFeedTab] = useState("for-you");
-  const [followingIds, setFollowingIds] = useState([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadFollowing() {
-      if (!user?._id) return;
-      try {
-        const data = await api(`/follows/${user._id}/following`);
-        const list = data.following || data.users || [];
-        const ids = list.map(item => String(item?.user?._id || item?._id || item?.user || "")).filter(Boolean);
-        if (!cancelled) setFollowingIds(ids);
-      } catch {
-        if (!cancelled) setFollowingIds([]);
-      }
-    }
-    loadFollowing();
-    return () => { cancelled = true; };
-  }, [user?._id]);
 
   async function load() {
     setLoading(true);
@@ -1148,21 +1133,12 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
     await openStoryGroup(group, Math.max(0, group.findIndex(item => String(item._id) === String(story._id))));
   }
 
-  const visiblePosts = activeFeedTab === "following"
-    ? posts.filter(post => followingIds.includes(String(post.author?._id || post.author || "")))
-    : posts;
-
   return (
     <div className="page feed-page">
       <div className="home-layout">
         <section className="home-feed-column">
           <div className="page-heading">
             <button className="desktop-create" onClick={onCreate}><PlusSquare /> Create</button>
-          </div>
-
-          <div className="feed-tabs" role="tablist" aria-label="Choose feed">
-            <button type="button" role="tab" aria-selected={activeFeedTab === "for-you"} className={activeFeedTab === "for-you" ? "active" : ""} onClick={() => setActiveFeedTab("for-you")}>For You</button>
-            <button type="button" role="tab" aria-selected={activeFeedTab === "following"} className={activeFeedTab === "following" ? "active" : ""} onClick={() => setActiveFeedTab("following")}>Following</button>
           </div>
 
           <div className="stories-card">
@@ -1187,7 +1163,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
       </div>
 
       {loading ? <div className="empty">Loading feed...</div> :
-        visiblePosts.length ? visiblePosts.map(p => (
+        posts.length ? posts.map(p => (
           <Post
             key={p._id}
             post={p}
@@ -1195,7 +1171,7 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
             onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
           />
         )) :
-        <div className="empty"><ImageIcon /><h2>{activeFeedTab === "following" ? "No posts from people you follow" : "Your feed is empty"}</h2><p>{activeFeedTab === "following" ? "Follow people to see their latest posts here." : "Create your first post to get started."}</p><button className="primary small" onClick={activeFeedTab === "following" ? () => setActiveFeedTab("for-you") : onCreate}>{activeFeedTab === "following" ? "Explore posts" : "Create post"}</button></div>}
+        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
 
           {activeStories[activeStoryIndex] && (
             <StoryViewer
@@ -4737,14 +4713,9 @@ function ReelsPage({ onCreate }) {
 
   return (
     <div className="page reels-page">
-      <div className="reels-mobile-header reels-reference-header">
-        <button type="button" className="reels-mobile-create reels-brand-mark" aria-label="ReelsGo home" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-home"))}>
-          <ReelsGoLogo />
-        </button>
-        <div className="reels-mobile-title">
-          <b>Reels</b>
-          <span className="reels-feed-mode">For You</span>
-        </div>
+      <div className="reels-mobile-header">
+        <button type="button" className="reels-mobile-create" aria-label="Create Reel" onClick={onCreate}><PlusSquare /></button>
+        <div className="reels-mobile-title"><b>Reels</b><button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}>Friends <span className="reels-friends-avatars">{reels.slice(0, 3).map((item, i) => <span key={item._id || i}><Avatar user={item.author} size={19} /></span>)}</span></button></div>
         <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
       </div>
       <div className="page-heading reels-heading">
@@ -4959,11 +4930,6 @@ function ReelsPage({ onCreate }) {
                       </div>
                     </div>
 
-                    <div className="reels-audio-chip">
-                      <span className="reels-audio-note"><Music2 size={15} /></span>
-                      <span>Original Audio</span>
-                      <span className="reels-audio-dot" />
-                    </div>
                     <div className="reels-desktop-actions" aria-label="Reel actions">
                       <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
                       <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
