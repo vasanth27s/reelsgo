@@ -15395,3 +15395,274 @@ body.reelsgo-story-open .bottom-nav,body.reelsgo-story-open .mobile-header,body.
 .rg-splash-screen .rg-splash-subline{color:#aeb9df!important;margin-top:3px!important;font-size:10px!important;letter-spacing:.2em!important}
 .rg-splash-screen .rg-splash-begin{display:flex!important;align-items:center!important;justify-content:center!important;width:min(100%,290px)!important;min-height:48px!important;margin:19px auto 0!important;border:1px solid #c6b0ff!important;border-radius:999px!important;background:linear-gradient(105deg,#32137f,#3d36d8,#7b25b8)!important;color:#fff!important;font-weight:750!important;box-shadow:0 0 25px #774aff9c!important;appearance:none!important;-webkit-appearance:none!important}
 html:has(.rg-splash-screen),body:has(.rg-splash-screen),#root:has(.rg-splash-screen){height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
+
+
+/* =========================================================
+   ReelsGo home feed — dark neon social layout
+   Additive home-only styling; other pages keep their current UI.
+   ========================================================= */
+body:has(.feed-page) {
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(18, 75, 145, .18), transparent 34%),
+    radial-gradient(ellipse at 88% 24%, rgba(92, 20, 120, .14), transparent 32%),
+    #050914 !important;
+  color: #f6f7fb !important;
+}
+.app:has(.feed-page) { background: transparent !important; }
+.app:has(.feed-page) .main { background: transparent !important; }
+.app:has(.feed-page) .feed-page {
+  width: min(100%, 560px) !important;
+  max-width: 560px !important;
+  min-height: 100vh;
+  padding: 14px 12px 100px !important;
+  margin: 0 auto !important;
+}
+.app:has(.feed-page) .home-layout {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.app:has(.feed-page) .home-feed-column {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+.app:has(.feed-page) .home-feed-column > .page-heading,
+.app:has(.feed-page) .quick-create,
+.app:has(.feed-page) .suggestions-rail { display: none !important; }
+.app:has(.feed-page) .feed-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+  margin: 2px 0 12px;
+  border: 1px solid rgba(140, 164, 205, .17);
+  border-radius: 15px;
+  background: rgba(7, 15, 31, .88);
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.app:has(.feed-page) .feed-tabs button {
+  min-height: 38px;
+  border-radius: 11px;
+  background: transparent;
+  color: #aab5ca;
+  font-size: 12px;
+  font-weight: 750;
+  transition: .18s ease;
+}
+.app:has(.feed-page) .feed-tabs button.active {
+  color: #fff;
+  background: linear-gradient(110deg, rgba(63, 89, 145, .55), rgba(32, 48, 87, .7));
+  box-shadow: inset 0 0 0 1px rgba(164, 190, 255, .18), 0 0 18px rgba(52, 122, 255, .12);
+}
+.app:has(.feed-page) .stories-card {
+  display: flex !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  padding: 2px 0 11px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(113, 147, 198, .18) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow-x: auto !important;
+  scrollbar-width: none;
+}
+.app:has(.feed-page) .stories-card::-webkit-scrollbar { display:none; }
+.app:has(.feed-page) .story {
+  flex: 0 0 66px !important;
+  width: 66px !important;
+  min-width: 66px !important;
+  color: #e7ebf5 !important;
+  font-size: 10px !important;
+  text-align: center;
+}
+.app:has(.feed-page) .story-ring,
+.app:has(.feed-page) .story-placeholder {
+  width: 62px !important;
+  height: 62px !important;
+  margin: 0 auto 6px !important;
+  padding: 3px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #ffb34b, #ff3d9a 48%, #775bff 78%, #28c8ff) !important;
+  box-shadow: 0 0 13px rgba(151, 74, 255, .22);
+}
+.app:has(.feed-page) .story-ring .avatar,
+.app:has(.feed-page) .story-ring img,
+.app:has(.feed-page) .story-ring video {
+  width: 100% !important;
+  height: 100% !important;
+  border: 2px solid #07101e !important;
+  object-fit: cover !important;
+}
+.app:has(.feed-page) .story-ring i {
+  right: -1px !important;
+  bottom: -1px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border: 2px solid #07101e !important;
+  background: #168cff !important;
+}
+.app:has(.feed-page) .story > span { color: #d7deec !important; }
+.app:has(.feed-page) .post-card {
+  width: 100% !important;
+  margin: 0 0 13px !important;
+  padding: 0 0 9px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(105, 141, 197, .19) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(155deg, rgba(12, 22, 42, .97), rgba(4, 10, 22, .98)) !important;
+  color: #f7f8fc !important;
+  box-shadow: 0 9px 26px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+.app:has(.feed-page) .post-head { padding: 9px 11px !important; min-height: 54px; }
+.app:has(.feed-page) .post-user { gap: 9px !important; color: #fff !important; }
+.app:has(.feed-page) .post-user .avatar {
+  width: 36px !important; height: 36px !important;
+  min-width: 36px !important; min-height: 36px !important;
+  border: 2px solid rgba(255, 103, 184, .72);
+}
+.app:has(.feed-page) .post-user span { color: #9eabc0 !important; }
+.app:has(.feed-page) .post-head .icon-button { color: #e9efff !important; }
+.app:has(.feed-page) .post-media-button {
+  display: block !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  background: #020611 !important;
+}
+.app:has(.feed-page) .post-media {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 620px !important;
+  object-fit: cover !important;
+  background: #020611 !important;
+}
+.app:has(.feed-page) .actions {
+  padding: 3px 8px 0 !important;
+  background: transparent !important;
+}
+.app:has(.feed-page) .actions > div { gap: 0 !important; }
+.app:has(.feed-page) .actions button {
+  width: 39px !important;
+  height: 39px !important;
+  color: #f2f5fc !important;
+}
+.app:has(.feed-page) .actions button svg { width: 21px !important; height: 21px !important; }
+.app:has(.feed-page) .actions button.liked { color: #ff4f83 !important; }
+.app:has(.feed-page) .actions button.saved { color: #8ab7ff !important; }
+.app:has(.feed-page) .post-body {
+  padding: 0 11px 8px !important;
+  background: transparent !important;
+  color: #f5f7fc !important;
+  font-size: 12px !important;
+}
+.app:has(.feed-page) .post-body > p { margin-top: 4px !important; line-height: 1.45 !important; }
+.app:has(.feed-page) .post-likes-link { color: #f5f7fc !important; }
+.app:has(.feed-page) .comments-link { color: #9aa8bd !important; }
+.app:has(.feed-page) .empty {
+  background: rgba(10, 19, 35, .92) !important;
+  border-color: rgba(105, 141, 197, .2) !important;
+  color: #aebbd0 !important;
+}
+.app:has(.feed-page) .empty h2 { color: #fff !important; }
+
+@media (max-width: 700px) {
+  body:has(.feed-page) { padding-bottom: 78px !important; }
+  .mobile-header.mobile-header-home {
+    position: fixed !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    height: calc(54px + env(safe-area-inset-top)) !important;
+    min-height: calc(54px + env(safe-area-inset-top)) !important;
+    padding: env(safe-area-inset-top) 13px 0 !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    align-items: center !important;
+    background: rgba(4, 9, 22, .91) !important;
+    border-bottom: 1px solid rgba(111, 150, 211, .18) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+  .mobile-header.mobile-header-home .mobile-brand-centered {
+    grid-column: 1 !important;
+    justify-self: start !important;
+    transform: none !important;
+    position: static !important;
+  }
+  .mobile-header.mobile-header-home .mobile-brand-wordmark {
+    max-width: 125px !important;
+    color: #fff !important;
+  }
+  .mobile-header.mobile-header-home .mobile-header-actions {
+    grid-column: 2 !important;
+    justify-self: end !important;
+    transform: none !important;
+    display: flex !important;
+    gap: 5px !important;
+  }
+  .mobile-header.mobile-header-home .mobile-header-actions button {
+    width: 36px !important; height: 38px !important;
+    color: #e9f2ff !important;
+  }
+  .mobile-header.mobile-header-home .mobile-header-actions svg { width: 21px !important; height: 21px !important; }
+  .main:has(.feed-page) {
+    padding-top: calc(54px + env(safe-area-inset-top)) !important;
+    padding-bottom: 76px !important;
+  }
+  .app:has(.feed-page) .feed-page {
+    width: 100% !important;
+    max-width: 560px !important;
+    min-height: 100dvh !important;
+    padding: 9px 9px calc(84px + env(safe-area-inset-bottom)) !important;
+  }
+  .app:has(.feed-page) .feed-tabs { margin: 0 0 10px !important; }
+  .app:has(.feed-page) .stories-card { gap: 9px !important; padding-bottom: 9px !important; }
+  .app:has(.feed-page) .story { flex-basis: 62px !important; width: 62px !important; min-width: 62px !important; }
+  .app:has(.feed-page) .story-ring,
+  .app:has(.feed-page) .story-placeholder { width: 58px !important; height: 58px !important; }
+  .app:has(.feed-page) .post-card { border-radius: 13px !important; margin-bottom: 10px !important; }
+  .app:has(.feed-page) .post-head { min-height: 48px !important; padding: 7px 9px !important; }
+  .app:has(.feed-page) .post-media { max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; }
+  .app:has(.feed-page) .post-body { padding: 0 10px 8px !important; }
+  .bottom-nav.glass-bottom-nav {
+    left: 50% !important; right: auto !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 24px) !important;
+    max-width: 560px !important; min-width: 0 !important;
+    height: 58px !important; padding: 5px 8px !important;
+    display: flex !important; justify-content: space-around !important;
+    border: 1px solid rgba(115, 159, 225, .3) !important;
+    border-radius: 17px !important;
+    background: rgba(4, 11, 25, .94) !important;
+    box-shadow: 0 0 18px rgba(28, 116, 255, .13), 0 8px 26px rgba(0,0,0,.42) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+  .bottom-nav.glass-bottom-nav .nav-mobile {
+    flex: 1 1 0 !important; height: 46px !important;
+    color: #f5f7fc !important; background: transparent !important;
+  }
+  .bottom-nav.glass-bottom-nav .nav-mobile.active {
+    color: #fff !important; background: rgba(74, 110, 174, .25) !important;
+  }
+  .bottom-nav.glass-bottom-nav .nav-mobile > svg {
+    width: 23px !important; height: 23px !important;
+    stroke-width: 2 !important;
+  }
+  .bottom-nav.glass-bottom-nav .nav-create-button {
+    flex: 0 0 46px !important;
+    width: 46px !important; height: 44px !important;
+    margin: 0 5px !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    background: linear-gradient(145deg, #263e74, #6a36b5) !important;
+    box-shadow: 0 0 15px rgba(75, 111, 255, .28) !important;
+  }
+  .bottom-nav.glass-bottom-nav .nav-create-button svg { width: 24px !important; height: 24px !important; }
+}
+@media (min-width: 701px) {
+  .app:has(.feed-page) .mobile-header,
+  .app:has(.feed-page) .bottom-nav { display: none !important; }
+  .app:has(.feed-page) .feed-page { padding-top: 24px !important; }
+  .app:has(.feed-page) .feed-tabs { margin-top: 0; }
+}
