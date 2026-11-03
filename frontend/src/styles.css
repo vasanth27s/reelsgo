@@ -15472,3 +15472,16 @@ html:has(.rg-splash-screen),body:has(.rg-splash-screen),#root:has(.rg-splash-scr
   .rg-following-sheet-row{min-height:70px!important;padding-left:28px!important;padding-right:28px!important;font-size:16px!important}
   .rg-following-sheet-title{padding-bottom:24px!important}
 }
+
+
+/* Public profile loading and recoverable error states: never leave a blank page. */
+.rg-profile-loading,.rg-profile-load-error{min-height:55vh;display:flex;align-items:center;justify-content:center;color:#f5f6f7;}
+.rg-profile-loading .empty{background:transparent;border:0;color:#d7dbe0;}
+.rg-profile-error-card{width:min(100%,460px);padding:26px;border:1px solid #30363d;border-radius:22px;background:#171a1e;color:#f5f6f7;text-align:center;box-shadow:0 18px 55px #0005;}
+.rg-profile-error-card>button:first-child{margin:0 auto 24px;}
+.rg-profile-error-icon{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:#252a30;color:#dce1e7;}
+.rg-profile-error-card h2{font-size:19px;margin-bottom:8px;}
+.rg-profile-error-card p{color:#aeb5be;font-size:13px;line-height:1.55;overflow-wrap:anywhere;}
+.rg-profile-error-actions{display:flex;gap:9px;justify-content:center;margin-top:20px;}
+.rg-profile-error-actions button{min-height:42px;padding:0 17px;}
+@media(max-width:700px){.rg-profile-error-card{padding:22px 17px;border-radius:18px;}.rg-profile-error-actions button{flex:1;}}
