@@ -617,6 +617,9 @@ function App() {
       } else {
         setProfileUserId(targetId);
         setPage("user-profile");
+        const profileUrl = new URL(window.location.href);
+        profileUrl.searchParams.set("profile", targetId);
+        window.history.pushState({ reelsgoProfile: targetId }, "", profileUrl.pathname + profileUrl.search + profileUrl.hash);
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -5352,6 +5355,8 @@ function SearchPage({ onOpenProfile, onBack }) {
 
 function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState("");
+  const profileLoadRequest = useRef(0);
   const [tab, setTab] = useState("posts");
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -5371,20 +5376,51 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
     try { return JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true; } catch { return false; }
   });
 
-  async function load() {
-    setLoading(true);
-    try {
-      const d = await api(`/users/${userId}/profile`);
-      setProfile(d);
-    } catch (e) {
-      alert(e.message);
-      onBack();
-    } finally {
+  async function load(targetUserId = userId) {
+    const requestId = ++profileLoadRequest.current;
+    if (!targetUserId) {
+      setProfile(null);
+      setProfileError("This profile link is missing a user ID.");
       setLoading(false);
+      return;
+    }
+    setLoading(true);
+    setProfileError("");
+    try {
+      // Support both the direct API response and common wrapped response shapes.
+      const response = await api(`/users/${encodeURIComponent(String(targetUserId))}/profile`);
+      const payload = response?.profile || response?.data?.profile || response?.data || response;
+      let normalized = payload;
+      if (!normalized?.user && response?.user) normalized = response;
+      if (!normalized?.user && payload?.profile?.user) normalized = payload.profile;
+      if (!normalized?.user && payload?.data?.user) normalized = payload.data;
+      if (!normalized?.user && (payload?._id || payload?.id || payload?.username)) {
+        normalized = { ...response, ...payload, user: payload };
+      }
+      if (!normalized?.user) {
+        throw new Error("The profile service returned no user details. Please check the /api/users/:id/profile response.");
+      }
+      // Keep optional collections predictable so the profile can render safely.
+      normalized = {
+        ...normalized,
+        posts: Array.isArray(normalized.posts) ? normalized.posts : [],
+        reels: Array.isArray(normalized.reels) ? normalized.reels : [],
+        tagged: Array.isArray(normalized.tagged) ? normalized.tagged : []
+      };
+      if (requestId === profileLoadRequest.current) setProfile(normalized);
+    } catch (error) {
+      if (requestId === profileLoadRequest.current) {
+        setProfile(null);
+        setProfileError(error?.message || "Unable to load this profile. Please try again.");
+      }
+    } finally {
+      if (requestId === profileLoadRequest.current) setLoading(false);
     }
   }
 
   useEffect(() => {
+    setProfile(null);
+    setProfileError("");
     setTab("posts");
     setProfileOptionsOpen(false);
     setFollowingSheetOpen(false);
@@ -5519,10 +5555,29 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   }
 
   if (loading) {
-    return <div className="page"><div className="empty"><p>Loading profile...</p></div></div>;
+    return (
+      <div className="page profile-page rg-profile-loading" role="status" aria-live="polite">
+        <div className="empty"><p>Loading profile...</p></div>
+      </div>
+    );
   }
 
-  if (!profile?.user) return null;
+  if (profileError || !profile?.user) {
+    return (
+      <div className="page profile-page rg-profile-load-error" role="alert">
+        <div className="rg-profile-error-card">
+          <button type="button" className="secondary" onClick={onBack}><ArrowLeft size={17}/> Back</button>
+          <div className="rg-profile-error-icon"><User size={30}/></div>
+          <h2>Profile couldn't be loaded</h2>
+          <p>{profileError || "The profile data was empty. Please try again."}</p>
+          <div className="rg-profile-error-actions">
+            <button type="button" className="primary" onClick={() => load(userId)}>Try again</button>
+            <button type="button" className="secondary" onClick={onBack}>Go back</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const u = profile.user;
   const isSelf = String(u._id) === String(currentUser?._id);
