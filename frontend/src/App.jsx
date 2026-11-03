@@ -4737,9 +4737,14 @@ function ReelsPage({ onCreate }) {
 
   return (
     <div className="page reels-page">
-      <div className="reels-mobile-header">
-        <button type="button" className="reels-mobile-create" aria-label="Create Reel" onClick={onCreate}><PlusSquare /></button>
-        <div className="reels-mobile-title"><b>Reels</b><button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}>Friends <span className="reels-friends-avatars">{reels.slice(0, 3).map((item, i) => <span key={item._id || i}><Avatar user={item.author} size={19} /></span>)}</span></button></div>
+      <div className="reels-mobile-header reels-reference-header">
+        <button type="button" className="reels-mobile-create reels-brand-mark" aria-label="ReelsGo home" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-home"))}>
+          <ReelsGoLogo />
+        </button>
+        <div className="reels-mobile-title">
+          <b>Reels</b>
+          <span className="reels-feed-mode">For You</span>
+        </div>
         <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
       </div>
       <div className="page-heading reels-heading">
@@ -4954,6 +4959,11 @@ function ReelsPage({ onCreate }) {
                       </div>
                     </div>
 
+                    <div className="reels-audio-chip">
+                      <span className="reels-audio-note"><Music2 size={15} /></span>
+                      <span>Original Audio</span>
+                      <span className="reels-audio-dot" />
+                    </div>
                     <div className="reels-desktop-actions" aria-label="Reel actions">
                       <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
                       <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
