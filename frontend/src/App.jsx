@@ -9,7 +9,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp, Star
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -3439,6 +3439,14 @@ function ProfilePage({ user, setUser }) {
   const [website, setWebsite] = useState(user?.website || "");
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
+  const [followingSheetOpen, setFollowingSheetOpen] = useState(false);
+  const [muteOptionsOpen, setMuteOptionsOpen] = useState(false);
+  const [profileFavorite, setProfileFavorite] = useState(() => {
+    try { return (JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]")).map(String).includes(String(userId)); } catch { return false; }
+  });
+  const [profileMute, setProfileMute] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}")[String(userId)] || { posts: false, stories: false, notes: false }; } catch { return { posts: false, stories: false, notes: false }; }
+  });
   const [shareQrOpen, setShareQrOpen] = useState(false);
   const [profileQuickActionsOpen, setProfileQuickActionsOpen] = useState(false);
   const profileAvatarLongPressTimer = useRef(null);
@@ -5379,6 +5387,15 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   useEffect(() => {
     setTab("posts");
     setProfileOptionsOpen(false);
+    setFollowingSheetOpen(false);
+    setMuteOptionsOpen(false);
+    try {
+      setProfileFavorite(JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]").map(String).includes(String(userId)));
+      setProfileMute(JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}")[String(userId)] || { posts: false, stories: false, notes: false });
+    } catch {
+      setProfileFavorite(false);
+      setProfileMute({ posts: false, stories: false, notes: false });
+    }
     try { setProfileNotifications(JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true); } catch { setProfileNotifications(false); }
     load();
   }, [userId]);
@@ -5434,6 +5451,54 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
       else window.prompt("Copy profile URL:", url);
     } catch { window.prompt("Copy profile URL:", url); }
     setPublicProfileQuickOpen(false);
+  }
+
+  function toggleProfileFavorite() {
+    const id = String(userId);
+    const saved = (() => { try { return JSON.parse(localStorage.getItem("reelsgo_favorite_users") || "[]").map(String); } catch { return []; } })();
+    const next = profileFavorite ? saved.filter(value => value !== id) : [...new Set([...saved, id])];
+    try { localStorage.setItem("reelsgo_favorite_users", JSON.stringify(next)); } catch {}
+    setProfileFavorite(!profileFavorite);
+    setProfileActionNotice(!profileFavorite ? "Added to Favourites." : "Removed from Favourites.");
+  }
+
+  function toggleProfileMute(kind) {
+    const next = { ...profileMute, [kind]: !profileMute[kind] };
+    const all = (() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_profile_settings") || "{}"); } catch { return {}; } })();
+    all[String(userId)] = next;
+    try { localStorage.setItem("reelsgo_muted_profile_settings", JSON.stringify(all)); } catch {}
+    setProfileMute(next);
+    setProfileActionNotice(`${kind[0].toUpperCase()}${kind.slice(1)} ${next[kind] ? "muted" : "unmuted"} for this profile on this device.`);
+  }
+
+  async function unfollowFromSheet() {
+    if (followLoading) return;
+    setFollowLoading(true);
+    try {
+      await api(`/follows/${profile.user._id}`, { method: "DELETE" });
+      setFollowingSheetOpen(false);
+      setMuteOptionsOpen(false);
+      await load();
+      setProfileActionNotice(`Unfollowed @${profile.user.username || "this account"}.`);
+    } catch (e) {
+      alert(e.message || "Unable to unfollow this account.");
+    } finally {
+      setFollowLoading(false);
+    }
+  }
+
+  async function restrictFromSheet() {
+    if (profileActionBusy) return;
+    setProfileActionBusy(true);
+    try {
+      await api(`/users/me/settings/people/restricted/${encodeURIComponent(profile.user._id)}`, { method: "POST" });
+      setFollowingSheetOpen(false);
+      setProfileActionNotice(`@${profile.user.username || "This account"} restricted.`);
+    } catch (e) {
+      alert(e.message || "Could not restrict this account.");
+    } finally {
+      setProfileActionBusy(false);
+    }
   }
 
   async function toggleFollow() {
@@ -5614,7 +5679,13 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
       </div>
 
       {!isSelf && <div className="rg-public-profile-actions">
-        <button type="button" className={profile.followStatus === "accepted" ? "secondary" : "primary"} onClick={toggleFollow} disabled={followLoading}>
+        <button
+          type="button"
+          className={profile.followStatus === "accepted" ? "secondary" : "primary"}
+          onClick={() => profile.followStatus === "accepted" ? setFollowingSheetOpen(true) : toggleFollow()}
+          disabled={followLoading}
+          aria-expanded={followingSheetOpen}
+        >
           {followLoading ? "Please wait…" : profile.followStatus === "accepted" ? <>Following <ChevronDown size={16}/></> : profile.followStatus === "pending" ? "Requested" : "Follow"}
         </button>
         <button type="button" className="secondary" onClick={() => onMessage(u._id)}><MessageCircle/> Message</button>
@@ -5695,6 +5766,67 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
               </button>
             </>}
           </div>
+        </div>,
+        document.body
+      )}
+
+      {followingSheetOpen && !isSelf && createPortal(
+        <div
+          className="rg-following-sheet-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Following options for @${u.username || "user"}`}
+          onMouseDown={event => {
+            if (event.target === event.currentTarget && !followLoading && !profileActionBusy) {
+              setFollowingSheetOpen(false);
+              setMuteOptionsOpen(false);
+            }
+          }}
+        >
+          <section className="rg-following-sheet" onMouseDown={event => event.stopPropagation()}>
+            <div className="rg-following-sheet-handle" />
+            <h2 className="rg-following-sheet-title">@{u.username || "user"}</h2>
+
+            <button type="button" className="rg-following-sheet-row" onClick={toggleProfileFavorite}>
+              <span>{profileFavorite ? "Remove from Favourites" : "Add to Favourites"}</span>
+              <Star size={25} fill={profileFavorite ? "currentColor" : "none"} />
+            </button>
+
+            <button
+              type="button"
+              className="rg-following-sheet-row"
+              aria-expanded={muteOptionsOpen}
+              onClick={() => setMuteOptionsOpen(value => !value)}
+            >
+              <span>Mute</span>
+              <ChevronRight className={muteOptionsOpen ? "rg-following-chevron-open" : ""} size={24} />
+            </button>
+
+            {muteOptionsOpen && (
+              <div className="rg-following-mute-options">
+                {[
+                  ["posts", "Posts"],
+                  ["stories", "Stories"],
+                  ["notes", "Notes"]
+                ].map(([key, label]) => (
+                  <button type="button" key={key} onClick={() => toggleProfileMute(key)}>
+                    <span>{label}</span>
+                    <span className={`rg-following-switch ${profileMute[key] ? "is-on" : ""}`} aria-label={`${label} ${profileMute[key] ? "muted" : "not muted"}`} />
+                  </button>
+                ))}
+                <p>Mute preferences are saved on this device.</p>
+              </div>
+            )}
+
+            <button type="button" className="rg-following-sheet-row" disabled={profileActionBusy} onClick={restrictFromSheet}>
+              <span>{profileActionBusy ? "Please wait…" : "Restrict"}</span>
+              <ChevronRight size={24} />
+            </button>
+
+            <button type="button" className="rg-following-sheet-row rg-following-unfollow" disabled={followLoading} onClick={unfollowFromSheet}>
+              <span>{followLoading ? "Unfollowing…" : "Unfollow"}</span>
+            </button>
+          </section>
         </div>,
         document.body
       )}
