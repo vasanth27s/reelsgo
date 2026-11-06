@@ -3029,32 +3029,65 @@ function ReelComposer({ onClose, onDone }) {
     } catch (e) { alert(e.message); } finally { setLoading(false); }
   }
 
-  return <Modal title="Create Reel" onClose={onClose}>
-    <div className="reel-editor">
-      <Film />
-      <h3>New Reel</h3>
-      <p>Upload a vertical video. Maximum 15 MB with the current MongoDB media model.</p>
-      {file && <div className="selected-file"><Check /> {file.name}</div>}
+  return (
+    <div className="publish-page-overlay rg-reel-publish-overlay" role="dialog" aria-modal="true" aria-label="Create Reel">
+      <div className="publish-page rg-reel-publish-page">
+        <header className="publish-page-header">
+          <button type="button" className="publish-back-button" onClick={onClose} aria-label="Close Reel creator"><X /></button>
+          <h1>Create Reel</h1>
+          <button type="button" className="rg-reel-next-button" onClick={() => input.current?.click()}>Add video</button>
+        </header>
+        <div className="publish-scroll-area rg-reel-publish-scroll">
+          <section className="rg-reel-preview-stage">
+            {file ? (
+              <video className="rg-reel-preview-video" src={URL.createObjectURL(file)} controls playsInline />
+            ) : (
+              <button type="button" className="rg-reel-empty-preview" onClick={() => input.current?.click()}>
+                <span className="rg-reel-upload-orbit"><Film size={34} /></span>
+                <b>Choose a video for your Reel</b>
+                <small>Vertical video looks best · MP4 or MOV</small>
+                <span className="rg-reel-select-cta"><Upload size={16} /> Select from device</span>
+              </button>
+            )}
+            {file && <button type="button" className="rg-reel-change-video" onClick={() => input.current?.click()}><ImageIcon size={15} /> Change video</button>}
+          </section>
+          <input ref={input} type="file" accept="video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
+          <section className="rg-reel-details-card">
+            <div className="rg-reel-section-title"><span>01</span><div><b>Caption</b><small>Tell people what your Reel is about</small></div></div>
+            <textarea className="rg-reel-caption-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} maxLength={2200} />
+            <div className="rg-reel-caption-count">{caption.length}/2,200</div>
+            <input className="normal-input rg-reel-hashtag-input" placeholder="# Add hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+          </section>
+          <section className="rg-reel-details-card">
+            <div className="rg-reel-section-title"><span>02</span><div><b>People and audience</b><small>Choose who can see and join your Reel</small></div></div>
+            <button type="button" className="rg-reel-option-row" onClick={() => setTagPeopleOpen(v => !v)}>
+              <span className="rg-reel-option-icon"><UserPlus /></span><span><b>Tag people</b><small>{taggedPeople.length ? `${taggedPeople.length} people selected` : "Mention people in your Reel"}</small></span><ChevronRight />
+            </button>
+            {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
+            <div className="rg-reel-option-row rg-reel-audience-row">
+              <span className="rg-reel-option-icon"><Users /></span><span><b>Audience</b><small>Control who can watch</small></span>
+              <select aria-label="Reel audience" value={audience} onChange={e => setAudience(e.target.value)}>
+                <option value="everyone">Everyone</option><option value="followers">Followers</option><option value="close_friends">Close friends</option>
+              </select>
+            </div>
+            <small className="rg-reel-audience-note">Close friends visibility must also be enforced by your backend.</small>
+          </section>
+          <section className="rg-reel-details-card rg-reel-checklist">
+            <div className="rg-reel-section-title"><span>03</span><div><b>Before you publish</b><small>Quick quality check</small></div></div>
+            <div><Check size={17} /><span>Use a clear vertical video</span></div>
+            <div><Check size={17} /><span>Add a caption that explains your content</span></div>
+            <div><Check size={17} /><span>Choose the right audience</span></div>
+            <small>Maximum upload size: 15 MB with the current media model.</small>
+          </section>
+        </div>
+        <footer className="rg-reel-publish-footer">
+          <div><b>{file ? "Ready to publish" : "Your Reel is not ready yet"}</b><small>{file ? file.name : "Select a video to continue"}</small></div>
+          <button type="button" className="rg-reel-publish-button" onClick={publish} disabled={loading || !file}>{loading ? "Publishing..." : "Publish Reel"} <Send size={16} /></button>
+        </footer>
+      </div>
     </div>
-    <input ref={input} type="file" accept="video/*" hidden onChange={e => setFile(e.target.files?.[0] || null)} />
-    <button className="secondary full" onClick={() => input.current?.click()}><Upload /> Choose video</button>
-    <input className="normal-input" placeholder="Write a caption..." value={caption} onChange={e => setCaption(e.target.value)} />
-    <input className="normal-input" placeholder="#hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
-    <label className="publish-audience-label" htmlFor="reel-audience">Who can see this Reel?</label>
-    <select id="reel-audience" className="normal-input" value={audience} onChange={e => setAudience(e.target.value)}>
-      <option value="everyone">Everyone</option>
-      <option value="followers">Followers</option>
-      <option value="close_friends">Close friends</option>
-    </select>
-    <small className="publish-audience-hint">Close friends visibility must also be enforced by your backend.</small>
-    <button type="button" className={`secondary full tag-people-trigger ${taggedPeople.length ? "has-tags" : ""}`} onClick={() => setTagPeopleOpen(v => !v)}>
-      <UserPlus /> {taggedPeople.length ? `Tagged ${taggedPeople.length} ${taggedPeople.length === 1 ? "person" : "people"}` : "Tag people"}
-    </button>
-    {tagPeopleOpen && <TagPeoplePicker selected={taggedPeople} setSelected={setTaggedPeople} onClose={() => setTagPeopleOpen(false)} />}
-    <button className="primary full" onClick={publish} disabled={loading}>{loading ? "Publishing..." : "Publish Reel"}</button>
-  </Modal>;
+  );
 }
-
 function InstagramMediaOptionsSheet({
   open,
   onClose,
@@ -3483,6 +3516,8 @@ function ProfilePage({ user, setUser }) {
   const [isPrivate, setIsPrivate] = useState(!!user?.isPrivate);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [shareQrOpen, setShareQrOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [aboutAccountOpen, setAboutAccountOpen] = useState(false);
   const [profileQuickActionsOpen, setProfileQuickActionsOpen] = useState(false);
   const profileAvatarLongPressTimer = useRef(null);
   const [professionalPanel, setProfessionalPanel] = useState("");
@@ -3662,7 +3697,7 @@ function ProfilePage({ user, setUser }) {
   useEffect(() => () => clearProfileAvatarLongPress(), []);
 
   return (
-    <div className="page profile-page">
+    <div className="page profile-page rg-account-profile-page">
       <div className="profile-header">
         <div
           className="profile-avatar-wrap rg-own-avatar-longpress-target"
@@ -3693,9 +3728,15 @@ function ProfilePage({ user, setUser }) {
         </div>
 
         <div className="profile-details">
-          <div className="profile-line">
+          <div className="profile-line rg-own-profile-line">
             <h1>{user?.username} <VerifiedBadge userId={user?._id} /></h1>
-            <button className="icon-button profile-more">
+            <button
+              type="button"
+              className="icon-button profile-more"
+              aria-label="Open profile menu"
+              aria-expanded={profileMenuOpen}
+              onClick={() => setProfileMenuOpen(true)}
+            >
               <MoreHorizontal />
             </button>
           </div>
@@ -3931,6 +3972,48 @@ function ProfilePage({ user, setUser }) {
               <span className="rg-profile-quick-action-icon"><QrCode /></span><span>QR code</span>
             </button>
           </div>
+        </div>
+      )}
+      {profileMenuOpen && (
+        <div className="rg-account-menu-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setProfileMenuOpen(false); }}>
+          <section className="rg-account-menu" role="dialog" aria-modal="true" aria-label="Account menu">
+            <div className="rg-account-menu-handle" />
+            <header className="rg-account-menu-head">
+              <div className="rg-account-menu-user">
+                <Avatar user={user} size={42} />
+                <div><b>@{user?.username || "your_account"}</b><small>Account controls</small></div>
+              </div>
+              <button type="button" className="rg-account-menu-close" onClick={() => setProfileMenuOpen(false)} aria-label="Close menu"><X /></button>
+            </header>
+            <button type="button" className="rg-account-menu-row" onClick={() => { setProfileMenuOpen(false); setAboutAccountOpen(true); }}>
+              <span className="rg-account-menu-icon"><CircleUser /></span><span><b>About this account</b><small>Account details and join information</small></span><ChevronRight />
+            </button>
+            <button type="button" className="rg-account-menu-row" onClick={() => { setProfileMenuOpen(false); shareQuickProfile(); }}>
+              <span className="rg-account-menu-icon"><Share2 /></span><span><b>Share profile</b><small>Share your profile with friends</small></span><ChevronRight />
+            </button>
+            <button type="button" className="rg-account-menu-row" onClick={() => { setProfileMenuOpen(false); setShareQrOpen(true); }}>
+              <span className="rg-account-menu-icon"><QrCode /></span><span><b>QR code</b><small>Let people scan to find your profile</small></span><ChevronRight />
+            </button>
+            <button type="button" className="rg-account-menu-row" onClick={() => { setProfileMenuOpen(false); setProfessionalPanel("Your dashboard"); }}>
+              <span className="rg-account-menu-icon"><ChartNoAxesColumnIcon /></span><span><b>Professional dashboard</b><small>Insights, tools and creator features</small></span><ChevronRight />
+            </button>
+            <button type="button" className="rg-account-menu-row" onClick={() => { setProfileMenuOpen(false); setEditOpen(true); }}>
+              <span className="rg-account-menu-icon"><Settings /></span><span><b>Settings and privacy</b><small>Profile, privacy and account settings</small></span><ChevronRight />
+            </button>
+            <div className="rg-account-menu-foot">ReelsGo · Account centre</div>
+          </section>
+        </div>
+      )}
+      {aboutAccountOpen && (
+        <div className="rg-account-menu-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setAboutAccountOpen(false); }}>
+          <section className="rg-about-account" role="dialog" aria-modal="true" aria-label="About this account">
+            <header><button type="button" onClick={() => setAboutAccountOpen(false)} aria-label="Back"><ChevronRight style={{ transform: "rotate(180deg)" }} /></button><b>About this account</b><button type="button" onClick={() => setAboutAccountOpen(false)} aria-label="Close"><X /></button></header>
+            <div className="rg-about-account-profile"><Avatar user={user} size={76} /><b>@{user?.username || "your_account"}</b><span>{user?.name || "ReelsGo member"}</span></div>
+            <div className="rg-about-account-row"><span>Account type</span><b>{user?.accountType || "Personal"}</b></div>
+            <div className="rg-about-account-row"><span>Privacy</span><b>{user?.isPrivate ? "Private account" : "Public account"}</b></div>
+            <div className="rg-about-account-row"><span>Joined</span><b>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Date not available"}</b></div>
+            <p>Information shown here is based on the account details currently available in ReelsGo.</p>
+          </section>
         </div>
       )}
       {shareQrOpen && <ProfileQRCodeModal user={user} onClose={() => setShareQrOpen(false)} />}
@@ -5590,7 +5673,147 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   }
 
   return (
-    <div className="page profile-page">
+    <div className="page profile-page rg-public-account-profile-page">
+      <style>{`
+        body #root .page.profile-page.rg-public-account-profile-page {
+          width:100% !important; max-width:720px !important; margin:0 auto !important;
+          padding:16px 18px 34px !important; color:#f7f4ff !important;
+          display:block !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-header {
+          width:100% !important; display:flex !important; flex-direction:column !important;
+          align-items:center !important; justify-content:center !important;
+          gap:10px !important; padding:12px 0 0 !important; margin:0 !important;
+          text-align:center !important; grid-template-columns:none !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-avatar-wrap {
+          width:144px !important; height:144px !important; min-width:144px !important;
+          max-width:144px !important; flex:0 0 144px !important; margin:0 auto !important;
+          padding:4px !important; box-sizing:border-box !important; border-radius:50% !important;
+          background:conic-gradient(from 15deg,#ff4eae,#884dff,#20c8ff,#54e5c2,#ffd45a,#ff4eae) !important;
+          box-shadow:0 0 24px rgba(133,76,255,.2) !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-avatar-wrap img,
+        body #root .page.profile-page.rg-public-account-profile-page .profile-avatar-wrap .profile-avatar {
+          display:block !important; width:100% !important; height:100% !important;
+          max-width:none !important; border:3px solid #080713 !important;
+          border-radius:50% !important; object-fit:cover !important; box-sizing:border-box !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-details {
+          width:100% !important; max-width:none !important; min-width:0 !important;
+          display:flex !important; flex-direction:column !important; align-items:center !important;
+          justify-content:center !important; gap:7px !important; text-align:center !important;
+          margin:0 !important; padding:0 !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-line {
+          width:100% !important; display:flex !important; justify-content:center !important;
+          align-items:center !important; margin:2px 0 4px !important; text-align:center !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-line h1 {
+          width:100% !important; margin:0 !important; color:#f8f5ff !important;
+          font-size:25px !important; line-height:1.2 !important; font-weight:800 !important;
+          text-align:center !important; letter-spacing:-.4px !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-stats {
+          display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+          width:100% !important; max-width:590px !important; gap:4px !important;
+          margin:7px auto 12px !important; padding:0 !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-stats > span,
+        body #root .page.profile-page.rg-public-account-profile-page .profile-stats > button {
+          display:flex !important; flex-direction:column !important; align-items:center !important;
+          justify-content:center !important; min-width:0 !important; min-height:48px !important;
+          padding:3px !important; margin:0 !important; background:transparent !important;
+          border:0 !important; text-align:center !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-stats b {
+          color:#fff !important; font-size:21px !important; line-height:1.2 !important;
+          font-weight:800 !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-stats small {
+          color:#bcb5cb !important; font-size:12px !important; text-transform:none !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-actions {
+          display:grid !important; grid-template-columns:1fr 1fr !important;
+          gap:10px !important; width:100% !important; max-width:470px !important;
+          margin:8px auto 17px !important; padding:0 !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-actions > button {
+          display:flex !important; align-items:center !important; justify-content:center !important;
+          gap:8px !important; width:100% !important; min-height:44px !important;
+          padding:8px 14px !important; border:0 !important; border-radius:999px !important;
+          color:#fff !important; font-size:13px !important; font-weight:800 !important;
+          background:linear-gradient(110deg,#168cf4,#214ed4) !important;
+          box-shadow:0 5px 19px rgba(31,105,235,.2) !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-actions > button.secondary {
+          background:linear-gradient(110deg,#245bdc,#243fba) !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio {
+          width:100% !important; max-width:560px !important; display:flex !important;
+          flex-direction:column !important; align-items:center !important; justify-content:center !important;
+          gap:5px !important; margin:0 auto 17px !important; text-align:center !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio > b {
+          color:#f8f5ff !important; font-size:19px !important; font-weight:750 !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio p {
+          margin:0 !important; color:#eee9f7 !important; font-size:14px !important;
+          line-height:1.5 !important; white-space:pre-line !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio a {
+          display:inline-flex !important; align-items:center !important; gap:6px !important;
+          color:#c8b8ff !important; font-size:14px !important; text-decoration:none !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-tabs {
+          display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+          width:calc(100% + 36px) !important; margin:0 -18px !important; padding:0 8px !important;
+          border-top:1px solid rgba(172,160,199,.16) !important;
+          border-bottom:1px solid rgba(172,160,199,.16) !important;
+          background:rgba(5,5,15,.96) !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-tabs button {
+          display:flex !important; align-items:center !important; justify-content:center !important;
+          gap:7px !important; min-height:48px !important; color:#bcb5cb !important;
+          background:transparent !important; border:0 !important; font-size:14px !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-tabs button.active {
+          color:#fff !important; border-bottom:3px solid #f0eaff !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-grid {
+          display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+          gap:2px !important; width:calc(100% + 36px) !important; margin:0 -18px !important;
+        }
+        body #root .page.profile-page.rg-public-account-profile-page .profile-grid img,
+        body #root .page.profile-page.rg-public-account-profile-page .profile-grid video {
+          display:block !important; width:100% !important; aspect-ratio:1/1 !important; object-fit:cover !important;
+        }
+        @media (max-width:700px) {
+          body #root .page.profile-page.rg-public-account-profile-page {
+            padding:calc(10px + env(safe-area-inset-top,0px)) 12px 28px !important;
+          }
+          body #root .page.profile-page.rg-public-account-profile-page .profile-avatar-wrap {
+            width:126px !important; height:126px !important; min-width:126px !important;
+            max-width:126px !important; flex-basis:126px !important;
+          }
+          body #root .page.profile-page.rg-public-account-profile-page .profile-line h1 { font-size:22px !important; }
+          body #root .page.profile-page.rg-public-account-profile-page .profile-stats b { font-size:19px !important; }
+          body #root .page.profile-page.rg-public-account-profile-page .profile-stats small { font-size:11px !important; }
+          body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-actions {
+            max-width:none !important; margin-top:7px !important; margin-bottom:14px !important;
+          }
+          body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-actions > button {
+            min-height:41px !important; font-size:12px !important;
+          }
+          body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio > b { font-size:17px !important; }
+          body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio p,
+          body #root .page.profile-page.rg-public-account-profile-page .rg-public-profile-bio a { font-size:12px !important; }
+          body #root .page.profile-page.rg-public-account-profile-page .profile-tabs,
+          body #root .page.profile-page.rg-public-account-profile-page .profile-grid {
+            width:calc(100% + 24px) !important; margin-left:-12px !important; margin-right:-12px !important;
+          }
+        }
+      `}</style>
       <div className="rg-public-profile-topbar">
         <button type="button" onClick={onBack} aria-label="Go back"><ArrowLeft size={23}/></button>
         <strong>@{u.username || "user"}</strong>
@@ -5603,26 +5826,34 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
         {!isSelf && <button type="button" aria-label="More profile options" aria-expanded={profileOptionsOpen} onClick={() => setProfileOptionsOpen(true)}><MoreHorizontal size={23}/></button>}
       </div>
 
-      <div className="profile-header">
+      <div className="profile-header rg-public-profile-header-inline" style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", gap: 10, textAlign: "center" }}>
         <div
-          className="profile-avatar-wrap"
+          className="profile-avatar-wrap rg-perfect-circle-wrap"
+          style={{
+            width: 136, height: 136, minWidth: 136, minHeight: 136,
+            maxWidth: 136, maxHeight: 136, aspectRatio: "1 / 1",
+            flex: "0 0 136px", alignSelf: "center", display: "block",
+            boxSizing: "border-box", padding: 4, borderRadius: "50%",
+            overflow: "hidden",
+            background: "conic-gradient(from 15deg, #ff4eae, #884dff, #20c8ff, #54e5c2, #ffd45a, #ff4eae)",
+            ...(!isSelf ? { touchAction: "pan-y", cursor: "pointer" } : {})
+          }}
           onPointerDown={!isSelf ? startPublicProfileLongPress : undefined}
           onPointerUp={clearPublicProfileLongPress}
           onPointerLeave={clearPublicProfileLongPress}
           onPointerCancel={clearPublicProfileLongPress}
           onContextMenu={event => { if (!isSelf) { event.preventDefault(); clearPublicProfileLongPress(); setPublicProfileQuickOpen(true); } }}
-          style={!isSelf ? { touchAction: "pan-y", cursor: "pointer" } : undefined}
           aria-label={!isSelf ? "Long press to view profile actions" : undefined}
         >
-          <Avatar user={u} size={96} className="profile-avatar" />
+          <Avatar user={u} size={128} className="profile-avatar rg-perfect-circle-avatar" />
         </div>
 
-        <div className="profile-details">
-          <div className="profile-line">
-            <h1 className="rg-public-profile-display-name">{u.name || u.username} <VerifiedBadge userId={u?._id} /></h1>
+        <div className="profile-details rg-public-profile-details-inline" style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 7 }}>
+          <div className="profile-line rg-public-profile-name-line" style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            <h1 className="rg-public-profile-display-name" style={{ width: "100%", margin: 0, textAlign: "center", color: "#f8f5ff", fontSize: 23, lineHeight: 1.25, fontWeight: 800 }}>{u.username || u.name} <VerifiedBadge userId={u?._id} /></h1>
           </div>
 
-          <div className="profile-stats">
+          <div className="profile-stats rg-public-profile-stats-inline" style={{ width: "100%", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", alignItems: "center", justifyItems: "center", gap: 4, margin: "7px auto 12px" }}>
             <span><b>{u.postsCount || posts.length}</b><small>posts</small></span>
             {canViewConnections ? (
               <>
@@ -5641,19 +5872,6 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
             )}
           </div>
 
-          <b>{u.name}</b>
-          <p>{u?.bio || ""}</p>
-          {u.website && <a href={u.website} target="_blank" rel="noreferrer"><LinkIcon /> {u.website}</a>}
-
-          {u.isPrivate && !canView && !isSelf && (
-            <div className="private-profile-note">
-              <Lock />
-              <div>
-                <b>This account is private</b>
-                <span>Follow this account and wait for approval to see posts and stories.</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -5662,8 +5880,23 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
           {followLoading ? "Please wait…" : profile.followStatus === "accepted" ? <>Following <ChevronDown size={16}/></> : profile.followStatus === "pending" ? "Requested" : "Follow"}
         </button>
         <button type="button" className="secondary" onClick={() => onMessage(u._id)}><MessageCircle/> Message</button>
-        <button type="button" className="secondary" aria-label="Profile options" onClick={() => setProfileOptionsOpen(true)}><UserPlus/></button>
       </div>}
+
+      <section className="rg-public-profile-bio">
+        <b>{u.name || u.username}</b>
+        {u?.bio && <p>{u.bio}</p>}
+        {u.website && <a href={u.website} target="_blank" rel="noreferrer"><LinkIcon /> {u.website}</a>}
+      </section>
+
+      {u.isPrivate && !canView && !isSelf && (
+        <div className="private-profile-note rg-public-profile-private-note">
+          <Lock />
+          <div>
+            <b>This account is private</b>
+            <span>Follow this account and wait for approval to see posts and stories.</span>
+          </div>
+        </div>
+      )}
 
       <div className="profile-tabs">
         <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><Grid3X3 /> Posts</button>
