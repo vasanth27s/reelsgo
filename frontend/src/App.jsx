@@ -7059,9 +7059,33 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         <div className="chat instagram-chat">
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
-              <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }} aria-label="Back to messages" title="Back to messages"><ArrowLeft /></button>
+              <button
+                type="button"
+                className="chat-back-button"
+                onClick={() => {
+                  setEmojiOpen(false);
+                  setChatCustomizeOpen(false);
+                  setChatDetailsOpen(false);
+                  setConversationMenuOpen(false);
+                  setActive(null);
+                  setMobileChat(false);
+                }}
+                aria-label="Back to messages"
+                title="Back to messages"
+              >
+                <ArrowLeft />
+              </button>
               <button type="button" className="chat-profile-open" onClick={openChatDetails} aria-label="Open chat details"><Avatar user={other(active)} size={44} /></button>
               <button type="button" className="chat-profile-title chat-profile-title-button" onClick={openChatDetails} aria-label="Open chat details"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></button>
+              <button
+                type="button"
+                className="chat-profile-settings-button"
+                aria-label="Profile settings"
+                title="Profile settings"
+                onClick={openChatDetails}
+              >
+                <Settings size={20} />
+              </button>
               <button type="button" className="chat-customize-button" aria-label="Customize chat" title="Customize chat" onClick={() => setChatCustomizeOpen(true)}><Palette size={20} /></button>
               <div className="chat-header-options-wrap">
                 <button type="button" className="chat-header-options-button" aria-label="Conversation options" onClick={() => setConversationMenuOpen(v => !v)}><MoreHorizontal /></button>
