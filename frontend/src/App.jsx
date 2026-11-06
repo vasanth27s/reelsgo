@@ -1098,6 +1098,27 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
   const [loading, setLoading] = useState(true);
   const [activeStories, setActiveStories] = useState([]);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const [feedTab, setFeedTab] = useState("for-you");
+  const [followingIds, setFollowingIds] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadFollowing() {
+      if (!user?._id) return;
+      try {
+        const data = await api(`/follows/${user._id}/following`);
+        const people = data.following || data.users || [];
+        const ids = people
+          .map(item => String(item?.user?._id || item?._id || ""))
+          .filter(Boolean);
+        if (!cancelled) setFollowingIds(ids);
+      } catch (error) {
+        console.error("Unable to load followed accounts", error);
+      }
+    }
+    loadFollowing();
+    return () => { cancelled = true; };
+  }, [user?._id]);
 
   async function load() {
     setLoading(true);
@@ -1156,14 +1177,35 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
         })}
       </div>
 
+      <div className="feed-tabs" role="tablist" aria-label="Choose your feed">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={feedTab === "for-you"}
+          className={feedTab === "for-you" ? "active" : ""}
+          onClick={() => setFeedTab("for-you")}
+        >For You</button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={feedTab === "following"}
+          className={feedTab === "following" ? "active" : ""}
+          onClick={() => setFeedTab("following")}
+        >Following</button>
+      </div>
+
       <div className="quick-create">
         <Avatar user={user} size={42} />
-        <button onClick={onCreate}>What's on your mind?</button>
+        <button onClick={onCreate}>Share something with your circle...</button>
         <button className="quick-icon" onClick={onCreate}><ImageIcon /></button>
       </div>
 
-      {loading ? <div className="empty">Loading feed...</div> :
-        posts.length ? posts.map(p => (
+      {(() => {
+        const visiblePosts = feedTab === "following"
+          ? posts.filter(post => followingIds.includes(String(post.author?._id || post.author || "")))
+          : posts;
+        return loading ? <div className="empty">Loading feed...</div> :
+        visiblePosts.length ? visiblePosts.map(p => (
           <Post
             key={p._id}
             post={p}
@@ -1171,7 +1213,8 @@ function HomePage({ user, refreshKey, onCreate, onStory }) {
             onDeleted={(id) => setPosts(current => current.filter(item => String(item._id) !== String(id)))}
           />
         )) :
-        <div className="empty"><ImageIcon /><h2>Your feed is empty</h2><p>Create your first post to get started.</p><button className="primary small" onClick={onCreate}>Create post</button></div>}
+        <div className="empty feed-empty"><ImageIcon /><h2>{feedTab === "following" ? "No posts from followed accounts yet" : "Your feed is empty"}</h2><p>{feedTab === "following" ? "Follow people to see their latest posts here." : "Create your first post to get started."}</p>{feedTab === "for-you" && <button className="primary small" onClick={onCreate}>Create post</button>}</div>;
+      })()}
 
           {activeStories[activeStoryIndex] && (
             <StoryViewer
@@ -4371,6 +4414,9 @@ function ReelsPage({ onCreate }) {
   const [soundEnabledById, setSoundEnabledById] = useState({});
   const [likedById, setLikedById] = useState({});
   const [savedById, setSavedById] = useState({});
+  const [followingReelAuthors, setFollowingReelAuthors] = useState({});
+  const [followBusyIds, setFollowBusyIds] = useState({});
+  const [pausedReelIds, setPausedReelIds] = useState({});
   const [likesTarget, setLikesTarget] = useState(null);
   const [likedUsers, setLikedUsers] = useState([]);
   const [likesLoading, setLikesLoading] = useState(false);
@@ -4392,6 +4438,29 @@ function ReelsPage({ onCreate }) {
   }
 
   useEffect(() => { load(); }, []);
+
+  // Hydrate Follow buttons from the real following list.
+  useEffect(() => {
+    let cancelled = false;
+    async function loadReelFollowing() {
+      if (!me?._id) return;
+      try {
+        const data = await api(`/follows/${me._id}/following`);
+        const rows = data.following || data.users || [];
+        const next = {};
+        rows.forEach(item => {
+          const person = item?.user || item?.following || item;
+          const id = person?._id || item?.userId || item?.followingId;
+          if (id) next[String(id)] = true;
+        });
+        if (!cancelled) setFollowingReelAuthors(next);
+      } catch (error) {
+        console.error("Unable to load Reel follow status", error);
+      }
+    }
+    loadReelFollowing();
+    return () => { cancelled = true; };
+  }, [me?._id]);
 
   // Mark the active page so global floating Messages UI is hidden only on Reels.
   useEffect(() => {
@@ -4439,7 +4508,10 @@ function ReelsPage({ onCreate }) {
     videos.forEach((video, index) => {
       if (index === activeIndex && !feedEnded) {
         const promise = video.play();
-        if (promise && typeof promise.catch === "function") promise.catch(() => {});
+        if (promise && typeof promise.then === "function") promise.then(() => {
+          const id = video.closest("[data-reel-id]")?.dataset.reelId;
+          if (id) setPausedReelIds(current => ({ ...current, [String(id)]: false }));
+        }).catch(() => {});
       } else {
         video.pause();
       }
@@ -4683,6 +4755,55 @@ function ReelsPage({ onCreate }) {
     }
   }
 
+  async function toggleReelFollow(reel) {
+    const authorId = String(reel?.author?._id || reel?.author || "");
+    if (!authorId || authorId === String(me?._id) || followBusyIds[authorId]) return;
+
+    const wasFollowing = Boolean(followingReelAuthors[authorId]);
+    const nextFollowing = !wasFollowing;
+
+    // Update immediately so the button changes from Follow to Following
+    // as soon as the user taps it; revert if the server rejects the request.
+    setFollowBusyIds(current => ({ ...current, [authorId]: true }));
+    setFollowingReelAuthors(current => ({ ...current, [authorId]: nextFollowing }));
+
+    try {
+      await api(`/follows/${authorId}`, {
+        method: wasFollowing ? "DELETE" : "POST"
+      });
+      window.dispatchEvent(new CustomEvent("reelsgo-following-updated", {
+        detail: { userId: authorId, following: nextFollowing }
+      }));
+    } catch (error) {
+      setFollowingReelAuthors(current => ({ ...current, [authorId]: wasFollowing }));
+      alert(error?.message || (wasFollowing
+        ? "Could not unfollow this account."
+        : "Could not follow this account."));
+    } finally {
+      setFollowBusyIds(current => {
+        const next = { ...current };
+        delete next[authorId];
+        return next;
+      });
+    }
+  }
+
+  async function quickSendReel(reel) {
+    const url = `${window.location.origin}/reels/${reel._id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "ReelsGo Reel", text: reel.caption || "Watch this Reel", url });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        alert("Reel link copied.");
+      } else {
+        window.prompt("Copy this Reel link:", url);
+      }
+    } catch (error) {
+      if (error?.name !== "AbortError") alert("Could not share this Reel.");
+    }
+  }
+
   async function openReelLikes(reel) {
     setLikesTarget(reel);
     setLikedUsers([]);
@@ -4713,9 +4834,14 @@ function ReelsPage({ onCreate }) {
 
   return (
     <div className="page reels-page">
-      <div className="reels-mobile-header">
-        <button type="button" className="reels-mobile-create" aria-label="Create Reel" onClick={onCreate}><PlusSquare /></button>
-        <div className="reels-mobile-title"><b>Reels</b><button type="button" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}>Friends <span className="reels-friends-avatars">{reels.slice(0, 3).map((item, i) => <span key={item._id || i}><Avatar user={item.author} size={19} /></span>)}</span></button></div>
+      <div className="reels-mobile-header reels-reference-header">
+        <button type="button" className="reels-mobile-create reels-brand-mark" aria-label="Create Reel" onClick={onCreate}>
+          <img src={reelsGoLogo} alt="ReelsGo" className="reels-mini-logo" />
+        </button>
+        <div className="reels-mobile-title reels-reference-title">
+          <b>Reels</b>
+          <span className="reels-for-you-label">For You</span>
+        </div>
         <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
       </div>
       <div className="page-heading reels-heading">
@@ -4768,8 +4894,16 @@ function ReelsPage({ onCreate }) {
                       controls={false}
                       onClick={e => {
                         const video = e.currentTarget;
-                        if (video.paused) video.play().catch(() => {});
-                        else video.pause();
+                        if (video.paused) {
+                          video.play().then(() => setPausedReelIds(current => ({ ...current, [String(r._id)]: false }))).catch(() => {});
+                        } else {
+                          video.pause();
+                          setPausedReelIds(current => ({ ...current, [String(r._id)]: true }));
+                        }
+                      }}
+                      onPlay={() => setPausedReelIds(current => ({ ...current, [String(r._id)]: false }))}
+                      onPause={() => {
+                        if (index === activeIndex) setPausedReelIds(current => ({ ...current, [String(r._id)]: true }));
                       }}
                       preload={
                         index === activeIndex ? "auto" : "metadata"
@@ -4778,159 +4912,69 @@ function ReelsPage({ onCreate }) {
                       loop
                     />
 
-                    <div className="reels-mobile-actions" aria-label="Reel actions">
-                      <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
-                      <button type="button" className="reels-mobile-likes-count" aria-label="See who liked this Reel" onClick={() => openReelLikes(r)}><small>{Number(r.likesCount || 0)} likes</small></button>
-                      <button type="button" aria-label="Comment on Reel" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
-                      <button type="button" aria-label="Share Reel" onClick={() => shareReel(r)}><Send /><small>Share</small></button>
-                      <button type="button" aria-label="Download Reel" onClick={() => downloadReel(r)}><Download /><small>Download</small></button>
-                      <button type="button" aria-label={soundEnabledById[String(r._id)] !== false ? "Mute Reel" : "Enable Reel sound"} onClick={() => toggleReelSound(r._id)}>{soundEnabledById[String(r._id)] !== false ? <Volume2 /> : <VolumeX />}<small>{soundEnabledById[String(r._id)] !== false ? "Sound on" : "Sound off"}</small></button>
-                      <button type="button" aria-label="Save Reel" onClick={() => toggleReelSave(r)} className={savedById[String(r._id)] ? "is-saved" : ""}><Bookmark fill={savedById[String(r._id)] ? "currentColor" : "none"} /><small>{savedById[String(r._id)] ? "Saved" : "Save"}</small></button>
-                    </div>
-                    <div className="reel-feed-top">
-                      <Avatar user={r.author} size={42} />
-
-                      <div>
-                        <UserLink user={r.author} />
-                        <span>{r.caption || "Reel"}</span>
-                      </div>
-
-                      <div
-                        style={{
-                          marginLeft: "auto",
-                          position: "relative"
-                        }}
-                      >
+                    <div className="reel-options-top">
+                      <div style={{ marginLeft: "auto", position: "relative" }}>
                         <button
                           type="button"
                           aria-label="Reel options"
                           title="Reel options"
-                          onClick={e => {
-                            e.stopPropagation();
-                            setOpenMenuId(current =>
-                              String(current) === String(r._id)
-                                ? null
-                                : r._id
-                            );
+                          onClick={event => {
+                            event.stopPropagation();
+                            setOpenMenuId(current => String(current) === String(r._id) ? null : r._id);
                           }}
-                          style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: "50%",
-                            background: "rgba(0,0,0,.45)",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center"
-                          }}
+                          className="reel-options-trigger"
                         >
                           <MoreHorizontal />
                         </button>
-
                         {openMenuId === r._id && (
-                          <div
-                            onClick={e => e.stopPropagation()}
-                            style={{
-                              position: "absolute",
-                              right: 0,
-                              top: 44,
-                              zIndex: 50,
-                              minWidth: 170,
-                              padding: 6,
-                              borderRadius: 14,
-                              background: "#171b21",
-                              border:
-                                "1px solid rgba(255,255,255,.12)",
-                              boxShadow:
-                                "0 18px 50px rgba(0,0,0,.5)"
-                            }}
-                          >
-                            <button
-                            type="button"
-                            onClick={() => shareReel(r)}
-                            style={{
-                              width: "100%",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 9,
-                              padding: "11px 12px",
-                              borderRadius: 10,
-                              background: "transparent",
-                              color: "#fff",
-                              textAlign: "left",
-                              fontWeight: 700
-                            }}
-                          >
-                            <Link2 size={17} />
-                            Share Reel
-                          </button>
-
-                          {isOwner ? (
-                              <>
-                                <button
-                                  type="button"
-                                  disabled={deletingId === r._id}
-                                  onClick={() => deleteReel(r)}
-                                  style={{
-                                    width: "100%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 9,
-                                    padding: "11px 12px",
-                                    borderRadius: 10,
-                                    background: "transparent",
-                                    color: "#ff5c70",
-                                    textAlign: "left",
-                                    fontWeight: 750
-                                  }}
-                                >
-                                  <Trash2 size={17} />
-                                  {deletingId === r._id
-                                    ? "Deleting..."
-                                    : "Delete Reel"}
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setOpenMenuId(null)
-                                  }
-                                  style={{
-                                    width: "100%",
-                                    padding: "11px 12px",
-                                    borderRadius: 10,
-                                    background: "transparent",
-                                    color: "#fff",
-                                    textAlign: "left"
-                                  }}
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setOpenMenuId(null)
-                                }
-                                style={{
-                                  width: "100%",
-                                  padding: "11px 12px",
-                                  borderRadius: 10,
-                                  background: "transparent",
-                                  color: "#fff",
-                                  textAlign: "left"
-                                }}
-                              >
-                                Close
+                          <div className="reel-options-menu" onClick={event => event.stopPropagation()}>
+                            <button type="button" onClick={() => shareReel(r)}><Link2 size={17} />Share Reel</button>
+                            {isOwner && (
+                              <button type="button" disabled={deletingId === r._id} onClick={() => deleteReel(r)} className="danger">
+                                <Trash2 size={17} />{deletingId === r._id ? "Deleting..." : "Delete Reel"}
                               </button>
                             )}
+                            <button type="button" onClick={() => setOpenMenuId(null)}>Close</button>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <div className="reels-desktop-actions" aria-label="Reel actions">
+                    <div className="reel-center-play" aria-hidden="true">
+                      {pausedReelIds[String(r._id)] && <span><Play fill="currentColor" /></span>}
+                    </div>
+
+                    <div className="reel-caption-panel">
+                      <div className="reel-author-line">
+                        <Avatar user={r.author} size={36} />
+                        <UserLink user={r.author} />
+                        {String(r.author?._id || r.author) !== String(me?._id) && (
+                          <button
+                            type="button"
+                            className={`reel-follow-button ${followingReelAuthors[String(r.author?._id || r.author)] ? "following" : ""}`}
+                            disabled={Boolean(followBusyIds[String(r.author?._id || r.author)])}
+                            aria-pressed={Boolean(followingReelAuthors[String(r.author?._id || r.author)])}
+                            onClick={() => toggleReelFollow(r)}
+                          >
+                            {followBusyIds[String(r.author?._id || r.author)]
+                              ? "Please wait..."
+                              : followingReelAuthors[String(r.author?._id || r.author)] ? "Following" : "Follow"}
+                          </button>
+                        )}
+                      </div>
+                      <p className="reel-caption-text">{r.caption || "Watch this Reel ✨"}</p>
+                      <div className="reel-audio-pill">
+                        <span className="reel-audio-note">♫</span>
+                        <span>{r.audioTitle || r.originalAudio || "Original Audio"}</span>
+                        <span className="reel-audio-dot">●</span>
+                      </div>
+                    </div>
+
+                    <div className="reel-audio-avatar">
+                      <Avatar user={r.author} size={28} />
+                    </div>
+
+                    <div className="reels-mobile-actions" aria-label="Reel actions">
                       <button type="button" aria-label={likedById[String(r._id)] ? "Unlike Reel" : "Like Reel"} onClick={() => toggleReelLike(r)} className={likedById[String(r._id)] ? "is-liked" : ""}><Heart fill={likedById[String(r._id)] ? "currentColor" : "none"} /></button>
                       <button type="button" className="reels-like-count-link" onClick={() => openReelLikes(r)} aria-label="See who liked this Reel">{Number(r.likesCount || 0)} likes</button>
                       <button type="button" aria-label="Open comments" onClick={() => openReelComments(r)}><MessageCircle /><small>{Number(r.commentsCount ?? 0)} comments</small></button>
