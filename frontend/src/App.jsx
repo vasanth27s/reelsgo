@@ -7020,17 +7020,14 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
               return <div className={`conversation-item-shell ${selected ? 'active' : ''}`} key={c._id}>
                 <button
                   className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''} ${pinnedConversationIds.includes(String(c._id)) ? 'is-pinned' : ''}`}
-                  onClick={() => {
-                    // Every tap on the row opens the selected conversation.
-                    // The separate three-dot control handles conversation actions.
+                  onClick={event => {
+                    // iOS Safari + Android: a normal tap always opens this chat.
+                    // Options are available only from the dedicated three-dot button.
+                    event.preventDefault();
                     setConversationMenuId(null);
                     setMobileConversationActions(null);
+                    setConversationMenuOpen(false);
                     openConversation(c);
-                  }}
-                  onContextMenu={e => {
-                    e.preventDefault();
-                    setConversationMenuId(null);
-                    setMobileConversationActions(c);
                   }}
                   type="button">
                   <div className="conversation-avatar-wrap">
@@ -7054,7 +7051,9 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                       event.stopPropagation();
                       setConversationMenuOpen(false);
                       setConversationMenuId(null);
-                      if (window.matchMedia("(max-width: 700px)").matches) {
+                      const isTouchLayout = window.matchMedia("(max-width: 700px)").matches
+                        || (navigator.maxTouchPoints > 0 && window.innerWidth <= 900);
+                      if (isTouchLayout) {
                         setMobileConversationActions(c);
                       } else {
                         setConversationMenuId(String(c._id));
