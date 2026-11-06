@@ -7059,7 +7059,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
         <div className="chat instagram-chat">
           {!active ? <div className="instagram-chat-placeholder"><div className="message-placeholder-icon"><Send /></div><h2>Your messages</h2><p>Send private messages to your friends.</p><span>Select a conversation to start chatting.</span></div> : <>
             <div className="chat-head instagram-chat-head">
-              <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }}><ChevronRight style={{ transform: 'rotate(180deg)' }} /></button>
+              <button type="button" className="chat-back-button" onClick={() => { setActive(null); setMobileChat(false); }} aria-label="Back to messages" title="Back to messages"><ArrowLeft /></button>
               <button type="button" className="chat-profile-open" onClick={openChatDetails} aria-label="Open chat details"><Avatar user={other(active)} size={44} /></button>
               <button type="button" className="chat-profile-title chat-profile-title-button" onClick={openChatDetails} aria-label="Open chat details"><b>{other(active)?.username || other(active)?.name || "User"}</b><span>Active now</span></button>
               <button type="button" className="chat-customize-button" aria-label="Customize chat" title="Customize chat" onClick={() => setChatCustomizeOpen(true)}><Palette size={20} /></button>
@@ -7123,7 +7123,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                 hidden
                 onChange={event => { const file = event.target.files?.[0]; if (file) sendChatMedia(file); }}
               />
-              <button type="button" className="chat-attach-button" aria-label="Attach image or video" title={uploadingMedia ? "Uploading media…" : "Attach image or video"} onClick={() => chatAttachmentInput.current?.click()} disabled={uploadingMedia || sending || !active}><Paperclip /></button>
+              <button type="button" className="chat-attach-button" aria-label="Add photo or video" title={uploadingMedia ? "Uploading media…" : "Add photo or video"} onClick={() => chatAttachmentInput.current?.click()} disabled={uploadingMedia || sending || !active}><Camera /></button>
               <div className="chat-message-field">
                 <input
                   value={text}
@@ -7146,10 +7146,10 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   type="button"
                   className={`chat-smile-button ${emojiOpen ? 'active' : ''}`}
                   onClick={() => setEmojiOpen(value => !value)}
-                  aria-label="Emoji"
-                  title="Emoji"
+                  aria-label="Open chat reactions"
+                  title="Reactions"
                 >
-                  <Smile />
+                  <MessageCircle />
                 </button>
                 {emojiOpen && (
                   <div className="reelsgo-emoji-picker" role="dialog" aria-label="Emoji picker">
@@ -7179,6 +7179,41 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   </div>
                 )}
               </div>
+              <button
+                type="button"
+                className="chat-voice-button"
+                aria-label="Voice typing"
+                title="Voice typing"
+                onClick={() => {
+                  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                  if (!SpeechRecognition) {
+                    window.alert("Voice typing is not supported in this browser. You can use your keyboard microphone instead.");
+                    return;
+                  }
+                  const recognition = new SpeechRecognition();
+                  recognition.lang = navigator.language || "en-US";
+                  recognition.interimResults = false;
+                  recognition.maxAlternatives = 1;
+                  recognition.onresult = event => {
+                    const spoken = event.results?.[0]?.[0]?.transcript || "";
+                    if (spoken) setText(current => `${current}${current ? " " : ""}${spoken}`);
+                  };
+                  recognition.onerror = () => {};
+                  try { recognition.start(); } catch (error) { console.warn("Voice typing could not start", error); }
+                }}
+              >
+                <Mic />
+              </button>
+              <button
+                type="button"
+                className="chat-gallery-button"
+                aria-label="Choose photo or video"
+                title="Choose photo or video"
+                onClick={() => chatAttachmentInput.current?.click()}
+                disabled={uploadingMedia || sending || !active}
+              >
+                <ImageIcon />
+              </button>
               {text.trim() && <button type="button" className="chat-send-button" onClick={sendMessage} disabled={sending} aria-label="Send"><Send /></button>}
             </div>
           </>}
