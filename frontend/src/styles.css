@@ -17776,3 +17776,208 @@ body #root .page.profile-page.rg-public-account-profile-page .profile-stats.rg-p
     border-radius:22px 22px 0 0 !important;
   }
 }
+
+
+/* Reels page brand mark -> Create Reel option chooser */
+.rg-create-reel-choice-backdrop {
+  position:fixed;
+  inset:0;
+  z-index:10080;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,4,14,.78);
+  backdrop-filter:blur(13px);
+  -webkit-backdrop-filter:blur(13px);
+  animation:rgCreateChoiceFade .18s ease-out;
+}
+.rg-create-reel-choice {
+  position:relative;
+  width:min(100%,390px);
+  padding:28px 22px 20px;
+  overflow:hidden;
+  color:#eff8ff;
+  text-align:center;
+  border:1px solid rgba(65,173,255,.62);
+  border-radius:25px;
+  background:
+    radial-gradient(ellipse at 50% 0,rgba(27,129,255,.23),transparent 48%),
+    linear-gradient(155deg,#0b1b35 0%,#040b18 78%);
+  box-shadow:0 0 34px rgba(0,130,255,.23),inset 0 0 24px rgba(20,119,255,.07);
+  animation:rgCreateChoicePop .2s ease-out;
+}
+.rg-create-reel-choice-handle {
+  display:none;
+}
+.rg-create-reel-choice-close {
+  position:absolute;
+  top:13px;
+  right:13px;
+  display:grid;
+  place-items:center;
+  width:35px;
+  height:35px;
+  color:#c9eaff;
+  border:1px solid rgba(75,164,255,.28);
+  border-radius:50%;
+  background:rgba(15,57,101,.42);
+}
+.rg-create-reel-choice-icon {
+  display:grid;
+  place-items:center;
+  width:62px;
+  height:62px;
+  margin:2px auto 14px;
+  color:#65d8ff;
+  border:1px solid rgba(72,190,255,.68);
+  border-radius:19px;
+  background:linear-gradient(145deg,rgba(16,117,255,.24),rgba(108,52,255,.16));
+  box-shadow:0 0 22px rgba(30,155,255,.22),inset 0 0 15px rgba(46,174,255,.12);
+}
+.rg-create-reel-choice h2 {
+  margin:0;
+  color:#f6fbff;
+  font-size:21px;
+  font-weight:850;
+  letter-spacing:-.35px;
+}
+.rg-create-reel-choice > p {
+  margin:8px 0 21px;
+  color:#9bb8d8;
+  font-size:13px;
+  line-height:1.5;
+}
+.rg-create-reel-choice-action {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  min-height:70px;
+  padding:12px;
+  color:#f1f8ff;
+  text-align:left;
+  border:1px solid rgba(62,166,255,.5);
+  border-radius:17px;
+  background:linear-gradient(110deg,rgba(31,85,160,.36),rgba(19,38,75,.66));
+  box-shadow:0 0 18px rgba(0,126,255,.13),inset 0 0 14px rgba(30,126,255,.06);
+  transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.rg-create-reel-choice-action:active {
+  transform:scale(.985);
+}
+.rg-create-reel-choice-action:hover {
+  border-color:#55caff;
+  box-shadow:0 0 22px rgba(0,148,255,.22);
+}
+.rg-create-reel-choice-action-icon {
+  display:grid;
+  flex:0 0 43px;
+  place-items:center;
+  width:43px;
+  height:43px;
+  color:#66d8ff;
+  border:1px solid rgba(66,176,255,.35);
+  border-radius:13px;
+  background:rgba(12,111,219,.2);
+}
+.rg-create-reel-choice-action > span:nth-child(2) {
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+.rg-create-reel-choice-action b {
+  color:#f5fbff;
+  font-size:14px;
+  font-weight:800;
+}
+.rg-create-reel-choice-action small {
+  color:#9ab8d9;
+  font-size:11px;
+  line-height:1.35;
+}
+.rg-create-reel-choice-action > svg {
+  color:#6acfff;
+}
+.rg-create-reel-choice-cancel {
+  width:100%;
+  min-height:42px;
+  margin-top:10px;
+  color:#a9c5e2;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  font-size:13px;
+  font-weight:700;
+}
+.rg-create-reel-choice-cancel:hover {
+  color:#fff;
+  background:rgba(40,112,184,.12);
+}
+@keyframes rgCreateChoiceFade {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+@keyframes rgCreateChoicePop {
+  from { opacity:0; transform:translateY(9px) scale(.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@media (max-width:600px) {
+  .rg-create-reel-choice-backdrop {
+    align-items:flex-end;
+    padding:0;
+  }
+  .rg-create-reel-choice {
+    width:100%;
+    max-width:none;
+    padding:25px 18px calc(17px + env(safe-area-inset-bottom,0px));
+    border-radius:25px 25px 0 0;
+    border-bottom:0;
+  }
+  .rg-create-reel-choice-handle {
+    display:block;
+    width:42px;
+    height:4px;
+    margin:0 auto 18px;
+    border-radius:99px;
+    background:rgba(154,198,235,.35);
+  }
+}
+
+
+/* Reels header: keep the brand logo, replace header Search with Create Reel. */
+.reels-reference-header {
+  grid-template-columns: auto minmax(0,1fr) auto !important;
+}
+.reels-mobile-create-action {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+  min-height:36px !important;
+  padding:0 12px !important;
+  white-space:nowrap !important;
+  color:#fff !important;
+  border:1px solid rgba(76,190,255,.82) !important;
+  border-radius:999px !important;
+  background:linear-gradient(105deg,#8120ff 0%,#315dff 58%,#078eff 100%) !important;
+  box-shadow:0 0 15px rgba(51,128,255,.28),0 0 10px rgba(136,50,255,.2) !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+}
+.reels-mobile-create-action:active {
+  transform:scale(.97);
+}
+.reels-mobile-create-action svg {
+  flex:0 0 auto;
+}
+@media (max-width:380px) {
+  .reels-mobile-create-action {
+    min-height:33px !important;
+    padding:0 9px !important;
+    gap:4px !important;
+    font-size:11px !important;
+  }
+}
