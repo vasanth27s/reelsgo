@@ -6149,8 +6149,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [mobileConversationActions, setMobileConversationActions] = useState(null);
   const [pinnedConversationIds, setPinnedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_pinned_conversations") || "[]").map(String); } catch { return []; } });
   const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
-  const longPressTimer = useRef(null);
-  const suppressConversationClick = useRef(false);
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -6278,22 +6276,6 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
     return () => { cancelled = true; };
   }, [messageFilters.verified, conversations]);
 
-  function cancelConversationLongPress() {
-    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
-    longPressTimer.current = null;
-  }
-
-  function startConversationLongPress(conversation) {
-    cancelConversationLongPress();
-    suppressConversationClick.current = false;
-    longPressTimer.current = window.setTimeout(() => {
-      suppressConversationClick.current = true;
-      setConversationMenuId(String(conversation._id));
-      setMobileConversationActions(conversation);
-      if (navigator.vibrate) navigator.vibrate(25);
-    }, 500);
-  }
-
   function runConversationAction(action, conversation) {
     const id = String(conversation?._id || "");
     if (!id) return;
@@ -6307,8 +6289,13 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
       setConversations(prev => prev.map(c => String(c._id) === id ? { ...c, unreadCount: Math.max(1, Number(c.unreadCount || 0)) } : c));
       if (String(active?._id) === id) setActive(prev => prev ? { ...prev, unreadCount: 1 } : prev);
     } else if (action === "primary" || action === "general") {
-      setConversationFolders(prev => ({ ...prev, [id]: action === "general" ? "General" : "Primary" }));
-      setInboxTab(action === "general" ? "General" : "Primary");
+      const nextFolder = action === "general" ? "General" : "Primary";
+      setConversationFolders(prev => {
+        const next = { ...prev, [id]: nextFolder };
+        try { localStorage.setItem("reelsgo_conversation_folders", JSON.stringify(next)); } catch {}
+        return next;
+      });
+      setInboxTab(nextFolder);
     } else if (action === "pin") {
       setPinnedConversationIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [id, ...prev]);
     } else if (action === "mute") {
@@ -6696,16 +6683,21 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   }, [openConversationId, openConversationData]);
 
   async function openConversation(c) {
+    if (!c?._id) return;
     // Opening a conversation must not trigger the mobile keyboard.
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) document.activeElement.blur();
     setEmojiOpen(false);
     setChatCustomizeOpen(false);
     setChatDetailsOpen(false);
+    setConversationMenuId(null);
+    setMobileConversationActions(null);
+    setMessages([]);
+    setText("");
     setActive({ ...c, unreadCount: 0 });
     setMobileChat(true);
     try {
       const d = await api(`/messages/conversations/${c._id}/messages`);
-      const rows = d.messages || [];
+      const rows = Array.isArray(d?.messages) ? d.messages : [];
       setMessages(rows);
 
       const unseen = rows
@@ -7028,14 +7020,18 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
               return <div className={`conversation-item-shell ${selected ? 'active' : ''}`} key={c._id}>
                 <button
                   className={`conversation-item ${selected ? 'active' : ''} ${unread ? 'unread' : ''} ${pinnedConversationIds.includes(String(c._id)) ? 'is-pinned' : ''}`}
-                  onClick={() => { if (suppressConversationClick.current) { suppressConversationClick.current = false; return; } openConversation(c); }}
-                  onTouchStart={() => startConversationLongPress(c)}
-                  onTouchEnd={cancelConversationLongPress}
-                  onTouchMove={cancelConversationLongPress}
-                  onTouchCancel={cancelConversationLongPress}
-                  onContextMenu={e => { e.preventDefault(); setConversationMenuId(String(c._id)); setMobileConversationActions(c); }}
-                  onMouseDown={e => { if (e.pointerType !== 'touch') return; startConversationLongPress(c); }}
-                  onMouseUp={cancelConversationLongPress}
+                  onClick={() => {
+                    // Every tap on the row opens the selected conversation.
+                    // The separate three-dot control handles conversation actions.
+                    setConversationMenuId(null);
+                    setMobileConversationActions(null);
+                    openConversation(c);
+                  }}
+                  onContextMenu={e => {
+                    e.preventDefault();
+                    setConversationMenuId(null);
+                    setMobileConversationActions(c);
+                  }}
                   type="button">
                   <div className="conversation-avatar-wrap">
                     <Avatar user={u} size={58} />
@@ -7048,7 +7044,23 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                   </div>
                 </button>
                 <div className="conversation-options-wrap">
-                  <button type="button" className="conversation-options-button" aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`} onClick={() => { setConversationMenuId(v => v === String(c._id) ? null : String(c._id)); setConversationMenuOpen(false); }}><MoreHorizontal size={19} /></button>
+                  <button
+                    type="button"
+                    className="conversation-options-button"
+                    aria-label={`Conversation options for ${u?.username || u?.name || 'user'}`}
+                    aria-haspopup="dialog"
+                    onClick={event => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setConversationMenuOpen(false);
+                      setConversationMenuId(null);
+                      if (window.matchMedia("(max-width: 700px)").matches) {
+                        setMobileConversationActions(c);
+                      } else {
+                        setConversationMenuId(String(c._id));
+                      }
+                    }}
+                  ><MoreHorizontal size={19} /></button>
                   {conversationMenuId === String(c._id) && !mobileConversationActions && <div className="conversation-options-menu"><button type="button" onClick={() => runConversationAction('primary', c)}><Mail size={17}/>Move to Primary</button><button type="button" onClick={() => runConversationAction('general', c)}><Mail size={17}/>Move to General</button><button type="button" onClick={() => runConversationAction('unread', c)}><Mail size={17}/>Mark as unread</button><button type="button" onClick={() => runConversationAction('pin', c)}><PinOff size={17}/>{pinnedConversationIds.includes(String(c._id)) ? 'Unpin' : 'Pin'}</button><button type="button" onClick={() => runConversationAction('mute', c)}><Bell size={17}/>{mutedConversationIds.includes(String(c._id)) ? 'Unmute' : 'Mute'}</button><button className="conversation-delete-action" type="button" disabled={deletingConversationId === String(c._id)} onClick={() => deleteConversation(c)}><Trash2 size={17}/>{deletingConversationId === String(c._id) ? 'Deleting…' : 'Delete'}</button></div>}
                 </div>
               </div>;
@@ -8824,4 +8836,3 @@ function ProfessionalPanelDetails({
 
   return <EmptyState>There is no panel configured for this option yet.</EmptyState>;
 }
-  
