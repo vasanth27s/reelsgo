@@ -17285,3 +17285,494 @@ body #root .page.profile-page.rg-public-account-profile-page .profile-stats.rg-p
     flex-basis:124px !important;aspect-ratio:1 / 1 !important;
   }
 }
+
+
+/* ==========================================================
+   REELSGO NEON BLUE PUBLISH + ENGAGEMENT UI
+   Applies to create post/reel, share sheet, views and comments.
+   External Instagram / WhatsApp / X shortcuts are intentionally
+   omitted from the ShareSheet UI; in-app send, Add to Story,
+   native Share and Copy Link remain available.
+   ========================================================== */
+:root {
+  --rg-neon-blue: #168cff;
+  --rg-neon-cyan: #36dcff;
+  --rg-neon-violet: #8b5cff;
+  --rg-neon-panel: rgba(5, 14, 31, .96);
+  --rg-neon-border: rgba(51, 174, 255, .55);
+  --rg-neon-glow: 0 0 22px rgba(20, 142, 255, .2), inset 0 0 18px rgba(31, 125, 255, .06);
+}
+
+/* Create Post */
+.rg-neon-create-post-overlay,
+.rg-reel-publish-overlay {
+  background:
+    radial-gradient(ellipse at 8% 5%,rgba(108,45,255,.18),transparent 35%),
+    radial-gradient(ellipse at 95% 92%,rgba(0,173,255,.17),transparent 38%),
+    rgba(1,4,13,.94) !important;
+  backdrop-filter: blur(16px) !important;
+}
+.rg-neon-create-post-page,
+.rg-reel-publish-page {
+  color:#f5f9ff !important;
+  background:
+    radial-gradient(ellipse at 0 0,rgba(26,107,255,.12),transparent 38%),
+    linear-gradient(160deg,#050b19 0%,#030711 55%,#071326 100%) !important;
+  border:1px solid rgba(48,158,255,.58) !important;
+  box-shadow:0 0 30px rgba(0,130,255,.18), inset 0 0 24px rgba(0,110,255,.045) !important;
+}
+.rg-neon-create-header,
+.rg-reel-publish-page .publish-page-header {
+  min-height:62px !important;
+  padding:10px 16px !important;
+  background:rgba(3,9,22,.94) !important;
+  border-bottom:1px solid rgba(54,164,255,.22) !important;
+}
+.rg-neon-create-header h1,
+.rg-reel-publish-page .publish-page-header h1 {
+  color:#f8fbff !important;
+  font-size:17px !important;
+  font-weight:800 !important;
+  letter-spacing:.1px !important;
+}
+.rg-neon-create-header .publish-back-button,
+.rg-reel-publish-page .publish-back-button {
+  color:#eff8ff !important;
+  background:transparent !important;
+}
+.rg-neon-next-button,
+.rg-reel-publish-page .rg-reel-next-button {
+  min-width:82px !important;
+  min-height:38px !important;
+  padding:0 18px !important;
+  border:1px solid rgba(76,189,255,.9) !important;
+  border-radius:999px !important;
+  color:#fff !important;
+  font-size:13px !important;
+  font-weight:800 !important;
+  background:linear-gradient(105deg,#8b16ff 0%,#3d4dff 55%,#078eff 100%) !important;
+  box-shadow:0 0 16px rgba(116,50,255,.42),0 0 12px rgba(0,151,255,.25) !important;
+}
+.rg-neon-next-button:disabled,
+.rg-reel-publish-page .rg-reel-next-button:disabled {
+  opacity:.48 !important;
+  cursor:not-allowed !important;
+}
+.rg-neon-create-post-page .publish-scroll-area,
+.rg-reel-publish-page .publish-scroll-area {
+  padding:14px !important;
+  scrollbar-color:#176dc4 transparent !important;
+}
+.rg-neon-create-post-page .publish-media-section {
+  margin-bottom:14px !important;
+}
+.rg-neon-create-post-page .publish-media-preview {
+  display:grid !important;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr)) !important;
+  gap:7px !important;
+  padding:4px !important;
+  border:1px solid rgba(65,156,255,.48) !important;
+  border-radius:20px !important;
+  background:linear-gradient(145deg,rgba(13,31,61,.9),rgba(4,10,24,.95)) !important;
+  box-shadow:var(--rg-neon-glow) !important;
+}
+.rg-neon-create-post-page .publish-media-item {
+  position:relative !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  border-radius:14px !important;
+  aspect-ratio:4/5 !important;
+  background:#08152a !important;
+}
+.rg-neon-create-post-page .publish-media-item img,
+.rg-neon-create-post-page .publish-media-item video {
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+}
+.rg-neon-create-post-page .publish-empty-media {
+  min-height:260px !important;
+  border:1px solid rgba(72,162,255,.7) !important;
+  border-radius:20px !important;
+  color:#eaf6ff !important;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(23,119,255,.18),transparent 48%),
+    linear-gradient(145deg,#0c1c37,#050b18) !important;
+  box-shadow:var(--rg-neon-glow) !important;
+}
+.rg-neon-create-post-page .publish-empty-media > svg {
+  color:#48cfff !important;
+  filter:drop-shadow(0 0 10px rgba(27,165,255,.65)) !important;
+}
+.rg-neon-create-post-page .publish-caption-section,
+.rg-neon-create-post-page .publish-options-card,
+.rg-neon-create-post-page .publish-audience-section,
+.rg-neon-create-post-page .publish-hashtags-section,
+.rg-reel-publish-page .rg-reel-details-card {
+  margin:12px 0 !important;
+  padding:14px !important;
+  border:1px solid rgba(64,148,238,.36) !important;
+  border-radius:18px !important;
+  color:#eaf4ff !important;
+  background:linear-gradient(145deg,rgba(12,27,51,.96),rgba(5,12,26,.97)) !important;
+  box-shadow:inset 0 0 16px rgba(27,122,255,.055) !important;
+}
+.rg-neon-create-post-page .publish-user-row b,
+.rg-neon-create-post-page .publish-option-copy b,
+.rg-reel-publish-page .rg-reel-section-title b {
+  color:#f6fbff !important;
+}
+.rg-neon-create-post-page .publish-user-row span,
+.rg-neon-create-post-page .publish-option-copy small,
+.rg-reel-publish-page .rg-reel-section-title small {
+  color:#9bb6d6 !important;
+}
+.rg-neon-create-post-page .publish-caption,
+.rg-reel-publish-page .rg-reel-caption-input,
+.rg-neon-create-post-page .publish-inline-field input,
+.rg-neon-create-post-page .publish-hashtags-section input {
+  width:100% !important;
+  color:#f5faff !important;
+  background:rgba(2,8,20,.88) !important;
+  border:1px solid rgba(65,155,255,.42) !important;
+  border-radius:13px !important;
+  outline:none !important;
+}
+.rg-neon-create-post-page .publish-caption:focus,
+.rg-reel-publish-page .rg-reel-caption-input:focus,
+.rg-neon-create-post-page .publish-inline-field input:focus,
+.rg-neon-create-post-page .publish-hashtags-section input:focus {
+  border-color:#35c7ff !important;
+  box-shadow:0 0 0 3px rgba(31,155,255,.13),0 0 15px rgba(31,155,255,.13) !important;
+}
+.rg-neon-create-post-page .publish-caption::placeholder,
+.rg-reel-publish-page .rg-reel-caption-input::placeholder {
+  color:#8ca4c3 !important;
+}
+.rg-neon-create-post-page .publish-pills {
+  display:flex !important;
+  gap:9px !important;
+  margin:12px 0 !important;
+}
+.rg-neon-create-post-page .publish-pills button {
+  flex:1 !important;
+  min-height:42px !important;
+  border:1px solid rgba(59,154,255,.42) !important;
+  border-radius:13px !important;
+  color:#cdeaff !important;
+  background:rgba(11,27,51,.92) !important;
+}
+.rg-neon-create-post-page .publish-pills button.active {
+  color:#fff !important;
+  border-color:#45caff !important;
+  background:linear-gradient(110deg,rgba(102,30,255,.5),rgba(0,130,255,.35)) !important;
+  box-shadow:0 0 14px rgba(0,143,255,.2) !important;
+}
+.rg-neon-create-post-page .publish-option-row {
+  color:#eaf5ff !important;
+  background:transparent !important;
+}
+.rg-neon-create-post-page .publish-option-icon {
+  color:#47caff !important;
+  background:rgba(22,122,255,.14) !important;
+  border:1px solid rgba(58,168,255,.24) !important;
+}
+.rg-neon-create-post-page .publish-option-divider {
+  background:rgba(67,148,229,.2) !important;
+}
+.rg-neon-create-post-page .publish-audience-section label,
+.rg-neon-create-post-page .publish-hashtags-section label {
+  color:#e8f5ff !important;
+}
+.rg-neon-create-post-page .publish-audience-section select {
+  color:#f4faff !important;
+  background:#07172d !important;
+  border:1px solid rgba(64,159,255,.48) !important;
+  border-radius:12px !important;
+}
+.rg-neon-create-post-page .publish-audience-section small {
+  color:#8eaacb !important;
+}
+.rg-neon-create-post-page .publish-bottom-bar,
+.rg-reel-publish-page .rg-reel-publish-footer {
+  padding:12px 15px calc(12px + env(safe-area-inset-bottom,0px)) !important;
+  border-top:1px solid rgba(55,154,255,.3) !important;
+  background:rgba(3,9,22,.97) !important;
+  box-shadow:0 -8px 25px rgba(0,0,0,.25) !important;
+}
+.rg-neon-create-post-page .publish-share-button,
+.rg-reel-publish-page .rg-reel-publish-button {
+  min-height:46px !important;
+  border:1px solid rgba(88,190,255,.72) !important;
+  border-radius:14px !important;
+  color:#fff !important;
+  font-weight:850 !important;
+  background:linear-gradient(105deg,#781cff,#245dff 58%,#078dff) !important;
+  box-shadow:0 0 19px rgba(40,105,255,.28) !important;
+}
+.rg-neon-create-post-page .publish-share-button:disabled,
+.rg-reel-publish-page .rg-reel-publish-button:disabled {
+  opacity:.48 !important;
+}
+
+/* Create Reel editor */
+.rg-reel-publish-page .rg-reel-preview-stage {
+  border:1px solid rgba(58,164,255,.62) !important;
+  border-radius:22px !important;
+  background:#061329 !important;
+  box-shadow:0 0 22px rgba(0,128,255,.15) !important;
+}
+.rg-reel-publish-page .rg-reel-empty-preview {
+  min-height:390px !important;
+  color:#eaf6ff !important;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(32,127,255,.2),transparent 45%),
+    linear-gradient(160deg,#0c1c3a,#040a17) !important;
+}
+.rg-reel-publish-page .rg-reel-upload-orbit {
+  color:#53d4ff !important;
+  border-color:#2a9fff !important;
+  box-shadow:0 0 20px rgba(28,147,255,.25) !important;
+}
+.rg-reel-publish-page .rg-reel-option-row {
+  color:#eaf5ff !important;
+  border-color:rgba(69,150,237,.22) !important;
+}
+.rg-reel-publish-page .rg-reel-option-icon {
+  color:#4bcaff !important;
+  background:rgba(18,121,255,.14) !important;
+}
+.rg-reel-publish-page .rg-reel-checklist > div:not(.rg-reel-section-title) svg {
+  color:#4bd4ff !important;
+}
+.rg-reel-publish-page .rg-reel-audience-note,
+.rg-reel-publish-page .rg-reel-checklist > small {
+  color:#91aac9 !important;
+}
+
+/* Share sheet: keep ReelsGo-native sharing, remove social-network connect shortcuts. */
+.share-sheet-overlay {
+  background:rgba(0,4,14,.82) !important;
+  backdrop-filter:blur(14px) !important;
+}
+.share-sheet {
+  color:#edf7ff !important;
+  background:linear-gradient(155deg,#08172d,#030914) !important;
+  border:1px solid rgba(48,157,255,.58) !important;
+  box-shadow:0 0 30px rgba(0,130,255,.2) !important;
+}
+.share-sheet-head h2 { color:#f5fbff !important; }
+.share-sheet-head p { color:#91abc9 !important; }
+.share-search {
+  color:#b9d9f7 !important;
+  background:#07152a !important;
+  border:1px solid rgba(55,150,255,.38) !important;
+}
+.share-search input { color:#f5faff !important; }
+.share-person b { color:#dceeff !important; }
+.share-person.selected .share-person-avatar { box-shadow:0 0 0 2px #30baff,0 0 16px rgba(30,160,255,.35) !important; }
+.share-send-button {
+  color:#fff !important;
+  background:linear-gradient(105deg,#781cff,#176cff) !important;
+  box-shadow:0 0 18px rgba(29,116,255,.25) !important;
+}
+.share-shortcuts button {
+  color:#dceeff !important;
+  background:rgba(10,29,54,.92) !important;
+  border:1px solid rgba(55,148,238,.35) !important;
+  border-radius:14px !important;
+}
+.share-shortcut-icon {
+  color:#55cfff !important;
+  background:rgba(25,123,255,.16) !important;
+}
+
+/* Story views / viewer list */
+.story-viewers-screen,
+.rg-neon-story-viewers-screen {
+  color:#eff8ff !important;
+  background:
+    radial-gradient(ellipse at 100% 0,rgba(26,120,255,.18),transparent 38%),
+    linear-gradient(160deg,#07162d,#030811 72%) !important;
+  border:1px solid rgba(45,153,255,.45) !important;
+  box-shadow:0 0 28px rgba(0,131,255,.2) !important;
+}
+.story-viewers-screen-top,
+.story-viewers-tabs {
+  background:rgba(4,13,28,.94) !important;
+  border-color:rgba(58,154,244,.26) !important;
+}
+.story-viewers-tab-active {
+  color:#5acfff !important;
+}
+.story-viewers-list,
+.story-viewers-screen-list {
+  background:transparent !important;
+}
+.story-viewer-row,
+.story-viewer-row-menu {
+  color:#eaf6ff !important;
+  background:linear-gradient(100deg,rgba(9,29,54,.96),rgba(5,14,29,.96)) !important;
+  border:1px solid rgba(51,139,226,.22) !important;
+  border-radius:14px !important;
+  box-shadow:inset 0 0 12px rgba(15,113,255,.045) !important;
+}
+.story-viewer-user-info b,
+.story-viewer-user-info a,
+.story-viewer-row b { color:#f3f9ff !important; }
+.story-viewer-user-info span,
+.story-viewer-row small { color:#91abc9 !important; }
+.story-viewer-more,
+.story-viewers-settings,
+.story-viewers-close {
+  color:#c9eaff !important;
+  background:rgba(16,76,137,.24) !important;
+  border:1px solid rgba(63,162,255,.3) !important;
+}
+.story-viewers-empty {
+  color:#dceeff !important;
+}
+.story-viewers-empty svg { color:#46c9ff !important; }
+.story-viewer-action-sheet {
+  color:#edf7ff !important;
+  background:linear-gradient(150deg,#0b1d38,#040b18) !important;
+  border:1px solid rgba(49,158,255,.55) !important;
+  box-shadow:0 0 28px rgba(0,125,255,.24) !important;
+}
+.story-viewer-action-sheet button {
+  color:#eaf5ff !important;
+  border-color:rgba(70,149,230,.2) !important;
+  background:transparent !important;
+}
+
+/* Post / Story comments and likes sheets */
+.post-comments-sheet-backdrop,
+.post-likes-sheet-backdrop,
+.saved-reel-comments-backdrop,
+.rg-story-comments-backdrop {
+  background:rgba(0,4,14,.82) !important;
+  backdrop-filter:blur(13px) !important;
+}
+.post-comments-sheet,
+.rg-neon-comments-panel,
+.post-likes-sheet,
+.rg-neon-likes-panel,
+.saved-reel-comments-panel,
+.rg-neon-reel-comments-panel {
+  color:#edf7ff !important;
+  background:
+    radial-gradient(ellipse at 100% 0,rgba(20,117,255,.17),transparent 42%),
+    linear-gradient(160deg,#0a1b34 0%,#040b18 75%) !important;
+  border:1px solid rgba(55,164,255,.58) !important;
+  box-shadow:0 0 30px rgba(0,129,255,.2),inset 0 0 18px rgba(0,108,255,.055) !important;
+}
+.post-sheet-header,
+.saved-reel-comments-panel > header {
+  color:#f3f9ff !important;
+  background:rgba(4,13,27,.96) !important;
+  border-bottom:1px solid rgba(62,157,242,.25) !important;
+}
+.post-sheet-header h2,
+.saved-reel-comments-panel > header h3 {
+  color:#f5faff !important;
+}
+.post-sheet-header button,
+.saved-reel-comments-panel > header button {
+  color:#cceaff !important;
+  background:rgba(14,72,128,.2) !important;
+  border:1px solid rgba(55,158,255,.28) !important;
+  border-radius:10px !important;
+}
+.post-comments-sheet-list,
+.post-likes-sheet-list,
+.saved-reel-comments-list {
+  color:#eaf5ff !important;
+  background:transparent !important;
+}
+.post-comment-row,
+.saved-reel-comment,
+.post-likes-user-row {
+  color:#eaf5ff !important;
+  border-bottom:1px solid rgba(67,146,222,.16) !important;
+}
+.post-comment-copy b,
+.post-comment-copy a,
+.saved-reel-comment b,
+.post-likes-user-row b,
+.post-likes-user-row a {
+  color:#f5faff !important;
+}
+.post-comment-copy p,
+.saved-reel-comment p {
+  color:#d0e3f8 !important;
+}
+.post-comment-copy small,
+.saved-reel-comment small {
+  color:#82a3c8 !important;
+}
+.post-comments-empty,
+.post-sheet-status,
+.saved-reel-comment-state {
+  color:#9bb9d8 !important;
+}
+.post-comment-composer-wrap,
+.post-comment-composer,
+.saved-reel-comment-form {
+  color:#eaf5ff !important;
+  background:rgba(3,11,24,.98) !important;
+  border-top:1px solid rgba(56,153,245,.25) !important;
+}
+.post-comment-composer input,
+.saved-reel-comment-form input {
+  color:#f4faff !important;
+  background:#091a31 !important;
+  border:1px solid rgba(59,154,245,.4) !important;
+  border-radius:999px !important;
+}
+.post-comment-composer input::placeholder,
+.saved-reel-comment-form input::placeholder {
+  color:#8ca8c8 !important;
+}
+.post-comment-composer button,
+.saved-reel-comment-form button {
+  color:#fff !important;
+  background:linear-gradient(110deg,#791cff,#176cff) !important;
+  border:1px solid rgba(80,179,255,.45) !important;
+  border-radius:999px !important;
+}
+.post-comment-emoji-row button {
+  background:rgba(14,62,111,.32) !important;
+  border:1px solid rgba(58,149,235,.2) !important;
+  border-radius:999px !important;
+}
+.rg-story-comments-sheet {
+  background:linear-gradient(160deg,#0a1b34,#040b18) !important;
+}
+
+/* All publish / engagement panels remain usable on phone and desktop. */
+@media (max-width:700px) {
+  .rg-neon-create-post-page,
+  .rg-reel-publish-page {
+    width:100% !important;
+    max-width:100% !important;
+    min-height:100dvh !important;
+    border-radius:0 !important;
+  }
+  .rg-neon-create-post-page .publish-scroll-area,
+  .rg-reel-publish-page .publish-scroll-area {
+    padding:11px !important;
+  }
+  .rg-neon-create-post-page .publish-empty-media { min-height:220px !important; }
+  .rg-reel-publish-page .rg-reel-empty-preview { min-height:340px !important; }
+  .post-comments-sheet,
+  .post-likes-sheet,
+  .saved-reel-comments-panel,
+  .story-viewers-screen {
+    max-height:min(88dvh,760px) !important;
+  }
+  .post-comments-sheet,
+  .post-likes-sheet,
+  .saved-reel-comments-panel {
+    border-radius:22px 22px 0 0 !important;
+  }
+}
