@@ -17981,3 +17981,570 @@ body #root .page.profile-page.rg-public-account-profile-page .profile-stats.rg-p
     font-size:11px !important;
   }
 }
+
+
+/* ============================================================
+   REELSGO DIRECT CHAT — reference-matched mobile conversation
+   This block intentionally comes last to override legacy chat
+   styles that were forcing white bubbles / black input panels.
+   ============================================================ */
+.messages-page .instagram-chat-layout,
+.messages-page .instagram-chat-layout.has-active {
+  background:transparent !important;
+}
+.messages-page .instagram-chat {
+  display:flex !important;
+  flex-direction:column !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  color:#f5f7fb !important;
+  background:#05090e !important;
+  border:1px solid rgba(49,167,255,.28) !important;
+  border-radius:18px !important;
+  box-shadow:0 0 22px rgba(0,119,255,.07) !important;
+}
+.messages-page .instagram-chat-head {
+  display:flex !important;
+  align-items:center !important;
+  flex:0 0 58px !important;
+  min-height:58px !important;
+  gap:9px !important;
+  padding:6px 12px !important;
+  background:#05090e !important;
+  border:0 !important;
+  border-bottom:1px solid rgba(119,151,184,.18) !important;
+  box-shadow:none !important;
+}
+.messages-page .instagram-chat-head .chat-back-button {
+  display:none !important;
+}
+.messages-page .instagram-chat-head .chat-profile-open {
+  display:grid !important;
+  flex:0 0 38px !important;
+  width:38px !important;
+  height:38px !important;
+  place-items:center !important;
+  padding:0 !important;
+  border:2px solid #a84cff !important;
+  border-radius:50% !important;
+  background:#111827 !important;
+  box-shadow:0 0 12px rgba(162,75,255,.25) !important;
+  overflow:hidden !important;
+}
+.messages-page .instagram-chat-head .chat-profile-open img {
+  width:100% !important;height:100% !important;object-fit:cover !important;border-radius:50% !important;
+}
+.messages-page .instagram-chat-head .chat-profile-title {
+  display:flex !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:2px !important;
+  padding:0 !important;
+  text-align:left !important;
+  background:transparent !important;
+  border:0 !important;
+}
+.messages-page .instagram-chat-head .chat-profile-title b {
+  max-width:100% !important;
+  overflow:hidden !important;
+  color:#f7f8fc !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+  line-height:1.2 !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+.messages-page .instagram-chat-head .chat-profile-title span {
+  color:#929baa !important;
+  font-size:10px !important;
+  line-height:1.2 !important;
+}
+.messages-page .instagram-chat-head .chat-customize-button,
+.messages-page .instagram-chat-head .chat-header-options-button {
+  display:grid !important;
+  flex:0 0 34px !important;
+  width:34px !important;
+  height:34px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#e8eef8 !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:50% !important;
+}
+.messages-page .instagram-chat-head .chat-customize-button svg,
+.messages-page .instagram-chat-head .chat-header-options-button svg {
+  width:19px !important;height:19px !important;
+}
+.messages-page .instagram-chat-messages {
+  display:flex !important;
+  flex:1 1 auto !important;
+  flex-direction:column !important;
+  min-height:0 !important;
+  gap:0 !important;
+  padding:13px 10px 15px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+  -webkit-overflow-scrolling:touch !important;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(24,106,178,.07),transparent 46%),
+    #05090e !important;
+}
+.messages-page .instagram-chat .message-line {
+  display:flex !important;
+  align-items:flex-end !important;
+  gap:7px !important;
+  width:100% !important;
+  margin:7px 0 !important;
+}
+.messages-page .instagram-chat .message-line.received {
+  justify-content:flex-start !important;
+}
+.messages-page .instagram-chat .message-line > img,
+.messages-page .instagram-chat .message-line > .avatar,
+.messages-page .instagram-chat .message-line > div:first-child:not(.message-bubble-wrap) {
+  flex:0 0 25px !important;
+  width:25px !important;
+  height:25px !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+}
+.messages-page .instagram-chat .message-bubble-wrap {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  min-width:0 !important;
+  max-width:82% !important;
+}
+.messages-page .instagram-chat .message-line.mine .message-bubble-wrap {
+  align-items:flex-end !important;
+  margin-left:auto !important;
+}
+.messages-page .instagram-chat .message-line .bubble {
+  display:block !important;
+  width:auto !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  padding:9px 12px !important;
+  color:#f4f7fb !important;
+  font-size:12px !important;
+  font-weight:500 !important;
+  line-height:1.4 !important;
+  overflow-wrap:anywhere !important;
+  border:1px solid rgba(129,157,185,.10) !important;
+  border-radius:19px 19px 19px 6px !important;
+  background:linear-gradient(145deg,#202a36,#151e29) !important;
+  box-shadow:0 3px 12px rgba(0,0,0,.18) !important;
+}
+.messages-page .instagram-chat .message-line.mine .bubble {
+  color:#fff !important;
+  border:1px solid rgba(129,126,255,.28) !important;
+  border-radius:19px 19px 6px 19px !important;
+  background:linear-gradient(115deg,#9144f5 0%,#6549f5 55%,#315cf3 100%) !important;
+  box-shadow:0 5px 16px rgba(87,61,224,.22) !important;
+}
+.messages-page .instagram-chat .bubble .message-meta {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:5px !important;
+  margin-top:4px !important;
+  color:rgba(232,239,250,.68) !important;
+  font-size:9px !important;
+}
+.messages-page .instagram-chat .bubble .message-meta small {
+  color:inherit !important;
+  font-size:9px !important;
+}
+.messages-page .instagram-chat .chat-attached-media {
+  max-width:min(230px,68vw) !important;
+  overflow:hidden !important;
+  border-radius:15px !important;
+  background:#101925 !important;
+}
+.messages-page .instagram-chat .chat-attached-media img,
+.messages-page .instagram-chat .chat-attached-media video {
+  display:block !important;
+  width:100% !important;
+  max-height:290px !important;
+  object-fit:cover !important;
+  border-radius:14px !important;
+}
+.messages-page .instagram-chat .chat-attached-caption {
+  margin:0 !important;
+  padding:7px 9px !important;
+  color:#eef3fa !important;
+  font-size:11px !important;
+}
+.messages-page .instagram-chat .chat-input.instagram-chat-input {
+  display:flex !important;
+  flex:0 0 auto !important;
+  align-items:center !important;
+  gap:7px !important;
+  min-height:59px !important;
+  padding:7px 9px calc(7px + env(safe-area-inset-bottom,0px)) !important;
+  background:#05090e !important;
+  border:0 !important;
+  border-top:1px solid rgba(119,151,184,.16) !important;
+  box-shadow:none !important;
+}
+.messages-page .instagram-chat .chat-attach-button {
+  display:grid !important;
+  flex:0 0 34px !important;
+  width:34px !important;
+  height:34px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#f4f7ff !important;
+  border:1px solid rgba(62,142,255,.7) !important;
+  border-radius:11px !important;
+  background:linear-gradient(145deg,#1a54e8,#5934dc) !important;
+  box-shadow:0 0 13px rgba(42,100,255,.25) !important;
+}
+.messages-page .instagram-chat .chat-attach-button svg {
+  width:19px !important;height:19px !important;
+}
+.messages-page .instagram-chat .chat-message-field {
+  display:flex !important;
+  flex:1 1 auto !important;
+  align-items:center !important;
+  min-width:0 !important;
+  min-height:39px !important;
+  padding:0 8px 0 11px !important;
+  border:1px solid rgba(126,153,187,.18) !important;
+  border-radius:999px !important;
+  background:#182331 !important;
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.18) !important;
+}
+.messages-page .instagram-chat .chat-message-field > input {
+  flex:1 1 auto !important;
+  width:100% !important;
+  min-width:0 !important;
+  height:37px !important;
+  padding:0 5px !important;
+  color:#f4f7fc !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  font-size:12px !important;
+}
+.messages-page .instagram-chat .chat-message-field > input::placeholder {
+  color:#9ba8b9 !important;
+  opacity:1 !important;
+}
+.messages-page .instagram-chat .chat-smile-button {
+  display:grid !important;
+  flex:0 0 28px !important;
+  width:28px !important;
+  height:28px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#dbe6f5 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+.messages-page .instagram-chat .chat-smile-button svg {
+  width:18px !important;height:18px !important;
+}
+.messages-page .instagram-chat .chat-send-button {
+  display:grid !important;
+  flex:0 0 38px !important;
+  width:38px !important;
+  height:38px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#fff !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:linear-gradient(140deg,#9d35f2,#553cf2) !important;
+  box-shadow:0 0 16px rgba(137,52,240,.22) !important;
+}
+.messages-page .instagram-chat .chat-send-button svg {
+  width:19px !important;height:19px !important;
+}
+.messages-page .instagram-chat .chat-no-messages {
+  color:#c5d1e0 !important;
+}
+.messages-page .instagram-chat .chat-no-messages h2 {
+  color:#f4f7fb !important;
+}
+.messages-page .instagram-chat .chat-no-messages span {
+  color:#97a7ba !important;
+}
+
+/* Mobile: a single full-screen conversation with fixed header and composer. */
+@media (max-width:700px) {
+  body #root .messages-page.is-mobile-chat {
+    position:fixed !important;
+    inset:0 !important;
+    z-index:130 !important;
+    display:block !important;
+    width:100vw !important;
+    height:var(--rg-visual-viewport-height,100dvh) !important;
+    min-height:0 !important;
+    max-height:var(--rg-visual-viewport-height,100dvh) !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#05090e !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat-layout.instagram-chat-layout.has-active {
+    position:fixed !important;
+    inset:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    width:100vw !important;
+    height:var(--rg-visual-viewport-height,100dvh) !important;
+    min-height:0 !important;
+    max-height:var(--rg-visual-viewport-height,100dvh) !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#05090e !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  body #root .messages-page.is-mobile-chat .conversation-list {
+    display:none !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat.instagram-chat {
+    position:relative !important;
+    inset:auto !important;
+    z-index:1 !important;
+    display:flex !important;
+    flex:1 1 auto !important;
+    flex-direction:column !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    max-height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#05090e !important;
+    box-shadow:none !important;
+  }
+  body #root .messages-page.is-mobile-chat .instagram-chat-head {
+    flex:0 0 55px !important;
+    min-height:55px !important;
+    height:55px !important;
+    padding:6px 10px !important;
+  }
+  body #root .messages-page.is-mobile-chat .instagram-chat-messages {
+    flex:1 1 0 !important;
+    min-height:0 !important;
+    max-height:none !important;
+    padding:12px 9px 15px !important;
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat-input.instagram-chat-input {
+    flex:0 0 auto !important;
+    min-height:55px !important;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px)) !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat-message-field {
+    min-height:38px !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat-message-field > input {
+    height:36px !important;
+  }
+  body #root .messages-page.is-mobile-chat .chat-send-button {
+    flex-basis:36px !important;
+    width:36px !important;
+    height:36px !important;
+  }
+}
+
+/* Desktop split view keeps the inbox list and conversation visible side-by-side. */
+@media (min-width:701px) {
+  .messages-page .chat-layout.instagram-chat-layout {
+    display:grid !important;
+    grid-template-columns:minmax(250px,34%) minmax(0,1fr) !important;
+    min-height:560px !important;
+    gap:12px !important;
+  }
+  .messages-page .instagram-chat {
+    min-height:560px !important;
+  }
+}
+
+
+/* Reference composer actions: camera, message field, mic, gallery, emoji. */
+.messages-page .instagram-chat .chat-voice-button,
+.messages-page .instagram-chat .chat-gallery-button {
+  display:grid !important;
+  flex:0 0 28px !important;
+  width:28px !important;
+  height:34px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#e4edf8 !important;
+  border:0 !important;
+  border-radius:8px !important;
+  background:transparent !important;
+}
+.messages-page .instagram-chat .chat-voice-button svg,
+.messages-page .instagram-chat .chat-gallery-button svg {
+  width:19px !important;height:19px !important;
+}
+.messages-page .instagram-chat .chat-voice-button:active,
+.messages-page .instagram-chat .chat-gallery-button:active {
+  color:#62caff !important;
+}
+@media(max-width:380px) {
+  .messages-page .instagram-chat .chat-input.instagram-chat-input { gap:5px !important;padding-left:6px !important;padding-right:6px !important; }
+  .messages-page .instagram-chat .chat-attach-button { flex-basis:31px !important;width:31px !important;height:32px !important; }
+  .messages-page .instagram-chat .chat-voice-button,
+  .messages-page .instagram-chat .chat-gallery-button { flex-basis:23px !important;width:23px !important; }
+  .messages-page .instagram-chat .chat-message-field { padding-left:8px !important;padding-right:5px !important; }
+}
+
+
+/* Latest reference correction: show the back arrow and omit the trailing plus action. */
+.messages-page .instagram-chat-head .chat-back-button {
+  display:grid !important;
+  flex:0 0 36px !important;
+  width:36px !important;
+  height:36px !important;
+  min-width:36px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#f7f9ff !important;
+  background:transparent !important;
+  border:0 !important;
+  border-radius:50% !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.messages-page .instagram-chat-head .chat-back-button svg {
+  display:block !important;
+  width:23px !important;
+  height:23px !important;
+  stroke:currentColor !important;
+  stroke-width:2.2 !important;
+}
+.messages-page .instagram-chat .chat-smile-button {
+  display:grid !important;
+  flex:0 0 28px !important;
+  width:28px !important;
+  height:34px !important;
+  place-items:center !important;
+  color:#e4edf8 !important;
+}
+.messages-page .instagram-chat .chat-smile-button svg {
+  width:19px !important;
+  height:19px !important;
+}
+/* Do not render a standalone add/plus action in the message composer. */
+.messages-page .instagram-chat .chat-input [class*="plus-button"],
+.messages-page .instagram-chat .chat-input [class*="add-button"] {
+  display:none !important;
+}
+@media(max-width:700px) {
+  body #root .messages-page.is-mobile-chat .instagram-chat-head .chat-back-button {
+    display:grid !important;
+    flex:0 0 36px !important;
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    margin-right:1px !important;
+  }
+}
+
+
+/* FINAL CHAT COLOR CLEANUP — remove light/pink message surfaces.
+   Keep the reference's near-black screen, charcoal incoming bubbles,
+   and cool indigo/blue outgoing bubbles. */
+.messages-page,
+.messages-page .chat-layout,
+.messages-page .instagram-chat-layout,
+.messages-page .instagram-chat-layout.has-active,
+.messages-page .instagram-chat,
+.messages-page .chat.instagram-chat,
+.messages-page .instagram-chat-messages {
+  background-color:#05090e !important;
+  background-image:none !important;
+}
+.messages-page .instagram-chat-messages .message-line,
+.messages-page .instagram-chat-messages .message-line.received,
+.messages-page .instagram-chat-messages .message-line.mine,
+.messages-page .instagram-chat-messages .message-bubble-wrap,
+.messages-page .instagram-chat-messages .message-bubble-wrap.mine {
+  background:transparent !important;
+  background-color:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+}
+.messages-page .instagram-chat-messages .bubble,
+.messages-page .instagram-chat-messages .message-line.received .bubble,
+.messages-page .instagram-chat-messages .message-bubble-wrap .bubble {
+  color:#f1f5f9 !important;
+  background:#222a33 !important;
+  background-image:none !important;
+  border:1px solid rgba(148,163,184,.10) !important;
+  box-shadow:none !important;
+  border-radius:19px 19px 19px 6px !important;
+}
+.messages-page .instagram-chat-messages .message-line.mine .bubble,
+.messages-page .instagram-chat-messages .message-bubble-wrap.mine .bubble {
+  color:#ffffff !important;
+  background:linear-gradient(135deg,#5135c9 0%,#354fd8 100%) !important;
+  background-image:linear-gradient(135deg,#5135c9 0%,#354fd8 100%) !important;
+  border:1px solid rgba(91,132,255,.24) !important;
+  box-shadow:0 4px 14px rgba(38,67,180,.16) !important;
+  border-radius:19px 19px 6px 19px !important;
+}
+.messages-page .instagram-chat-messages .bubble .message-meta,
+.messages-page .instagram-chat-messages .bubble .message-meta small {
+  color:#9aa8ba !important;
+}
+.messages-page .instagram-chat-messages .message-line.mine .bubble .message-meta,
+.messages-page .instagram-chat-messages .message-line.mine .bubble .message-meta small {
+  color:rgba(235,242,255,.72) !important;
+}
+.messages-page .instagram-chat .chat-input.instagram-chat-input {
+  background:#080d14 !important;
+  background-image:none !important;
+  border-top:1px solid rgba(105,139,181,.16) !important;
+}
+.messages-page .instagram-chat .chat-message-field {
+  background:#171f2a !important;
+  background-image:none !important;
+  border:1px solid rgba(123,148,179,.20) !important;
+}
+.messages-page .instagram-chat .chat-message-field > input {
+  color:#f1f5f9 !important;
+  background:transparent !important;
+}
+.messages-page .instagram-chat .chat-message-field > input::placeholder {
+  color:#8d9bad !important;
+}
+
+/* Keep the back arrow visible in the conversation header. */
+.messages-page .instagram-chat-head .chat-back-button {
+  display:grid !important;
+  flex:0 0 34px !important;
+  width:34px !important;
+  height:34px !important;
+  place-items:center !important;
+  padding:0 !important;
+  color:#f1f5f9 !important;
+  border:0 !important;
+  border-radius:50% !important;
+  background:transparent !important;
+}
+.messages-page .instagram-chat-head .chat-back-button svg {
+  width:22px !important;
+  height:22px !important;
+}
