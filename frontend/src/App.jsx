@@ -1669,7 +1669,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
       </section></div>}
       {storySendOpen && <ShareSheet post={story} kind="story" onClose={() => setStorySendOpen(false)} />}
       {storyCommentsOpen && <div className="post-comments-sheet-backdrop rg-story-comments-backdrop" role="presentation" onClick={event => event.stopPropagation()} onMouseDown={event => { event.stopPropagation(); if (event.target === event.currentTarget) setStoryCommentsOpen(false); }}>
-        <section className="post-comments-sheet rg-story-comments-sheet" role="dialog" aria-modal="true" aria-label="Story comments" onClick={event => event.stopPropagation()} onMouseDown={event => event.stopPropagation()}>
+        <section className="post-comments-sheet rg-story-comments-sheet rg-neon-comments-panel" role="dialog" aria-modal="true" aria-label="Story comments" onClick={event => event.stopPropagation()} onMouseDown={event => event.stopPropagation()}>
           <header className="post-sheet-header"><span className="post-sheet-handle"/><h2>Comments</h2><button type="button" aria-label="Close comments" onClick={() => setStoryCommentsOpen(false)}><X/></button></header>
           <div className="post-comments-sheet-list">
             {storyCommentsLoading ? <div className="post-comments-empty"><b>Loading comments…</b></div> : storyComments.length ? storyComments.map(comment => <article className="post-comment-row" key={comment._id}><Avatar user={comment.author} size={34}/><div className="post-comment-copy"><div><b>{comment.author?.name || comment.author?.username || "ReelsGo user"}</b><span>{comment.text}</span></div><small>{comment.createdAt ? new Date(comment.createdAt).toLocaleString() : "Just now"}</small></div></article>) : <div className="post-comments-empty"><MessageCircle/><b>No comments yet</b><span>Be the first to comment on this story.</span></div>}
@@ -1679,7 +1679,7 @@ function StoryViewer({ story, onClose, onDeleted, storyIndex = 0, storyCount = 1
         </section>
       </div>}
       {viewersOpen && (
-        <section className="story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
+        <section className="story-viewers-screen rg-neon-story-viewers-screen" onClick={e => e.stopPropagation()} aria-label="Story viewers">
           <div className="story-viewers-screen-top">
             <button type="button" className="story-viewers-settings" aria-label="Story settings" onClick={() => setStorySettingsOpen(true)}><Settings /></button>
             <div className="story-viewer-thumbnails">
@@ -2048,8 +2048,8 @@ function Post({ post, user, onDeleted }) {
       </article>
 
       {likedUsersOpen && (
-        <div className="post-likes-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
-          <section className="post-likes-sheet" role="dialog" aria-modal="true" aria-label="People who liked this post">
+        <div className="post-likes-sheet-backdrop rg-neon-likes-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setLikedUsersOpen(false); }}>
+          <section className="post-likes-sheet rg-neon-likes-panel" role="dialog" aria-modal="true" aria-label="People who liked this post">
             <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Likes</h2><button type="button" aria-label="Close likes" onClick={() => setLikedUsersOpen(false)}><X /></button></header>
             <div className="post-likes-sheet-list">
               {likedUsersLoading ? <p className="post-sheet-status">Loading likes…</p> : likedUsersError ? <p className="post-sheet-status">{likedUsersError}</p> : likedUsers.length ? likedUsers.map((person, index) => {
@@ -2063,8 +2063,8 @@ function Post({ post, user, onDeleted }) {
       )}
 
       {showComments && (
-        <div className="post-comments-sheet-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
-          <section className="post-comments-sheet" role="dialog" aria-modal="true" aria-label="Comments">
+        <div className="post-comments-sheet-backdrop rg-neon-comments-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setShowComments(false); }}>
+          <section className="post-comments-sheet rg-neon-comments-panel" role="dialog" aria-modal="true" aria-label="Comments">
             <header className="post-sheet-header"><span className="post-sheet-handle" /><h2>Comments</h2><button type="button" className="post-comments-send" aria-label="Share post" onClick={() => { setShowComments(false); setShareOpen(true); }}><Send /></button></header>
             <div className="post-comments-sheet-list">
               {commentsLoading ? <p className="post-sheet-status">Loading comments…</p> : commentsError ? <p className="post-sheet-status">{commentsError}</p> : comments.length ? comments.map((c, index) => <div className="post-comment-row" key={c._id || `comment-${index}`}><Avatar user={c.author} size={38} /><div className="post-comment-copy"><div><UserLink user={c.author} /><span>{c.text}</span></div><small>Reply · Like</small></div></div>) : <div className="post-comments-empty"><b>No comments yet</b><span>Start the conversation.</span></div>}
@@ -2423,29 +2423,12 @@ function ShareSheet({ post, onClose, kind = "post" }) {
           {kind !== "story" && <button type="button" onClick={addToStory}>
             <span className="share-shortcut-icon"><CirclePlusFallback /></span><b>Add to story</b>
           </button>}
-          <button type="button" onClick={() => openWhatsApp(false)}>
-            <span className="share-shortcut-icon whatsapp"><MessageCircle /></span><b>WhatsApp</b>
-          </button>
-          {kind !== "story" && <button type="button" onClick={() => openWhatsApp(true)}>
-            <span className="share-shortcut-icon whatsapp"><CirclePlusFallback /></span><b>WhatsApp Status</b>
-          </button>}
           <button type="button" onClick={shareExternally}>
             <span className="share-shortcut-icon"><Upload /></span><b>Share to…</b>
           </button>
           <button type="button" onClick={copyPostLink}>
             <span className="share-shortcut-icon"><LinkIcon /></span><b>Copy link</b>
           </button>
-          {kind !== "story" && [
-            { name: "Instagram", mark: "◎", bg: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)" },
-            { name: "WhatsApp", mark: "◉", bg: "#25D366" },
-            { name: "X / Twitter", mark: "𝕏", bg: "#111111" },
-            { name: "Facebook", mark: "f", bg: "#1877F2" },
-            { name: "Telegram", mark: "➤", bg: "#229ED9" }
-          ].map(app => (
-            <button className="share-social-app-button" key={app.name} type="button" onClick={() => openSocialApp(app.name)} aria-label={`Share to ${app.name}`}>
-              <span className="share-shortcut-icon share-social-app-icon" style={{ background: app.bg }}>{app.mark}</span><b>{app.name}</b>
-            </button>
-          ))}
         </div>
         {notice && <div className="share-notice" role="status">{notice}</div>}
       </div>
@@ -2666,14 +2649,14 @@ function PostComposer({ user, onClose, onDone }) {
   }
 
   return (
-    <div className="publish-page-overlay" role="dialog" aria-modal="true" aria-label="New post">
-      <div className="publish-page">
-        <header className="publish-page-header">
+    <div className="publish-page-overlay rg-neon-create-post-overlay" role="dialog" aria-modal="true" aria-label="Create Post">
+      <div className="publish-page rg-neon-create-post-page">
+        <header className="publish-page-header rg-neon-create-header">
           <button type="button" className="publish-back-button" onClick={onClose} aria-label="Go back">
             <ChevronRight style={{ transform: "rotate(180deg)" }} />
           </button>
-          <h1>New post</h1>
-          <div className="publish-header-spacer" />
+          <h1>Create Post</h1>
+          <button type="button" className="rg-neon-next-button" onClick={publish} disabled={loading || (!files.length && !caption.trim())}>{loading ? "Posting…" : "Next"}</button>
         </header>
 
         <div className="publish-scroll-area">
@@ -3035,7 +3018,7 @@ function ReelComposer({ onClose, onDone }) {
         <header className="publish-page-header">
           <button type="button" className="publish-back-button" onClick={onClose} aria-label="Close Reel creator"><X /></button>
           <h1>Create Reel</h1>
-          <button type="button" className="rg-reel-next-button" onClick={() => input.current?.click()}>Add video</button>
+          <button type="button" className="rg-reel-next-button" onClick={() => file ? publish() : input.current?.click()} disabled={loading}>{loading ? "Publishing…" : "Next"}</button>
         </header>
         <div className="publish-scroll-area rg-reel-publish-scroll">
           <section className="rg-reel-preview-stage">
@@ -5363,7 +5346,7 @@ function ReelViewer({ reel, onClose }) {
         {error && <div className="saved-reel-fullscreen-notice" role="status">{error}<button type="button" onClick={() => setError("")} aria-label="Dismiss message"><X size={14}/></button></div>}
       </div>
       {commentsOpen && <div className="saved-reel-comments-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) setCommentsOpen(false); }}>
-        <section className="saved-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
+        <section className="saved-reel-comments-panel rg-neon-reel-comments-panel" role="dialog" aria-modal="true" aria-label="Reel comments">
           <header><h3>Comments <span>{Number(currentReel.commentsCount || comments.length)}</span></h3><button type="button" onClick={() => setCommentsOpen(false)} aria-label="Close comments"><X /></button></header>
           <div className="saved-reel-comments-list">
             {commentsLoading ? <p className="saved-reel-comment-state">Loading comments…</p> : null}
