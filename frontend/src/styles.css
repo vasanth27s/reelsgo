@@ -18811,3 +18811,76 @@ body #root .page.profile-page.rg-public-account-profile-page .profile-stats.rg-p
     border-radius:20px !important;
   }
 }
+
+
+/* iOS SAFARI / ANDROID CONVERSATION TAP FIX
+   Long-press on a row must never invoke conversation actions.
+   Only the dedicated three-dot button may open the action sheet. */
+.messages-page .conversation-item-shell {
+  position:relative !important;
+  display:block !important;
+  overflow:visible !important;
+  -webkit-touch-callout:none !important;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+}
+.messages-page .conversation-item-shell > .conversation-item {
+  position:relative !important;
+  z-index:2 !important;
+  display:flex !important;
+  width:100% !important;
+  min-height:72px !important;
+  align-items:center !important;
+  text-align:left !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:rgba(53,151,255,.14) !important;
+  -webkit-touch-callout:none !important;
+  pointer-events:auto !important;
+  cursor:pointer !important;
+}
+.messages-page .conversation-item-shell > .conversation-item:active {
+  background:rgba(35,116,190,.13) !important;
+}
+.messages-page .conversation-item-shell .conversation-options-wrap {
+  position:absolute !important;
+  z-index:5 !important;
+  top:50% !important;
+  right:4px !important;
+  transform:translateY(-50%) !important;
+  pointer-events:auto !important;
+}
+.messages-page .conversation-item-shell .conversation-options-button {
+  position:relative !important;
+  z-index:6 !important;
+  display:grid !important;
+  width:38px !important;
+  min-width:38px !important;
+  height:38px !important;
+  min-height:38px !important;
+  place-items:center !important;
+  touch-action:manipulation !important;
+  -webkit-tap-highlight-color:transparent !important;
+  pointer-events:auto !important;
+}
+.messages-page .conversation-item-shell > .conversation-item {
+  padding-right:52px !important;
+}
+.mobile-conversation-action-overlay {
+  touch-action:pan-y !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+.mobile-conversation-action-sheet {
+  touch-action:pan-y !important;
+  overscroll-behavior:contain !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+@media (hover:none) and (pointer:coarse) {
+  .messages-page .conversation-item-shell > .conversation-item {
+    cursor:default !important;
+  }
+  .messages-page .conversation-item-shell > .conversation-item,
+  .messages-page .conversation-item-shell .conversation-options-button {
+    -webkit-user-select:none !important;
+    user-select:none !important;
+  }
+}
