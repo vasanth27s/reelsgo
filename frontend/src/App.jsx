@@ -4901,14 +4901,22 @@ function ReelsPage({ onCreate }) {
   return (
     <div className="page reels-page">
       <div className="reels-mobile-header reels-reference-header">
-        <button type="button" className="reels-mobile-create reels-brand-mark" aria-label="Create Reel" onClick={onCreate}>
+        <div className="reels-mobile-create reels-brand-mark" aria-label="ReelsGo">
           <img src={reelsGoLogo} alt="ReelsGo" className="reels-mini-logo" />
-        </button>
+        </div>
         <div className="reels-mobile-title reels-reference-title">
           <b>Reels</b>
           <span className="reels-for-you-label">For You</span>
         </div>
-        <button type="button" className="reels-mobile-search" aria-label="Search" onClick={() => window.dispatchEvent(new CustomEvent("vk-open-search"))}><Search /></button>
+        <button
+          type="button"
+          className="reels-mobile-create-action"
+          aria-label="Create a Reel"
+          onClick={onCreate}
+        >
+          <Film size={16} />
+          <span>Create Reel</span>
+        </button>
       </div>
       <div className="page-heading reels-heading">
         <div>
