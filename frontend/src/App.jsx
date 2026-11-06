@@ -6151,6 +6151,7 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
   const [mutedConversationIds, setMutedConversationIds] = useState(() => { try { return JSON.parse(localStorage.getItem("reelsgo_muted_conversations") || "[]").map(String); } catch { return []; } });
   const longPressTimer = useRef(null);
   const suppressConversationClick = useRef(false);
+  const chatSwipeStart = useRef(null);
   const [messageMenuId, setMessageMenuId] = useState(null);
   const [deletingMessageId, setDeletingMessageId] = useState(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -7092,7 +7093,43 @@ function MessagesPage({ openConversationId = null, openConversationData = null }
                 {conversationMenuOpen && <div className="conversation-options-menu chat-header-options-menu"><button type="button" disabled={deletingConversationId === String(active._id)} onClick={() => deleteConversation(active)}><Trash2 size={15}/>{deletingConversationId === String(active._id) ? 'Deleting…' : 'Delete conversation'}</button></div>}
               </div>
             </div>
-            <div className="chat-messages instagram-chat-messages">
+            <div
+              className="chat-messages instagram-chat-messages"
+              onTouchStart={event => {
+                if (typeof window === "undefined" || window.innerWidth > 700) return;
+                const touch = event.touches?.[0];
+                if (!touch) return;
+                const target = event.target;
+                if (target?.closest?.("button, input, textarea, video, a, [role='button']")) {
+                  chatSwipeStart.current = null;
+                  return;
+                }
+                // Start the back gesture at the left edge, like native mobile navigation.
+                chatSwipeStart.current = touch.clientX <= 60
+                  ? { x: touch.clientX, y: touch.clientY, at: Date.now() }
+                  : null;
+              }}
+              onTouchEnd={event => {
+                const start = chatSwipeStart.current;
+                chatSwipeStart.current = null;
+                if (!start || typeof window === "undefined" || window.innerWidth > 700) return;
+                const touch = event.changedTouches?.[0];
+                if (!touch) return;
+                const dx = touch.clientX - start.x;
+                const dy = touch.clientY - start.y;
+                const elapsed = Date.now() - start.at;
+                if (dx >= 85 && dx > Math.abs(dy) * 1.35 && elapsed < 800) {
+                  setEmojiOpen(false);
+                  setChatCustomizeOpen(false);
+                  setChatDetailsOpen(false);
+                  setConversationMenuOpen(false);
+                  setConversationMenuId(null);
+                  setActive(null);
+                  setMobileChat(false);
+                }
+              }}
+              onTouchCancel={() => { chatSwipeStart.current = null; }}
+            >
               {messages.length ? messages.map(m => {
                 const mine = String(m.sender?._id) === String(me?._id);
                 const seen = (m.seenBy || []).some(x => String(x?._id || x) !== String(me?._id));
