@@ -8824,3 +8824,4 @@ function ProfessionalPanelDetails({
 
   return <EmptyState>There is no panel configured for this option yet.</EmptyState>;
 }
+  
