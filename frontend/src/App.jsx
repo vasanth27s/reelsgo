@@ -3488,21 +3488,66 @@ function ProfileQRCodeModal({ user, onClose }) {
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const palette = palettes[colorIndex];
-  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || user?.username || "")}`;
+  const profileUrl = `${window.location.origin}/?profile=${encodeURIComponent(user?._id || "")}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=700x700&margin=20&ecc=H&color=${palette.qr}&bgcolor=ffffff&data=${encodeURIComponent(profileUrl)}`;
 
   function openScannedLink(value) {
     const raw = String(value || "").trim();
-    if (!raw) return;
-    let target;
-    try { target = new URL(raw, window.location.origin); }
-    catch { setCameraError("This QR code does not contain a valid web link."); return; }
-    if (!/^https?:$/.test(target.protocol)) {
-      setCameraError("This QR code is not a web link."); return;
+    if (!raw) {
+      setCameraError("No QR link was detected. Hold the camera steady and try again.");
+      return;
     }
-    // Keep links on this ReelsGo site in the current tab; external URLs open separately.
-    if (target.origin === window.location.origin) window.location.href = target.href;
-    else window.open(target.href, "_blank", "noopener,noreferrer");
+
+    let target;
+    try {
+      // QR codes may contain an absolute URL or a same-site relative URL.
+      target = new URL(raw, window.location.origin);
+    } catch {
+      setCameraError("This QR code does not contain a valid ReelsGo profile link.");
+      return;
+    }
+
+    if (!/^https?:$/.test(target.protocol)) {
+      setCameraError("This QR code is not a supported web link.");
+      return;
+    }
+
+    // ReelsGo profile QR format: https://your-domain/?profile=USER_ID
+    // Route through the React app instead of forcing a full page reload.
+    const scannedProfileId =
+      target.searchParams.get("profile") ||
+      target.searchParams.get("user") ||
+      target.searchParams.get("userId");
+
+    const isSameReelsGoSite = target.origin === window.location.origin;
+    if (scannedProfileId && isSameReelsGoSite) {
+      const nextUrl = `${target.pathname || "/"}${target.search}${target.hash}`;
+      window.history.pushState({ reelsGoScannedProfile: true }, "", nextUrl);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      onClose();
+      return;
+    }
+
+    // Support common profile path links as well as the query-string QR format.
+    const profilePathMatch = target.pathname.match(/^\/(?:profile|user)\/([^/]+)\/?$/i);
+    if (profilePathMatch && isSameReelsGoSite) {
+      const profileId = decodeURIComponent(profilePathMatch[1]);
+      const nextUrl = `/?profile=${encodeURIComponent(profileId)}`;
+      window.history.pushState({ reelsGoScannedProfile: true }, "", nextUrl);
+      window.dispatchEvent(new PopStateEvent("popstate"));
+      onClose();
+      return;
+    }
+
+    if (isSameReelsGoSite) {
+      setCameraError("This QR code opens ReelsGo, but it does not contain a profile ID.");
+      return;
+    }
+
+    // If the QR was generated on the live ReelsGo domain and this app is
+    // currently running on localhost or another domain, open that live link
+    // in this tab so its own ReelsGo router can resolve the profile.
+    window.location.assign(target.href);
   }
 
   function loadJsQR() {
@@ -3672,6 +3717,7 @@ function ProfileQRCodeModal({ user, onClose }) {
           </div>
         ) : (
           <div className="rg-profile-qr-content">
+            {!user?._id && <p className="rg-qr-camera-error" role="status">Your profile ID is not loaded yet. Refresh your profile and open QR code again.</p>}
             <div className="rg-profile-qr-card" style={{ "--rg-qr-accent": palette.accent }}>
               <div className="rg-profile-qr-image-wrap"><img src={qrUrl} alt={`QR code for ${user?.username || "your ReelsGo profile"}`} /><div className="rg-profile-qr-center-mark"><QrCode /></div></div>
               <div className="rg-profile-qr-username">@{user?.username || "reelsgo"}</div>
