@@ -3672,6 +3672,11 @@ function ProfileQRCodeModal({ user, onClose }) {
               <button type="button" onClick={shareProfile}><Share2/><span>Share profile</span></button>
               <button type="button" onClick={copyProfileLink}><LinkIcon/><span>Copy link</span></button>
               <button type="button" onClick={downloadQr}><Download/><span>Download</span></button>
+              <button
+                type="button"
+                onClick={() => { setCameraError(""); setScannerOpen(true); }}
+                aria-label="Scan QR code"
+              ><ScanLine/><span>Scan</span></button>
             </div>
             <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>PROFILE QR</span><p>Change the colours and share your profile anywhere.</p></div>
             <div className="rg-qr-palette-dots" aria-label="Choose QR design">{palettes.map((p, i) => <button key={p.name} type="button" title={p.name} aria-label={`${p.name} colour theme`} className={i === colorIndex ? "active" : ""} style={{ background: p.accent }} onClick={() => setColorIndex(i)} />)}</div>
@@ -3981,7 +3986,16 @@ function ProfilePage({ user, setUser }) {
             <div className="rg-pro-detail-backdrop" role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setProfessionalPanel(""); }}>
               <section className="rg-pro-detail-sheet rg-pro-dashboard-sheet" role="dialog" aria-modal="true" aria-label={professionalPanel}>
                 <div className="rg-pro-sheet-header">
-                  <button type="button" className="rg-pro-sheet-back" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")} aria-label={professionalPanel === "Your dashboard" ? "Back to profile" : "Back to dashboard"}><ArrowLeft size={22} /></button>
+                  <button
+                    type="button"
+                    className="rg-pro-sheet-back"
+                    onClick={() => setProfessionalPanel(current => current === "Your dashboard" ? "" : "Your dashboard")}
+                    aria-label={professionalPanel === "Your dashboard" ? "Back to profile" : "Back to professional dashboard"}
+                    title={professionalPanel === "Your dashboard" ? "Back to profile" : "Back to dashboard"}
+                  >
+                    <ArrowLeft size={22} />
+                    <span className="rg-pro-back-label">Back</span>
+                  </button>
                   <h2>{professionalPanel}</h2>
                   {professionalPanel === "Your dashboard" ? <button type="button" className="rg-pro-sheet-settings" onClick={() => setProfessionalPanel("Dashboard settings")} aria-label="Dashboard settings"><Settings size={20}/></button> : <span className="rg-pro-sheet-right-spacer" />}
                 </div>
@@ -4007,6 +4021,7 @@ function ProfilePage({ user, setUser }) {
                     <p className="rg-pro-dashboard-disclaimer">Some tools depend on eligibility and integrations. Insights shown here use data currently available in ReelsGo.</p>
                   </div>
                 </> : <>
+                  <div className="rg-pro-dashboard-scroll rg-pro-detail-content">
                   <ProfessionalPanelDetails
                     panel={professionalPanel}
                     analytics={professionalAnalytics}
@@ -4024,6 +4039,7 @@ function ProfilePage({ user, setUser }) {
                     setSavedReplyMessage={setSavedReplyMessage}
                     actionMessage={professionalActionMessage}
                   />
+                  </div>
                 </>}
                 {professionalActionMessage && <p className="rg-pro-detail-note" role="status">{professionalActionMessage}</p>}
                 {professionalPanel !== "Your dashboard" && <button type="button" className="rg-pro-detail-primary" onClick={() => setProfessionalPanel(professionalPanel === "Your dashboard" ? "" : "Your dashboard")}>Back to dashboard</button>}
