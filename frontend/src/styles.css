@@ -19606,3 +19606,625 @@ body:has(#root .rg-account-profile-page) #root .bottom-nav {
     padding-bottom:28px !important;
   }
 }
+
+
+
+/* ============================================================
+   REELSGO — PROFESSIONAL NEO BLUE GLASS SETTINGS
+   Scoped to Settings; leaves other pages' visual theme unchanged.
+   ============================================================ */
+.settings-overlay {
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(23,145,255,.20),transparent 45%),
+    rgba(1,10,24,.78) !important;
+  backdrop-filter: blur(18px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+}
+.settings-overlay .settings-modal.instagram-settings {
+  color: #eff8ff !important;
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(20,126,225,.18),transparent 46%),
+    linear-gradient(145deg,#082747 0%,#061d38 52%,#04152b 100%) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  box-shadow: 0 28px 90px rgba(0,8,24,.52),inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+.settings-overlay .settings-topbar {
+  color: #f3f9ff !important;
+  background: linear-gradient(100deg,rgba(9,48,86,.94),rgba(6,31,62,.94)) !important;
+  border-bottom: 1px solid rgba(91,184,255,.24) !important;
+}
+.settings-overlay .settings-topbar h2,
+.settings-overlay .settings-section-title h1,
+.settings-overlay .settings-mobile-heading h1,
+.settings-overlay .settings-mobile-detail-head h1 {
+  color: #f3f9ff !important;
+}
+.settings-overlay .settings-back,
+.settings-overlay .settings-close-desktop,
+.settings-overlay .settings-mobile-detail-head button {
+  color: #d9edff !important;
+  background: rgba(18,102,170,.18) !important;
+  border: 1px solid rgba(91,184,255,.24) !important;
+  border-radius: 12px !important;
+}
+.settings-overlay .settings-search {
+  background: linear-gradient(110deg,rgba(23,67,108,.76),rgba(11,43,80,.84)) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  border-radius: 15px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06),0 8px 24px rgba(0,8,24,.16) !important;
+}
+.settings-overlay .settings-search input {
+  color: #f1f8ff !important;
+  background: transparent !important;
+}
+.settings-overlay .settings-search input::placeholder { color: #a9c4df !important; }
+.settings-overlay .settings-search > svg { color: #a9d9ff !important; }
+.settings-overlay .settings-layout { background: transparent !important; }
+.settings-overlay .settings-sidebar {
+  background: linear-gradient(180deg,rgba(7,36,68,.68),rgba(4,22,44,.68)) !important;
+  border-right: 1px solid rgba(91,184,255,.20) !important;
+}
+.settings-overlay .settings-sidebar button,
+.settings-overlay .settings-mobile-category {
+  color: #d8eaff !important;
+  background: rgba(10,46,82,.28) !important;
+  border: 1px solid rgba(91,184,255,.12) !important;
+  border-radius: 14px !important;
+  margin: 4px 0 !important;
+  transition: background .18s ease,border-color .18s ease,transform .18s ease !important;
+}
+.settings-overlay .settings-sidebar button:hover,
+.settings-overlay .settings-mobile-category:hover {
+  color: #fff !important;
+  background: rgba(22,110,180,.34) !important;
+  border-color: rgba(91,184,255,.30) !important;
+}
+.settings-overlay .settings-sidebar button.active {
+  color: #fff !important;
+  background: linear-gradient(110deg,rgba(22,140,255,.30),rgba(53,213,255,.12)) !important;
+  border: 1px solid rgba(91,184,255,.42) !important;
+  box-shadow: 0 0 20px rgba(22,140,255,.13),inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+.settings-overlay .settings-sidebar button svg,
+.settings-overlay .settings-mobile-category > svg,
+.settings-overlay .settings-mobile-category-icon {
+  color: #a9d9ff !important;
+}
+.settings-overlay .settings-content,
+.settings-overlay .settings-mobile,
+.settings-overlay .settings-mobile-list,
+.settings-overlay .settings-mobile-detail {
+  color: #eaf5ff !important;
+  background: transparent !important;
+}
+.settings-overlay .settings-section-title p,
+.settings-overlay .settings-mobile-heading p,
+.settings-overlay .settings-mobile-category-copy small {
+  color: #a9c4df !important;
+}
+.settings-overlay .settings-content h1,
+.settings-overlay .settings-content h2,
+.settings-overlay .settings-content h3,
+.settings-overlay .settings-mobile-detail h1,
+.settings-overlay .settings-mobile-detail h2,
+.settings-overlay .settings-mobile-detail h3 {
+  color: #f1f8ff !important;
+}
+.settings-overlay .settings-content input,
+.settings-overlay .settings-content textarea,
+.settings-overlay .settings-content select,
+.settings-overlay .settings-mobile input,
+.settings-overlay .settings-mobile textarea,
+.settings-overlay .settings-mobile select {
+  color: #f1f8ff !important;
+  background: rgba(4,22,43,.78) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  border-radius: 12px !important;
+}
+.settings-overlay .settings-content input::placeholder,
+.settings-overlay .settings-content textarea::placeholder,
+.settings-overlay .settings-mobile input::placeholder {
+  color: #9bbbd8 !important;
+}
+.settings-overlay .settings-content button,
+.settings-overlay .settings-mobile button {
+  color: #eaf5ff;
+}
+.settings-overlay .settings-content button:not(.settings-sidebar button),
+.settings-overlay .settings-mobile button:not(.settings-mobile-detail-head button) {
+  border-color: rgba(91,184,255,.18);
+}
+.settings-overlay .settings-logout,
+.settings-overlay .settings-mobile-logout {
+  color: #ffb3c0 !important;
+  background: rgba(120,32,55,.18) !important;
+  border: 1px solid rgba(255,115,145,.20) !important;
+  border-radius: 13px !important;
+}
+.settings-overlay .settings-mobile-category-icon {
+  background: linear-gradient(145deg,rgba(22,140,255,.25),rgba(53,213,255,.10)) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  border-radius: 12px !important;
+}
+
+/* Settings cards and rows: unified glass surfaces. */
+.settings-overlay .settings-content section,
+.settings-overlay .settings-mobile-detail section,
+.settings-overlay .settings-content .setting-group,
+.settings-overlay .settings-mobile-detail .setting-group,
+.settings-overlay .settings-content .settings-card,
+.settings-overlay .settings-mobile-detail .settings-card,
+.settings-overlay .settings-content .toggle-settings-group {
+  border-color: rgba(91,184,255,.18) !important;
+}
+.settings-overlay .settings-content [class*="setting-row"],
+.settings-overlay .settings-mobile-detail [class*="setting-row"],
+.settings-overlay .settings-content [class*="setting-item"],
+.settings-overlay .settings-mobile-detail [class*="setting-item"] {
+  color: #eaf5ff !important;
+  border-color: rgba(91,184,255,.14) !important;
+}
+.settings-overlay .settings-content [class*="setting-row"] small,
+.settings-overlay .settings-mobile-detail [class*="setting-row"] small,
+.settings-overlay .settings-content [class*="setting-item"] small,
+.settings-overlay .settings-mobile-detail [class*="setting-item"] small {
+  color: #a9c4df !important;
+}
+.settings-overlay .settings-content button:focus-visible,
+.settings-overlay .settings-mobile button:focus-visible {
+  outline: 2px solid #42caff !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================================
+   REEL LIKES + COMMENTS — NEO BLUE GLASS
+   Covers both desktop dialog and mobile bottom-sheet layouts.
+   ============================================================ */
+.reel-comments-backdrop,
+.reel-likes-backdrop {
+  background: rgba(1,9,22,.76) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+.reel-comments-panel,
+.reel-likes-panel {
+  color: #eef8ff !important;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(22,140,255,.20),transparent 48%),
+    linear-gradient(155deg,#0a3158 0%,#072344 56%,#041a33 100%) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  box-shadow: 0 28px 90px rgba(0,8,24,.58),inset 0 1px 0 rgba(255,255,255,.07) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+}
+.reel-comments-header {
+  color: #f3f9ff !important;
+  background: linear-gradient(110deg,rgba(10,54,94,.96),rgba(7,34,68,.96)) !important;
+  border-bottom: 1px solid rgba(91,184,255,.24) !important;
+}
+.reel-comments-header h2 { color: #f3f9ff !important; }
+.reel-comments-header button {
+  color: #eaf7ff !important;
+  background: rgba(22,140,255,.14) !important;
+  border: 1px solid rgba(91,184,255,.22) !important;
+}
+.reel-comments-header button:hover { background: rgba(22,140,255,.28) !important; }
+.reel-comments-count {
+  color: #a9dcff !important;
+  background: rgba(22,140,255,.18) !important;
+  border: 1px solid rgba(91,184,255,.20) !important;
+}
+.reel-comments-list,
+.reel-likes-list {
+  color: #eaf5ff !important;
+  background: linear-gradient(155deg,rgba(7,35,66,.88),rgba(4,22,43,.92)) !important;
+  scrollbar-color: rgba(91,184,255,.46) rgba(4,22,43,.8) !important;
+}
+.reel-comment-row,
+.reel-likes-user {
+  color: #eef8ff !important;
+  background: rgba(10,49,86,.34) !important;
+  border: 1px solid rgba(91,184,255,.13) !important;
+  border-radius: 14px !important;
+  margin: 7px 0 !important;
+}
+.reel-comment-row.is-pinned {
+  background: linear-gradient(110deg,rgba(19,91,145,.48),rgba(8,48,88,.48)) !important;
+  border-color: rgba(67,199,255,.30) !important;
+}
+.reel-comment-content,
+.reel-comment-content p,
+.reel-comment-author-line b,
+.reel-likes-user b {
+  color: #f1f8ff !important;
+}
+.reel-comment-content small,
+.reel-likes-user small {
+  color: #a9c4df !important;
+}
+.reel-comment-inline-actions button,
+.reel-comment-menu-trigger {
+  color: #70d5ff !important;
+  background: transparent !important;
+}
+.reel-comment-options-menu {
+  color: #eef8ff !important;
+  background: linear-gradient(145deg,#0b3a66,#061f3d) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  box-shadow: 0 18px 46px rgba(0,8,24,.48) !important;
+}
+.reel-comment-options-menu button {
+  color: #eaf5ff !important;
+  background: transparent !important;
+}
+.reel-comment-options-menu button:hover {
+  background: rgba(22,140,255,.20) !important;
+}
+.reel-comment-options-menu button.danger { color: #ff9cab !important; }
+.reel-comments-status,
+.reel-comments-error {
+  color: #b8d5ef !important;
+}
+.reel-comments-error { color: #ff9cab !important; }
+.reel-comment-form {
+  background: linear-gradient(110deg,rgba(8,43,78,.98),rgba(5,28,55,.98)) !important;
+  border-top: 1px solid rgba(91,184,255,.24) !important;
+}
+.reel-comment-form input {
+  color: #f1f8ff !important;
+  background: rgba(3,20,40,.76) !important;
+  border: 1px solid rgba(91,184,255,.32) !important;
+}
+.reel-comment-form input::placeholder { color: #9bbbd8 !important; }
+.reel-comment-form button {
+  color: #fff !important;
+  background: linear-gradient(120deg,#168cff,#235ce7) !important;
+  border: 1px solid rgba(110,204,255,.34) !important;
+  box-shadow: 0 5px 16px rgba(22,140,255,.20) !important;
+}
+.reel-comment-form button:disabled { opacity: .45 !important; }
+
+/* Also cover comments opened from the saved-Reel viewer. */
+.saved-reel-comments-backdrop {
+  background: rgba(1,9,22,.76) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+}
+.saved-reel-comments-panel.rg-neon-reel-comments-panel {
+  color: #eef8ff !important;
+  background: linear-gradient(155deg,#0a3158 0%,#072344 56%,#041a33 100%) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  box-shadow: 0 28px 90px rgba(0,8,24,.58),inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+.saved-reel-comments-panel.rg-neon-reel-comments-panel header,
+.saved-reel-comments-panel.rg-neon-reel-comments-panel .saved-reel-comments-list {
+  color: #eef8ff !important;
+  background: rgba(7,35,66,.92) !important;
+  border-color: rgba(91,184,255,.22) !important;
+}
+.saved-reel-comments-panel.rg-neon-reel-comments-panel .saved-reel-comment {
+  color: #eef8ff !important;
+  background: rgba(10,49,86,.34) !important;
+  border: 1px solid rgba(91,184,255,.13) !important;
+  border-radius: 13px !important;
+}
+.saved-reel-comments-panel.rg-neon-reel-comments-panel input {
+  color: #f1f8ff !important;
+  background: rgba(3,20,40,.76) !important;
+  border-color: rgba(91,184,255,.32) !important;
+}
+
+/* Swipe/hold gesture surface: preserve vertical feed scrolling. */
+.reel-feed-media {
+  touch-action: pan-y pinch-zoom !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.reel-feed-media > video { touch-action: pan-y pinch-zoom !important; }
+
+@media (max-width:700px) {
+  .settings-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  .settings-overlay .settings-modal.instagram-settings {
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    background: linear-gradient(155deg,#082747 0%,#061d38 54%,#04152b 100%) !important;
+  }
+  .settings-overlay .settings-mobile {
+    background: transparent !important;
+  }
+  .settings-overlay .settings-mobile-categories {
+    gap: 7px !important;
+  }
+  .settings-overlay .settings-mobile-category {
+    min-height: 68px !important;
+    padding: 10px 12px !important;
+  }
+  .reel-comments-backdrop,
+  .reel-likes-backdrop {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .reel-comments-panel,
+  .reel-likes-panel {
+    width: 100% !important;
+    max-width: none !important;
+    height: min(78dvh,760px) !important;
+    border-radius: 25px 25px 0 0 !important;
+    border-bottom: 0 !important;
+    background: linear-gradient(155deg,#0a3158 0%,#072344 56%,#041a33 100%) !important;
+    padding-bottom: env(safe-area-inset-bottom,0px) !important;
+  }
+  .reel-comments-list,
+  .reel-likes-list {
+    padding-bottom: 16px !important;
+  }
+  .reel-comment-form {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom,0px)) !important;
+  }
+}
+
+
+
+/* ============================================================
+   REELSGO SETTINGS — FIX EVERY INNER OPTION / DETAIL SURFACE
+   Replaces the legacy black (#0d1015/#11151b) panels with one
+   consistent navy-blue glass treatment, including nested pages.
+   ============================================================ */
+.settings-overlay {
+  --rg-settings-top: #0a3158;
+  --rg-settings-mid: #082747;
+  --rg-settings-deep: #061d38;
+  --rg-settings-glass: rgba(10,48,84,.82);
+  --rg-settings-glass-soft: rgba(8,39,72,.62);
+  --rg-settings-line: rgba(91,184,255,.25);
+}
+.settings-overlay .settings-content,
+.settings-overlay .settings-mobile,
+.settings-overlay .settings-mobile-list,
+.settings-overlay .settings-mobile-detail,
+.settings-overlay .settings-layout,
+.settings-overlay .settings-panel,
+.settings-overlay .setting-detail-screen,
+.settings-overlay .rg-detail-heading,
+.settings-overlay .rg-people-results {
+  color: #eff8ff !important;
+  background: transparent !important;
+}
+.settings-overlay .settings-content {
+  background: linear-gradient(155deg,rgba(7,34,65,.52),rgba(4,21,43,.60)) !important;
+}
+.settings-overlay .settings-panel {
+  max-width: 100% !important;
+  padding: 14px !important;
+  border: 1px solid rgba(91,184,255,.18) !important;
+  border-radius: 17px !important;
+  background: linear-gradient(145deg,rgba(10,48,84,.66),rgba(5,27,53,.74)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045),0 10px 28px rgba(0,8,24,.12) !important;
+}
+.settings-overlay .settings-panel .panel-heading,
+.settings-overlay .settings-panel h2,
+.settings-overlay .settings-panel h3 {
+  color: #f2f9ff !important;
+}
+.settings-overlay .setting-row,
+.settings-overlay .settings-mobile-detail .setting-row,
+.settings-overlay .settings-content .setting-row {
+  width: 100% !important;
+  min-height: 66px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 13px !important;
+  padding: 13px 12px !important;
+  margin: 6px 0 !important;
+  color: #edf7ff !important;
+  text-align: left !important;
+  background: linear-gradient(110deg,rgba(12,55,94,.86),rgba(7,35,68,.90)) !important;
+  border: 1px solid rgba(91,184,255,.20) !important;
+  border-radius: 13px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+.settings-overlay .setting-row:hover,
+.settings-overlay .settings-mobile-detail .setting-row:hover {
+  color: #fff !important;
+  background: linear-gradient(110deg,rgba(17,76,125,.94),rgba(9,47,86,.94)) !important;
+  border-color: rgba(91,184,255,.38) !important;
+}
+.settings-overlay .setting-row-icon,
+.settings-overlay .settings-card-highlight > svg,
+.settings-overlay .privacy-toggle-row > svg {
+  color: #a8dcff !important;
+  background: linear-gradient(145deg,rgba(22,140,255,.27),rgba(53,213,255,.12)) !important;
+  border: 1px solid rgba(91,184,255,.22) !important;
+}
+.settings-overlay .setting-row b,
+.settings-overlay .setting-row-text b,
+.settings-overlay .setting-row strong {
+  color: #f1f8ff !important;
+}
+.settings-overlay .setting-row span,
+.settings-overlay .setting-row-text small,
+.settings-overlay .setting-row small,
+.settings-overlay .setting-row p {
+  color: #a9c5df !important;
+}
+.settings-overlay .setting-row > svg,
+.settings-overlay .setting-row > svg:last-child {
+  color: #9bcfff !important;
+}
+.settings-overlay .setting-row em {
+  color: #55d5ff !important;
+}
+.settings-overlay .danger-row .setting-row-icon {
+  color: #ffb3c0 !important;
+  background: rgba(150,43,68,.20) !important;
+  border-color: rgba(255,130,155,.25) !important;
+}
+.settings-overlay .danger-row .setting-row-text b {
+  color: #ffb3c0 !important;
+}
+.settings-overlay .settings-card-highlight {
+  color: #eff8ff !important;
+  background: linear-gradient(110deg,rgba(16,75,122,.70),rgba(8,42,79,.78)) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  border-radius: 15px !important;
+}
+.settings-overlay .settings-card-highlight b { color: #f4faff !important; }
+.settings-overlay .settings-card-highlight p { color: #b2cde5 !important; }
+.settings-overlay .privacy-toggle-row {
+  color: #eff8ff !important;
+  background: linear-gradient(110deg,rgba(10,49,86,.72),rgba(6,30,59,.78)) !important;
+  border: 1px solid rgba(91,184,255,.20) !important;
+  border-radius: 14px !important;
+  padding: 15px !important;
+}
+.settings-overlay .privacy-toggle-row b { color: #f2f9ff !important; }
+.settings-overlay .privacy-toggle-row span:not(.toggle-knob) { color: #abc6df !important; }
+.settings-overlay .setting-detail-screen {
+  min-height: 100% !important;
+  padding: 20px 24px 36px !important;
+  color: #eff8ff !important;
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(22,140,255,.16),transparent 50%),
+    linear-gradient(155deg,rgba(8,39,72,.96),rgba(5,24,48,.98)) !important;
+  border: 1px solid rgba(91,184,255,.20) !important;
+  border-radius: 17px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+.settings-overlay .setting-detail-back {
+  color: #bde5ff !important;
+  background: rgba(22,140,255,.14) !important;
+  border: 1px solid rgba(91,184,255,.24) !important;
+  border-radius: 11px !important;
+  padding: 9px 12px !important;
+}
+.settings-overlay .rg-detail-kicker { color: #5bd4ff !important; }
+.settings-overlay .rg-detail-heading h2 { color: #f3f9ff !important; }
+.settings-overlay .rg-detail-heading p,
+.settings-overlay .rg-detail-footnote { color: #a9c4df !important; }
+.settings-overlay .rg-detail-form,
+.settings-overlay .rg-people-manager {
+  color: #eff8ff !important;
+  background: transparent !important;
+}
+.settings-overlay .rg-detail-form label { color: #dceeff !important; }
+.settings-overlay .rg-detail-form input,
+.settings-overlay .rg-detail-form textarea,
+.settings-overlay .rg-detail-form select,
+.settings-overlay .rg-people-manager input {
+  color: #f2f9ff !important;
+  background: linear-gradient(110deg,rgba(5,27,52,.92),rgba(8,39,72,.92)) !important;
+  border: 1px solid rgba(91,184,255,.32) !important;
+  border-radius: 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035) !important;
+}
+.settings-overlay .rg-detail-form input::placeholder,
+.settings-overlay .rg-detail-form textarea::placeholder,
+.settings-overlay .rg-people-manager input::placeholder { color: #8eacc8 !important; }
+.settings-overlay .rg-detail-form input:focus,
+.settings-overlay .rg-detail-form textarea:focus,
+.settings-overlay .rg-people-manager input:focus {
+  border-color: #40caff !important;
+  box-shadow: 0 0 0 3px rgba(45,177,255,.16) !important;
+  outline: none !important;
+}
+.settings-overlay .rg-detail-control-card {
+  max-width: 100% !important;
+  color: #eff8ff !important;
+  background: linear-gradient(120deg,rgba(13,61,104,.88),rgba(6,32,62,.92)) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 28px rgba(0,8,24,.16),inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+.settings-overlay .rg-detail-control-card b { color: #f3f9ff !important; }
+.settings-overlay .rg-detail-control-card p { color: #b1cbe3 !important; }
+.settings-overlay .rg-detail-control-card small { color: #56d3ff !important; }
+.settings-overlay .rg-detail-control-card.danger {
+  border-color: rgba(255,130,155,.30) !important;
+  background: linear-gradient(120deg,rgba(91,36,60,.38),rgba(6,32,62,.92)) !important;
+}
+.settings-overlay .rg-people-row {
+  color: #eff8ff !important;
+  background: linear-gradient(110deg,rgba(12,55,94,.82),rgba(7,35,68,.88)) !important;
+  border: 1px solid rgba(91,184,255,.18) !important;
+  border-radius: 13px !important;
+  margin: 7px 0 !important;
+}
+.settings-overlay .rg-people-copy b { color: #f2f9ff !important; }
+.settings-overlay .rg-people-copy small { color: #a9c4df !important; }
+.settings-overlay .rg-detail-message,
+.settings-overlay .settings-save-status,
+.settings-overlay .settings-save-error {
+  color: #dceeff !important;
+  background: rgba(10,49,86,.58) !important;
+  border: 1px solid rgba(91,184,255,.20) !important;
+  border-radius: 12px !important;
+}
+.settings-overlay .rg-detail-message.success {
+  color: #b6f2dc !important;
+  background: rgba(12,95,80,.22) !important;
+  border-color: rgba(83,220,177,.28) !important;
+}
+.settings-overlay .rg-detail-message.error,
+.settings-overlay .settings-save-error {
+  color: #ffbdc8 !important;
+  background: rgba(110,31,51,.24) !important;
+  border-color: rgba(255,130,155,.26) !important;
+}
+.settings-overlay .toggle {
+  background: rgba(5,23,44,.90) !important;
+  border: 1px solid rgba(91,184,255,.32) !important;
+}
+.settings-overlay .toggle.on {
+  background: linear-gradient(110deg,#168cff,#21b9ee) !important;
+  border-color: rgba(100,215,255,.60) !important;
+}
+.settings-overlay .settings-content .primary,
+.settings-overlay .settings-mobile .primary,
+.settings-overlay .rg-detail-save {
+  color: #fff !important;
+  background: linear-gradient(115deg,#168cff,#245ce7) !important;
+  border: 1px solid rgba(112,207,255,.38) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(22,140,255,.18) !important;
+}
+.settings-overlay .settings-content .secondary,
+.settings-overlay .settings-mobile .secondary {
+  color: #dff2ff !important;
+  background: rgba(22,140,255,.14) !important;
+  border: 1px solid rgba(91,184,255,.28) !important;
+  border-radius: 11px !important;
+}
+@media (max-width:700px) {
+  .settings-overlay .setting-detail-screen {
+    min-height: calc(100dvh - 150px) !important;
+    padding: 16px 12px 28px !important;
+    border-radius: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+  .settings-overlay .settings-panel {
+    padding: 10px !important;
+    border-radius: 14px !important;
+  }
+  .settings-overlay .setting-row {
+    min-height: 62px !important;
+    padding: 11px 10px !important;
+  }
+  .settings-overlay .rg-detail-control-card {
+    padding: 15px !important;
+    gap: 12px !important;
+  }
+  .settings-overlay .rg-people-row {
+    padding: 10px !important;
+  }
+  .settings-overlay .settings-mobile.section-open {
+    touch-action: pan-y !important;
+  }
+}
+
