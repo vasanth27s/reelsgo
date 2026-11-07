@@ -4490,6 +4490,9 @@ function ReelsPage({ onCreate }) {
   const scrollRef = useRef(null);
   const cardRefs = useRef([]);
   const endCardRef = useRef(null);
+  const reelGestureRef = useRef(null);
+  const reelGestureTimerRef = useRef(null);
+  const reelLongPressHandledRef = useRef(false);
   const me = getUser();
 
   async function load() {
@@ -4504,6 +4507,10 @@ function ReelsPage({ onCreate }) {
   }
 
   useEffect(() => { load(); }, []);
+
+  useEffect(() => () => {
+    if (reelGestureTimerRef.current) window.clearTimeout(reelGestureTimerRef.current);
+  }, []);
 
   // Hydrate Follow buttons from the real following list.
   useEffect(() => {
@@ -4593,6 +4600,87 @@ function ReelsPage({ onCreate }) {
       setFeedEnded(false);
       setActiveIndex(next);
     }
+  }
+
+
+  // Reel navigation:
+  // Quick horizontal swipe navigates immediately.
+  // Long-press anywhere on the video, then slide left/right to navigate.
+  function clearReelGesture() {
+    if (reelGestureTimerRef.current) {
+      window.clearTimeout(reelGestureTimerRef.current);
+      reelGestureTimerRef.current = null;
+    }
+    reelGestureRef.current = null;
+  }
+
+  function handleReelPointerDown(event) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (event.target?.closest?.("button, a, input, textarea, select, [role='button']")) return;
+
+    reelLongPressHandledRef.current = false;
+    reelGestureRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      pointerId: event.pointerId,
+      longPressed: false,
+      navigated: false
+    };
+
+    reelGestureTimerRef.current = window.setTimeout(() => {
+      if (reelGestureRef.current?.pointerId === event.pointerId) {
+        reelGestureRef.current.longPressed = true;
+        reelLongPressHandledRef.current = true;
+        const video = event.currentTarget.querySelector("video");
+        if (video && !video.paused) {
+          video.pause();
+          setPausedReelIds(current => ({ ...current, [String(reels[activeIndex]?._id)]: true }));
+        }
+      }
+      reelGestureTimerRef.current = null;
+    }, 480);
+  }
+
+  function handleReelPointerMove(event) {
+    const gesture = reelGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+
+    // Before the hold threshold, movement cancels long-press and a normal
+    // horizontal swipe is handled on pointer-up.
+    if (!gesture.longPressed && (Math.abs(dx) > 14 || Math.abs(dy) > 14)) {
+      if (reelGestureTimerRef.current) {
+        window.clearTimeout(reelGestureTimerRef.current);
+        reelGestureTimerRef.current = null;
+      }
+      return;
+    }
+
+    // After holding, sliding left/right changes the active Reel.
+    if (gesture.longPressed && !gesture.navigated &&
+        Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+      gesture.navigated = true;
+      goToReel(activeIndex + (dx < 0 ? 1 : -1));
+    }
+  }
+
+  function handleReelPointerUp(event) {
+    const gesture = reelGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      clearReelGesture();
+      return;
+    }
+
+    if (!gesture.longPressed && !gesture.navigated) {
+      const dx = event.clientX - gesture.x;
+      const dy = event.clientY - gesture.y;
+      if (Math.abs(dx) >= 58 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        goToReel(activeIndex + (dx < 0 ? 1 : -1));
+      }
+    }
+    clearReelGesture();
   }
 
   function shareReel(reel) {
@@ -4960,7 +5048,14 @@ function ReelsPage({ onCreate }) {
                   data-index={index}
                   data-reel-id={r._id}
                 >
-                  <div className="reel-feed-media">
+                  <div
+                    className="reel-feed-media"
+                    onPointerDown={handleReelPointerDown}
+                    onPointerMove={handleReelPointerMove}
+                    onPointerUp={handleReelPointerUp}
+                    onPointerCancel={clearReelGesture}
+                    onPointerLeave={clearReelGesture}
+                  >
                     <video
                       src={`${SERVER}${r.mediaUrl}`}
                       muted={soundEnabledById[String(r._id)] === false}
@@ -8131,6 +8226,7 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
   const [privateAccount, setPrivateAccount] = useState(!!user?.isPrivate);
   const [selectedItem, setSelectedItem] = useState("");
   const [mobileSectionOpen, setMobileSectionOpen] = useState(false);
+  const settingsTouchStartRef = useRef(null);
 
   const visible = settingsSections.filter(s =>
     !search ||
@@ -8155,6 +8251,40 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
       return;
     }
     onClose();
+  }
+
+
+  // On mobile, swipe left/right across a settings detail to switch
+  // directly between categories. Swipe right from an individual option
+  // returns to its category without losing the current section.
+  function handleSettingsTouchStart(event) {
+    if (!mobileSectionOpen || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    settingsTouchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }
+
+  function handleSettingsTouchEnd(event) {
+    const start = settingsTouchStartRef.current;
+    settingsTouchStartRef.current = null;
+    if (!start || !mobileSectionOpen || !event.changedTouches?.length) return;
+
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 76 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
+
+    if (selectedItem && dx > 0) {
+      setSelectedItem("");
+      return;
+    }
+
+    const currentIndex = visible.findIndex(entry => entry.id === section);
+    const nextIndex = Math.max(0, Math.min(visible.length - 1, currentIndex + (dx < 0 ? 1 : -1)));
+    if (nextIndex !== currentIndex && visible[nextIndex]) {
+      setSection(visible[nextIndex].id);
+      setSelectedItem("");
+      setMobileSectionOpen(true);
+    }
   }
 
   async function savePrivacy() {
@@ -8330,7 +8460,11 @@ function SettingsModal({ user, setUser, onClose, onLogout, onOpenVerification })
         </div>
 
         {/* Mobile settings category list. Nothing is hidden behind the desktop sidebar. */}
-        <div className={`settings-mobile ${mobileSectionOpen ? "section-open" : "section-list-open"}`}>
+        <div
+          className={`settings-mobile ${mobileSectionOpen ? "section-open" : "section-list-open"}`}
+          onTouchStart={handleSettingsTouchStart}
+          onTouchEnd={handleSettingsTouchEnd}
+        >
           {!mobileSectionOpen ? (
             <div className="settings-mobile-list">
               <div className="settings-mobile-heading">
