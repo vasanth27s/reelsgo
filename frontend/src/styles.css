@@ -20228,3 +20228,36 @@ body:has(#root .rg-account-profile-page) #root .bottom-nav {
   }
 }
 
+
+
+/* App-wide primary navigation: long-press, then slide left/right. */
+.rg-app-swipe-surface {
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rg-app-swipe-surface input,
+.rg-app-swipe-surface textarea,
+.rg-app-swipe-surface select,
+.rg-app-swipe-surface button,
+.rg-app-swipe-surface a,
+.rg-app-swipe-surface [contenteditable="true"] {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+
+
+/* Bottom navigation pill: hold on an icon, then slide across icons to switch pages. */
+.rg-bottom-nav-swipe {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.rg-bottom-nav-swipe .nav-mobile,
+.rg-bottom-nav-swipe .mobile-profile {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
