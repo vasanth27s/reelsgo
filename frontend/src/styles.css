@@ -20261,3 +20261,559 @@ body:has(#root .rg-account-profile-page) #root .bottom-nav {
   user-select: none;
 }
 
+
+
+/* ============================================================
+   PROFESSIONAL DASHBOARD — CONSISTENT NEO BLUE GLASS
+   Override all legacy black panels, rows, forms and detail pages.
+   Scoped to the professional dashboard only.
+   ============================================================ */
+#root .rg-pro-detail-backdrop {
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(0,145,255,.16),transparent 52%),
+    rgba(1,8,20,.78) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+#root .rg-pro-detail-sheet,
+#root .rg-pro-dashboard-sheet {
+  color: #eef8ff !important;
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(0,145,255,.23),transparent 48%),
+    radial-gradient(ellipse at 100% 24%,rgba(42,94,255,.14),transparent 45%),
+    linear-gradient(155deg,#0a3158 0%,#082747 48%,#061d38 100%) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 28px 90px rgba(0,8,24,.56),inset 0 1px 0 rgba(255,255,255,.07) !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(26px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(165%) !important;
+}
+#root .rg-pro-sheet-header {
+  min-height: 58px !important;
+  padding: 7px 16px !important;
+  background: linear-gradient(105deg,rgba(15,67,111,.92),rgba(7,37,72,.94)) !important;
+  border-bottom: 1px solid rgba(91,184,255,.28) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055) !important;
+}
+#root .rg-pro-sheet-header h2 {
+  color: #f4faff !important;
+  font-size: 16px !important;
+  font-weight: 750 !important;
+  text-align: center !important;
+}
+#root .rg-pro-sheet-back,
+#root .rg-pro-sheet-settings {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  width: auto !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  padding: 0 10px !important;
+  color: #f0f9ff !important;
+  background: linear-gradient(135deg,rgba(29,135,224,.32),rgba(22,76,145,.34)) !important;
+  border: 1px solid rgba(112,202,255,.42) !important;
+  border-radius: 13px !important;
+  box-shadow: 0 5px 18px rgba(0,10,28,.18),inset 0 1px 0 rgba(255,255,255,.10) !important;
+  cursor: pointer !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+#root .rg-pro-sheet-back svg { flex:none !important; color:#e8f7ff !important; }
+#root .rg-pro-back-label { font-size:12px !important; font-weight:650 !important; }
+#root .rg-pro-sheet-back:hover,
+#root .rg-pro-sheet-settings:hover {
+  background: linear-gradient(135deg,rgba(34,157,255,.48),rgba(36,99,196,.46)) !important;
+  border-color: rgba(133,215,255,.62) !important;
+}
+#root .rg-pro-sheet-right-spacer { width:40px !important; height:40px !important; }
+#root .rg-pro-dashboard-scroll {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  background: transparent !important;
+  scrollbar-color: rgba(91,184,255,.48) rgba(4,21,43,.35) !important;
+}
+#root .rg-pro-dashboard-group {
+  margin: 12px 14px !important;
+  padding: 10px 0 12px !important;
+  color: #eef8ff !important;
+  background: linear-gradient(135deg,rgba(16,70,116,.72),rgba(7,36,69,.76)) !important;
+  border: 1px solid rgba(91,184,255,.24) !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.055),0 10px 26px rgba(0,8,24,.16) !important;
+}
+#root .rg-pro-dashboard-group h3 {
+  margin: 8px 16px 10px !important;
+  color: #f2f9ff !important;
+  font-size: 14px !important;
+}
+#root .rg-pro-dashboard-group h3 small { color:#a9c9e6 !important; }
+#root .rg-pro-dashboard-group h3 button { color:#56d3ff !important; }
+#root .rg-pro-dashboard-row {
+  min-height: 48px !important;
+  padding: 11px 16px !important;
+  color: #eaf6ff !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(115,192,255,.12) !important;
+}
+#root .rg-pro-dashboard-row:last-child { border-bottom:0 !important; }
+#root .rg-pro-dashboard-row:hover,
+#root .rg-pro-dashboard-row:active {
+  color: #fff !important;
+  background: linear-gradient(100deg,rgba(28,139,225,.24),rgba(29,91,175,.18)) !important;
+}
+#root .rg-pro-dashboard-row b,
+#root .rg-pro-row-text b { color:#f3f9ff !important; }
+#root .rg-pro-row-text small { color:#b0cbe4 !important; }
+#root .rg-pro-row-icon,
+#root .rg-pro-dashboard-row > svg:last-child { color:#78d2ff !important; }
+#root .rg-pro-dashboard-row em {
+  color:#fff !important;
+  background:linear-gradient(110deg,#168cf4,#315be8) !important;
+  border:1px solid rgba(126,212,255,.34) !important;
+}
+#root .rg-pro-switch-personal {
+  margin: 8px 14px !important;
+  width: calc(100% - 28px) !important;
+  color:#79d6ff !important;
+  background:rgba(15,76,125,.35) !important;
+  border:1px solid rgba(91,184,255,.22) !important;
+  border-radius:13px !important;
+}
+#root .rg-pro-dashboard-disclaimer { color:#a8c4df !important; }
+
+/* Every dashboard detail panel and its contents */
+#root .rg-pro-dashboard-sheet > :not(.rg-pro-sheet-header),
+#root .rg-pro-dashboard-sheet .rg-pro-panel-intro,
+#root .rg-pro-dashboard-sheet .rg-pro-data-section,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form,
+#root .rg-pro-dashboard-sheet .rg-pro-resource-list,
+#root .rg-pro-dashboard-sheet .rg-pro-integration-status,
+#root .rg-pro-dashboard-sheet .rg-pro-detail-stats {
+  color:#eaf6ff !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-panel-intro {
+  margin: 16px 18px !important;
+  color:#b5cde4 !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-data-section {
+  margin: 12px 14px !important;
+  padding: 14px !important;
+  background:linear-gradient(135deg,rgba(13,58,98,.78),rgba(6,31,60,.82)) !important;
+  border:1px solid rgba(91,184,255,.22) !important;
+  border-radius:15px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-data-section h3 {
+  color:#f3f9ff !important;
+  border-color:rgba(91,184,255,.18) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-metric,
+#root .rg-pro-dashboard-sheet .rg-pro-detail-stats > div {
+  color:#f2f9ff !important;
+  background:linear-gradient(145deg,rgba(20,82,132,.78),rgba(7,38,72,.86)) !important;
+  border:1px solid rgba(91,184,255,.24) !important;
+  border-radius:13px !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-metric b { color:#fff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-metric small { color:#b2cee7 !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-daily-list > div,
+#root .rg-pro-dashboard-sheet .rg-pro-content-performance article,
+#root .rg-pro-dashboard-sheet .rg-pro-saved-replies article,
+#root .rg-pro-dashboard-sheet .rg-pro-idea-list article,
+#root .rg-pro-dashboard-sheet .rg-pro-resource-list article,
+#root .rg-pro-dashboard-sheet .rg-pro-status-row,
+#root .rg-pro-dashboard-sheet .rg-pro-recap-lines {
+  color:#eaf6ff !important;
+  background:rgba(9,47,83,.62) !important;
+  border:1px solid rgba(91,184,255,.16) !important;
+  border-radius:12px !important;
+  padding:11px !important;
+  margin:7px 0 !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-daily-list span,
+#root .rg-pro-dashboard-sheet .rg-pro-content-performance span,
+#root .rg-pro-dashboard-sheet .rg-pro-content-performance small,
+#root .rg-pro-dashboard-sheet .rg-pro-saved-replies p,
+#root .rg-pro-dashboard-sheet .rg-pro-idea-list p,
+#root .rg-pro-dashboard-sheet .rg-pro-resource-list p,
+#root .rg-pro-dashboard-sheet .rg-pro-empty-state {
+  color:#b2cce4 !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form {
+  padding:16px !important;
+  background:transparent !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form label,
+#root .rg-pro-dashboard-sheet .rg-pro-field,
+#root .rg-pro-dashboard-sheet .rg-pro-toggle {
+  color:#eaf6ff !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form input:not([type=checkbox]),
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form textarea,
+#root .rg-pro-dashboard-sheet .rg-pro-field input,
+#root .rg-pro-dashboard-sheet .rg-pro-field textarea,
+#root .rg-pro-dashboard-sheet .rg-pro-field select {
+  width:100% !important;
+  box-sizing:border-box !important;
+  color:#f2f9ff !important;
+  background:linear-gradient(120deg,rgba(4,25,49,.96),rgba(8,42,76,.96)) !important;
+  border:1px solid rgba(91,184,255,.34) !important;
+  border-radius:12px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-field input::placeholder,
+#root .rg-pro-dashboard-sheet .rg-pro-field textarea::placeholder,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form input::placeholder,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form textarea::placeholder {
+  color:#91b1cf !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-integration-status {
+  margin:12px 0 !important;
+  padding:14px !important;
+  background:linear-gradient(130deg,rgba(15,66,109,.76),rgba(6,31,60,.82)) !important;
+  border:1px solid rgba(91,184,255,.24) !important;
+  border-radius:14px !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-integration-status small { color:#aec9e2 !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-detail-primary {
+  color:#fff !important;
+  background:linear-gradient(110deg,#168cf4,#315be8) !important;
+  border:1px solid rgba(126,212,255,.38) !important;
+  border-radius:13px !important;
+  box-shadow:0 8px 22px rgba(22,140,255,.22) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-detail-note {
+  color:#c9eaff !important;
+  background:rgba(13,62,103,.74) !important;
+  border:1px solid rgba(91,184,255,.24) !important;
+  border-radius:12px !important;
+}
+@media(max-width:600px) {
+  #root .rg-pro-dashboard-sheet,
+  #root .rg-pro-detail-sheet {
+    width:100% !important;
+    height:100dvh !important;
+    max-height:100dvh !important;
+    padding-top:calc(8px + env(safe-area-inset-top)) !important;
+    border-radius:0 !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    background:
+      radial-gradient(ellipse at 8% 0%,rgba(0,145,255,.23),transparent 48%),
+      linear-gradient(155deg,#0a3158 0%,#082747 48%,#061d38 100%) !important;
+  }
+  #root .rg-pro-sheet-header { min-height:56px !important; padding:4px 12px 9px !important; }
+  #root .rg-pro-sheet-back { min-width:42px !important; height:40px !important; }
+  #root .rg-pro-back-label { display:inline !important; }
+  #root .rg-pro-dashboard-group { margin:10px 10px !important; }
+  #root .rg-pro-dashboard-sheet .rg-pro-data-section { margin:10px !important; }
+}
+
+
+
+/* ============================================================
+   FINAL PROFESSIONAL DASHBOARD FIX
+   Blue glass entry card, blue glass inner pages, visible back arrow.
+   ============================================================ */
+
+/* Profile dashboard entry card */
+#root .rg-pro-dashboard-entry {
+  width:100% !important;
+  margin:0 0 14px !important;
+  padding:0 4px !important;
+}
+#root .rg-pro-dashboard-entry-button,
+#root .rg-pro-dashboard-entry-button:hover,
+#root .rg-pro-dashboard-entry-button:focus-visible,
+#root .rg-pro-dashboard-entry-button:active {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  width:100% !important;
+  min-height:58px !important;
+  height:auto !important;
+  padding:11px 15px !important;
+  color:#f1f8ff !important;
+  text-align:left !important;
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(31,151,255,.22),transparent 62%),
+    linear-gradient(110deg,rgba(12,57,99,.96),rgba(6,31,61,.98)) !important;
+  border:1px solid rgba(91,184,255,.34) !important;
+  border-radius:14px !important;
+  box-shadow:0 8px 24px rgba(0,12,32,.18),inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+#root .rg-pro-entry-copy { display:flex !important; flex:1 !important; flex-direction:column !important; gap:4px !important; }
+#root .rg-pro-entry-copy b { color:#f4faff !important; font-size:14px !important; font-weight:750 !important; }
+#root .rg-pro-entry-copy small { display:block !important; color:#b5d0e9 !important; font-size:11px !important; }
+#root .rg-pro-dashboard-entry-button > svg { color:#72d2ff !important; }
+
+/* Full-screen overlay above app header and bottom navigation */
+#root .rg-pro-detail-backdrop {
+  position:fixed !important;
+  inset:0 !important;
+  z-index:20000 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100vw !important;
+  height:100dvh !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  background:rgba(1,10,25,.78) !important;
+  backdrop-filter:blur(18px) saturate(155%) !important;
+  -webkit-backdrop-filter:blur(18px) saturate(155%) !important;
+}
+
+/* Desktop sheet */
+#root .rg-pro-detail-backdrop > .rg-pro-dashboard-sheet {
+  position:relative !important;
+  inset:auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  width:min(900px,calc(100vw - 48px)) !important;
+  height:min(88dvh,920px) !important;
+  max-width:900px !important;
+  max-height:920px !important;
+  min-height:420px !important;
+  margin:auto !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  color:#eff8ff !important;
+  background:
+    radial-gradient(ellipse at 8% 0%,rgba(0,145,255,.24),transparent 48%),
+    radial-gradient(ellipse at 100% 20%,rgba(42,94,255,.16),transparent 44%),
+    linear-gradient(155deg,#0a3158 0%,#082747 48%,#061d38 100%) !important;
+  border:1px solid rgba(91,184,255,.38) !important;
+  border-radius:22px !important;
+  box-shadow:0 30px 100px rgba(0,8,24,.64),0 0 42px rgba(0,132,255,.16),inset 0 1px 0 rgba(255,255,255,.08) !important;
+  backdrop-filter:blur(28px) saturate(165%) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(165%) !important;
+}
+
+/* Sticky header and clearly visible back arrow */
+#root .rg-pro-dashboard-sheet > .rg-pro-sheet-header {
+  position:relative !important;
+  z-index:5 !important;
+  display:grid !important;
+  grid-template-columns:76px minmax(0,1fr) 44px !important;
+  align-items:center !important;
+  flex:0 0 62px !important;
+  width:100% !important;
+  min-height:62px !important;
+  height:62px !important;
+  margin:0 !important;
+  padding:8px 16px !important;
+  background:linear-gradient(105deg,rgba(15,67,111,.98),rgba(7,37,72,.98)) !important;
+  border:0 !important;
+  border-bottom:1px solid rgba(91,184,255,.30) !important;
+  box-shadow:0 8px 24px rgba(0,8,24,.16),inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+#root .rg-pro-dashboard-sheet > .rg-pro-sheet-header h2 {
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  color:#f4faff !important;
+  text-align:center !important;
+  font-size:16px !important;
+  font-weight:800 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-sheet-back {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:5px !important;
+  width:auto !important;
+  min-width:68px !important;
+  height:42px !important;
+  padding:0 10px !important;
+  color:#f0f9ff !important;
+  background:linear-gradient(135deg,rgba(29,135,224,.36),rgba(22,76,145,.34)) !important;
+  border:1px solid rgba(112,202,255,.48) !important;
+  border-radius:12px !important;
+  box-shadow:0 5px 16px rgba(0,10,28,.18),inset 0 1px 0 rgba(255,255,255,.10) !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  cursor:pointer !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-sheet-back svg { display:block !important; width:21px !important; height:21px !important; color:#eaf7ff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-back-label { display:inline !important; color:#eaf7ff !important; font-size:12px !important; font-weight:750 !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-sheet-settings {
+  display:grid !important;
+  place-items:center !important;
+  width:40px !important;
+  height:40px !important;
+  color:#eaf7ff !important;
+  background:rgba(53,151,255,.17) !important;
+  border:1px solid rgba(115,196,255,.34) !important;
+  border-radius:12px !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-sheet-right-spacer { display:block !important; width:40px !important; height:40px !important; }
+
+/* Scroll body only; keep header always visible */
+#root .rg-pro-dashboard-sheet > .rg-pro-dashboard-scroll,
+#root .rg-pro-dashboard-sheet > .rg-pro-detail-content {
+  display:block !important;
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  width:100% !important;
+  padding:12px 12px 24px !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+  color:#eff8ff !important;
+  background:linear-gradient(155deg,rgba(7,34,65,.28),rgba(4,21,43,.34)) !important;
+  scrollbar-color:rgba(91,184,255,.48) rgba(4,21,43,.28) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-group {
+  margin:10px 4px 14px !important;
+  padding:12px 0 !important;
+  color:#eff8ff !important;
+  background:linear-gradient(135deg,rgba(16,70,116,.72),rgba(7,36,69,.78)) !important;
+  border:1px solid rgba(91,184,255,.24) !important;
+  border-radius:16px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 10px 26px rgba(0,8,24,.16) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-group h3 { color:#f2f9ff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-group h3 small { color:#b1cde7 !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-group h3 button { color:#58d3ff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-row {
+  min-height:52px !important;
+  color:#eaf6ff !important;
+  background:transparent !important;
+  border-bottom:1px solid rgba(115,192,255,.14) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-row:hover { background:rgba(22,140,255,.17) !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-row-text b { color:#f3f9ff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-row-text small { color:#b3cce4 !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-row-icon,
+#root .rg-pro-dashboard-sheet .rg-pro-dashboard-row > svg { color:#79d5ff !important; }
+
+/* Inner professional tool pages, including Content ideas */
+#root .rg-pro-dashboard-sheet .rg-pro-panel-intro,
+#root .rg-pro-dashboard-sheet .rg-pro-detail-content > p {
+  margin:10px 8px 16px !important;
+  color:#bfd8ef !important;
+  line-height:1.65 !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-data-section,
+#root .rg-pro-dashboard-sheet .rg-pro-idea-list article,
+#root .rg-pro-dashboard-sheet .rg-pro-content-performance article,
+#root .rg-pro-dashboard-sheet .rg-pro-saved-replies article,
+#root .rg-pro-dashboard-sheet .rg-pro-resource-list article,
+#root .rg-pro-dashboard-sheet .rg-pro-status-row {
+  color:#edf7ff !important;
+  background:linear-gradient(130deg,rgba(13,61,104,.82),rgba(6,32,62,.88)) !important;
+  border:1px solid rgba(91,184,255,.24) !important;
+  border-radius:14px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-idea-list article p,
+#root .rg-pro-dashboard-sheet .rg-pro-data-section p,
+#root .rg-pro-dashboard-sheet .rg-pro-data-section small,
+#root .rg-pro-dashboard-sheet .rg-pro-resource-list p { color:#c0d8ef !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-idea-list article span { color:#7bd5ff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form form { color:#edf7ff !important; background:transparent !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form label { color:#dceeff !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form input:not([type=checkbox]),
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form textarea,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form select {
+  color:#f2f9ff !important;
+  background:rgba(4,25,49,.92) !important;
+  border:1px solid rgba(91,184,255,.34) !important;
+  border-radius:12px !important;
+}
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form input::placeholder,
+#root .rg-pro-dashboard-sheet .rg-pro-tool-form textarea::placeholder { color:#91b1cf !important; }
+#root .rg-pro-dashboard-sheet .rg-pro-detail-primary {
+  color:#fff !important;
+  background:linear-gradient(110deg,#168cf4,#315be8) !important;
+  border:1px solid rgba(126,212,255,.38) !important;
+  border-radius:13px !important;
+}
+
+/* Mobile full-screen dashboard */
+@media(max-width:700px) {
+  #root .rg-pro-detail-backdrop {
+    align-items:stretch !important;
+    justify-content:stretch !important;
+    background:linear-gradient(155deg,#0a3158 0%,#082747 48%,#061d38 100%) !important;
+  }
+  #root .rg-pro-detail-backdrop > .rg-pro-dashboard-sheet {
+    width:100vw !important;
+    height:100dvh !important;
+    min-height:100dvh !important;
+    max-height:100dvh !important;
+    margin:0 !important;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom) !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:
+      radial-gradient(ellipse at 8% 0%,rgba(0,145,255,.24),transparent 48%),
+      linear-gradient(155deg,#0a3158 0%,#082747 48%,#061d38 100%) !important;
+  }
+  #root .rg-pro-dashboard-sheet > .rg-pro-sheet-header {
+    flex-basis:60px !important;
+    min-height:60px !important;
+    height:60px !important;
+    padding:6px 12px !important;
+  }
+  #root .rg-pro-dashboard-sheet > .rg-pro-dashboard-scroll,
+  #root .rg-pro-dashboard-sheet > .rg-pro-detail-content {
+    padding:10px 10px calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+
+
+/* Profile QR actions: four equal actions, with Scan after Download. */
+.rg-profile-qr-actions {
+  width: min(100%, 420px) !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+}
+.rg-profile-qr-actions button {
+  min-width: 0 !important;
+  min-height: 68px !important;
+  padding: 8px 4px !important;
+  border: 1px solid rgba(91,184,255,.22) !important;
+  border-radius: 13px !important;
+  background: linear-gradient(145deg,#ffffff,#eaf5ff) !important;
+  color: #10243a !important;
+}
+.rg-profile-qr-actions button svg {
+  width: 21px !important;
+  height: 21px !important;
+}
+.rg-profile-qr-actions button span {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+@media (max-width: 700px) {
+  .rg-profile-qr-actions {
+    width: min(100%, 420px) !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+  .rg-profile-qr-actions button {
+    min-height: 64px !important;
+    padding: 7px 2px !important;
+  }
+  .rg-profile-qr-actions button span {
+    font-size: clamp(9px, 2.5vw, 11px) !important;
+  }
+}
+
