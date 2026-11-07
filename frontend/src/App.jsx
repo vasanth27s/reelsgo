@@ -563,6 +563,11 @@ function App() {
   const [openConversationData, setOpenConversationData] = useState(null);
   const [verificationOpen, setVerificationOpen] = useState(false);
   const [verificationAlert, setVerificationAlert] = useState(false);
+  const appSwipeGestureRef = useRef(null);
+  const appSwipeLongPressTimerRef = useRef(null);
+  const bottomNavRef = useRef(null);
+  const bottomNavGestureRef = useRef(null);
+  const bottomNavLongPressTimerRef = useRef(null);
 
   useEffect(() => {
     const syncRoute = () => {
@@ -758,6 +763,172 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+
+  // App-wide long-press + horizontal slide navigation:
+  // Home <-> Reels <-> Messages <-> Search <-> Profile.
+  // Hold for 450ms, then slide left/right to change section.
+  const primarySwipePages = ["home", "reels", "messages", "search", "profile"];
+
+  function clearAppSwipeGesture() {
+    if (appSwipeLongPressTimerRef.current) {
+      window.clearTimeout(appSwipeLongPressTimerRef.current);
+      appSwipeLongPressTimerRef.current = null;
+    }
+    appSwipeGestureRef.current = null;
+  }
+
+  function handleAppSwipePointerDown(event) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (!token || settingsOpen || menuOpen || createOpen || storyOpen || reelOpen ||
+        verificationOpen || showSplash) return;
+
+    const target = event.target;
+    if (target?.closest?.(
+      'button, a, input, textarea, select, [role="button"], [contenteditable="true"], .overlay, .modal, .settings-overlay, .reel-comments-backdrop, .reel-likes-backdrop'
+    )) return;
+
+    // Only enable the gesture on the five primary navigation destinations.
+    const currentPage = primarySwipePages.includes(page) ? page : null;
+    if (!currentPage) return;
+
+    appSwipeGestureRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      pointerId: event.pointerId,
+      longPressed: false,
+      navigated: false
+    };
+
+    appSwipeLongPressTimerRef.current = window.setTimeout(() => {
+      const gesture = appSwipeGestureRef.current;
+      if (gesture && gesture.pointerId === event.pointerId) {
+        gesture.longPressed = true;
+      }
+      appSwipeLongPressTimerRef.current = null;
+    }, 450);
+  }
+
+  function handleAppSwipePointerMove(event) {
+    const gesture = appSwipeGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+
+    if (!gesture.longPressed) {
+      // Movement before the hold completes cancels the gesture.
+      if (Math.abs(dx) > 12 || Math.abs(dy) > 12) {
+        if (appSwipeLongPressTimerRef.current) {
+          window.clearTimeout(appSwipeLongPressTimerRef.current);
+          appSwipeLongPressTimerRef.current = null;
+        }
+      }
+      return;
+    }
+
+    if (gesture.navigated || Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
+
+    const currentIndex = primarySwipePages.indexOf(page);
+    if (currentIndex < 0) return;
+
+    const nextIndex = Math.max(
+      0,
+      Math.min(primarySwipePages.length - 1, currentIndex + (dx < 0 ? 1 : -1))
+    );
+
+    if (nextIndex === currentIndex) return;
+
+    gesture.navigated = true;
+    const nextPage = primarySwipePages[nextIndex];
+    if (nextPage === "profile") {
+      openOwnProfile();
+    } else {
+      navigate(nextPage);
+    }
+  }
+
+  function handleAppSwipePointerUp(event) {
+    const gesture = appSwipeGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      clearAppSwipeGesture();
+      return;
+    }
+    clearAppSwipeGesture();
+  }
+
+
+  // Bottom navigation bar gesture:
+  // Press and hold on the navigation pill, then slide across its icons.
+  // The page changes as the finger enters each navigation item.
+  const bottomNavPages = ["home", "reels", "messages", "search", "profile"];
+
+  function clearBottomNavGesture() {
+    if (bottomNavLongPressTimerRef.current) {
+      window.clearTimeout(bottomNavLongPressTimerRef.current);
+      bottomNavLongPressTimerRef.current = null;
+    }
+    bottomNavGestureRef.current = null;
+  }
+
+  function navigateFromBottomNav(pageName) {
+    if (!pageName) return;
+    if (pageName === "profile") {
+      openOwnProfile();
+    } else {
+      navigate(pageName);
+    }
+  }
+
+  function handleBottomNavPointerDown(event) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    const nav = bottomNavRef.current;
+    if (!nav) return;
+
+    const item = event.target?.closest?.("[data-nav-page]");
+    if (!item || !nav.contains(item)) return;
+
+    bottomNavGestureRef.current = {
+      pointerId: event.pointerId,
+      longPressed: false,
+      lastPage: item.dataset.navPage
+    };
+
+    bottomNavLongPressTimerRef.current = window.setTimeout(() => {
+      const gesture = bottomNavGestureRef.current;
+      if (gesture && gesture.pointerId === event.pointerId) {
+        gesture.longPressed = true;
+      }
+      bottomNavLongPressTimerRef.current = null;
+    }, 380);
+  }
+
+  function handleBottomNavPointerMove(event) {
+    const gesture = bottomNavGestureRef.current;
+    const nav = bottomNavRef.current;
+    if (!gesture || !nav || gesture.pointerId !== event.pointerId || !gesture.longPressed) return;
+
+    // elementFromPoint tracks the icon underneath the finger even when the
+    // pointer began on a different navigation button.
+    const element = document.elementFromPoint(event.clientX, event.clientY);
+    const item = element?.closest?.("[data-nav-page]");
+    if (!item || !nav.contains(item)) return;
+
+    const nextPage = item.dataset.navPage;
+    if (!bottomNavPages.includes(nextPage) || nextPage === gesture.lastPage) return;
+
+    gesture.lastPage = nextPage;
+    navigateFromBottomNav(nextPage);
+  }
+
+  function handleBottomNavPointerUp(event) {
+    const gesture = bottomNavGestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) {
+      clearBottomNavGesture();
+      return;
+    }
+    clearBottomNavGesture();
+  }
+
   // Shared post/Reel links should open directly in a browser, even when the visitor
   // is not logged in. Other sections still require authentication as before.
   if (!token && sharedPostId) {
@@ -833,7 +1004,14 @@ function App() {
         </div>
       )}
 
-      <main className={`main ${page === "user-profile" ? "main-public-profile" : ""}`}>
+      <main
+        className={`main ${page === "user-profile" ? "main-public-profile" : ""} rg-app-swipe-surface`}
+        onPointerDown={handleAppSwipePointerDown}
+        onPointerMove={handleAppSwipePointerMove}
+        onPointerUp={handleAppSwipePointerUp}
+        onPointerCancel={clearAppSwipeGesture}
+        onPointerLeave={clearAppSwipeGesture}
+      >
         {page === "home" && <HomePage user={user} refreshKey={feedRefresh} onCreate={() => setCreateOpen(true)} onStory={() => setStoryOpen(true)} />}
         {page === "shared-post" && <SharedPostPage postId={sharedPostId} user={user} onBack={() => navigate("home")} />}
         {page === "shared-reel" && <SharedReelPage reelId={sharedReelId} onBack={() => navigate("home")} />}
@@ -865,12 +1043,24 @@ function App() {
         {page === "profile" && <ProfilePage user={user} setUser={setUser} />}
       </main>
 
-      <nav className="bottom-nav glass-bottom-nav">
+      <nav
+        ref={bottomNavRef}
+        className="bottom-nav glass-bottom-nav rg-bottom-nav-swipe"
+        onPointerDown={handleBottomNavPointerDown}
+        onPointerMove={handleBottomNavPointerMove}
+        onPointerUp={handleBottomNavPointerUp}
+        onPointerCancel={clearBottomNavGesture}
+        onPointerLeave={(event) => {
+          // Keep tracking while the pointer is held; pointer-up/cancel clears it.
+          if (event.pointerType === "mouse") clearBottomNavGesture();
+        }}
+        aria-label="Primary navigation"
+      >
         <NavMobile icon={<Home />} label="Home" active={page === "home"} onClick={() => navigate("home")} />
         <NavMobile icon={<Film />} label="Reels" active={page === "reels"} onClick={() => navigate("reels")} />
         <NavMobile icon={<ChatBubblesIcon size={29} />} label="Messages" active={page === "messages"} onClick={() => navigate("messages")} />
         <NavMobile icon={<Search />} label="Search" active={page === "search"} onClick={() => navigate("search")} />
-        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} onClick={(event) => openOwnProfile(event)} aria-label="Profile">
+        <button className={`mobile-profile ${page === "profile" ? "active" : ""}`} data-nav-page="profile" onClick={(event) => openOwnProfile(event)} aria-label="Profile">
           <Avatar user={user} size={34} />
           <span>Profile</span>
         </button>
@@ -930,7 +1120,14 @@ function Nav({ icon, label, active, onClick }) {
 }
 
 function NavMobile({ icon, label, active, onClick }) {
-  return <button className={`nav-mobile ${active ? "active" : ""}`} onClick={onClick}>{icon}<span>{label}</span></button>;
+  const pageName = label.toLowerCase();
+  return <button
+    type="button"
+    className={`nav-mobile ${active ? "active" : ""}`}
+    data-nav-page={pageName}
+    onClick={onClick}
+    aria-label={label}
+  >{icon}<span>{label}</span></button>;
 }
 
 function SplashScreen({ onBegin }) {
@@ -5050,11 +5247,6 @@ function ReelsPage({ onCreate }) {
                 >
                   <div
                     className="reel-feed-media"
-                    onPointerDown={handleReelPointerDown}
-                    onPointerMove={handleReelPointerMove}
-                    onPointerUp={handleReelPointerUp}
-                    onPointerCancel={clearReelGesture}
-                    onPointerLeave={clearReelGesture}
                   >
                     <video
                       src={`${SERVER}${r.mediaUrl}`}
