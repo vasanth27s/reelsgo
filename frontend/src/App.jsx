@@ -3645,7 +3645,7 @@ function ProfileQRCodeModal({ user, onClose }) {
 
   return (
     <div className="rg-profile-qr-overlay" role="dialog" aria-modal="true" aria-label={scannerOpen ? "Scan profile QR code" : "Share profile QR code"} onMouseDown={e => { if (e.target === e.currentTarget) scannerOpen ? setScannerOpen(false) : onClose(); }}>
-      <section className="rg-profile-qr-screen" style={{ background: scannerOpen ? "linear-gradient(145deg,#10172b,#202c55)" : palette.bg, "--rg-qr-accent": palette.accent }}>
+      <section className="rg-profile-qr-screen" style={{ background: scannerOpen ? "radial-gradient(ellipse at 12% 0%,rgba(35,145,255,.24),transparent 48%),linear-gradient(155deg,#0a3158 0%,#082747 52%,#061d38 100%)" : palette.bg, "--rg-qr-accent": palette.accent }}>
         <header className="rg-profile-qr-topbar">
           <button type="button" className="rg-qr-round-button" aria-label="Close" onClick={() => scannerOpen ? setScannerOpen(false) : onClose()}><X /></button>
           {!scannerOpen ? <button type="button" className="rg-qr-colour-button" onClick={() => setColorIndex(i => (i + 1) % palettes.length)}><Palette size={14}/> {palette.name} · CHANGE</button> : <span className="rg-qr-scanner-label">LIVE SCANNER</span>}
@@ -3655,6 +3655,15 @@ function ProfileQRCodeModal({ user, onClose }) {
           <div className="rg-qr-scanner-content">
             <h2>Scan a profile QR code</h2>
             <p>Center any QR code in the frame. Compatible camera scanning uses native detection or the fallback decoder.</p>
+            <button
+              type="button"
+              className="rg-qr-scanner-cancel"
+              onClick={onClose}
+              aria-label="Cancel scanning and close QR screen"
+            >
+              <X size={17} />
+              Cancel
+            </button>
             <div className="rg-qr-camera-frame"><video ref={videoRef} muted playsInline autoPlay /><canvas ref={canvasRef} className="rg-qr-hidden-canvas" aria-hidden="true"/><span className="rg-qr-scan-corner top-left"/><span className="rg-qr-scan-corner top-right"/><span className="rg-qr-scan-corner bottom-left"/><span className="rg-qr-scan-corner bottom-right"/></div>
             {cameraError && <p className="rg-qr-camera-error" role="status">{cameraError}</p>}
             <div className="rg-qr-scanner-alternatives"><button type="button" onClick={() => fileInputRef.current?.click()} disabled={scanBusy}><ImageIcon size={17}/>{scanBusy ? "Reading image…" : "Scan image"}</button><input ref={fileInputRef} className="rg-qr-file-input" type="file" accept="image/*" onChange={e => { const file = e.target.files?.[0]; if (file) scanImageFile(file); e.target.value = ""; }}/></div>
@@ -3672,11 +3681,6 @@ function ProfileQRCodeModal({ user, onClose }) {
               <button type="button" onClick={shareProfile}><Share2/><span>Share profile</span></button>
               <button type="button" onClick={copyProfileLink}><LinkIcon/><span>Copy link</span></button>
               <button type="button" onClick={downloadQr}><Download/><span>Download</span></button>
-              <button
-                type="button"
-                onClick={() => { setCameraError(""); setScannerOpen(true); }}
-                aria-label="Scan QR code"
-              ><ScanLine/><span>Scan</span></button>
             </div>
             <div className="rg-profile-qr-pagination"><span className="rg-qr-arrow">↑</span><span>PROFILE QR</span><p>Change the colours and share your profile anywhere.</p></div>
             <div className="rg-qr-palette-dots" aria-label="Choose QR design">{palettes.map((p, i) => <button key={p.name} type="button" title={p.name} aria-label={`${p.name} colour theme`} className={i === colorIndex ? "active" : ""} style={{ background: p.accent }} onClick={() => setColorIndex(i)} />)}</div>
