@@ -18704,3 +18704,905 @@ body #root .messages-page.is-mobile-chat .instagram-chat-head .chat-back-button 
     min-width:29px !important;
   }
 }
+
+
+/* =========================================================
+   REELSGO NEO BLUE GLASS FINISH
+   Dashboard + profile + message composer
+   Appended intentionally so these rules override legacy themes.
+   ========================================================= */
+:root {
+  --rg-neo-bg: #061426;
+  --rg-neo-panel: rgba(10, 35, 67, .72);
+  --rg-neo-panel-strong: rgba(8, 27, 53, .88);
+  --rg-neo-line: rgba(87, 174, 255, .28);
+  --rg-neo-blue: #39a8ff;
+  --rg-neo-cyan: #5ce1ff;
+  --rg-neo-text: #eef8ff;
+  --rg-neo-muted: #a9c4df;
+}
+
+/* Profile surface: replace flat black with layered navy / electric-blue glass. */
+body:has(#root .profile-page),
+#root .profile-page,
+#root .profile-page.rg-account-profile-page,
+#root .profile-page.rg-public-profile-page,
+#root .profile-page.rg-public-account-profile-page {
+  color: var(--rg-neo-text) !important;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(0, 145, 255, .24), transparent 42%),
+    radial-gradient(ellipse at 92% 22%, rgba(35, 91, 255, .18), transparent 38%),
+    linear-gradient(145deg, #071a30 0%, #071222 48%, #030b17 100%) !important;
+}
+#root .profile-page .profile-header,
+#root .profile-page .profile-details,
+#root .profile-page .rg-profile-bio,
+#root .profile-page .rg-public-profile-bio {
+  color: var(--rg-neo-text) !important;
+}
+#root .profile-page .profile-details > p,
+#root .profile-page .profile-stats small {
+  color: var(--rg-neo-muted) !important;
+}
+#root .profile-page .profile-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-flow: column !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+  margin-bottom: 16px !important;
+  border-top: 1px solid var(--rg-neo-line) !important;
+  border-bottom: 1px solid var(--rg-neo-line) !important;
+  background: linear-gradient(110deg, rgba(8, 35, 67, .82), rgba(8, 24, 48, .76)) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+}
+#root .profile-page .profile-tabs > button {
+  display: flex !important;
+  flex: initial !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  padding: 9px 3px !important;
+  gap: 5px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  color: #a9c5e2 !important;
+  font-size: clamp(10px, 2.8vw, 13px) !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+#root .profile-page .profile-tabs > button svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 auto !important;
+}
+#root .profile-page .profile-tabs > button.active {
+  color: #ffffff !important;
+  border-bottom: 2px solid var(--rg-neo-cyan) !important;
+  text-shadow: 0 0 14px rgba(57, 168, 255, .5) !important;
+}
+#root .profile-page .empty,
+#root .profile-page .tab-empty,
+#root .profile-page .empty-tab {
+  color: #b9d5ef !important;
+  background: linear-gradient(145deg, rgba(8, 32, 61, .72), rgba(5, 19, 39, .8)) !important;
+  border: 1px solid var(--rg-neo-line) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 18px 50px rgba(0,0,0,.18) !important;
+  border-radius: 20px !important;
+}
+
+/* Professional dashboard: glass header, glowing blue cards and rows. */
+#root .rg-pro-detail-backdrop {
+  background: rgba(1, 8, 19, .68) !important;
+  backdrop-filter: blur(16px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(145%) !important;
+}
+#root .rg-pro-dashboard-sheet {
+  color: var(--rg-neo-text) !important;
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(0, 153, 255, .28), transparent 43%),
+    radial-gradient(ellipse at 100% 25%, rgba(48, 93, 255, .2), transparent 42%),
+    linear-gradient(145deg, rgba(7, 31, 59, .97), rgba(4, 15, 34, .97)) !important;
+  border: 1px solid rgba(85, 174, 255, .34) !important;
+  box-shadow: 0 25px 90px rgba(0, 0, 0, .52), 0 0 42px rgba(0, 132, 255, .16), inset 0 1px 0 rgba(255,255,255,.09) !important;
+  backdrop-filter: blur(28px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+}
+#root .rg-pro-sheet-header {
+  background: linear-gradient(100deg, rgba(13, 55, 96, .84), rgba(8, 30, 60, .7)) !important;
+  border-bottom: 1px solid rgba(91, 184, 255, .28) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .12) !important;
+}
+#root .rg-pro-sheet-header h2,
+#root .rg-pro-dashboard-group h3 {
+  color: #f2f9ff !important;
+}
+#root .rg-pro-sheet-back,
+#root .rg-pro-sheet-settings {
+  color: #eaf7ff !important;
+  background: rgba(53, 151, 255, .15) !important;
+  border: 1px solid rgba(115, 196, 255, .25) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+#root .rg-pro-dashboard-group {
+  margin: 10px 12px 13px !important;
+  padding: 8px 0 10px !important;
+  border: 1px solid rgba(85, 174, 255, .18) !important;
+  border-radius: 16px !important;
+  background: linear-gradient(130deg, rgba(15, 58, 99, .48), rgba(8, 29, 58, .38)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045), 0 10px 26px rgba(0,0,0,.12) !important;
+}
+#root .rg-pro-dashboard-group h3 {
+  margin-top: 10px !important;
+}
+#root .rg-pro-dashboard-group h3 small,
+#root .rg-pro-dashboard-row > svg:last-child {
+  color: #9bc8ef !important;
+}
+#root .rg-pro-dashboard-row {
+  color: #eaf6ff !important;
+  border-bottom: 1px solid rgba(106, 180, 244, .08) !important;
+  background: transparent !important;
+}
+#root .rg-pro-dashboard-row:active,
+#root .rg-pro-dashboard-row:hover {
+  background: rgba(43, 143, 255, .13) !important;
+}
+#root .rg-pro-row-icon {
+  color: #65c7ff !important;
+}
+#root .rg-pro-dashboard-row em,
+#root .rg-pro-dashboard-sheet .rg-pro-detail-primary {
+  background: linear-gradient(110deg, #168cf4, #315be8) !important;
+  box-shadow: 0 6px 22px rgba(24, 126, 255, .24) !important;
+}
+#root .rg-pro-switch-personal {
+  color: #71caff !important;
+}
+#root .rg-pro-dashboard-disclaimer {
+  color: #9ab6d1 !important;
+}
+
+/* Message composer: keep the placeholder and icon, remove the dark inner input fill. */
+#root .messages-page .instagram-chat .chat-input.instagram-chat-input {
+  background: rgba(5, 19, 37, .68) !important;
+  background-image: none !important;
+  border-top: 1px solid rgba(76, 169, 255, .2) !important;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, .12) !important;
+  backdrop-filter: blur(18px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+}
+#root .messages-page .instagram-chat .chat-message-field {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+#root .messages-page .instagram-chat .chat-message-field > input,
+#root .messages-page .instagram-chat .chat-message-field > input:focus {
+  color: #edf8ff !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+#root .messages-page .instagram-chat .chat-message-field > input::placeholder {
+  color: #9db9d5 !important;
+  opacity: 1 !important;
+}
+#root .messages-page .instagram-chat .chat-smile-button {
+  color: #d8efff !important;
+  background: transparent !important;
+}
+
+@media (max-width: 700px) {
+  #root .profile-page .profile-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    overflow: hidden !important;
+  }
+  #root .profile-page .profile-tabs > button {
+    min-height: 44px !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    font-size: 10px !important;
+    gap: 3px !important;
+  }
+  #root .profile-page .profile-tabs > button svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+
+
+
+/* =========================================================
+   REELSGO PROFILE — FULL VIEWPORT NEO BLUE GLASS FIX
+   Fixes black strips outside the profile content on mobile/desktop.
+   ========================================================= */
+:root { color-scheme: dark; }
+html:has(#root .rg-account-profile-page),
+body:has(#root .rg-account-profile-page) {
+  min-height: 100% !important;
+  background:
+    radial-gradient(ellipse at 14% 5%, rgba(0,145,255,.24), transparent 40%),
+    radial-gradient(ellipse at 88% 28%, rgba(34,91,255,.19), transparent 42%),
+    linear-gradient(150deg,#082747 0%,#061a33 48%,#041226 100%) !important;
+  background-attachment: fixed !important;
+}
+body:has(#root .rg-account-profile-page) #root,
+body:has(#root .rg-account-profile-page) #root .app,
+body:has(#root .rg-account-profile-page) #root .main {
+  min-height: 100dvh !important;
+  background: transparent !important;
+}
+body:has(#root .rg-account-profile-page) #root .main {
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(20,120,255,.12),transparent 58%),
+    linear-gradient(180deg,rgba(5,23,45,.18),rgba(3,14,29,.12)) !important;
+}
+#root .page.profile-page.rg-account-profile-page {
+  position: relative !important;
+  isolation: isolate !important;
+  width: 100% !important;
+  min-height: calc(100dvh - 57px) !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  color: #eff8ff !important;
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(0,145,255,.19),transparent 48%),
+    radial-gradient(ellipse at 100% 32%,rgba(36,95,255,.13),transparent 42%),
+    linear-gradient(155deg,rgba(8,37,69,.94),rgba(5,24,48,.96) 55%,rgba(4,18,37,.98)) !important;
+  border-left: 1px solid rgba(90,181,255,.12) !important;
+  border-right: 1px solid rgba(90,181,255,.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+#root .page.profile-page.rg-account-profile-page .profile-tabs {
+  background: linear-gradient(100deg,rgba(12,53,91,.88),rgba(8,34,69,.88)) !important;
+  border-top: 1px solid rgba(94,190,255,.34) !important;
+  border-bottom: 1px solid rgba(94,190,255,.34) !important;
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+}
+#root .page.profile-page.rg-account-profile-page .profile-grid {
+  background: linear-gradient(135deg,rgba(8,34,64,.65),rgba(5,23,46,.72)) !important;
+}
+#root .page.profile-page.rg-account-profile-page .profile-grid > *,
+#root .page.profile-page.rg-account-profile-page .profile-grid .grid-media,
+#root .page.profile-page.rg-account-profile-page .profile-grid .grid-reel {
+  background-color: rgba(8,34,64,.72) !important;
+}
+body:has(#root .rg-account-profile-page) #root .mobile-header {
+  color: #eff8ff !important;
+  background: linear-gradient(100deg,rgba(6,31,57,.96),rgba(7,27,55,.94)) !important;
+  border-bottom: 1px solid rgba(87,174,255,.25) !important;
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+}
+body:has(#root .rg-account-profile-page) #root .bottom-nav {
+  background: linear-gradient(105deg,rgba(6,28,53,.97),rgba(8,25,52,.97)) !important;
+  border-top: 1px solid rgba(87,174,255,.3) !important;
+  box-shadow: 0 -12px 34px rgba(0,7,20,.24),inset 0 1px 0 rgba(255,255,255,.05) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+}
+body:has(#root .rg-account-profile-page) #root .bottom-nav .nav-mobile,
+body:has(#root .rg-account-profile-page) #root .bottom-nav .mobile-profile {
+  color: #c2ddf5 !important;
+}
+body:has(#root .rg-account-profile-page) #root .bottom-nav .nav-mobile.active,
+body:has(#root .rg-account-profile-page) #root .bottom-nav .mobile-profile.active {
+  color: #ffffff !important;
+}
+@media (max-width:700px) {
+  body:has(#root .rg-account-profile-page) #root .main {
+    padding-bottom: calc(82px + env(safe-area-inset-bottom,0px)) !important;
+  }
+  #root .page.profile-page.rg-account-profile-page {
+    min-height: calc(100dvh - 57px - 82px - env(safe-area-inset-bottom,0px)) !important;
+    max-width: none !important;
+    padding-bottom: 28px !important;
+  }
+  #root .page.profile-page.rg-account-profile-page .profile-tabs {
+    grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+    grid-auto-flow: column !important;
+    overflow: hidden !important;
+  }
+  #root .page.profile-page.rg-account-profile-page .profile-tabs > button {
+    min-width: 0 !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+    font-size: clamp(9px,2.7vw,12px) !important;
+    gap: 3px !important;
+  }
+}
+
+
+
+/* ============================================================
+   REELSGO — NAVIGATION CONTROLS ONLY: NEO BLUE GLASS
+   Keep page/content backgrounds and cards in their existing theme.
+   Only navigation bars, navigation buttons and profile tabs are blue.
+   ============================================================ */
+:root {
+  --rg-nav-blue: #168cff;
+  --rg-nav-cyan: #35d5ff;
+  --rg-nav-glass: rgba(7, 35, 67, .94);
+  --rg-nav-line: rgba(91, 184, 255, .34);
+}
+
+/* Main top navigation */
+#root .mobile-header,
+#root .desktop-header,
+#root .app-header,
+#root .topbar {
+  background: linear-gradient(110deg,rgba(7,39,73,.96),rgba(8,30,65,.96)) !important;
+  border-bottom: 1px solid var(--rg-nav-line) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+}
+
+/* Bottom navigation and desktop navigation controls */
+#root .bottom-nav,
+#root .bottom-navigation,
+#root .mobile-bottom-nav,
+#root .navigation,
+#root .desktop-sidebar,
+#root .sidebar {
+  background: linear-gradient(110deg,rgba(7,35,67,.96),rgba(8,28,58,.96)) !important;
+  border-color: var(--rg-nav-line) !important;
+  backdrop-filter: blur(22px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(160%) !important;
+  box-shadow: 0 8px 28px rgba(0,10,28,.18), inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+
+/* Individual navigation buttons only */
+#root .bottom-nav button,
+#root .bottom-navigation button,
+#root .mobile-bottom-nav button,
+#root .navigation button,
+#root .desktop-sidebar button,
+#root .sidebar button,
+#root .nav-item,
+#root .nav-link {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: #c5def5 !important;
+}
+#root .bottom-nav button.active,
+#root .bottom-navigation button.active,
+#root .mobile-bottom-nav button.active,
+#root .navigation button.active,
+#root .desktop-sidebar button.active,
+#root .sidebar button.active,
+#root .nav-item.active,
+#root .nav-link.active,
+#root .bottom-nav button[aria-current="page"],
+#root .nav-link[aria-current="page"] {
+  color: #ffffff !important;
+  background: linear-gradient(135deg,rgba(22,140,255,.24),rgba(53,213,255,.12)) !important;
+  border: 1px solid rgba(75,180,255,.36) !important;
+  box-shadow: 0 0 18px rgba(22,140,255,.16), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+/* Profile's Posts / Reels / Tagged / Saved navigation row */
+#root .profile-page .profile-tabs,
+#root .rg-account-profile-page .profile-tabs,
+#root .rg-public-account-profile-page .profile-tabs {
+  background: linear-gradient(100deg,rgba(7,39,73,.94),rgba(8,30,65,.94)) !important;
+  border-top: 1px solid var(--rg-nav-line) !important;
+  border-bottom: 1px solid var(--rg-nav-line) !important;
+  backdrop-filter: blur(20px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(155%) !important;
+}
+#root .profile-page .profile-tabs button,
+#root .rg-account-profile-page .profile-tabs button,
+#root .rg-public-account-profile-page .profile-tabs button {
+  color: #c5def5 !important;
+  background: transparent !important;
+}
+#root .profile-page .profile-tabs button.active,
+#root .rg-account-profile-page .profile-tabs button.active,
+#root .rg-public-account-profile-page .profile-tabs button.active {
+  color: #ffffff !important;
+  border-bottom: 2px solid var(--rg-nav-cyan) !important;
+  background: linear-gradient(180deg,rgba(22,140,255,.13),transparent) !important;
+}
+
+/* Do not recolor page content, cards, message areas, forms or backgrounds. */
+
+
+
+/* ============================================================
+   REELSGO SEARCH — ONE CONTINUOUS BLUE BACKGROUND
+   Remove the black band caused by the app/main area showing
+   through below the search page. Scope is SEARCH ROUTE ONLY.
+   ============================================================ */
+:root {
+  --rg-search-bg-top: #082747;
+  --rg-search-bg-mid: #061d38;
+  --rg-search-bg-bottom: #04152b;
+  --rg-search-glass: rgba(8, 39, 72, .92);
+  --rg-search-border: rgba(91, 184, 255, .28);
+}
+html:has(#root .rg-instagram-search-page),
+body:has(#root .rg-instagram-search-page) {
+  min-height: 100dvh !important;
+  background: linear-gradient(155deg,
+    var(--rg-search-bg-top) 0%,
+    var(--rg-search-bg-mid) 54%,
+    var(--rg-search-bg-bottom) 100%) !important;
+  background-attachment: fixed !important;
+}
+body:has(#root .rg-instagram-search-page) #root,
+body:has(#root .rg-instagram-search-page) #root .app {
+  min-height: 100dvh !important;
+  background: linear-gradient(155deg,
+    var(--rg-search-bg-top) 0%,
+    var(--rg-search-bg-mid) 54%,
+    var(--rg-search-bg-bottom) 100%) !important;
+}
+body:has(#root .rg-instagram-search-page) #root .main {
+  min-height: 100dvh !important;
+  background: linear-gradient(155deg,
+    var(--rg-search-bg-top) 0%,
+    var(--rg-search-bg-mid) 54%,
+    var(--rg-search-bg-bottom) 100%) !important;
+  background-attachment: fixed !important;
+}
+#root .main:has(> .rg-instagram-search-page) {
+  min-height: 100dvh !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background: linear-gradient(155deg,
+    var(--rg-search-bg-top) 0%,
+    var(--rg-search-bg-mid) 54%,
+    var(--rg-search-bg-bottom) 100%) !important;
+}
+#root .page.rg-instagram-search-page {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 680px !important;
+  min-height: 100dvh !important;
+  margin: 0 auto !important;
+  padding: 8px 16px calc(100px + env(safe-area-inset-bottom,0px)) !important;
+  color: #eff8ff !important;
+  background: linear-gradient(155deg,
+    var(--rg-search-bg-top) 0%,
+    var(--rg-search-bg-mid) 54%,
+    var(--rg-search-bg-bottom) 100%) !important;
+  background-attachment: fixed !important;
+  border-left: 1px solid rgba(91,184,255,.12) !important;
+  border-right: 1px solid rgba(91,184,255,.12) !important;
+}
+#root .page.rg-instagram-search-page .rg-search-topbar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+#root .page.rg-instagram-search-page .search-box.rg-search-pill {
+  background: linear-gradient(110deg,rgba(24,64,101,.82),rgba(12,43,79,.88)) !important;
+  border: 1px solid var(--rg-search-border) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06),0 6px 20px rgba(0,10,28,.12) !important;
+}
+#root .page.rg-instagram-search-page .recent-profile-wrap {
+  background: rgba(8,39,72,.30) !important;
+  border: 1px solid rgba(91,184,255,.12) !important;
+  border-radius: 14px !important;
+  padding: 7px 10px !important;
+}
+#root .page.rg-instagram-search-page .recent-profile-wrap:hover {
+  background: rgba(15,61,101,.48) !important;
+}
+#root .page.rg-instagram-search-page .recent-searches-section,
+#root .page.rg-instagram-search-page .recent-searches-list,
+#root .page.rg-instagram-search-page .user-list,
+#root .page.rg-instagram-search-page .empty {
+  background: transparent !important;
+}
+#root .page.rg-instagram-search-page .recent-searches-heading h2,
+#root .page.rg-instagram-search-page .recent-profile-row b {
+  color: #f1f8ff !important;
+}
+#root .page.rg-instagram-search-page .recent-profile-row span {
+  color: #a9c4df !important;
+}
+#root .page.rg-instagram-search-page .recent-clear-button {
+  color: #43d5ff !important;
+}
+@media (max-width:700px) {
+  #root .main:has(> .rg-instagram-search-page) {
+    padding-top: 57px !important;
+    padding-bottom: 82px !important;
+  }
+  #root .page.rg-instagram-search-page {
+    min-height: calc(100dvh - 57px - 82px) !important;
+    padding: 8px 8px 20px !important;
+    background: linear-gradient(155deg,
+      var(--rg-search-bg-top) 0%,
+      var(--rg-search-bg-mid) 54%,
+      var(--rg-search-bg-bottom) 100%) !important;
+  }
+  body:has(#root .rg-instagram-search-page) #root .bottom-nav.glass-bottom-nav {
+    background: linear-gradient(155deg,rgba(8,39,72,.97),rgba(4,21,43,.98)) !important;
+    border: 1px solid rgba(91,184,255,.34) !important;
+    box-shadow: 0 8px 26px rgba(0,8,24,.24),inset 0 1px 0 rgba(255,255,255,.06) !important;
+  }
+  body:has(#root .rg-instagram-search-page) #root .bottom-nav.glass-bottom-nav .nav-mobile.active,
+  body:has(#root .rg-instagram-search-page) #root .bottom-nav.glass-bottom-nav .mobile-profile.active {
+    background: rgba(22,140,255,.24) !important;
+    border: 1px solid rgba(91,184,255,.34) !important;
+  }
+}
+
+
+
+/* ============================================================
+   REELSGO FOLLOWERS / FOLLOWING — NEO BLUE GLASS
+   Scoped only to the connections modal opened from profile
+   follower/following counts. Other app screens are untouched.
+   ============================================================ */
+.connections-overlay {
+  background: rgba(1, 10, 24, .72) !important;
+  backdrop-filter: blur(14px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(145%) !important;
+}
+.connections-modal {
+  color: #eff8ff !important;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(22,140,255,.20),transparent 52%),
+    linear-gradient(155deg,rgba(8,39,72,.98),rgba(5,24,48,.99)) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  box-shadow: 0 28px 90px rgba(0,8,24,.58), inset 0 1px 0 rgba(255,255,255,.07) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+}
+.connections-header {
+  background: linear-gradient(110deg,rgba(10,48,85,.96),rgba(7,32,65,.96)) !important;
+  border-bottom: 1px solid rgba(91,184,255,.24) !important;
+}
+.connections-header h2 {
+  color: #f2f9ff !important;
+}
+.connections-header span {
+  color: #a9c8e5 !important;
+}
+.connections-header > button {
+  color: #eaf7ff !important;
+  background: rgba(22,140,255,.17) !important;
+  border: 1px solid rgba(91,184,255,.25) !important;
+}
+.connections-header > button:hover {
+  background: rgba(22,140,255,.30) !important;
+}
+.connections-body,
+.connections-list {
+  color: #eff8ff !important;
+  background: linear-gradient(155deg,rgba(7,34,65,.96),rgba(4,21,43,.98)) !important;
+  scrollbar-color: rgba(91,184,255,.48) rgba(4,21,43,.9) !important;
+}
+.connection-row {
+  color: #eff8ff !important;
+  background: rgba(10,45,80,.28) !important;
+  border-bottom: 1px solid rgba(91,184,255,.15) !important;
+  border-radius: 12px !important;
+  transition: background .18s ease,border-color .18s ease !important;
+}
+.connection-row:hover {
+  background: rgba(22,110,180,.24) !important;
+  border-color: rgba(91,184,255,.28) !important;
+}
+.connection-info a {
+  color: #f2f9ff !important;
+}
+.connection-info > span {
+  color: #a9c8e5 !important;
+}
+.connections-state {
+  color: #b9d3eb !important;
+  background: transparent !important;
+}
+.connections-state b {
+  color: #f2f9ff !important;
+}
+.connections-state span {
+  color: #a9c8e5 !important;
+}
+.connections-spinner {
+  border-color: rgba(91,184,255,.24) !important;
+  border-top-color: #39c9ff !important;
+}
+.connections-error b,
+.connections-error svg {
+  color: #ff8297 !important;
+}
+@media (max-width:700px) {
+  .connections-overlay {
+    background: rgba(1,10,24,.70) !important;
+  }
+  .connections-modal {
+    background:
+      radial-gradient(ellipse at 12% 0%,rgba(22,140,255,.20),transparent 52%),
+      linear-gradient(155deg,rgba(8,39,72,.99),rgba(5,24,48,.99)) !important;
+    border: 1px solid rgba(91,184,255,.30) !important;
+    border-bottom: 0 !important;
+    border-radius: 26px 26px 0 0 !important;
+    box-shadow: 0 -18px 60px rgba(0,8,24,.48), inset 0 1px 0 rgba(255,255,255,.07) !important;
+  }
+  .connections-header,
+  .connections-body,
+  .connections-list {
+    background-color: transparent !important;
+  }
+  .connections-list {
+    padding: 4px 8px calc(16px + env(safe-area-inset-bottom,0px)) !important;
+  }
+  .connection-row {
+    min-height: 72px !important;
+    background: rgba(10,45,80,.24) !important;
+    border-bottom: 1px solid rgba(91,184,255,.15) !important;
+  }
+}
+
+
+
+/* ============================================================
+   REELSGO PROFILE SHEETS — CONSISTENT NEO BLUE GLASS
+   Includes Following options and existing profile action/info
+   sheets only. Does not recolor unrelated app routes.
+   ============================================================ */
+.rg-following-menu-backdrop {
+  position:fixed !important;
+  inset:0 !important;
+  z-index:10050 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:20px !important;
+}
+.rg-following-menu-sheet {
+  width:min(100%,480px) !important;
+  max-height:min(82dvh,760px) !important;
+  overflow-y:auto !important;
+  border-radius:24px !important;
+  padding:10px 0 8px !important;
+}
+.rg-profile-options-backdrop,
+.rg-profile-info-backdrop {
+  background: rgba(1,9,22,.76) !important;
+  backdrop-filter: blur(15px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(145%) !important;
+}
+.rg-following-menu-backdrop {
+  background: rgba(1,9,22,.76) !important;
+  backdrop-filter: blur(15px) saturate(145%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(145%) !important;
+}
+.rg-following-menu-sheet,
+.rg-profile-options-sheet,
+.rg-profile-info-card {
+  color: #eff8ff !important;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(22,140,255,.22),transparent 55%),
+    linear-gradient(155deg,#0a3158 0%,#072544 55%,#041a34 100%) !important;
+  border: 1px solid rgba(91,184,255,.34) !important;
+  box-shadow: 0 24px 76px rgba(0,7,22,.55), inset 0 1px 0 rgba(255,255,255,.07) !important;
+  backdrop-filter: blur(24px) saturate(165%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(165%) !important;
+}
+.rg-following-menu-handle,
+.rg-profile-options-handle,
+.rg-profile-info-handle {
+  background: rgba(174,220,255,.72) !important;
+}
+.rg-following-menu-user {
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:15px 18px 17px !important;
+  border-bottom:1px solid rgba(91,184,255,.20) !important;
+}
+.rg-following-menu-user > div {
+  display:flex !important;
+  flex:1 !important;
+  min-width:0 !important;
+  flex-direction:column !important;
+  gap:3px !important;
+}
+.rg-following-menu-user b { color:#f4faff !important; font-size:15px !important; }
+.rg-following-menu-user span { color:#a9c8e5 !important; font-size:12px !important; }
+.rg-following-menu-user > button {
+  width:38px !important;
+  height:38px !important;
+  border-radius:50% !important;
+  display:grid !important;
+  place-items:center !important;
+  color:#dff3ff !important;
+  background:rgba(22,140,255,.17) !important;
+  border:1px solid rgba(91,184,255,.26) !important;
+}
+.rg-following-menu-item {
+  width:100% !important;
+  min-height:67px !important;
+  padding:0 20px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:16px !important;
+  color:#eaf6ff !important;
+  background:rgba(7,34,64,.22) !important;
+  border:0 !important;
+  border-bottom:1px solid rgba(91,184,255,.15) !important;
+  text-align:left !important;
+  font-size:15px !important;
+}
+.rg-following-menu-item:hover {
+  background:rgba(22,119,197,.25) !important;
+}
+.rg-following-menu-item > span:first-child {
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+}
+.rg-following-menu-item svg { color:#a9dfff !important; flex:0 0 auto !important; }
+.rg-following-menu-item b { color:#eff8ff !important; font-weight:600 !important; }
+.rg-following-menu-trailing { color:#55d4ff !important; }
+.rg-following-menu-item.rg-following-menu-unfollow {
+  color:#ff9eae !important;
+  border-bottom:0 !important;
+}
+.rg-following-menu-item.rg-following-menu-unfollow svg,
+.rg-following-menu-item.rg-following-menu-unfollow b {
+  color:#ff9eae !important;
+}
+.rg-following-menu-item:disabled { opacity:.55 !important; cursor:wait !important; }
+.rg-profile-options-sheet > button,
+.rg-profile-info-card button {
+  color:#eaf6ff !important;
+  background:rgba(7,34,64,.22) !important;
+  border-color:rgba(91,184,255,.15) !important;
+}
+.rg-profile-options-sheet > button:hover,
+.rg-profile-info-card button:hover {
+  background:rgba(22,119,197,.25) !important;
+}
+.rg-profile-options-sheet > button.danger { color:#ff9eae !important; }
+.rg-profile-info-card h2,
+.rg-profile-info-card p,
+.rg-profile-info-card b,
+.rg-profile-info-card span { color:#eff8ff !important; }
+@media(max-width:700px) {
+  .rg-following-menu-backdrop {
+    align-items:flex-end !important;
+    padding:0 !important;
+  }
+  .rg-following-menu-sheet {
+    width:100% !important;
+    max-height:min(82dvh,760px) !important;
+    overflow-y:auto !important;
+    padding:10px 0 calc(12px + env(safe-area-inset-bottom,0px)) !important;
+    border-radius:26px 26px 0 0 !important;
+    border-bottom:0 !important;
+  }
+  .rg-following-menu-item { min-height:68px !important; padding:0 22px !important; }
+}
+
+
+.rg-following-menu-handle {
+  width:42px !important;
+  height:4px !important;
+  border-radius:99px !important;
+  margin:4px auto 8px !important;
+}
+
+
+/* ============================================================
+   REELSGO FINAL PROFILE CONSISTENCY PATCH — NOV 2026
+   One continuous navy-blue profile surface; circular menu avatar.
+   ============================================================ */
+:root {
+  --rg-profile-unified-bg: #071a30;
+  --rg-profile-unified-panel: #0a2747;
+  --rg-profile-unified-line: rgba(91,184,255,.30);
+}
+html:has(#root .rg-public-account-profile-page),
+body:has(#root .rg-public-account-profile-page),
+body:has(#root .rg-account-profile-page) {
+  min-height:100% !important;
+  background:var(--rg-profile-unified-bg) !important;
+  background-image:none !important;
+}
+body:has(#root .rg-public-account-profile-page) #root,
+body:has(#root .rg-public-account-profile-page) #root .app,
+body:has(#root .rg-public-account-profile-page) #root .main,
+body:has(#root .rg-account-profile-page) #root,
+body:has(#root .rg-account-profile-page) #root .app,
+body:has(#root .rg-account-profile-page) #root .main {
+  min-height:100dvh !important;
+  background:var(--rg-profile-unified-bg) !important;
+  background-image:none !important;
+}
+#root .page.profile-page.rg-public-account-profile-page,
+#root .page.profile-page.rg-account-profile-page {
+  min-height:calc(100dvh - 57px) !important;
+  color:#eff8ff !important;
+  background:var(--rg-profile-unified-bg) !important;
+  background-image:none !important;
+  box-shadow:none !important;
+}
+#root .rg-public-account-profile-page .profile-grid,
+#root .rg-public-account-profile-page .profile-tabs,
+#root .rg-public-account-profile-page .rg-public-profile-bio,
+#root .rg-public-account-profile-page .empty,
+#root .rg-public-account-profile-page .tab-empty,
+#root .rg-public-account-profile-page .empty-tab,
+#root .rg-account-profile-page .profile-grid,
+#root .rg-account-profile-page .profile-tabs {
+  background-color:var(--rg-profile-unified-bg) !important;
+}
+#root .rg-public-account-profile-page .profile-grid > *,
+#root .rg-public-account-profile-page .profile-grid .grid-media,
+#root .rg-public-account-profile-page .profile-grid .grid-reel,
+#root .rg-account-profile-page .profile-grid > *,
+#root .rg-account-profile-page .profile-grid .grid-media,
+#root .rg-account-profile-page .profile-grid .grid-reel {
+  background-color:var(--rg-profile-unified-bg) !important;
+}
+body:has(#root .rg-public-account-profile-page) #root .bottom-nav,
+body:has(#root .rg-account-profile-page) #root .bottom-nav {
+  background:#082747 !important;
+  background-image:none !important;
+  border-color:var(--rg-profile-unified-line) !important;
+}
+/* The Avatar component is a flex child. Never let the text-column rule stretch it. */
+.rg-following-menu-user > .rg-following-menu-avatar,
+.rg-following-menu-user > div.avatar {
+  display:block !important;
+  position:relative !important;
+  flex:0 0 48px !important;
+  width:48px !important;
+  min-width:48px !important;
+  max-width:48px !important;
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+  aspect-ratio:1 / 1 !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+}
+.rg-following-menu-user > .rg-following-menu-avatar img,
+.rg-following-menu-user > div.avatar img,
+.rg-following-menu-user > .rg-following-menu-avatar > *,
+.rg-following-menu-user > div.avatar > * {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-width:100% !important;
+  min-height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  aspect-ratio:1 / 1 !important;
+  object-fit:cover !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+}
+.rg-following-menu-user > .rg-following-menu-user-copy {
+  display:flex !important;
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  flex-direction:column !important;
+  gap:3px !important;
+}
+@media(max-width:700px) {
+  #root .page.profile-page.rg-public-account-profile-page,
+  #root .page.profile-page.rg-account-profile-page {
+    min-height:calc(100dvh - 57px - 82px - env(safe-area-inset-bottom,0px)) !important;
+    padding-bottom:28px !important;
+  }
+}
