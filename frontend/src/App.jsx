@@ -9,7 +9,7 @@ import {
   UserMinus, Flag, ChevronRight, Play, Bell, Mic, Smile, Paperclip, Upload,
   SlidersHorizontal, KeyRound, Eye, EyeOff, HelpCircle, Languages, Moon, Sun,
   Link as LinkIcon, AtSign, UserRoundCheck, Smartphone, Mail, CircleUser,
-  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp
+  Clock3, Ban, MessageSquareText, CircleHelp, CircleDashed, AlertTriangle, CameraOff, ChevronUp, ChevronDown, CircleMinus, HeartOff, SendHorizontal, Download, Maximize2, Link2, Handshake, PinOff, QrCode, BadgeCheck, Volume2, VolumeX, Share2, ScanLine, Palette, TrendingUp, Star, BellOff
 } from "lucide-react";
 
 const API = (import.meta.env.VITE_API_URL || "https://reelsgo.onrender.com/api").replace(/\/$/, "");
@@ -5467,6 +5467,11 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   const [followLoading, setFollowLoading] = useState(false);
   const [connectionsOpen, setConnectionsOpen] = useState(null);
   const [profileOptionsOpen, setProfileOptionsOpen] = useState(false);
+  const [followingMenuOpen, setFollowingMenuOpen] = useState(false);
+  const [relationshipBusy, setRelationshipBusy] = useState(false);
+  const [isCloseFriend, setIsCloseFriend] = useState(false);
+  const [isFavourite, setIsFavourite] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [profileAboutOpen, setProfileAboutOpen] = useState(false);
   const [sharedActivityOpen, setSharedActivityOpen] = useState(false);
   const [profileQrOpen, setProfileQrOpen] = useState(false);
@@ -5497,6 +5502,10 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   useEffect(() => {
     setTab("posts");
     setProfileOptionsOpen(false);
+    setFollowingMenuOpen(false);
+    setIsFavourite((() => { try { return (JSON.parse(localStorage.getItem("reelsgo_favourite_users") || "[]")).map(String).includes(String(userId)); } catch { return false; } })());
+    setIsMuted((() => { try { return (JSON.parse(localStorage.getItem("reelsgo_muted_users") || "[]")).map(String).includes(String(userId)); } catch { return false; } })());
+    setIsCloseFriend(false);
     try { setProfileNotifications(JSON.parse(localStorage.getItem("reelsgo_profile_notifications") || "{}")[String(userId)] === true); } catch { setProfileNotifications(false); }
     load();
   }, [userId]);
@@ -5555,10 +5564,26 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
   }
 
   async function toggleFollow() {
-    if (!profile?.user || String(profile.user._id) === String(currentUser?._id)) return;
+    if (!profile?.user || String(profile.user._id) === String(currentUser?._id) || followLoading) return;
+
+    // Following is a menu trigger. Never unfollow immediately from this button.
+    if (profile.followStatus === "accepted") {
+      setFollowingMenuOpen(true);
+      try {
+        const data = await api("/users/me/close-friends");
+        const closeFriends = data.closeFriends || [];
+        setIsCloseFriend(closeFriends.some(item => String(item?._id || item?.user?._id || item) === String(profile.user._id)));
+      } catch {
+        setIsCloseFriend(false);
+      }
+      return;
+    }
+
     setFollowLoading(true);
     try {
-      if (profile.followStatus === "accepted" || profile.followStatus === "pending") {
+      if (profile.followStatus === "pending") {
+        const confirmed = window.confirm("Cancel your follow request?");
+        if (!confirmed) return;
         await api(`/follows/${profile.user._id}`, { method: "DELETE" });
       } else {
         await api(`/follows/${profile.user._id}`, { method: "POST" });
@@ -5569,6 +5594,67 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
     } finally {
       setFollowLoading(false);
     }
+  }
+
+  async function unfollowFromMenu() {
+    if (!profile?.user || relationshipBusy) return;
+    const confirmed = window.confirm(`Unfollow @${profile.user.username || "this account"}?`);
+    if (!confirmed) return;
+    setRelationshipBusy(true);
+    try {
+      await api(`/follows/${profile.user._id}`, { method: "DELETE" });
+      setFollowingMenuOpen(false);
+      await load();
+    } catch (e) {
+      alert(e.message || "Could not unfollow this account.");
+    } finally {
+      setRelationshipBusy(false);
+    }
+  }
+
+  async function toggleCloseFriendFromMenu() {
+    if (!profile?.user || relationshipBusy) return;
+    setRelationshipBusy(true);
+    try {
+      const id = String(profile.user._id);
+      if (isCloseFriend) {
+        const data = await api(`/users/me/close-friends/${encodeURIComponent(id)}`, { method: "DELETE" });
+        setIsCloseFriend((data.closeFriends || []).some(item => String(item?._id || item?.user?._id || item) === id));
+      } else {
+        const data = await api("/users/me/close-friends", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: id })
+        });
+        setIsCloseFriend((data.closeFriends || []).some(item => String(item?._id || item?.user?._id || item) === id) || true);
+      }
+    } catch (e) {
+      alert(e.message || "Could not update Close Friends.");
+    } finally {
+      setRelationshipBusy(false);
+    }
+  }
+
+  function toggleFavouriteFromMenu() {
+    const id = String(profile?.user?._id || "");
+    if (!id) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem("reelsgo_favourite_users") || "[]").map(String);
+      const next = isFavourite ? saved.filter(value => value !== id) : [...new Set([...saved, id])];
+      localStorage.setItem("reelsgo_favourite_users", JSON.stringify(next));
+      setIsFavourite(!isFavourite);
+    } catch {}
+  }
+
+  function toggleMuteFromMenu() {
+    const id = String(profile?.user?._id || "");
+    if (!id) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem("reelsgo_muted_users") || "[]").map(String);
+      const next = isMuted ? saved.filter(value => value !== id) : [...new Set([...saved, id])];
+      localStorage.setItem("reelsgo_muted_users", JSON.stringify(next));
+      setIsMuted(!isMuted);
+    } catch {}
   }
 
   if (loading) {
@@ -5943,7 +6029,7 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
           </div>
           <div className="rg-profile-quick-actions">
             {profile.followStatus === "accepted" ? (
-              <button type="button" onClick={() => { setPublicProfileQuickOpen(false); toggleFollow(); }}>
+              <button type="button" onClick={() => { setPublicProfileQuickOpen(false); setFollowingMenuOpen(true); }}>
                 <span className="rg-profile-quick-action-icon"><UserRoundCheck /></span><span>Following</span>
               </button>
             ) : (
@@ -5963,6 +6049,39 @@ function UserProfilePage({ userId, currentUser, onBack, onMessage }) {
               </button>
             </>}
           </div>
+        </div>,
+        document.body
+      )}
+
+      {followingMenuOpen && !isSelf && createPortal(
+        <div className="rg-following-menu-backdrop" role="dialog" aria-modal="true" aria-label={`Following options for @${u.username}`} onMouseDown={e => { if (e.target === e.currentTarget && !relationshipBusy) setFollowingMenuOpen(false); }}>
+          <section className="rg-following-menu-sheet" onMouseDown={e => e.stopPropagation()}>
+            <div className="rg-following-menu-handle" />
+            <div className="rg-following-menu-user">
+              <Avatar user={u} size={48} className="rg-following-menu-avatar" />
+              <div className="rg-following-menu-user-copy"><b>@{u.username || "user"}</b><span>{u.name || "ReelsGo member"}</span></div>
+              <button type="button" aria-label="Close following options" onClick={() => setFollowingMenuOpen(false)}><X size={20}/></button>
+            </div>
+            <button type="button" className="rg-following-menu-item" disabled={relationshipBusy} onClick={toggleCloseFriendFromMenu}>
+              <span><Users size={21}/><b>{isCloseFriend ? "Remove from Close Friends" : "Add to Close Friends list"}</b></span>
+              <span className="rg-following-menu-trailing">{isCloseFriend ? <Check size={20}/> : <Star size={22}/>}</span>
+            </button>
+            <button type="button" className="rg-following-menu-item" onClick={toggleFavouriteFromMenu}>
+              <span><Star size={21}/><b>{isFavourite ? "Remove from Favourites" : "Add to Favourites"}</b></span>
+              <span className="rg-following-menu-trailing">{isFavourite ? <Check size={20}/> : <Star size={22}/>}</span>
+            </button>
+            <button type="button" className="rg-following-menu-item" onClick={toggleMuteFromMenu}>
+              <span><BellOff size={21}/><b>{isMuted ? "Unmute" : "Mute"}</b></span>
+              <ChevronRight size={21}/>
+            </button>
+            <button type="button" className="rg-following-menu-item" disabled={profileActionBusy} onClick={() => { setFollowingMenuOpen(false); runProfileAction("restrict"); }}>
+              <span><Shield size={21}/><b>Restrict</b></span>
+              <ChevronRight size={21}/>
+            </button>
+            <button type="button" className="rg-following-menu-item rg-following-menu-unfollow" disabled={relationshipBusy} onClick={unfollowFromMenu}>
+              <span><UserMinus size={21}/><b>Unfollow</b></span>
+            </button>
+          </section>
         </div>,
         document.body
       )}
